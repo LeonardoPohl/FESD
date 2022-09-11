@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\Orbbec">
+      <UniqueIdentifier>{b51bdc35-2f94-43b9-a8b6-275f024afdd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -26,5 +29,31 @@
     <None Include="Readme.md">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\Orbbec\en\0000_Overview.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\en\0100_Installation.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\en\0200_Code samples.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\en\0300_SDK knowledge base.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\en\0400_API.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\en\0500_Product Support.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

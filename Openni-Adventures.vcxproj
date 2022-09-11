@@ -147,6 +147,16 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="Readme.md" />
+    <None Include="resources\Orbbec\en\0000_Overview.md" />
+    <None Include="resources\Orbbec\en\0100_Installation.md" />
+    <None Include="resources\Orbbec\en\0200_Code samples.md" />
+    <None Include="resources\Orbbec\en\0300_SDK knowledge base.md" />
+    <None Include="resources\Orbbec\en\0400_API.md" />
+    <None Include="resources\Orbbec\en\0500_Product Support.md" />
+    <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
