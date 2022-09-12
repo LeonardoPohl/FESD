@@ -8,6 +8,8 @@
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
 #include <opencv2/videoio.hpp>  // Video write
 
+#include "DepthCamera.h"
+
 void print_device_info_openni(openni::DeviceInfo deviceInfo);
 
 void initialise_realsense();
