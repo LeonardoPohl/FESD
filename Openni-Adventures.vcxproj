@@ -154,6 +154,7 @@
     <None Include="resources\Orbbec\en\0400_API.md" />
     <None Include="resources\Orbbec\en\0500_Product Support.md" />
     <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf" />
+    <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OpenNI_SDK\Include\OpenNI.h" />

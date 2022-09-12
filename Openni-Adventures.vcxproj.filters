@@ -50,6 +50,9 @@
     <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf">
       <Filter>Resource Files\Orbbec</Filter>
     </None>
+    <None Include="vcpkg.json">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
