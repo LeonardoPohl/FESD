@@ -11,7 +11,7 @@ void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
 OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, std::string window_name){
     this->_device_info = device_info;
 
-    printDeviceInfoOpenni();
+    printDeviceInfo();
 
     //open initialised_devices
     this->rc = this->_device.open(device_info->getUri());
@@ -103,10 +103,9 @@ cv::Mat OrbbecCamera::getFrame() {
 }
 
 // Utils
-void OrbbecCamera::printDeviceInfoOpenni() {
+void OrbbecCamera::printDeviceInfo() {
     printf("---\nDevice: %s\n", this->_device_info->getName());
     printf("URI: %s\n", this->_device_info->getUri());
     printf("USB Product Id: %d\n", this->_device_info->getUsbProductId());
-    printf("USB Vendor Id: %d\n", this->_device_info->getUsbVendorId());
-    printf("Vendor: %s\n\n", this->_device_info->getVendor());
+    printf("Vendor: %s\n", this->_device_info->getVendor());
 }

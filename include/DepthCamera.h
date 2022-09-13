@@ -16,7 +16,7 @@ public:
 	~OrbbecCamera();
 
 	cv::Mat getFrame();
-	void printDeviceInfoOpenni();
+	void printDeviceInfo();
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 
@@ -36,6 +36,7 @@ public:
 	~RealSenseCamera();
 
 	cv::Mat getFrame();
+	void printDeviceInfo();
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
 

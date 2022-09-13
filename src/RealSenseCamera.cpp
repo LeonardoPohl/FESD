@@ -12,9 +12,11 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, std::string windo
 	this->_device = device;
 	this->_pipe = pipeline(*ctx);
 
+	this->printDeviceInfo();
+
 	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	this->_pipe.start(this->_cfg);
-	this->_window_name = window_name;// this->_pipe.get_active_profile().get_stream(RS2_STREAM_DEPTH).unique_id();
+	this->_window_name = window_name;
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -32,4 +34,13 @@ cv::Mat RealSenseCamera::getFrame() {
 
 	// Create OpenCV matrix of size (w,h) from the colorized depth data
 	return cv::Mat(cv::Size(w, h), CV_8UC3, (void*)depth.get_data(), cv::Mat::AUTO_STEP);
+}
+
+
+// Utils
+void RealSenseCamera::printDeviceInfo() {
+	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));
+	printf("Produc Line: %s\n", this->_device->get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+	printf("Serial Number: %s\n", this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	printf("Physical Port: %s\n\n", this->_device->get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
 }
