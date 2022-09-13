@@ -10,7 +10,7 @@
 
 #include "DepthCamera.h"
 
-#define NUM_FRAMES 1000
+#define NUM_FRAMES 500
 
 int main() {
     //initialize openni sdk and rs context
@@ -34,10 +34,16 @@ int main() {
     std::vector<std::string> windows;
     int id = 0;
 
+    for (auto&& dev : rs_devices)
+    {
+        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, "Camera " + std::to_string(id)));
+        windows.push_back("Window " + std::to_string(id++));
+    }
+
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         auto dev = &orbbec_devices[i];
         try {
-            depthCameras.push_back(new OrbbecCamera(dev));
+            depthCameras.push_back(new OrbbecCamera(dev, "Camera " + std::to_string(id)));
             windows.push_back("Window " + std::to_string(id++));
         }
         catch (const std::system_error& ex) {
@@ -45,12 +51,6 @@ int main() {
             std::cout << ex.code().message() << '\n';
             std::cout << ex.what() << '\n';
         }
-    }
-
-    for (auto&& dev : rs_devices)
-    {
-        depthCameras.push_back(new RealSenseCamera(&ctx, &dev));
-        windows.push_back("Window " + std::to_string(id++));
     }
 
     auto count = 0;
@@ -76,6 +76,11 @@ int main() {
     }
 
     //Shutdown
+    std::cout << std::endl;
+
+    for (DepthCamera* cam : depthCameras) {
+        delete cam;
+    }
 
     openni::OpenNI::shutdown();
     

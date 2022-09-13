@@ -2,16 +2,13 @@
 #include <opencv2/highgui.hpp>
 #define READ_WAIT_TIMEOUT 1000
 
-static int sNextId = 0;
-int getNextId() { return ++sNextId; }
-
 using namespace openni;
 
 void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
+OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, std::string window_name){
     this->_device_info = device_info;
 
     printDeviceInfoOpenni();
@@ -19,7 +16,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
     //open initialised_devices
     this->rc = this->_device.open(device_info->getUri());
 
-    this->_window_name = "Orbbec Camera " + std::to_string(getNextId());
+    this->_window_name = window_name;
 
     if (this->rc != STATUS_OK)
     {
@@ -63,7 +60,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    printf("Shutting down %s...\n", this->_window_name);
+    printf("Shutting down Orbbec %s...\n", this->_window_name.c_str());
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
 
@@ -103,44 +100,6 @@ cv::Mat OrbbecCamera::getFrame() {
     //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
     DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
 	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP);
-}
-
-void OrbbecCamera::showFrame() {
-    int changedStreamDummy;
-    VideoStream* pStream = &this->_depth_stream;
-
-    //wait a new frame
-    this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "Wait failed! (timeout is ";
-        error_string += std::to_string(READ_WAIT_TIMEOUT);
-        error_string += " ms)\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //get depth frame
-    this->rc = this->_depth_stream.readFrame(&this->_frame_ref);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "Read failed!\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //check if the frame format is depth frame format
-    if (this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
-    {
-        std::string error_string = "Unexpected frame format!";
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
-
-    cv::Mat image(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC2, pDepth, cv::Mat::AUTO_STEP);
-
-    cv::imshow(this->_window_name, image);
 }
 
 // Utils
