@@ -99,7 +99,7 @@ cv::Mat OrbbecCamera::getFrame() {
     }
     //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
     DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
-	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP);
+	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP) * 10;
 }
 
 // Utils
