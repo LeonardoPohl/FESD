@@ -1,31 +1,55 @@
 #pragma once
-#include <OpenNI.h>
-#include <opencv2/core.hpp>
+#include <OpenNI.h>				// Include OpenNI
+#include <opencv2/core.hpp>		// Include OpenCV
+#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
+#include <stdexcept>
 
 class DepthCamera {
 public:
 	DepthCamera();
 	virtual ~DepthCamera();
 	virtual cv::Mat getFrame();
-	static std::vector<std::string> getAvailableDeviceUri();
 };
 
-class Orbbec : public DepthCamera {
+class OrbbecCamera : public DepthCamera {
 public:
-	Orbbec();
-	Orbbec(std::string uri);
-	~Orbbec();
+	OrbbecCamera();
+	OrbbecCamera(const openni::DeviceInfo *deviceInfo);
+	~OrbbecCamera();
+
 	cv::Mat getFrame();
-	static std::vector<std::string> getAvailableDeviceUri();
+	void printDeviceInfoOpenni();
+
+	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
+
 private:
-	openni::DeviceInfo _deviceInfo;
+	const openni::DeviceInfo* _device_info;
+	openni::Device* _device;
+	openni::VideoStream* _depth_stream;
+	openni::VideoFrameRef _frame_ref;
+	openni::Status rc;
+
 };
 
-class RealSense : public DepthCamera {
+class RealSenseCamera : public DepthCamera {
 public:
-	RealSense();
-	RealSense(std::string uri);
-	~RealSense();
+	RealSenseCamera(rs2::context* ctx);
+	RealSenseCamera(rs2::context* ctx, rs2::device* device);
+	~RealSenseCamera();
+
 	cv::Mat getFrame();
-	static std::vector<std::string> getAvailableDeviceUri();
+	void showFrame();
+
+	static void getAvailableDevices(rs2::context ctx, rs2::device_list* rs_devices);
+
+private:
+	rs2::pipeline _pipe;
+	rs2::context* _ctx		{};
+	rs2::device* _device	{};
+	rs2::config* _cfg		{};
+
+	// Declare depth colorizer for pretty visualization of depth data
+	rs2::colorizer _color_map{};
+
+	cv::String _window_name	{};
 };

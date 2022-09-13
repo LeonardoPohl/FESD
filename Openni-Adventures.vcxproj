@@ -149,7 +149,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Orbbec.cpp" />
+    <ClCompile Include="src\OrbbecCamera.cpp" />
+    <ClCompile Include="src\RealSenseCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

@@ -21,7 +21,10 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Orbbec.cpp">
+    <ClCompile Include="src\OrbbecCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RealSenseCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
