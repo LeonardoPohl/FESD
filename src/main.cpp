@@ -28,22 +28,29 @@ int main() {
     OrbbecCamera::getAvailableDevices(&orbbec_devices);
 
     // Initialise Devices
-    std::vector<DepthCamera> depthCameras;
+    std::vector<DepthCamera*> depthCameras;
     
     for (auto&& dev : rs_devices)
     {
-        depthCameras.push_back(RealSenseCamera(&ctx, &dev));
+        depthCameras.push_back(new RealSenseCamera(&ctx, &dev));
     }
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         auto dev = &orbbec_devices[i];
         try {
-            depthCameras.push_back(OrbbecCamera(dev));
+            depthCameras.push_back(new OrbbecCamera(dev));
         }
         catch (const std::system_error& ex) {
             std::cout << ex.code() << '\n';
             std::cout << ex.code().message() << '\n';
             std::cout << ex.what() << '\n';
+        }
+    }
+
+
+    while (cv::waitKey(1) < 0) {
+        for (DepthCamera* cam : depthCameras) {
+            cam->showFrame();
         }
     }
 

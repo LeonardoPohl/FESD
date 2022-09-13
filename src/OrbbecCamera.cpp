@@ -1,4 +1,5 @@
 #include "DepthCamera.h"
+#include <opencv2/highgui.hpp>
 #define READ_WAIT_TIMEOUT 1000
 
 using namespace openni;
@@ -12,10 +13,10 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
 
     printDeviceInfoOpenni();
 
-    Device current_device;
-
     //open initialised_devices
-    this->rc = this->_device->open(device_info->getUri());
+    this->rc = this->_device.open(device_info->getUri());
+
+    this->_window_name = device_info->getUri();
 
     if (this->rc != STATUS_OK)
     {
@@ -27,9 +28,9 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
 
 
     //create color stream
-    if (this->_device->getSensorInfo(SENSOR_DEPTH) != NULL)
+    if (this->_device.getSensorInfo(SENSOR_DEPTH) != NULL)
     {
-        this->rc = _depth_stream->create(current_device, SENSOR_DEPTH);
+        this->rc = _depth_stream.create(this->_device, SENSOR_DEPTH);
         if (this->rc != STATUS_OK)
         {
             std::string error_string = "Couldn't create depth stream\n";
@@ -43,7 +44,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
     }
 
     //start color stream
-    this->rc = _depth_stream->start();
+    this->rc = _depth_stream.start();
     if (this->rc != STATUS_OK)
     {
         std::string error_string = "Couldn't start depth stream\n";
@@ -59,17 +60,18 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    this->_depth_stream->stop();
-    this->_depth_stream->destroy();
+    this->_depth_stream.stop();
+    this->_depth_stream.destroy();
 
-    this->_device->close();
+    this->_device.close();
 }
 
 cv::Mat OrbbecCamera::getFrame() {
     int changedStreamDummy;
+    VideoStream* pStream = &this->_depth_stream;
 
     //wait a new frame
-    this->rc = OpenNI::waitForAnyStream(&this->_depth_stream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+    this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     if (this->rc != STATUS_OK)
     {
         std::string error_string = "Wait failed! (timeout is ";
@@ -80,7 +82,7 @@ cv::Mat OrbbecCamera::getFrame() {
     }
 
     //get depth frame
-    this->rc = this->_depth_stream->readFrame(&this->_frame_ref);
+    this->rc = this->_depth_stream.readFrame(&this->_frame_ref);
     if (this->rc != STATUS_OK)
     {
         std::string error_string = "Read failed!\n";
@@ -97,6 +99,44 @@ cv::Mat OrbbecCamera::getFrame() {
 
     DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
 	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth);
+}
+
+void OrbbecCamera::showFrame() {
+    int changedStreamDummy;
+    VideoStream* pStream = &this->_depth_stream;
+
+    //wait a new frame
+    this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+    if (this->rc != STATUS_OK)
+    {
+        std::string error_string = "Wait failed! (timeout is ";
+        error_string += std::to_string(READ_WAIT_TIMEOUT);
+        error_string += " ms)\n";
+        error_string += OpenNI::getExtendedError();
+        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
+    }
+
+    //get depth frame
+    this->rc = this->_depth_stream.readFrame(&this->_frame_ref);
+    if (this->rc != STATUS_OK)
+    {
+        std::string error_string = "Read failed!\n";
+        error_string += OpenNI::getExtendedError();
+        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
+    }
+
+    //check if the frame format is depth frame format
+    if (this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
+    {
+        std::string error_string = "Unexpected frame format!";
+        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
+    }
+
+    DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
+
+    cv::Mat image(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth, cv::Mat::AUTO_STEP);
+
+    cv::imshow(this->_window_name, image);
 }
 
 // Utils

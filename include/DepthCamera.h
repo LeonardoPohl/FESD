@@ -6,7 +6,8 @@
 
 class DepthCamera {
 public:
-	cv::Mat getFrame();
+	virtual cv::Mat getFrame() = 0;
+	virtual void showFrame() = 0;
 };
 
 class OrbbecCamera : public DepthCamera {
@@ -15,17 +16,19 @@ public:
 	~OrbbecCamera();
 
 	cv::Mat getFrame();
+	void showFrame();
 	void printDeviceInfoOpenni();
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 
 private:
 	const openni::DeviceInfo* _device_info;
-	openni::Device* _device;
-	openni::VideoStream* _depth_stream;
+	openni::Device _device;
+	openni::VideoStream _depth_stream;
 	openni::VideoFrameRef _frame_ref;
 	openni::Status rc;
 
+	cv::String _window_name{};
 };
 
 class RealSenseCamera : public DepthCamera {

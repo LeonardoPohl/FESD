@@ -1,4 +1,5 @@
 #include "DepthCamera.h"
+#include <opencv2/highgui.hpp>
 
 using namespace rs2;
 
@@ -42,4 +43,6 @@ void RealSenseCamera::showFrame() {
 
 	// Create OpenCV matrix of size (w,h) from the colorized depth data
 	cv::Mat image(cv::Size(w, h), CV_8UC3, (void*)depth.get_data(), cv::Mat::AUTO_STEP);
+
+	cv::imshow(this->_window_name, image);
 }
