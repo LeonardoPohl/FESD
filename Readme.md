@@ -8,6 +8,3 @@ To use the code in this repository some things have to be installed, this might 
 
 - Astra Driver
 - Realsense Driver
-- vcpkg (I did not bother with a manifest yet, might do so in the future)
-  - OpenCV2
-  - Realsense 2
