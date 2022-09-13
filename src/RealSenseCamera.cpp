@@ -18,6 +18,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device) {
 }
 
 RealSenseCamera::~RealSenseCamera() {
+	printf("Shutting down %s...\n", this->_window_name);
 	this->_pipe.stop();
 }
 
@@ -30,7 +31,7 @@ cv::Mat RealSenseCamera::getFrame() {
 	const int h = depth.as<video_frame>().get_height();
 
 	// Create OpenCV matrix of size (w,h) from the colorized depth data
-	return cv::Mat(cv::Size(w, h), CV_8UC3, (void*)depth.get_data());
+	return cv::Mat(cv::Size(w, h), CV_8UC3, (void*)depth.get_data(), cv::Mat::AUTO_STEP);
 }
 
 void RealSenseCamera::showFrame() {

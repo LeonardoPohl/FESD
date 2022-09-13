@@ -2,6 +2,9 @@
 #include <opencv2/highgui.hpp>
 #define READ_WAIT_TIMEOUT 1000
 
+static int sNextId = 0;
+int getNextId() { return ++sNextId; }
+
 using namespace openni;
 
 void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
@@ -16,7 +19,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
     //open initialised_devices
     this->rc = this->_device.open(device_info->getUri());
 
-    this->_window_name = device_info->getUri();
+    this->_window_name = "Orbbec Camera " + std::to_string(getNextId());
 
     if (this->rc != STATUS_OK)
     {
@@ -60,6 +63,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info){
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
+    printf("Shutting down %s...\n", this->_window_name);
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
 
@@ -96,9 +100,9 @@ cv::Mat OrbbecCamera::getFrame() {
         std::string error_string = "Unexpected frame format!";
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
-
+    //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
     DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
-	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth);
+	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP);
 }
 
 void OrbbecCamera::showFrame() {
@@ -134,7 +138,7 @@ void OrbbecCamera::showFrame() {
 
     DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
 
-    cv::Mat image(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth, cv::Mat::AUTO_STEP);
+    cv::Mat image(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC2, pDepth, cv::Mat::AUTO_STEP);
 
     cv::imshow(this->_window_name, image);
 }

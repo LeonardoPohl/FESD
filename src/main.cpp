@@ -10,6 +10,8 @@
 
 #include "DepthCamera.h"
 
+#define NUM_FRAMES 1000
+
 int main() {
     //initialize openni sdk and rs context
     openni::Status rc = openni::OpenNI::initialize();
@@ -29,16 +31,14 @@ int main() {
 
     // Initialise Devices
     std::vector<DepthCamera*> depthCameras;
-    
-    for (auto&& dev : rs_devices)
-    {
-        depthCameras.push_back(new RealSenseCamera(&ctx, &dev));
-    }
+    std::vector<std::string> windows;
+    int id = 0;
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         auto dev = &orbbec_devices[i];
         try {
             depthCameras.push_back(new OrbbecCamera(dev));
+            windows.push_back("Window " + std::to_string(id++));
         }
         catch (const std::system_error& ex) {
             std::cout << ex.code() << '\n';
@@ -47,11 +47,32 @@ int main() {
         }
     }
 
+    for (auto&& dev : rs_devices)
+    {
+        depthCameras.push_back(new RealSenseCamera(&ctx, &dev));
+        windows.push_back("Window " + std::to_string(id++));
+    }
 
-    while (cv::waitKey(1) < 0) {
-        for (DepthCamera* cam : depthCameras) {
-            cam->showFrame();
+    auto count = 0;
+    std::vector<cv::Mat> frames {};
+    cv::Mat result;
+    while (cv::waitKey(1) < 0 && count++ < NUM_FRAMES) {
+        std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
+        try {
+            frames.clear();
+            for (DepthCamera* cam : depthCameras) {
+                frames.push_back(cam->getFrame());
+            }
+
+            for (int i = 0; i < frames.size(); i++) {
+                cv::imshow(windows[i], frames[i]);
+                cv::resizeWindow(windows[i], frames[i].size[1], frames[i].size[0]);
+            }
         }
+        catch (...) {
+            std::cout << " | An Exception occured";
+        }
+        std::cout << std::flush;
     }
 
     //Shutdown
