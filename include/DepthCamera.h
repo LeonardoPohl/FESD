@@ -6,14 +6,11 @@
 
 class DepthCamera {
 public:
-	DepthCamera();
-	virtual ~DepthCamera();
-	virtual cv::Mat getFrame();
+	cv::Mat getFrame();
 };
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera();
 	OrbbecCamera(const openni::DeviceInfo *deviceInfo);
 	~OrbbecCamera();
 
@@ -33,20 +30,19 @@ private:
 
 class RealSenseCamera : public DepthCamera {
 public:
-	RealSenseCamera(rs2::context* ctx);
 	RealSenseCamera(rs2::context* ctx, rs2::device* device);
 	~RealSenseCamera();
 
 	cv::Mat getFrame();
 	void showFrame();
 
-	static void getAvailableDevices(rs2::context ctx, rs2::device_list* rs_devices);
+	static rs2::device_list getAvailableDevices(rs2::context ctx);
 
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx		{};
 	rs2::device* _device	{};
-	rs2::config* _cfg		{};
+	rs2::config _cfg		{};
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};

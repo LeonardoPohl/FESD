@@ -2,15 +2,8 @@
 
 using namespace rs2;
 
-void RealSenseCamera::getAvailableDevices(context ctx, device_list* rs_devices) {
-	*rs_devices = ctx.query_devices();
-}
-
-RealSenseCamera::RealSenseCamera(context* ctx) {
-	this->_ctx = ctx;
-	this->_pipe = pipeline(*ctx);
-	this->_pipe.start();
-	this->_window_name = this->_pipe.get_active_profile().get_stream(RS2_STREAM_DEPTH).unique_id();
+device_list RealSenseCamera::getAvailableDevices(context ctx) {
+	return ctx.query_devices();
 }
 
 RealSenseCamera::RealSenseCamera(context* ctx, device* device) {
@@ -18,8 +11,9 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device) {
 	this->_device = device;
 	this->_pipe = pipeline(*ctx);
 
-	this->_cfg->enable_device(device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	this->_pipe.start(this->_cfg);
+	this->_window_name = this->_pipe.get_active_profile().get_stream(RS2_STREAM_DEPTH).unique_id();
 }
 
 RealSenseCamera::~RealSenseCamera() {

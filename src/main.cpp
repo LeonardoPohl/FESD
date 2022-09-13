@@ -24,14 +24,12 @@ int main() {
     // Get devices
 
     openni::Array<openni::DeviceInfo> orbbec_devices;
-    rs2::device_list rs_devices;
-
-    RealSenseCamera::getAvailableDevices(ctx, &rs_devices);
+    rs2::device_list rs_devices = RealSenseCamera::getAvailableDevices(ctx);
     OrbbecCamera::getAvailableDevices(&orbbec_devices);
 
     // Initialise Devices
     std::vector<DepthCamera> depthCameras;
-
+    
     for (auto&& dev : rs_devices)
     {
         depthCameras.push_back(RealSenseCamera(&ctx, &dev));
