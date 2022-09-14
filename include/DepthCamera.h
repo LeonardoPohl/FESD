@@ -16,7 +16,7 @@ public:
 	~OrbbecCamera() override;
 
 	cv::Mat getFrame() override;
-	void printDeviceInfo();
+	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 
@@ -36,7 +36,7 @@ public:
 	~RealSenseCamera() override;
 
 	cv::Mat getFrame() override;
-	void printDeviceInfo();
+	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
 

@@ -7,20 +7,20 @@ device_list RealSenseCamera::getAvailableDevices(context ctx) {
 	return ctx.query_devices();
 }
 
-RealSenseCamera::RealSenseCamera(context* ctx, device* device, std::string window_name) {
-	this->_ctx = ctx;
-	this->_device = device;
-	this->_pipe = pipeline(*ctx);
+RealSenseCamera::RealSenseCamera(context* ctx, device* device, const char* window_name) : 
+	_pipe(pipeline(*ctx)), 
+	_ctx(ctx), 
+	_device(device), 
+	_window_name(window_name) {
 
 	this->printDeviceInfo();
 
 	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	this->_pipe.start(this->_cfg);
-	this->_window_name = window_name;
 }
 
 RealSenseCamera::~RealSenseCamera() {
-	printf("Shutting down Realsense %s...\n", this->_window_name.c_str());
+	printf("Shutting down [Realsense] %s...\n", this->_window_name.c_str());
 	this->_pipe.stop();
 }
 
@@ -37,7 +37,7 @@ cv::Mat RealSenseCamera::getFrame() {
 }
 
 // Utils
-void RealSenseCamera::printDeviceInfo() {
+void RealSenseCamera::printDeviceInfo() const {
 	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));
 	printf("Produc Line: %s\n", this->_device->get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
 	printf("Serial Number: %s\n", this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
