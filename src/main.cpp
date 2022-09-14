@@ -9,6 +9,7 @@
 #include <opencv2/videoio.hpp>  // Video write
 
 #include "DepthCamera.h"
+#include "CameraCalibration.h"
 
 constexpr int NUM_FRAMES = 500;
 
@@ -67,7 +68,7 @@ int main() {
         try {
             frames.clear();
             for (DepthCamera* cam : depthCameras) {
-                frames.push_back(cam->getFrame());
+                frames.push_back(detectionSpheres(cam->getFrame()));
             }
 
             for (int i = 0; i < frames.size(); i++) {
