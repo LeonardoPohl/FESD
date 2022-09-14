@@ -36,7 +36,6 @@ cv::Mat RealSenseCamera::getFrame() {
 	return cv::Mat(cv::Size(w, h), CV_8UC3, (void*)depth.get_data(), cv::Mat::AUTO_STEP);
 }
 
-
 // Utils
 void RealSenseCamera::printDeviceInfo() {
 	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));

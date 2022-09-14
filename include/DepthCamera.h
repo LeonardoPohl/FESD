@@ -6,16 +6,16 @@
 
 class DepthCamera {
 public:
-	virtual ~DepthCamera() { };
+	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
 };
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo *deviceInfo, std::string window_name);
-	~OrbbecCamera();
+	OrbbecCamera(const openni::DeviceInfo *deviceInfo, const char* window_name);
+	~OrbbecCamera() override;
 
-	cv::Mat getFrame();
+	cv::Mat getFrame() override;
 	void printDeviceInfo();
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
@@ -32,10 +32,10 @@ private:
 
 class RealSenseCamera : public DepthCamera {
 public:
-	RealSenseCamera(rs2::context* ctx, rs2::device* device, std::string window_name);
-	~RealSenseCamera();
+	RealSenseCamera(rs2::context* ctx, rs2::device* device, const char* window_name);
+	~RealSenseCamera() override;
 
-	cv::Mat getFrame();
+	cv::Mat getFrame() override;
 	void printDeviceInfo();
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);

@@ -10,7 +10,7 @@
 
 #include "DepthCamera.h"
 
-#define NUM_FRAMES 500
+constexpr int NUM_FRAMES = 500;
 
 int main() {
     //initialize openni sdk and rs context
@@ -36,15 +36,17 @@ int main() {
 
     for (auto&& dev : rs_devices)
     {
-        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, "Camera " + std::to_string(id)));
-        windows.push_back("Window " + std::to_string(id++));
+        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, ("Camera " + std::to_string(id)).c_str()));
+        windows.push_back("Window " + std::to_string(id));
+        id++;
     }
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         auto dev = &orbbec_devices[i];
         try {
-            depthCameras.push_back(new OrbbecCamera(dev, "Camera " + std::to_string(id)));
-            windows.push_back("Window " + std::to_string(id++));
+            depthCameras.push_back(new OrbbecCamera(dev, ("Camera " + std::to_string(id)).c_str()));
+            windows.push_back("Window " + std::to_string(id));
+            id++;
         }
         catch (const std::system_error& ex) {
             std::cout << ex.code() << '\n';
@@ -56,8 +58,9 @@ int main() {
     auto count = 0;
     std::vector<cv::Mat> frames {};
     cv::Mat result;
-    while (cv::waitKey(1) < 0 && count++ < NUM_FRAMES) {
+    while (cv::waitKey(1) < 0 && count < NUM_FRAMES) {
         std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
+        count++;
         try {
             frames.clear();
             for (DepthCamera* cam : depthCameras) {
