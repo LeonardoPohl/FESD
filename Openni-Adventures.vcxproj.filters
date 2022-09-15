@@ -30,6 +30,9 @@
     <ClCompile Include="src\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
+    <ClCompile Include="src\DepthCamera.cpp">
+      <Filter>Source Files\CameraController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore">
@@ -65,9 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DepthCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CameraCalibration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

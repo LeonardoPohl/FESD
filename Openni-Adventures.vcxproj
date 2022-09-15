@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DepthCamera.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OrbbecCamera.cpp" />
     <ClCompile Include="src\RealSenseCamera.cpp" />
@@ -171,7 +172,6 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CameraCalibration.h" />
     <ClInclude Include="include\DepthCamera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

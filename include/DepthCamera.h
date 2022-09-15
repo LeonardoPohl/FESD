@@ -9,7 +9,7 @@ public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
 
-	virtual std::vector<Vec3f> detectSpheres();
+	virtual std::vector<cv::Vec3f> detectSpheres();
 };
 
 class OrbbecCamera : public DepthCamera {
