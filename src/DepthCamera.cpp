@@ -2,14 +2,15 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/mat.hpp>
+#include <opencv2/core/mat.inl.hpp>
 
 constexpr auto PI = 3.14159;
 
 using namespace cv;
-
 std::vector<Circle*> DepthCamera::detectSpheres() {
-	Mat frame = this->getFrame();
-
+    detectSpheres(this->getFrame());
+}
+std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
     int width = frame.size[0];
     int height = frame.size[1];
 
@@ -30,17 +31,10 @@ std::vector<Circle*> DepthCamera::detectSpheres() {
 
     cvtColor(edge_mat, col, COLOR_GRAY2BGR);
     std::vector<Circle*> res_circles;
-    for (size_t i = 0; i < circles.size(); i++)
-    {
-        Vec3i c = circles[i];
-        Point center = Point(c[0], c[1]);
-        int radius = c[2];
-        res_circles.push_back(new Circle(circles[i], frame.at(c[0], c[1])));
 
-        // circle outline
-        circle(col, center, radius, Scalar(0, 255, 0), FILLED, LINE_AA);
-        // circle center
-        circle(col, center, 1, Scalar(0, 100, 100), 3, LINE_AA);
+    for (Vec3i c : circles)
+    {
+        res_circles.push_back(new Circle(c, frame.at<ushort>(c[0], c[1])));
     }
 
     return res_circles;

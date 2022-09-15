@@ -11,6 +11,10 @@ public:
 	virtual cv::Mat getFrame() = 0;
 
 	virtual std::vector<Circle*> detectSpheres();
+	virtual std::vector<Circle*> detectSpheres(cv::Mat frame);
+private:
+	std::string _window_name{};
+	std::string _camera_name{};
 };
 
 class OrbbecCamera : public DepthCamera {
@@ -29,8 +33,6 @@ private:
 	openni::VideoStream _depth_stream;
 	openni::VideoFrameRef _frame_ref;
 	openni::Status rc;
-
-	std::string _window_name{};
 };
 
 class RealSenseCamera : public DepthCamera {
@@ -51,6 +53,4 @@ private:
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};
-
-	std::string _window_name	{};
 };

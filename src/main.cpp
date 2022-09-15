@@ -9,7 +9,6 @@
 #include <opencv2/videoio.hpp>  // Video write
 
 #include "DepthCamera.h"
-#include "CameraCalibration.h"
 
 constexpr int NUM_FRAMES = 500;
 
@@ -60,18 +59,24 @@ int main() {
     }
 
     auto count = 0;
-    std::vector<cv::Mat> frames {};
+    std::vector<cv::Mat> frames{};
+    std::vector<std::vector<Circle*>> circles{};
     cv::Mat result;
     while (cv::waitKey(1) < 0 && count < NUM_FRAMES) {
         count++;
         std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
         try {
             frames.clear();
+            circles.clear();
             for (DepthCamera* cam : depthCameras) {
-                frames.push_back(detectionSpheres(cam->getFrame()));
+                frames.push_back(cam->getFrame());
+                circles.push_back(cam->detectSpheres(frames.back()));
             }
 
             for (int i = 0; i < frames.size(); i++) {
+                for (Circle const *c : circles[i]) {
+                    c->drawCircle(frames[i]);
+                }
                 cv::imshow(windows[i], frames[i]);
                 cv::resizeWindow(windows[i], frames[i].size[1], frames[i].size[0]);
             }
