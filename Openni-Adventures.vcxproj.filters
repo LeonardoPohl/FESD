@@ -19,6 +19,9 @@
     <Filter Include="Source Files\CameraController">
       <UniqueIdentifier>{4fef71fb-8f55-4ef9-9bd4-22e1ccb00dc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Openni">
+      <UniqueIdentifier>{451d06c9-1dee-40b9-9066-a36ce1bd7ed1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -72,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="include\Circle.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
+      <Filter>Header Files\Openni</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

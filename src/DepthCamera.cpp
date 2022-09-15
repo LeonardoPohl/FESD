@@ -1,6 +1,7 @@
 #include "DepthCamera.h"
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/core/mat.hpp>
 
 constexpr auto PI = 3.14159;
 
@@ -34,7 +35,7 @@ std::vector<Circle*> DepthCamera::detectSpheres() {
         Vec3i c = circles[i];
         Point center = Point(c[0], c[1]);
         int radius = c[2];
-        res_circles.push_back(new Circle(circles[i]));
+        res_circles.push_back(new Circle(circles[i], frame.at(c[0], c[1])));
 
         // circle outline
         circle(col, center, radius, Scalar(0, 255, 0), FILLED, LINE_AA);
