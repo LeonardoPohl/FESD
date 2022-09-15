@@ -1,21 +1,22 @@
-#pragma once
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
+#include "DepthCamera.h"
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 
-#define PI 3.14159
+constexpr auto PI = 3.14159;
 
 using namespace cv;
 
-cv::Mat detectionSpheres(cv::Mat depth_image) {
-    int width = depth_image.size[0];
-    int height = depth_image.size[1];
+void DepthCamera::detectSpheres() {
+	cv::Mat frame = this->getFrame();
+
+    int width = frame.size[0];
+    int height = frame.size[1];
 
     Mat col = Mat::zeros(height, width, IMREAD_COLOR);
-    Mat edge_mat = Mat::zeros(height, width, CV_8UC1); 
+    Mat edge_mat = Mat::zeros(height, width, CV_8UC1);
 
     std::vector<Vec3f> circles;
-    depth_image.convertTo(edge_mat, CV_8UC1);
+    frame.convertTo(edge_mat, CV_8UC1);
     adaptiveThreshold(edge_mat, edge_mat, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 5, 2);
 
     GaussianBlur(edge_mat, edge_mat, Size(9, 9), 2, 2);
@@ -26,7 +27,9 @@ cv::Mat detectionSpheres(cv::Mat depth_image) {
         30, 30,
         10, 40);
 
-    cvtColor(edge_mat, col, COLOR_GRAY2BGR);
+    cvtColor(frame, col, COLOR_GRAY2BGR);
+
+    frame.convertTo(edge_mat, CV_8UC1);
 
     for (size_t i = 0; i < circles.size(); i++)
     {

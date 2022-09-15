@@ -173,7 +173,6 @@
   <ItemGroup>
     <ClInclude Include="include\CameraCalibration.h" />
     <ClInclude Include="include\DepthCamera.h" />
-    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
