@@ -1,5 +1,6 @@
 #pragma once
 #include <opencv2/core.hpp>		// Include OpenCV
+#include <opencv2/imgproc.hpp>
 
 
 class Circle {

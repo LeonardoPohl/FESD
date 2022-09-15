@@ -7,9 +7,11 @@
 constexpr auto PI = 3.14159;
 
 using namespace cv;
+
 std::vector<Circle*> DepthCamera::detectSpheres() {
-    detectSpheres(this->getFrame());
+    return detectSpheres(this->getFrame());
 }
+
 std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
     int width = frame.size[0];
     int height = frame.size[1];
@@ -34,7 +36,8 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
 
     for (Vec3i c : circles)
     {
-        res_circles.push_back(new Circle(c, frame.at<ushort>(c[0], c[1])));
+        //TODO Circle size validation
+        res_circles.push_back(new Circle(c, frame.at<ushort>(c[1], c[0])));
     }
 
     return res_circles;
