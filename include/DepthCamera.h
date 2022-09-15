@@ -3,13 +3,14 @@
 #include <opencv2/core.hpp>		// Include OpenCV
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
+#include <Circle.h>
 
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
 
-	virtual std::vector<cv::Vec3f> detectSpheres();
+	virtual std::vector<Circle*> detectSpheres();
 };
 
 class OrbbecCamera : public DepthCamera {

@@ -6,7 +6,7 @@ constexpr auto PI = 3.14159;
 
 using namespace cv;
 
-std::vector<Vec3f> DepthCamera::detectSpheres() {
+std::vector<Circle*> DepthCamera::detectSpheres() {
 	Mat frame = this->getFrame();
 
     int width = frame.size[0];
@@ -28,12 +28,13 @@ std::vector<Vec3f> DepthCamera::detectSpheres() {
         10, 40);
 
     cvtColor(edge_mat, col, COLOR_GRAY2BGR);
-
+    std::vector<Circle*> res_circles;
     for (size_t i = 0; i < circles.size(); i++)
     {
         Vec3i c = circles[i];
         Point center = Point(c[0], c[1]);
         int radius = c[2];
+        res_circles.push_back(new Circle(circles[i]));
 
         // circle outline
         circle(col, center, radius, Scalar(0, 255, 0), FILLED, LINE_AA);
@@ -41,5 +42,5 @@ std::vector<Vec3f> DepthCamera::detectSpheres() {
         circle(col, center, 1, Scalar(0, 100, 100), 3, LINE_AA);
     }
 
-    return circles;
+    return res_circles;
 }
