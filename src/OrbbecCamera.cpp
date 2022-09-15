@@ -9,9 +9,9 @@ void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, const char *window_name) : 
-    _device_info(device_info), 
-    _window_name(window_name) {
+OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
+    _device_info(device_info),
+    camera_id(camera_id){
     printDeviceInfo();
 
     //open initialised_devices
@@ -59,7 +59,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, const char *window_nam
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    printf("Shutting down [Orbbec] %s...\n", this->_window_name.c_str());
+    printf("Shutting down [Orbbec] %s...\n", this->getCameraName().c_str());
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
 

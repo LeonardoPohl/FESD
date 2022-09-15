@@ -1,5 +1,6 @@
 #include "DepthCamera.h"
 #include <opencv2/highgui.hpp>
+#include <iostream>
 
 using namespace rs2;
 
@@ -7,21 +8,26 @@ device_list RealSenseCamera::getAvailableDevices(context ctx) {
 	return ctx.query_devices();
 }
 
-RealSenseCamera::RealSenseCamera(context* ctx, device* device, const char* window_name) : 
+RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
 	_pipe(pipeline(*ctx)), 
 	_ctx(ctx), 
-	_device(device), 
-	_window_name(window_name) {
-
+	_device(device),
+	camera_id(camera_id) {
 	this->printDeviceInfo();
-
+	
 	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	this->_pipe.start(this->_cfg);
 }
 
 RealSenseCamera::~RealSenseCamera() {
-	printf("Shutting down [Realsense] %s...\n", this->_window_name.c_str());
-	this->_pipe.stop();
+	printf("Shutting down [Realsense] %s...\n", this->getCameraName().c_str()); 
+
+	try {
+		this->_pipe.stop();
+	}
+	catch (...) {
+		std::cout << "An exception occured while shutting down [Realsense] Camera " << this->getCameraName();
+	}
 }
 
 cv::Mat RealSenseCamera::getFrame() {

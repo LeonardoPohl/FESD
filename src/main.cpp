@@ -38,16 +38,16 @@ int main() {
 
     for (auto&& dev : rs_devices)
     {
-        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, ("Camera " + std::to_string(id)).c_str()));
-        windows.push_back("Window Camera " + std::to_string(id));
+        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, id));
+        windows.push_back("Display: Camera " + std::to_string(id));
         id++;
     }
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         auto dev = &orbbec_devices[i];
         try {
-            depthCameras.push_back(new OrbbecCamera(dev, ("Camera " + std::to_string(id)).c_str()));
-            windows.push_back("Window Camera " + std::to_string(id));
+            depthCameras.push_back(new OrbbecCamera(dev, id));
+            windows.push_back("Display: Camera " + std::to_string(id));
             id++;
         }
         catch (const std::system_error& ex) {
@@ -59,30 +59,26 @@ int main() {
     }
 
     auto count = 0;
-    std::vector<cv::Mat> frames{};
+    cv::Mat frame{};
     std::vector<std::vector<Circle*>> circles{};
     cv::Mat result;
     while (cv::waitKey(1) < 0 && count < NUM_FRAMES) {
         count++;
         std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
         try {
-            frames.clear();
-            circles.clear();
             for (DepthCamera* cam : depthCameras) {
-                frames.push_back(cam->getFrame());
-                circles.push_back(cam->detectSpheres(frames.back()));
+                frame = cam->getFrame();
+                for (Circle const* c : cam->detectSpheres(frame)) {
+                    c->drawCircle(frame);
+                }
+
+                cv::imshow(cam->getWindowName(), frame);
+                cv::resizeWindow(cam->getWindowName(), frame.size[1], frame.size[0]);
             }
 
-            for (int i = 0; i < frames.size(); i++) {
-                for (Circle const *c : circles[i]) {
-                    c->drawCircle(frames[i]);
-                }
-                cv::imshow(windows[i], frames[i]);
-                cv::resizeWindow(windows[i], frames[i].size[1], frames[i].size[0]);
-            }
         }
         catch (cv::Exception e) {
-            
+            //TODO: Just shut down error camera
             std::cout << " | " << e.msg;
             shut_down(&depthCameras);
             return 1;
