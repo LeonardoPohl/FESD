@@ -1,6 +1,7 @@
 #include "DepthCamera.h"
 #include <opencv2/highgui.hpp>
-#define READ_WAIT_TIMEOUT 1000
+
+constexpr int READ_WAIT_TIMEOUT = 1000;
 
 using namespace openni;
 
@@ -8,15 +9,13 @@ void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, std::string window_name){
-    this->_device_info = device_info;
-
+OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, const char *window_name) : 
+    _device_info(device_info), 
+    _window_name(window_name) {
     printDeviceInfo();
 
     //open initialised_devices
     this->rc = this->_device.open(device_info->getUri());
-
-    this->_window_name = window_name;
 
     if (this->rc != STATUS_OK)
     {
@@ -28,7 +27,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, std::string window_nam
 
 
     //create color stream
-    if (this->_device.getSensorInfo(SENSOR_DEPTH) != NULL)
+    if (this->_device.getSensorInfo(SENSOR_DEPTH) != nullptr)
     {
         this->rc = _depth_stream.create(this->_device, SENSOR_DEPTH);
         if (this->rc != STATUS_OK)
@@ -60,7 +59,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, std::string window_nam
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    printf("Shutting down Orbbec %s...\n", this->_window_name.c_str());
+    printf("Shutting down [Orbbec] %s...\n", this->_window_name.c_str());
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
 
@@ -98,12 +97,12 @@ cv::Mat OrbbecCamera::getFrame() {
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
     //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
-    DepthPixel* pDepth = (DepthPixel*)this->_frame_ref.getData();
+    auto* pDepth = (DepthPixel*)this->_frame_ref.getData();
 	return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP) * 10;
 }
 
 // Utils
-void OrbbecCamera::printDeviceInfo() {
+void OrbbecCamera::printDeviceInfo() const  {
     printf("---\nDevice: %s\n", this->_device_info->getName());
     printf("URI: %s\n", this->_device_info->getUri());
     printf("USB Product Id: %d\n", this->_device_info->getUsbProductId());

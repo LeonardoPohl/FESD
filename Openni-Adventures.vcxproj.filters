@@ -16,16 +16,25 @@
     <Filter Include="Resource Files\Orbbec">
       <UniqueIdentifier>{b51bdc35-2f94-43b9-a8b6-275f024afdd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\CameraController">
+      <UniqueIdentifier>{4fef71fb-8f55-4ef9-9bd4-22e1ccb00dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Openni">
+      <UniqueIdentifier>{451d06c9-1dee-40b9-9066-a36ce1bd7ed1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\OrbbecCamera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\CameraController</Filter>
     </ClCompile>
     <ClCompile Include="src\RealSenseCamera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\CameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DepthCamera.cpp">
+      <Filter>Source Files\CameraController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,11 +70,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DepthCamera.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Circle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
+      <Filter>Header Files\Openni</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

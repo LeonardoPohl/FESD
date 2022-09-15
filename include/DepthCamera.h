@@ -3,20 +3,23 @@
 #include <opencv2/core.hpp>		// Include OpenCV
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
+#include <Circle.h>
 
 class DepthCamera {
 public:
-	virtual ~DepthCamera() { };
+	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
+
+	virtual std::vector<Circle*> detectSpheres();
 };
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo *deviceInfo, std::string window_name);
-	~OrbbecCamera();
+	OrbbecCamera(const openni::DeviceInfo *deviceInfo, const char* window_name);
+	~OrbbecCamera() override;
 
-	cv::Mat getFrame();
-	void printDeviceInfo();
+	cv::Mat getFrame() override;
+	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 
@@ -32,11 +35,11 @@ private:
 
 class RealSenseCamera : public DepthCamera {
 public:
-	RealSenseCamera(rs2::context* ctx, rs2::device* device, std::string window_name);
-	~RealSenseCamera();
+	RealSenseCamera(rs2::context* ctx, rs2::device* device, const char* window_name);
+	~RealSenseCamera() override;
 
-	cv::Mat getFrame();
-	void printDeviceInfo();
+	cv::Mat getFrame() override;
+	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
 
