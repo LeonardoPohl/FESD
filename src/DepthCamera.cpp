@@ -13,6 +13,10 @@ std::vector<Circle*> DepthCamera::detectSpheres() {
 }
 
 std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
+    if (!this->detect_circles) {
+        return std::vector<Circle*>();
+    }
+
     int width = frame.size[0];
     int height = frame.size[1];
 

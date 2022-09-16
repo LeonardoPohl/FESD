@@ -9,6 +9,7 @@ class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
+	virtual std::string getName() const = 0;
 
 	std::vector<Circle*> detectSpheres();
 	std::vector<Circle*> detectSpheres(cv::Mat frame);
@@ -18,9 +19,16 @@ public:
 	}
 
 	std::string getCameraName() const {
-		return "Camera" + std::to_string(this->camera_id);
+		return this->getName() + " Camera " + std::to_string(this->camera_id);
 	}
 
+	int getCameraId() const {
+		return camera_id;
+	}
+
+	bool detect_circles {true};
+	bool is_enabled{ true };
+	
 private:
 	int camera_id;
 };
@@ -31,9 +39,12 @@ public:
 	~OrbbecCamera() override;
 
 	cv::Mat getFrame() override;
+	std::string getName() const override { return "Orbbec"; }
+
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
+	static std::vector<OrbbecCamera*> initialiseAllDevices();
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
@@ -49,10 +60,12 @@ public:
 	~RealSenseCamera() override;
 
 	cv::Mat getFrame() override;
+	std::string getName() const override { return "Realsense"; }
+
 	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
-
+	static std::vector<RealSenseCamera*> initialiseAllDevices();
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx		{};

@@ -1,5 +1,6 @@
 #include "DepthCamera.h"
 #include <opencv2/highgui.hpp>
+#include <iostream>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
@@ -7,6 +8,28 @@ using namespace openni;
 
 void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
+}
+
+std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices() {
+    openni::Array<openni::DeviceInfo> orbbec_devices;
+    OrbbecCamera::getAvailableDevices(&orbbec_devices);
+
+    std::vector<OrbbecCamera*> depthCameras;
+
+    for (int i = 0; i < orbbec_devices.getSize(); i++) {
+        try {
+            depthCameras.push_back(new OrbbecCamera(&orbbec_devices[i], i));
+            std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
+        }
+        catch (const std::system_error& ex) {
+            std::cout << std::endl << std::endl;
+            std::cout << ex.code() << std::endl;
+            std::cout << ex.code().message() << std::endl;
+            std::cout << ex.what() << std::endl << std::endl;
+        }
+    }
+
+    return depthCameras;
 }
 
 OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
