@@ -26,10 +26,10 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     }
 
 
-    //create color stream
+    //create depth stream
     if (this->_device.getSensorInfo(SENSOR_DEPTH) != nullptr)
     {
-        this->rc = _depth_stream.create(this->_device, SENSOR_DEPTH);
+        this->rc = this->_depth_stream.create(this->_device, SENSOR_DEPTH);
         if (this->rc != STATUS_OK)
         {
             std::string error_string = "Couldn't create depth stream\n";
@@ -42,8 +42,8 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
 
-    //start color stream
-    this->rc = _depth_stream.start();
+    //start depth stream
+    this->rc = this->_depth_stream.start();
     if (this->rc != STATUS_OK)
     {
         std::string error_string = "Couldn't start depth stream\n";
