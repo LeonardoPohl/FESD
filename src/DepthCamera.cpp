@@ -25,11 +25,18 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
 
     GaussianBlur(edge_mat, edge_mat, Size(9, 9), 2, 2);
 
+    int hough_method = HOUGH_GRADIENT;
+    double min_dist = edge_mat.rows / static_cast<double>(16);
+    double param1 = 30;
+    double param2 = 30;
+    int min_radius = 10;
+    int max_radius = 40;
+
     HoughCircles(edge_mat, circles,
-        HOUGH_GRADIENT, 1,
-        edge_mat.rows / static_cast<double>(16),
-        30, 30,
-        10, 40);
+        hough_method, 1,
+        min_dist,
+        param1, param2,
+        min_radius, max_radius);
 
     cvtColor(edge_mat, col, COLOR_GRAY2BGR);
     std::vector<Circle*> res_circles;

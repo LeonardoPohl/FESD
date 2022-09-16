@@ -10,8 +10,8 @@ public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
 
-	virtual std::vector<Circle*> detectSpheres();
-	virtual std::vector<Circle*> detectSpheres(cv::Mat frame);
+	std::vector<Circle*> detectSpheres();
+	std::vector<Circle*> detectSpheres(cv::Mat frame);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
