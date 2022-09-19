@@ -10,7 +10,7 @@ public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getFrame() = 0;
 	virtual std::string getName() const = 0;
-	virtual cv::Point3f pointIn3D(int x, int y, ushort depth) const = 0;
+	virtual cv::Point3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
 	std::vector<Circle*> detectSpheres();
 	std::vector<Circle*> detectSpheres(cv::Mat frame);
@@ -41,7 +41,7 @@ public:
 
 	cv::Mat getFrame() override;
 	std::string getName() const override { return "Orbbec"; }
-	cv::Point3f pointIn3D(int x, int y, ushort depth) const override;
+	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
@@ -63,7 +63,7 @@ public:
 
 	cv::Mat getFrame() override;
 	std::string getName() const override { return "Realsense"; }
-	cv::Point3f pointIn3D(int x, int y, ushort depth) const override;
+	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
