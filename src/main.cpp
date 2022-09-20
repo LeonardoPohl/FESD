@@ -8,6 +8,8 @@
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
 #include <opencv2/videoio.hpp>  // Video write
 
+#include "ImguiBootstrap.h"
+
 #include "DepthCamera.h"
 
 constexpr int NUM_FRAMES = 500;

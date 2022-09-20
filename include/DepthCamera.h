@@ -27,16 +27,16 @@ public:
 		return camera_id;
 	}
 
-	bool detect_circles {true};
+	bool detect_circles{ true };
 	bool is_enabled{ true };
-	
+
 private:
 	int camera_id;
 };
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo *deviceInfo, int camera_id);
+	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
 	cv::Mat getFrame() override;
@@ -71,9 +71,9 @@ public:
 	static std::vector<RealSenseCamera*> initialiseAllDevices();
 private:
 	rs2::pipeline _pipe;
-	rs2::context* _ctx		{};
-	rs2::device* _device	{};
-	rs2::config _cfg		{};
+	rs2::context* _ctx{};
+	rs2::device* _device{};
+	rs2::config _cfg{};
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};

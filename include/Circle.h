@@ -2,14 +2,13 @@
 #include <opencv2/core.hpp>		// Include OpenCV
 #include <opencv2/imgproc.hpp>
 
-
 class Circle {
 public:
 	Circle(cv::Vec3f circle, ushort depth) :
 		center(cv::Point(circle[0], circle[1])),
 		radius(circle[2]),
 		depth(depth) { };
-	~Circle() =default;
+	~Circle() = default;
 
 	void drawCircle(cv::Mat frame) const {
 		// circle outline

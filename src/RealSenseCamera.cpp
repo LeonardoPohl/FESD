@@ -58,6 +58,11 @@ cv::Mat RealSenseCamera::getFrame() {
 	return cv::Mat(cv::Size(w, h), CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP) * 10;
 }
 
+
+cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const {
+	return cv::Point3f();
+}
+
 // Utils
 void RealSenseCamera::printDeviceInfo() const {
 	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));

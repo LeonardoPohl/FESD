@@ -4,6 +4,15 @@
   "version": "0.0.1",
   "dependencies": [
     "opencv",
-    "realsense2"
+    "realsense2",
+    {
+      "name": "imgui",
+      "features": [ "glfw-binding", "opengl3-binding" ]
+    },
+    "glfw3",
+    "glad",
+    "glm",
+    "stb",
+    "opengl"
   ]
 }
