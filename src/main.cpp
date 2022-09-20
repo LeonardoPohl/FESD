@@ -18,27 +18,37 @@ void CameraContext();
 int update(const std::vector<DepthCamera*> *depthCameras);
 
 int main() {
+    //# initialize imgui
+    //##################
+
+    auto glsl_version = imgui::glfw_init();
+    if (!glsl_version) {
+        return 1;
+    }
+
+    auto window = imgui::create_window(*glsl_version);
+    if (!window) {
+        return 1;
+    }
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    
+    // Load Fonts
+    ImGuiIO* io = &ImGui::GetIO();
+    io->Fonts->AddFontDefault();
+    ImFont* roboto_font = io->Fonts->AddFontFromFileTTF("./resources/fonts/Roboto-Medium.ttf", 14.0f);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(2);
+
     //# initialize openni sdk
     //#######################
+
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
     {
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
         return 1;
     }
-    
-    CameraContext();
-
-    //# Shutdown
-    //##########
-
-    std::cout << std::endl;
-
-    openni::OpenNI::shutdown();
-
-    return 0;
-}
-
-void CameraContext() {
 
     //# Camera Initialisation
     //#######################
@@ -58,6 +68,17 @@ void CameraContext() {
     while (cv::waitKey(1) < 0 && count < NUM_FRAMES && !depthCameras.empty()) {
         count++;
         std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
+
+        //# Main Settings Frame
+        //#####################
+
+        ImGui::PushFont(roboto_font);
+        ImGui::Begin("Another Window");
+
+        ImGui::End();
+
+
+
         if (update(&depthCameras) <= 0) {
             std::cout << "All cameras are disabled, terminating now..." << std::endl;
             break;
@@ -70,7 +91,17 @@ void CameraContext() {
     for (DepthCamera* cam : depthCameras) {
         delete cam;
     }
+
+    //# Shutdown
+    //##########
+
+    std::cout << std::endl;
+
+    openni::OpenNI::shutdown();
+
+    return 0;
 }
+
 
 int update(const std::vector<DepthCamera*> *depthCameras) {
     cv::Mat frame;

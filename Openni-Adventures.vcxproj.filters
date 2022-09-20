@@ -44,29 +44,26 @@
     <None Include="Readme.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\Orbbec\en\0000_Overview.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0100_Installation.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0200_Code samples.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0300_SDK knowledge base.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0400_API.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0500_Product Support.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
     <None Include="vcpkg.json">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0000_Overview.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0100_Installation.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0200_Code samples.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0300_SDK knowledge base.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0400_API.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0500_Product Support.md">
+      <Filter>Resource Files\Orbbec</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -59,7 +59,7 @@ namespace imgui {
     {
         // Create window with graphics context
         GLFWwindow* window = glfwCreateWindow(
-            1280, 720, "Dear ImGui GLFW+OpenGL3 example", NULL, NULL);
+            1280, 720, "Camera Calibration Tool", NULL, NULL);
 
         if (window == NULL) {
             return {};
