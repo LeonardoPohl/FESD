@@ -8,13 +8,11 @@
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
 #include <opencv2/videoio.hpp>  // Video write
 
-#include "ImguiBootstrap.h"
-
-#include "DepthCamera.h"
+#include <DepthCamera.h>
+#include <ImguiBootstrap.h>
 
 constexpr int NUM_FRAMES = 500;
 
-void CameraContext();
 int update(const std::vector<DepthCamera*> *depthCameras);
 
 int main() {

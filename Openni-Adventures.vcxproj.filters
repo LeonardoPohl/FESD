@@ -73,11 +73,11 @@
     <ClInclude Include="include\Circle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
-      <Filter>Header Files\Openni</Filter>
-    </ClInclude>
     <ClInclude Include="include\ImguiBootstrap.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
+      <Filter>Header Files\Openni</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
