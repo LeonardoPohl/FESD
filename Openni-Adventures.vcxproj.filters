@@ -79,5 +79,8 @@
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
       <Filter>Header Files\Openni</Filter>
     </ClInclude>
+    <ClInclude Include="include\App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

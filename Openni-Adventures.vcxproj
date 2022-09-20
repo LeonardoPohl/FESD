@@ -172,6 +172,7 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Circle.h" />
     <ClInclude Include="include\DepthCamera.h" />
     <ClInclude Include="include\ImguiBootstrap.h" />
