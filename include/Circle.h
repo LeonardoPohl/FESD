@@ -17,7 +17,6 @@ public:
 		cv::circle(frame, center, 1, cv::Scalar(0, 100, 100), 3, cv::LINE_AA);
 	}
 
-private:
 	cv::Point center;
 	ushort depth;
 	float radius;

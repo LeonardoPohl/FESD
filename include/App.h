@@ -17,11 +17,13 @@
 int update();
 
 std::vector<DepthCamera*> depthCameras;
+ImGuiTableFlags sphereTableFlags = ImGuiTableFlags_Resizable + ImGuiTableFlags_Borders;
 
 int App(std::string_view const &glsl_version) {
 
     //# initialize imgui
     //##################
+
     auto window = imgui::create_window(glsl_version);
     if (!window) {
         return 1;
@@ -77,8 +79,34 @@ int update() {
                 //# Sphere Detection
                 //##################
 
-                for (Circle const* c : cam->detectSpheres(frame)) {
-                    c->drawCircle(frame);
+                if (cam->detect_circles) {
+                    auto spheres = cam->detectSpheres(frame);
+                    ImGui::Text("Detected Spheres: %d", spheres.size());
+                    ImGui::BeginTable("Spheres", 4, sphereTableFlags);
+                    ImGui::TableSetupColumn("");
+                    ImGui::TableSetupColumn("Radius");
+                    ImGui::TableSetupColumn("Position");
+                    ImGui::TableSetupColumn("Distance");
+                    ImGui::TableHeadersRow();
+
+                    for (int i = 0; i < spheres.size(); i++) {
+                        spheres[i]->drawCircle(frame);
+                        if (i < 5) {
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%d", i);
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%f", spheres[i]->radius);
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%d, %d", spheres[i]->center.x, spheres[i]->center.y);
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%d", spheres[i]->depth);
+                        }
+                    }
+                    for (Circle const* c : spheres) {
+                        c->drawCircle(frame);
+                    }
+                    ImGui::EndTable();
                 }
 
                 //# Display window

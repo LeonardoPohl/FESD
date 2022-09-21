@@ -47,8 +47,10 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame) {
 
     for (Vec3i c : circles)
     {
-        //TODO Circle size validation
-        res_circles.push_back(new Circle(c, frame.at<ushort>(c[1], c[0])));
+        if (frame.at<ushort>(c[1], c[0]) > 0 && frame.at<ushort>(c[1], c[0]) < 50000) {
+            //TODO Circle size validation
+            res_circles.push_back(new Circle(c, frame.at<ushort>(c[1], c[0])));
+        }
     }
 
     return res_circles;
