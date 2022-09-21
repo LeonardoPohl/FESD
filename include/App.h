@@ -14,9 +14,9 @@
 #include <DepthCamera.h>
 #include <ImguiBootstrap.h>
 
-constexpr int NUM_FRAMES = 500;
+int update();
 
-int update(const std::vector<DepthCamera*>* depthCameras);
+std::vector<DepthCamera*> depthCameras;
 
 int App(std::string_view const &glsl_version) {
 
@@ -29,16 +29,8 @@ int App(std::string_view const &glsl_version) {
 
     auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    auto font_dir = (std::filesystem::current_path() / "resources" / "fonts" / "Roboto - Medium.ttf").string();
-
-    // Load Fonts
     ImGuiIO* io = &ImGui::GetIO();
     io->Fonts->AddFontDefault();
-    ImFont* roboto_font = io->Fonts->AddFontFromFileTTF(font_dir.c_str(), 14.0f);
-
-    if (roboto_font == nullptr) {
-        return 1;
-    }
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ScaleAllSizes(2);
@@ -46,11 +38,9 @@ int App(std::string_view const &glsl_version) {
     //# Camera Initialisation
     //#######################
 
-    std::vector<DepthCamera*> depthCameras;
-
     auto rs_cameras = RealSenseCamera::initialiseAllDevices();
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices();
-
+    
     depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
 
@@ -58,26 +48,8 @@ int App(std::string_view const &glsl_version) {
     //###########
 
     auto count = 0;
-    while (cv::waitKey(1) < 0 && count < NUM_FRAMES && !depthCameras.empty()) {
-        count++;
-        std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
 
-        //# Main Settings Frame
-        //#####################
-
-        ImGui::PushFont(roboto_font);
-        ImGui::Begin("Another Window");
-
-        ImGui::End();
-
-
-
-        if (update(&depthCameras) <= 0) {
-            std::cout << "All cameras are disabled, terminating now..." << std::endl;
-            break;
-        }
-        std::cout << std::flush;
-    }
+    imgui::loop(*window, clear_color, update);
 
     std::cout << std::endl;
 
@@ -86,44 +58,64 @@ int App(std::string_view const &glsl_version) {
     }
 }
 
-
-int update(const std::vector<DepthCamera*>* depthCameras) {
+int update() {
     cv::Mat frame;
     std::vector<int>::iterator new_end;
     int enabled_cameras = 0;
 
-    for (DepthCamera* cam : *depthCameras) {
-        try {
-            frame = cam->getFrame();
-            for (Circle const* c : cam->detectSpheres(frame)) {
-                c->drawCircle(frame);
+    for (DepthCamera* cam : depthCameras) {
+
+        ImGui::Begin(cam->getCameraName().c_str());
+        ImGui::Checkbox("Enable Camera", &cam->is_enabled);
+
+        if (&cam->is_enabled) {
+            ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
+
+            try {
+                frame = cam->getFrame();
+
+                //# Sphere Detection
+                //##################
+
+                for (Circle const* c : cam->detectSpheres(frame)) {
+                    c->drawCircle(frame);
+                }
+
+                //# Display window
+                //################
+
+                cv::imshow(cam->getWindowName(), frame);
+                cv::resizeWindow(cam->getWindowName(), frame.size[1], frame.size[0]);
+            }
+            catch (cv::Exception e) {
+                std::cout << " | " << e.msg;
+                if (cam->detect_circles) {
+                    cam->detect_circles = false;
+                }
+                else {
+                    cam->is_enabled = false;
+                }
+            }
+            catch (std::exception e) {
+                std::cout << " | " << e.what();
+                if (cam->detect_circles) {
+                    cam->detect_circles = false;
+                }
+                else {
+                    cam->is_enabled = false;
+                }
             }
 
-            cv::imshow(cam->getWindowName(), frame);
-            cv::resizeWindow(cam->getWindowName(), frame.size[1], frame.size[0]);
-        }
-        catch (cv::Exception e) {
-            std::cout << " | " << e.msg;
-            if (cam->detect_circles) {
-                cam->detect_circles = false;
+            if (cam->is_enabled) {
+                enabled_cameras++;
             }
-            else {
-                cam->is_enabled = false;
-            }
-        }
-        catch (std::exception e) {
-            std::cout << " | " << e.what();
-            if (cam->detect_circles) {
-                cam->detect_circles = false;
-            }
-            else {
-                cam->is_enabled = false;
-            }
-        }
 
-        if (cam->is_enabled) {
-            enabled_cameras++;
-        }
+            if (!frame.empty()) {
+
+            }
+        }        
+
+        ImGui::End();
     }
     return enabled_cameras;
 }
