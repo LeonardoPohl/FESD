@@ -4,10 +4,11 @@
 
 class Circle {
 public:
-	Circle(cv::Vec3f circle, ushort depth) :
+	Circle(cv::Vec3f circle, ushort depth, float radius):
 		center(cv::Point(circle[0], circle[1])),
 		radius(circle[2]),
-		depth(depth) { };
+		depth(depth),
+		world_radius(radius) { };
 	~Circle() = default;
 
 	void drawCircle(cv::Mat frame) const {
@@ -20,4 +21,5 @@ public:
 	cv::Point center;
 	ushort depth;
 	float radius;
+	float world_radius;
 };

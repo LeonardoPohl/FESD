@@ -82,5 +82,8 @@
     <ClInclude Include="include\App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

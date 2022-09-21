@@ -1,6 +1,7 @@
 #include "DepthCamera.h"
 #include <opencv2/highgui.hpp>
 #include <iostream>
+#include <exception>
 
 using namespace rs2;
 
@@ -58,8 +59,8 @@ cv::Mat RealSenseCamera::getFrame() {
 	return cv::Mat(cv::Size(w, h), CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP) * 10;
 }
 
-
-cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const {
+cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
+{
 	return cv::Point3f();
 }
 

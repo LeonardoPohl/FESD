@@ -5,6 +5,15 @@
 #include <stdexcept>
 #include <Circle.h>
 
+struct SphereDetectionParameters {
+	float sphere_radius = 50;
+
+	float param1 = 10;
+	float param2 = 10;
+    int min_radius = 0;
+    int max_radius = 10;
+};
+
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
@@ -12,8 +21,8 @@ public:
 	virtual std::string getName() const = 0;
 	virtual cv::Point3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
-	std::vector<Circle*> detectSpheres();
-	std::vector<Circle*> detectSpheres(cv::Mat frame);
+	std::vector<Circle*> detectSpheres(SphereDetectionParameters params);
+	std::vector<Circle*> detectSpheres(cv::Mat frame, SphereDetectionParameters params);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();

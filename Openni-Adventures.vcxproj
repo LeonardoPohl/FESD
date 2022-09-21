@@ -176,6 +176,7 @@
     <ClInclude Include="include\Circle.h" />
     <ClInclude Include="include\DepthCamera.h" />
     <ClInclude Include="include\ImguiBootstrap.h" />
+    <ClInclude Include="include\Utilities.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,8 +16,12 @@
 
 int update();
 
+SphereDetectionParameters params;
+
 std::vector<DepthCamera*> depthCameras;
 ImGuiTableFlags sphereTableFlags = ImGuiTableFlags_Resizable + ImGuiTableFlags_Borders;
+ImGuiIO* io;
+float sphere_radius;
 
 int App(std::string_view const &glsl_version) {
 
@@ -31,7 +35,7 @@ int App(std::string_view const &glsl_version) {
 
     auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    ImGuiIO* io = &ImGui::GetIO();
+    io = &ImGui::GetIO();
     io->Fonts->AddFontDefault();
 
     ImGuiStyle& style = ImGui::GetStyle();
@@ -52,7 +56,7 @@ int App(std::string_view const &glsl_version) {
     auto count = 0;
 
     imgui::loop(*window, clear_color, update);
-
+    
     std::cout << std::endl;
 
     for (DepthCamera* cam : depthCameras) {
@@ -63,7 +67,22 @@ int App(std::string_view const &glsl_version) {
 int update() {
     cv::Mat frame;
     std::vector<int>::iterator new_end;
-    int enabled_cameras = 0;
+    
+    {
+        ImGui::Begin("Global Settings");
+
+        ImGui::SliderFloat("Sphere Radius", &params.sphere_radius, 0, 100);
+        ImGui::SliderInt("Min Circle Radius", &params.min_radius, 0, 100);
+        ImGui::SliderInt("Max Circle Radius", &params.max_radius, 0, 100);
+        ImGui::SliderFloat("Canny edge detector threshold", &params.param1, 0, 100);
+        ImGui::SliderFloat("Accumulator threshold", &params.param2, 0, 100);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+            1000.0f / io->Framerate, io->Framerate);
+
+        ImGui::End();
+    }
+
 
     for (DepthCamera* cam : depthCameras) {
 
@@ -80,11 +99,14 @@ int update() {
                 //##################
 
                 if (cam->detect_circles) {
-                    auto spheres = cam->detectSpheres(frame);
+                    auto spheres = cam->detectSpheres(frame, params);
+
                     ImGui::Text("Detected Spheres: %d", spheres.size());
-                    ImGui::BeginTable("Spheres", 4, sphereTableFlags);
+                    ImGui::BeginTable("Spheres", 5, sphereTableFlags);
+
                     ImGui::TableSetupColumn("");
                     ImGui::TableSetupColumn("Radius");
+                    ImGui::TableSetupColumn("World Radius");
                     ImGui::TableSetupColumn("Position");
                     ImGui::TableSetupColumn("Distance");
                     ImGui::TableHeadersRow();
@@ -98,21 +120,26 @@ int update() {
                             ImGui::TableNextColumn();
                             ImGui::Text("%f", spheres[i]->radius);
                             ImGui::TableNextColumn();
+                            ImGui::Text("%f", spheres[i]->world_radius);
+                            ImGui::TableNextColumn();
                             ImGui::Text("%d, %d", spheres[i]->center.x, spheres[i]->center.y);
                             ImGui::TableNextColumn();
                             ImGui::Text("%d", spheres[i]->depth);
                         }
                     }
-                    for (Circle const* c : spheres) {
-                        c->drawCircle(frame);
-                    }
+
                     ImGui::EndTable();
                 }
 
-                //# Display window
-                //################
+                //# Display image
+                //###############
 
-                cv::imshow(cam->getWindowName(), frame);
+                cv::Mat edge_mat = cv::Mat::zeros(frame.size[1], frame.size[0], CV_8UC1);
+
+                frame.convertTo(edge_mat, CV_8UC1);
+                cv::adaptiveThreshold(edge_mat, edge_mat, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 5, 2);
+
+                cv::imshow(cam->getWindowName(), edge_mat);
                 cv::resizeWindow(cam->getWindowName(), frame.size[1], frame.size[0]);
             }
             catch (cv::Exception e) {
@@ -133,17 +160,8 @@ int update() {
                     cam->is_enabled = false;
                 }
             }
-
-            if (cam->is_enabled) {
-                enabled_cameras++;
-            }
-
-            if (!frame.empty()) {
-
-            }
-        }        
+        }
 
         ImGui::End();
     }
-    return enabled_cameras;
 }
