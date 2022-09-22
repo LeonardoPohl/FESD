@@ -33,7 +33,7 @@ int App(std::string_view const &glsl_version) {
         return 1;
     }
 
-    auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    auto clear_color = ImVec4(0.0f, 0.0f, 0.3f, 1.00f);
 
     io = &ImGui::GetIO();
     io->Fonts->AddFontDefault();
@@ -93,7 +93,7 @@ int update() {
             ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
 
             try {
-                frame = cam->getFrame();
+                frame = cam->getDepthFrame();
 
                 //# Sphere Detection
                 //##################

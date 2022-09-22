@@ -89,7 +89,7 @@ OrbbecCamera::~OrbbecCamera() {
     this->_device.close();
 }
 
-cv::Mat OrbbecCamera::getFrame() {
+cv::Mat OrbbecCamera::getDepthFrame() {
     int changedStreamDummy;
     VideoStream* pStream = &this->_depth_stream;
 

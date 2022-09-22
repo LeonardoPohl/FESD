@@ -17,7 +17,8 @@ struct SphereDetectionParameters {
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
-	virtual cv::Mat getFrame() = 0;
+	virtual cv::Mat getDepthFrame() = 0;
+	virtual cv::Mat getColorFrame() = 0;
 	virtual std::string getName() const = 0;
 	virtual cv::Point3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
@@ -48,7 +49,8 @@ public:
 	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
-	cv::Mat getFrame() override;
+	cv::Mat getDepthFrame() override;
+	cv::Mat getColorFrame() override;
 	std::string getName() const override { return "Orbbec"; }
 	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 
@@ -70,7 +72,8 @@ public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, int camera_id);
 	~RealSenseCamera() override;
 
-	cv::Mat getFrame() override;
+	cv::Mat getDepthFrame() override;
+	cv::Mat getColorFrame() override;
 	std::string getName() const override { return "Realsense"; }
 	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 

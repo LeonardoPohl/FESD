@@ -8,7 +8,7 @@
 using namespace cv;
 
 std::vector<Circle*> DepthCamera::detectSpheres(SphereDetectionParameters params) {
-    return detectSpheres(this->getFrame(), params);
+    return detectSpheres(this->getDepthFrame(), params);
 }
 
 std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParameters params) {

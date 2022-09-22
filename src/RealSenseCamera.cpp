@@ -31,7 +31,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
 	_device(device),
 	camera_id(camera_id) {
 	this->printDeviceInfo();
-	
+	this->_device->query_sensors();
 	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	this->_pipe.start(this->_cfg);
 }
@@ -61,7 +61,15 @@ cv::Mat RealSenseCamera::getFrame() {
 
 cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
 {
-	return cv::Point3f();
+	float pixel[3] = { x, y, depth };
+	rs2_intrinsics* intrinsics;
+	rs2_stream_profile* profile;
+	//rs2_open(, profile, this->roc);
+	//rs2_get_video_stream_intrinsics(RS2_STREAM_DEPTH, intrinsics);
+	//rs2_deproject_pixel_to_point(pt, intrinsics)
+	cv::Point3f pt;
+	//CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt.x, &pt.y, &pt.z);
+	return pt;
 }
 
 // Utils
