@@ -4,6 +4,7 @@
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
 #include <Circle.h>
+#include <WalkingAverage.h>
 
 struct SphereDetectionParameters {
 	float sphere_radius = 50;
@@ -12,6 +13,9 @@ struct SphereDetectionParameters {
 	float param2 = 10;
     int min_radius = 0;
     int max_radius = 10;
+
+	bool simple_edge_detection = true;
+	float edge_depth_diff = 20;
 };
 
 class DepthCamera {
@@ -41,7 +45,7 @@ public:
 	bool detect_circles{ true };
 	bool show_color_stream{ true };
 	bool is_enabled{ true };
-
+	WalkingAverageMatrix walkingFrames {};
 private:
 	int camera_id;
 };

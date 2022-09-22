@@ -178,6 +178,7 @@
     <ClInclude Include="include\DepthCamera.h" />
     <ClInclude Include="include\ImguiBootstrap.h" />
     <ClInclude Include="include\Utilities.h" />
+    <ClInclude Include="include\WalkingAverage.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

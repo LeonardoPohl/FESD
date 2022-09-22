@@ -24,20 +24,40 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParame
 
     std::vector<Vec3f> circles;
     frame.convertTo(edge_mat, CV_8UC1);
-    adaptiveThreshold(edge_mat, edge_mat, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 5, 2);
 
-    GaussianBlur(edge_mat, edge_mat, Size(9, 9), 2, 2);
+    if (params.simple_edge_detection) {
+        adaptiveThreshold(edge_mat, edge_mat, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 5, 2);
+    }
+    else {
+        for (int w = 1; w < width-1; w++) {
+            for (int h = 1; h < height-1; h++) {
+                if (std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w - 1, h - 1)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w - 1, h + 0)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w - 1, h + 1)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w + 0, h - 1)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w + 0, h + 1)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w + 1, h - 1)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w + 1, h + 0)) > params.edge_depth_diff ||
+                    std::abs(frame.at<unsigned char>(w, h) - frame.at<unsigned char>(w + 1, h + 1)) > params.edge_depth_diff) {
+                    edge_mat.at<unsigned char>(w, h) = 255;
+                }
+            }
+        }
+    }
+
+
+    cv::GaussianBlur(edge_mat, edge_mat, Size(9, 9), 2, 2);
 
     int hough_method = HOUGH_GRADIENT;
     double min_dist = edge_mat.rows / static_cast<double>(16);
 
-    HoughCircles(edge_mat, circles,
+    cv::HoughCircles(edge_mat, circles,
         hough_method, 1,
         min_dist,
         params.param1, params.param2,
         params.min_radius, params.max_radius);
 
-    cvtColor(edge_mat, col, COLOR_GRAY2BGR);
+    cv::cvtColor(edge_mat, col, COLOR_GRAY2BGR);
     std::vector<Circle*> res_circles;
 
     for (Vec3i c : circles)

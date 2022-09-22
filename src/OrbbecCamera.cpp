@@ -34,7 +34,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices() {
 
 OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     _device_info(device_info),
-    camera_id(camera_id){
+    camera_id(camera_id) {
     printDeviceInfo();
 
     //# Open initialised_devices
@@ -154,7 +154,6 @@ cv::Mat OrbbecCamera::getDepthFrame() {
         std::string error_string = "Unexpected frame format!";
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
-
     //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
     auto* pDepth = (DepthPixel*)this->_frame_ref.getData();
     return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP) * 10;
@@ -169,7 +168,7 @@ cv::Mat OrbbecCamera::getColorFrame() {
     this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     if (this->rc != STATUS_OK)
     {
-        std::string error_string = "Wait failed! (timeout is ";
+        std::string error_string = "hhuhiWait failed! (timeout is ";
         error_string += std::to_string(READ_WAIT_TIMEOUT);
         error_string += " ms)\n";
         error_string += OpenNI::getExtendedError();
