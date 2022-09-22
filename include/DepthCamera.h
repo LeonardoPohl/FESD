@@ -19,7 +19,8 @@ public:
 	virtual ~DepthCamera() = default;
 	virtual cv::Mat getDepthFrame() = 0;
 	virtual cv::Mat getColorFrame() = 0;
-	virtual std::string getName() const = 0;
+	virtual std::string getName() const = 0; 
+	virtual bool hasColorStream() = 0;
 	virtual cv::Point3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
 	std::vector<Circle*> detectSpheres(SphereDetectionParameters params);
@@ -38,6 +39,7 @@ public:
 	}
 
 	bool detect_circles{ true };
+	bool show_color_stream{ true };
 	bool is_enabled{ true };
 
 private:
@@ -51,6 +53,7 @@ public:
 
 	cv::Mat getDepthFrame() override;
 	cv::Mat getColorFrame() override;
+	bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
 	std::string getName() const override { return "Orbbec"; }
 	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 
@@ -62,6 +65,7 @@ private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
 	openni::VideoStream _depth_stream;
+	openni::VideoStream _color_stream;
 	openni::VideoFrameRef _frame_ref;
 	openni::Status rc;
 	int camera_id;
@@ -74,6 +78,7 @@ public:
 
 	cv::Mat getDepthFrame() override;
 	cv::Mat getColorFrame() override;
+	bool hasColorStream() { return true; };
 	std::string getName() const override { return "Realsense"; }
 	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
 

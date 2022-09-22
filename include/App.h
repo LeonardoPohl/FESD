@@ -14,7 +14,7 @@
 #include <DepthCamera.h>
 #include <ImguiBootstrap.h>
 
-int update();
+void update();
 
 SphereDetectionParameters params;
 
@@ -64,8 +64,8 @@ int App(std::string_view const &glsl_version) {
     }
 }
 
-int update() {
-    cv::Mat frame;
+void update() {
+    cv::Mat depth_frame, color_frame;
     std::vector<int>::iterator new_end;
     
     {
@@ -83,23 +83,25 @@ int update() {
         ImGui::End();
     }
 
-
     for (DepthCamera* cam : depthCameras) {
-
         ImGui::Begin(cam->getCameraName().c_str());
         ImGui::Checkbox("Enable Camera", &cam->is_enabled);
 
-        if (&cam->is_enabled) {
+        if (cam->is_enabled) {
             ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
 
+            if (cam->hasColorStream()) {
+                ImGui::Checkbox("Color Stream", &cam->show_color_stream);
+            }
+            
             try {
-                frame = cam->getDepthFrame();
+                depth_frame = cam->getDepthFrame();
 
                 //# Sphere Detection
                 //##################
 
                 if (cam->detect_circles) {
-                    auto spheres = cam->detectSpheres(frame, params);
+                    auto spheres = cam->detectSpheres(depth_frame, params);
 
                     ImGui::Text("Detected Spheres: %d", spheres.size());
                     ImGui::BeginTable("Spheres", 5, sphereTableFlags);
@@ -112,7 +114,7 @@ int update() {
                     ImGui::TableHeadersRow();
 
                     for (int i = 0; i < spheres.size(); i++) {
-                        spheres[i]->drawCircle(frame);
+                        spheres[i]->drawCircle(depth_frame);
                         if (i < 5) {
                             ImGui::TableNextRow();
                             ImGui::TableNextColumn();
@@ -131,16 +133,22 @@ int update() {
                     ImGui::EndTable();
                 }
 
+                if (cam->show_color_stream) {
+                    color_frame = cam->getColorFrame();
+                    cv::imshow(cam->getWindowName() + " - Color Stream", color_frame);
+                    cv::resizeWindow(cam->getWindowName() + " - Color Stream", color_frame.size[1], color_frame.size[0]);
+                }
+
                 //# Display image
                 //###############
 
-                cv::Mat edge_mat = cv::Mat::zeros(frame.size[1], frame.size[0], CV_8UC1);
+                cv::Mat edge_mat = cv::Mat::zeros(depth_frame.size[1], depth_frame.size[0], CV_8UC1);
 
-                frame.convertTo(edge_mat, CV_8UC1);
+                depth_frame.convertTo(edge_mat, CV_8UC1);
                 cv::adaptiveThreshold(edge_mat, edge_mat, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 5, 2);
 
                 cv::imshow(cam->getWindowName(), edge_mat);
-                cv::resizeWindow(cam->getWindowName(), frame.size[1], frame.size[0]);
+                cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);
             }
             catch (cv::Exception e) {
                 std::cout << " | " << e.msg;
