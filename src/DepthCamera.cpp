@@ -20,7 +20,7 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParame
     int height = frame.size[1];
 
     Mat col = Mat::zeros(height, width, IMREAD_COLOR);
-    Mat edge_mat = detectEdges(frame, params);
+    Mat edge_mat = DepthCamera::detectEdges(frame, params);
 
     std::vector<Vec3f> circles;
 
@@ -51,4 +51,51 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParame
     }
 
     return res_circles;
+}
+
+void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, SphereDetectionParameters params, bool display_edges) {
+    auto spheres = this->detectSpheres(depth_frame, params);
+
+    ImGui::Text("Detected Spheres: %d", spheres.size());
+    ImGui::BeginTable("Spheres", 5, ImGuiTableFlags_Resizable + ImGuiTableFlags_Borders);
+
+    ImGui::TableSetupColumn("");
+    ImGui::TableSetupColumn("Radius");
+    ImGui::TableSetupColumn("World Radius");
+    ImGui::TableSetupColumn("Position");
+    ImGui::TableSetupColumn("Distance");
+    ImGui::TableHeadersRow();
+
+    for (int i = 0; i < spheres.size(); i++) {
+        spheres[i]->drawCircle(depth_frame);
+        if (display_edges) {
+            spheres[i]->drawCircle(edge_frame);
+        }
+        if (i < 5) {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", i);
+            ImGui::TableNextColumn();
+            ImGui::Text("%f", spheres[i]->radius);
+            ImGui::TableNextColumn();
+            ImGui::Text("%f", spheres[i]->world_radius);
+            ImGui::TableNextColumn();
+            ImGui::Text("%d, %d", spheres[i]->center.x, spheres[i]->center.y);
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", spheres[i]->depth);
+        }
+    }
+
+    ImGui::EndTable();
+}
+
+
+cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, SphereDetectionParameters params) {
+    cv::Mat edge_mat = cv::Mat::zeros(depth_frame.size[1], depth_frame.size[0], CV_8UC1);
+    if (depth_frame.empty()) {
+        return edge_mat;
+    }
+    depth_frame.convertTo(edge_mat, CV_8UC1);
+    cv::adaptiveThreshold(edge_mat, edge_mat, 255, params.adapriveThresholdType, params.thresholdType, 5, 2);
+    return edge_mat;
 }

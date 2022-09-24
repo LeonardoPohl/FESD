@@ -1,7 +1,5 @@
 #pragma once
 
-#include <OpenNI.h>
-
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -12,10 +10,11 @@
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
 #include <opencv2/videoio.hpp>  // Video write
 
+#include <OpenNI.h>
+
 #include <DepthCamera.h>
 #include <ImguiBootstrap.h>
 #include <SphereDetectionParameters.h>
-#include <Utilities.h>
 
 void update();
 void initAllCameras();
@@ -142,7 +141,7 @@ void update() {
                 //###############
 
                 if (display_edges) {
-                    cam->walkingEdges.enqueue(detectEdges(depth_frame, params));
+                    cam->walkingEdges.enqueue(DepthCamera::detectEdges(depth_frame, params));
                     edge_frame = cam->walkingEdges.getValue();
                 }
 
@@ -150,7 +149,7 @@ void update() {
                 //##################
 
                 if (cam->detect_circles) {
-                    showSphereTable(cam, depth_frame, edge_frame, params, display_edges);
+                    cam->displaySphereTable(depth_frame, edge_frame, params, display_edges);
                 }
 
                 cv::imshow(cam->getWindowName() + " Edges", edge_frame);

@@ -3,9 +3,9 @@
 #include <opencv2/core.hpp>		// Include OpenCV
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
+
 #include <Circle.h>
 #include <WalkingAverage.h>
-
 #include <SphereDetectionParameters.h>
 
 class DepthCamera {
@@ -19,6 +19,10 @@ public:
 
 	std::vector<Circle*> detectSpheres(SphereDetectionParameters params);
 	std::vector<Circle*> detectSpheres(cv::Mat frame, SphereDetectionParameters params);
+
+	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, SphereDetectionParameters params, bool display_edges);
+
+	static cv::Mat detectEdges(cv::Mat depth_frame, SphereDetectionParameters params);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
