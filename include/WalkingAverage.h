@@ -4,8 +4,7 @@
 
 class WalkingAverageMatrix {
 public:
-	WalkingAverageMatrix() : length(500) {}
-	WalkingAverageMatrix(int size) : length(size) {}
+	WalkingAverageMatrix() {}
 
 	cv::Mat getValue() {
 		std::queue<cv::Mat> q_copy = q;
@@ -38,5 +37,5 @@ public:
 	}
 
 	std::queue<cv::Mat> q;
-	int length;
+	int length {100};
 };

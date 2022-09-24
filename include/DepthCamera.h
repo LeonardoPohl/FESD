@@ -6,17 +6,7 @@
 #include <Circle.h>
 #include <WalkingAverage.h>
 
-struct SphereDetectionParameters {
-	float sphere_radius = 50;
-
-	float param1 = 10;
-	float param2 = 10;
-    int min_radius = 0;
-    int max_radius = 10;
-
-	bool simple_edge_detection = true;
-	float edge_depth_diff = 20;
-};
+#include <SphereDetectionParameters.h>
 
 class DepthCamera {
 public:
@@ -42,10 +32,11 @@ public:
 		return camera_id;
 	}
 
-	bool detect_circles{ true };
-	bool show_color_stream{ true };
+	bool detect_circles{ false };
+	bool show_color_stream{ false };
 	bool is_enabled{ true };
-	WalkingAverageMatrix walkingFrames {};
+	WalkingAverageMatrix walkingFrames{};
+	WalkingAverageMatrix walkingEdges{};
 private:
 	int camera_id;
 };

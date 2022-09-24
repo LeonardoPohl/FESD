@@ -14,14 +14,15 @@
 
 #include <DepthCamera.h>
 #include <ImguiBootstrap.h>
+#include <SphereDetectionParameters.h>
+#include <Utilities.h>
 
 void update();
 void initAllCameras();
 
-SphereDetectionParameters params;
+SphereDetectionParameters params {};
 
 std::vector<DepthCamera*> depthCameras;
-ImGuiTableFlags sphereTableFlags = ImGuiTableFlags_Resizable + ImGuiTableFlags_Borders;
 ImGuiIO* io;
 float sphere_radius;
 bool display_edges = false;
@@ -72,24 +73,25 @@ void initAllCameras() {
 }
 
 void update() {
-    cv::Mat depth_frame, color_frame, frame;
+    cv::Mat depth_frame, edge_frame, color_frame, frame;
     std::vector<int>::iterator new_end;
-    
+    bool reset_walking_frames = false;
     {
         ImGui::Begin("Global Settings");
         ImGui::Text("%d Devices Available", depthCameras.size());
 
-        ImGui::SliderFloat("Sphere Radius", &params.sphere_radius, 0, 100);
-        ImGui::SliderInt("Min Circle Radius", &params.min_radius, 0, 100);
-        ImGui::SliderInt("Max Circle Radius", &params.max_radius, 0, 100);
-        ImGui::SliderFloat("Canny edge detector threshold", &params.param1, 0, 100);
-        ImGui::SliderFloat("Accumulator threshold", &params.param2, 0, 100);
+        ImGui::Text("");
+
+        for (DepthCamera* cam : depthCameras) {
+            ImGui::SameLine();
+            ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
+        }
+
+        params.displayParameters();
 
         ImGui::Checkbox("Display edges", &display_edges);
-        ImGui::Checkbox("Use Walking Average", &walking_average);
-        ImGui::Checkbox("Simple Edge Detection", &params.simple_edge_detection);
-        ImGui::SliderFloat("Edge Difference Threshold", &params.edge_depth_diff, 10, 1000);
-        
+
+        reset_walking_frames |= ImGui::Checkbox("Use Walking Average", &walking_average);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
             1000.0f / io->Framerate, io->Framerate);
@@ -97,13 +99,21 @@ void update() {
         ImGui::End();
     }
 
-    for (DepthCamera* cam : depthCameras) {
-        ImGui::Begin(cam->getCameraName().c_str());
-        ImGui::Checkbox("Enable Camera", &cam->is_enabled);
+    if (reset_walking_frames) {
+        for (DepthCamera* cam : depthCameras) {
+            cam->walkingFrames.reset();
+            cam->walkingEdges.reset();
+        }
+    }
 
+    for (DepthCamera* cam : depthCameras) {
+        ImGui::Begin(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled) {
-            if (ImGui::Button("Flush Moving Average")) {
-                cam->walkingFrames.reset();
+            if (walking_average) {
+                if (ImGui::Button("Flush Moving Average")) {
+                    cam->walkingFrames.reset();
+                }
+                ImGui::SliderInt("Moving Average Length", &cam->walkingFrames.length, 0, 100);
             }
             ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
 
@@ -116,44 +126,10 @@ void update() {
             
             try {
                 depth_frame = cam->getDepthFrame();
+
                 if (walking_average) {
                     cam->walkingFrames.enqueue(depth_frame);
                     depth_frame = cam->walkingFrames.getValue();
-                }
-                //# Sphere Detection
-                //##################
-
-                if (cam->detect_circles) {
-                    auto spheres = cam->detectSpheres(depth_frame, params);
-
-                    ImGui::Text("Detected Spheres: %d", spheres.size());
-                    ImGui::BeginTable("Spheres", 5, sphereTableFlags);
-
-                    ImGui::TableSetupColumn("");
-                    ImGui::TableSetupColumn("Radius");
-                    ImGui::TableSetupColumn("World Radius");
-                    ImGui::TableSetupColumn("Position");
-                    ImGui::TableSetupColumn("Distance");
-                    ImGui::TableHeadersRow();
-
-                    for (int i = 0; i < spheres.size(); i++) {
-                        spheres[i]->drawCircle(depth_frame);
-                        if (i < 5) {
-                            ImGui::TableNextRow();
-                            ImGui::TableNextColumn();
-                            ImGui::Text("%d", i);
-                            ImGui::TableNextColumn();
-                            ImGui::Text("%f", spheres[i]->radius);
-                            ImGui::TableNextColumn();
-                            ImGui::Text("%f", spheres[i]->world_radius);
-                            ImGui::TableNextColumn();
-                            ImGui::Text("%d, %d", spheres[i]->center.x, spheres[i]->center.y);
-                            ImGui::TableNextColumn();
-                            ImGui::Text("%d", spheres[i]->depth);
-                        }
-                    }
-
-                    ImGui::EndTable();
                 }
 
                 if (cam->show_color_stream) {
@@ -166,36 +142,22 @@ void update() {
                 //###############
 
                 if (display_edges) {
-                    cv::Mat edge_mat = cv::Mat::zeros(depth_frame.size[1], depth_frame.size[0], CV_8UC1);
-
-                    depth_frame.convertTo(edge_mat, CV_8UC1);
-                    if (&params.simple_edge_detection) {
-                        cv::adaptiveThreshold(edge_mat, edge_mat, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 5, 2);
-                    }
-                    else {
-                        for (int w = 1; w < edge_mat.size[1] - 1; w++) {
-                            for (int h = 1; h < edge_mat.size[0] - 1; h++) {
-                                if (std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w - 1, h - 1)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w - 1, h + 0)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w - 1, h + 1)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w + 0, h - 1)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w + 0, h + 1)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w + 1, h - 1)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w + 1, h + 0)) > params.edge_depth_diff ||
-                                    std::abs(depth_frame.at<unsigned char>(w, h) - depth_frame.at<unsigned char>(w + 1, h + 1)) > params.edge_depth_diff) {
-                                    edge_mat.at<unsigned char>(w, h) = 255;
-                                }
-                            }
-                        }
-                    }
-
-                    cv::imshow(cam->getWindowName(), edge_mat);
-                    cv::resizeWindow(cam->getWindowName(), edge_mat.size[1], edge_mat.size[0]);
+                    cam->walkingEdges.enqueue(detectEdges(depth_frame, params));
+                    edge_frame = cam->walkingEdges.getValue();
                 }
-                else {
-                    cv::imshow(cam->getWindowName(), depth_frame);
-                    cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);
+
+                //# Sphere Detection
+                //##################
+
+                if (cam->detect_circles) {
+                    showSphereTable(cam, depth_frame, edge_frame, params, display_edges);
                 }
+
+                cv::imshow(cam->getWindowName() + " Edges", edge_frame);
+                cv::resizeWindow(cam->getWindowName() + " Edges", edge_frame.size[1], edge_frame.size[0]);
+
+                cv::imshow(cam->getWindowName(), depth_frame);
+                cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);                
             }
             catch (cv::Exception e) {
                 std::cout << " | " << e.msg;
