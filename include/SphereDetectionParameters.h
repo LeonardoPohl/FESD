@@ -1,7 +1,8 @@
 #pragma once
 #include <opencv2/imgproc.hpp>
 #include <imgui.h>
-/*
+
+/* TODO Implement all parameters
 @param src Source 8 - bit single - channel image.
 @param dst Destination image of the same size and the same type as src.
 @param maxValue Non - zero value assigned to the pixels for which the condition is satisfied
@@ -14,6 +15,10 @@ pixel : 3, 5, 7, and so on.
 @param C Constant subtracted from the mean or weighted mean(see the details below).Normally, it
 is positive but may be zero or negative as well.
 */
+
+// TODO: Add save capability
+// TODO: Investigate if this should be camera specific
+
 class SphereDetectionParameters {
 public:
 	SphereDetectionParameters() = default;
@@ -45,14 +50,13 @@ public:
 		if (ImGui::Combo("Threshold Type", &current_threshold, threshold_types, IM_ARRAYSIZE(threshold_types))) {
 			thresholdType = thresholdTypes[current_threshold];
 		} 
-		
 
 		ImGui::Separator();
 
 		ImGui::Text("Sphere Detector Settings");
 
 		ImGui::SliderFloat("Sphere Radius", &sphere_radius, 0, 100);
-		ImGui::DragIntRange2("Circle Radius", &min_radius, &max_radius, 5, 1, 1, "Min: %d", "Max: %d");
+		ImGui::DragIntRange2("Circle Radius", &min_radius, &max_radius, 5, 0, 100, "Min: %d", "Max: %d");
 		ImGui::SliderFloat("Canny edge detector threshold", &param1, 0, 500);
 		ImGui::SliderFloat("Accumulator threshold", &param2, 0, 500);
 

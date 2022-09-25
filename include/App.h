@@ -16,6 +16,8 @@
 #include <ImguiBootstrap.h>
 #include <SphereDetectionParameters.h>
 
+// TODO: Implement logger object
+
 void update();
 void initAllCameras();
 
@@ -37,10 +39,11 @@ int App(std::string_view const &glsl_version) {
         return 1;
     }
 
-    auto clear_color = ImVec4(0.0f, 0.0f, 0.3f, 1.00f);
+    auto clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
 
     io = &ImGui::GetIO();
     io->Fonts->AddFontDefault();
+    io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGuiStyle& style = ImGui::GetStyle();
     style.ScaleAllSizes(2);
@@ -106,13 +109,17 @@ void update() {
     }
 
     for (DepthCamera* cam : depthCameras) {
-        ImGui::Begin(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled) {
+            ImGui::Begin(cam->getCameraName().c_str());
             if (walking_average) {
                 if (ImGui::Button("Flush Moving Average")) {
                     cam->walkingFrames.reset();
+                    cam->walkingEdges.reset();
                 }
-                ImGui::SliderInt("Moving Average Length", &cam->walkingFrames.length, 0, 100);
+                if (ImGui::SliderInt("Moving Average Length", &cam->walkingFrames.length, 1, 100)) {
+                    cam->walkingEdges.length = cam->walkingFrames.length;
+                }
+               
             }
             ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
 
@@ -141,8 +148,14 @@ void update() {
                 //###############
 
                 if (display_edges) {
-                    cam->walkingEdges.enqueue(DepthCamera::detectEdges(depth_frame, params));
-                    edge_frame = cam->walkingEdges.getValue();
+                    edge_frame = DepthCamera::detectEdges(depth_frame, params);
+                    if (walking_average) {
+                        cam->walkingFrames.enqueue(edge_frame);
+                        edge_frame = cam->walkingEdges.getValue();
+                    }
+
+                    cv::imshow(cam->getWindowName() + " Edges", edge_frame);
+                    cv::resizeWindow(cam->getWindowName() + " Edges", edge_frame.size[1], edge_frame.size[0]);
                 }
 
                 //# Sphere Detection
@@ -151,9 +164,6 @@ void update() {
                 if (cam->detect_circles) {
                     cam->displaySphereTable(depth_frame, edge_frame, params, display_edges);
                 }
-
-                cv::imshow(cam->getWindowName() + " Edges", edge_frame);
-                cv::resizeWindow(cam->getWindowName() + " Edges", edge_frame.size[1], edge_frame.size[0]);
 
                 cv::imshow(cam->getWindowName(), depth_frame);
                 cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);                
@@ -176,8 +186,7 @@ void update() {
                     cam->is_enabled = false;
                 }
             }
+            ImGui::End();
         }
-
-        ImGui::End();
     }
 }
