@@ -26,6 +26,7 @@ public:
 	void displayParameters() {
 		ImGui::Separator();
 
+		/*
 		ImGui::Text("Edge Detection Settings");
 
 		const char* adaptive_threshold_types[] = {
@@ -52,13 +53,19 @@ public:
 		} 
 
 		ImGui::Separator();
-
 		ImGui::Text("Sphere Detector Settings");
 
 		ImGui::SliderFloat("Sphere Radius", &sphere_radius, 0, 100);
 		ImGui::DragIntRange2("Circle Radius", &min_radius, &max_radius, 5, 0, 100, "Min: %d", "Max: %d");
 		ImGui::SliderFloat("Canny edge detector threshold", &param1, 0, 500);
 		ImGui::SliderFloat("Accumulator threshold", &param2, 0, 500);
+
+		ImGui::Separator();
+		*/
+		ImGui::Text("Normal Settings");
+		
+		ImGui::SliderInt("Whats Up", &whatsUp, 0, 2);
+		ImGui::SliderFloat("How Up", &upnessFilter, -3.45f, 3.45f);
 
 		ImGui::Separator();
 	}
@@ -94,4 +101,6 @@ public:
 
 	cv::AdaptiveThresholdTypes adapriveThresholdType{ cv::AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C };
 	cv::ThresholdTypes thresholdType{ cv::ThresholdTypes::THRESH_BINARY };
+	float upnessFilter{ 1 };
+	int whatsUp;
 };

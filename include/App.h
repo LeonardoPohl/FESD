@@ -27,7 +27,8 @@ std::vector<DepthCamera*> depthCameras;
 ImGuiIO* io;
 float sphere_radius;
 bool display_edges = false;
-bool walking_average = true;
+bool walking_average = false;
+bool calculate_surface_normals = true;
 
 int App(std::string_view const &glsl_version) {
 
@@ -75,7 +76,7 @@ void initAllCameras() {
 }
 
 void update() {
-    cv::Mat depth_frame, edge_frame, color_frame, frame;
+    cv::Mat depth_frame, edge_frame, color_frame, frame, normal_frame;
     std::vector<int>::iterator new_end;
     bool reset_walking_frames = false;
     {
@@ -92,7 +93,8 @@ void update() {
         params.displayParameters();
 
         ImGui::Checkbox("Display edges", &display_edges);
-
+        ImGui::Checkbox("Calculate Surface Normals", &calculate_surface_normals);
+        
         reset_walking_frames |= ImGui::Checkbox("Use Walking Average", &walking_average);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
@@ -163,6 +165,12 @@ void update() {
 
                 if (cam->detect_circles) {
                     cam->displaySphereTable(depth_frame, edge_frame, params, display_edges);
+                }
+
+                if (calculate_surface_normals) {
+                    normal_frame = cam->calculateSurfaceNormals(depth_frame, params);
+                    cv::imshow(cam->getWindowName() + " - Normals", normal_frame);
+                    cv::resizeWindow(cam->getWindowName() + " - Normals", normal_frame.size[1], normal_frame.size[0]);
                 }
 
                 cv::imshow(cam->getWindowName(), depth_frame);

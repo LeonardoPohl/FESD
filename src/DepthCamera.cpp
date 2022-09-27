@@ -99,3 +99,37 @@ cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, SphereDetectionParameters 
     cv::adaptiveThreshold(edge_mat, edge_mat, 255, params.adapriveThresholdType, params.thresholdType, 5, 2);
     return edge_mat;
 }
+
+cv::Mat DepthCamera::calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params)
+{
+    Mat normals(depth_frame.size(), CV_32FC3);
+    if (depth_frame.empty()) {
+        return normals;
+    }
+    for (int x = 1; x < depth_frame.rows; ++x)
+    {
+        for (int y = 1; y < depth_frame.cols; ++y)
+        {
+            float dzdx = (depth_frame.at<ushort>(x + 1, y) - depth_frame.at<ushort>(x - 1, y)) / 2.0;
+            float dzdy = (depth_frame.at<ushort>(x, y + 1) - depth_frame.at<ushort>(x, y - 1)) / 2.0;
+
+            if ((depth_frame.at<ushort>(x, y) == 0) || (dzdx == 0 && dzdy == 0)) {
+                continue;
+            }
+
+            Vec3f d(-dzdx, -dzdy, 1.0f);
+            Vec3f n = normalize(d);
+
+            if (std::acos(n[0]) < 0.1f) {
+                normals.at<Vec3f>(x, y) = n;
+            }
+
+        }
+    }
+
+
+    // Assume that up is up around
+    // Filter everything thats not pointing upwartds
+
+    return normals;
+}

@@ -24,6 +24,8 @@ public:
 
 	static cv::Mat detectEdges(cv::Mat depth_frame, SphereDetectionParameters params);
 
+	cv::Mat calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params);
+
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
 	}
