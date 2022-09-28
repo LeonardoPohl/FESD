@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
 #include <opencv2/videoio.hpp>  // Video write
+#include <opencv2/highgui.hpp>  // Video write
 
 #include <OpenNI.h>
 
@@ -28,7 +29,19 @@ ImGuiIO* io;
 float sphere_radius;
 bool display_edges = false;
 bool walking_average = false;
-bool calculate_surface_normals = true;
+bool calculate_surface_normals = false;
+
+static void onMouse(int event, int x, int y, int d, void* ptr)
+{
+    if (event == cv::EVENT_LBUTTONDOWN)
+    {
+        cv::Point* p = (cv::Point*)ptr;
+        p->x = x;
+        p->y = y;
+    }
+    
+}
+
 
 int App(std::string_view const &glsl_version) {
 
@@ -52,8 +65,8 @@ int App(std::string_view const &glsl_version) {
     //# Camera Initialisation
     //#######################
 
-    std::async(std::launch::async, [] { initAllCameras(); });
-
+    //std::async(std::launch::async, [] { });
+    initAllCameras();
     //# Main Loop
     //###########
 
@@ -73,10 +86,15 @@ void initAllCameras() {
 
     depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
+    
+    for (DepthCamera* cam : depthCameras) {
+        cv::namedWindow(cam->getWindowName());
+        cv::setMouseCallback(cam->getWindowName(), onMouse, (void*)(&cam->selectedFloorPoint));
+    }
 }
 
 void update() {
-    cv::Mat depth_frame, edge_frame, color_frame, frame, normal_frame, world_points;
+    cv::Mat depth_frame, edge_frame, color_frame, frame, normal_frame, floor_points;
     std::vector<int>::iterator new_end;
     bool reset_walking_frames = false;
     {
@@ -167,14 +185,15 @@ void update() {
                     cam->displaySphereTable(depth_frame, edge_frame, params, display_edges);
                 }
 
-                if (calculate_surface_normals) {
-                    normal_frame = cam->calculateSurfaceNormals(depth_frame, params);
-                    cv::imshow(cam->getWindowName() + " - Normals", normal_frame);
-                    cv::resizeWindow(cam->getWindowName() + " - Normals", normal_frame.size[1], normal_frame.size[0]);
+                if (cam->selectedFloorPoint.x != -1) {
+                    floor_points = cam->calculateSelectedFloor(depth_frame, params);
+
+                    cv::imshow(cam->getWindowName() + " Floor", floor_points);
+                    cv::resizeWindow(cam->getWindowName() + " Floor", floor_points.size[1], floor_points.size[0]);
                 }
 
                 cv::imshow(cam->getWindowName(), depth_frame);
-                cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);                
+                cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);
             }
             catch (cv::Exception e) {
                 std::cout << " | " << e.msg;

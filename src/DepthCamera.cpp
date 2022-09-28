@@ -118,13 +118,14 @@ cv::Mat DepthCamera::getWorldFrame(cv::Mat depth_frame)
     return cv::Mat();
 }
 
-cv::Mat DepthCamera::calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params)
+cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetectionParameters params)
 {
-    Mat normals(depth_frame.size(), CV_32FC3);
-    std::vector<cv::Vec2i> points_to_consider;
-    if (depth_frame.empty()) {
-        return normals;
+    if (this->selectedFloorPoint.x == -1 || depth_frame.empty()) {
+        return cv::Mat();
     }
+    Mat normals(depth_frame.size(), CV_32FC3);
+    Mat floor(depth_frame.size(), CV_32FC3);
+
     for (int x = 1; x < depth_frame.rows; ++x)
     {
         for (int y = 1; y < depth_frame.cols; ++y)
@@ -159,7 +160,45 @@ cv::Mat DepthCamera::calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectio
             }
         }
     }
-    GaussianBlur(normals, normals, Size(9, 9), 2, 2);
 
-    return normals;
+    GaussianBlur(normals, normals, Size(9, 9), 2, 2);
+    
+    floodFill(normals, floor, this->selectedFloorPoint, 255);
+
+    Vec3f avg_normal;
+    float floor_normals = 0;
+
+    for (int x = 1; x < floor.rows; ++x)
+    {
+        for (int y = 1; y < floor.cols; ++y)
+        {
+            if (floor.at<int>(x, y) == 1) {
+                floor_normals += 1;
+                avg_normal[0] += normals.at<Vec3f>(x, y)[0];
+                avg_normal[1] += normals.at<Vec3f>(x, y)[1];
+                avg_normal[2] += normals.at<Vec3f>(x, y)[2];
+            }
+        }
+    }
+
+    avg_normal[0] /= floor_normals;
+    avg_normal[1] /= floor_normals;
+    avg_normal[2] /= floor_normals;
+
+    this->floorNormal = avg_normal;
+
+    Mat col = Mat::zeros(normals.rows, normals.cols, IMREAD_COLOR);
+    cvtColor(depth_frame, col, COLOR_GRAY2BGR);
+
+    for (int x = 1; x < floor.rows; ++x)
+    {
+        for (int y = 1; y < floor.cols; ++y)
+        {
+            if (floor.at<int>(x, y) == 1) {
+                col.at<Scalar>(x, y) = avg_normal;
+            }
+        }
+    }
+
+    return col;
 }

@@ -25,7 +25,7 @@ public:
 	static cv::Mat detectEdges(cv::Mat depth_frame, SphereDetectionParameters params);
 	cv::Mat getWorldFrame(cv::Mat depth_frame);
 
-	cv::Mat calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params);
+	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, SphereDetectionParameters params);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -39,11 +39,14 @@ public:
 		return camera_id;
 	}
 
+	cv::Point selectedFloorPoint{-1,-1};
+
 	bool detect_circles{ false };
 	bool show_color_stream{ false };
 	bool is_enabled{ true };
 	WalkingAverageMatrix walkingFrames{};
-	WalkingAverageMatrix walkingEdges{};
+	WalkingAverageMatrix walkingEdges{}; 
+	cv::Vec3f floorNormal;
 private:
 	int camera_id;
 };

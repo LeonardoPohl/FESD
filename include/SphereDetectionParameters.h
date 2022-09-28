@@ -63,9 +63,10 @@ public:
 		ImGui::Separator();
 		*/
 		ImGui::Text("Normal Settings");
-		
+
 		ImGui::SliderInt("Whats Up", &whatsUp, 0, 2);
 		ImGui::SliderFloat("How Up", &upnessFilter, 0, 2*3.45f);
+		ImGui::SliderInt("Number of Samples", &num_samples, 0, 50);
 
 		ImGui::Separator();
 	}
@@ -103,4 +104,5 @@ public:
 	cv::ThresholdTypes thresholdType{ cv::ThresholdTypes::THRESH_BINARY };
 	float upnessFilter{ 1 };
 	int whatsUp;
+	int num_samples;
 };
