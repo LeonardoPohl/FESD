@@ -71,7 +71,7 @@ cv::Mat RealSenseCamera::getColorFrame() {
 	return cv::Mat(cv::Size(w, h), CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP) * 10;
 }
 
-cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
+cv::Vec3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
 {
 	float pixel[3] = { x, y, depth };
 	rs2_intrinsics* intrinsics;
@@ -79,7 +79,7 @@ cv::Point3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
 	//rs2_open(, profile, this->roc);
 	//rs2_get_video_stream_intrinsics(RS2_STREAM_DEPTH, intrinsics);
 	//rs2_deproject_pixel_to_point(pt, intrinsics)
-	cv::Point3f pt;
+	cv::Vec3f pt;
 	//CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt.x, &pt.y, &pt.z);
 	return pt;
 }

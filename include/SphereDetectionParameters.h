@@ -65,7 +65,7 @@ public:
 		ImGui::Text("Normal Settings");
 		
 		ImGui::SliderInt("Whats Up", &whatsUp, 0, 2);
-		ImGui::SliderFloat("How Up", &upnessFilter, -3.45f, 3.45f);
+		ImGui::SliderFloat("How Up", &upnessFilter, 0, 2*3.45f);
 
 		ImGui::Separator();
 	}

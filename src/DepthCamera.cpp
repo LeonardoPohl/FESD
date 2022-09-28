@@ -4,6 +4,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/mat.inl.hpp>
 #include <Utilities.h>
+#include <numbers>
 
 using namespace cv;
 
@@ -100,9 +101,27 @@ cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, SphereDetectionParameters 
     return edge_mat;
 }
 
+cv::Mat DepthCamera::getWorldFrame(cv::Mat depth_frame)
+{
+    Mat world_frame(depth_frame.size(), CV_32FC3);
+    for (int x = 1; x < depth_frame.rows; ++x)
+    {
+        for (int y = 1; y < depth_frame.cols; ++y)
+        {
+            if (depth_frame.at<ushort>(x, y) == 0) {
+                continue;
+            }
+
+            world_frame.at<Vec3f>(x, y) = this->pixelToPoint(x, y, depth_frame.at<ushort>(x, y));
+        }
+    }
+    return cv::Mat();
+}
+
 cv::Mat DepthCamera::calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params)
 {
     Mat normals(depth_frame.size(), CV_32FC3);
+    std::vector<cv::Vec2i> points_to_consider;
     if (depth_frame.empty()) {
         return normals;
     }
@@ -110,26 +129,37 @@ cv::Mat DepthCamera::calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectio
     {
         for (int y = 1; y < depth_frame.cols; ++y)
         {
-            float dzdx = (depth_frame.at<ushort>(x + 1, y) - depth_frame.at<ushort>(x - 1, y)) / 2.0;
-            float dzdy = (depth_frame.at<ushort>(x, y + 1) - depth_frame.at<ushort>(x, y - 1)) / 2.0;
-
-            if ((depth_frame.at<ushort>(x, y) == 0) || (dzdx == 0 && dzdy == 0)) {
+            if ((depth_frame.at<ushort>(x, y) == 0) ||
+                (depth_frame.at<ushort>(x - 1, y) == 0) ||
+                (depth_frame.at<ushort>(x, y - 1) == 0)) {
                 continue;
             }
 
-            Vec3f d(-dzdx, -dzdy, 1.0f);
-            Vec3f n = normalize(d);
-
-            if (std::acos(n[0]) < 0.1f) {
-                normals.at<Vec3f>(x, y) = n;
+            if ((depth_frame.at<ushort>(x, y) == depth_frame.at<ushort>(x, y - 1)) ||
+                (depth_frame.at<ushort>(x, y) == depth_frame.at<ushort>(x - 1, y))) {
+                continue;
             }
 
+            float dzdx = (depth_frame.at<ushort>(x + 1, y) - depth_frame.at<ushort>(x - 1, y));
+            float dzdy = (depth_frame.at<ushort>(x, y + 1) - depth_frame.at<ushort>(x, y - 1));
+            
+            Vec3f d(-dzdx,
+                    -dzdy,
+                    1);
+
+            Vec3f n = normalize(d);
+
+            n[0] = (n[0] + 1) / 2;
+            n[1] = (n[1] + 1) / 2;
+            n[2] = (n[2] + 1) / 2;
+            
+            // Surface should point roughly up
+            if (std::acos(n[params.whatsUp]) < params.upnessFilter) {
+                normals.at<Vec3f>(x, y) = n;
+            }
         }
     }
-
-
-    // Assume that up is up around
-    // Filter everything thats not pointing upwartds
+    GaussianBlur(normals, normals, Size(9, 9), 2, 2);
 
     return normals;
 }

@@ -198,10 +198,10 @@ cv::Mat OrbbecCamera::getColorFrame() {
     return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth, cv::Mat::AUTO_STEP) * 10;
 }
 
-cv::Point3f OrbbecCamera::pixelToPoint(int x, int y, ushort depth) const
+cv::Vec3f OrbbecCamera::pixelToPoint(int x, int y, ushort depth) const
 {
-    cv::Point3f pt{};
-    CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt.x, &pt.y, &pt.z);
+    cv::Vec3f pt{};
+    CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt[0], &pt[1], &pt[2]);
     return pt;
 }
 

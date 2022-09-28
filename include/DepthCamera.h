@@ -15,7 +15,7 @@ public:
 	virtual cv::Mat getColorFrame() = 0;
 	virtual std::string getName() const = 0; 
 	virtual bool hasColorStream() = 0;
-	virtual cv::Point3f pixelToPoint(int x, int y, ushort depth) const = 0;
+	virtual cv::Vec3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
 	std::vector<Circle*> detectSpheres(SphereDetectionParameters params);
 	std::vector<Circle*> detectSpheres(cv::Mat frame, SphereDetectionParameters params);
@@ -23,6 +23,7 @@ public:
 	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, SphereDetectionParameters params, bool display_edges);
 
 	static cv::Mat detectEdges(cv::Mat depth_frame, SphereDetectionParameters params);
+	cv::Mat getWorldFrame(cv::Mat depth_frame);
 
 	cv::Mat calculateSurfaceNormals(cv::Mat depth_frame, SphereDetectionParameters params);
 
@@ -56,7 +57,7 @@ public:
 	cv::Mat getColorFrame() override;
 	bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
 	std::string getName() const override { return "Orbbec"; }
-	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
+	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
@@ -81,7 +82,7 @@ public:
 	cv::Mat getColorFrame() override;
 	bool hasColorStream() { return true; };
 	std::string getName() const override { return "Realsense"; }
-	cv::Point3f pixelToPoint(int x, int y, ushort depth) const override;
+	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
@@ -92,6 +93,7 @@ private:
 	rs2::context* _ctx{};
 	rs2::device* _device{};
 	rs2::config _cfg{};
+	rs2_intrinsics intrinsics;
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};

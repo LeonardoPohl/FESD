@@ -76,7 +76,7 @@ void initAllCameras() {
 }
 
 void update() {
-    cv::Mat depth_frame, edge_frame, color_frame, frame, normal_frame;
+    cv::Mat depth_frame, edge_frame, color_frame, frame, normal_frame, world_points;
     std::vector<int>::iterator new_end;
     bool reset_walking_frames = false;
     {
