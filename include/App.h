@@ -17,7 +17,8 @@
 #include <ImguiBootstrap.h>
 #include <SphereDetectionParameters.h>
 
-// TODO: Implement logger object
+// TODO: Implement logger object and print in ImGui
+// TODO: display opencv frame in ImGui I dont like floating frames
 
 void update();
 void initAllCameras();
@@ -26,6 +27,8 @@ SphereDetectionParameters params {};
 
 std::vector<DepthCamera*> depthCameras;
 ImGuiIO* io;
+
+// TODO: Put in seperate Params class
 float sphere_radius;
 bool display_edges = false;
 bool walking_average = false;
@@ -39,7 +42,6 @@ static void onMouse(int event, int x, int y, int d, void* ptr)
         p->x = x;
         p->y = y;
     }
-    
 }
 
 
