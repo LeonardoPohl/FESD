@@ -160,8 +160,10 @@ void update() {
 
                 if (cam->show_color_stream) {
                     color_frame = cam->getColorFrame();
-                    cv::imshow(cam->getWindowName() + " - Color Stream", color_frame);
-                    cv::resizeWindow(cam->getWindowName() + " - Color Stream", color_frame.size[1], color_frame.size[0]);
+                    if (color_frame.rows > 0 && color_frame.cols > 0) {
+                        cv::imshow(cam->getWindowName() + " - Color Stream", color_frame);
+                        cv::resizeWindow(cam->getWindowName() + " - Color Stream", color_frame.size[1], color_frame.size[0]);
+                    }
                 }
 
                 //# Display image
@@ -170,12 +172,14 @@ void update() {
                 if (display_edges) {
                     edge_frame = DepthCamera::detectEdges(depth_frame, params);
                     if (walking_average) {
-                        cam->walkingFrames.enqueue(edge_frame);
+                        cam->walkingEdges.enqueue(edge_frame);
                         edge_frame = cam->walkingEdges.getValue();
                     }
 
-                    cv::imshow(cam->getWindowName() + " Edges", edge_frame);
-                    cv::resizeWindow(cam->getWindowName() + " Edges", edge_frame.size[1], edge_frame.size[0]);
+                    if (edge_frame.rows > 0 && edge_frame.cols > 0) {
+                        cv::imshow(cam->getWindowName() + " Edges", edge_frame);
+                        cv::resizeWindow(cam->getWindowName() + " Edges", edge_frame.size[1], edge_frame.size[0]);
+                    }
                 }
 
                 //# Sphere Detection
@@ -188,12 +192,15 @@ void update() {
                 if (cam->selectedFloorPoint.x != -1) {
                     floor_points = cam->calculateSelectedFloor(depth_frame, params);
 
-                    cv::imshow(cam->getWindowName() + " Floor", floor_points);
-                    cv::resizeWindow(cam->getWindowName() + " Floor", floor_points.size[1], floor_points.size[0]);
+                    if (floor_points.rows > 0 && floor_points.cols > 0) {
+                        cv::imshow(cam->getWindowName() + " Floor", floor_points);
+                        cv::resizeWindow(cam->getWindowName() + " Floor", floor_points.size[1], floor_points.size[0]);
+                    }
                 }
-
-                cv::imshow(cam->getWindowName(), depth_frame);
-                cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);
+                if (depth_frame.rows > 0 && depth_frame.cols > 0) {
+                    cv::imshow(cam->getWindowName(), depth_frame);
+                    cv::resizeWindow(cam->getWindowName(), depth_frame.size[1], depth_frame.size[0]);
+                }
             }
             catch (cv::Exception e) {
                 std::cout << " | " << e.msg;
