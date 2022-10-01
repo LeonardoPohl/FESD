@@ -23,12 +23,12 @@ namespace imgui {
         fprintf(stderr, "Glfw Error %d: %s\n", error, description);
     }
 
-    inline static auto glfw_init() -> std::optional<const std::string>
+    inline static std::string glfw_init()
     {
         // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
-            return {};
+            return "";
         }
 
         // Decide GL+GLSL versions

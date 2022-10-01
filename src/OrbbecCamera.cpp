@@ -1,4 +1,4 @@
-#include "DepthCamera.h"
+#include "OrbbecCamera.h"
 #include <opencv2/highgui.hpp>
 #include <iostream>
 

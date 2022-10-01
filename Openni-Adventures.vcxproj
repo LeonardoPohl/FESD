@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\DepthCamera.cpp" />
+    <ClCompile Include="src\DepthCameraUpdate.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OrbbecCamera.cpp" />
     <ClCompile Include="src\RealSenseCamera.cpp" />

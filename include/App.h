@@ -21,7 +21,7 @@ class App {
 public:
     // TODO: Implement logger object and print in ImGui
     // TODO: display opencv frame in ImGui I dont like floating frames
-    App(std::string_view const& glsl_version);
+    App();
     static void onMouse(int event, int x, int y, int d, void* ptr)
     {
         if (event == cv::EVENT_LBUTTONDOWN)

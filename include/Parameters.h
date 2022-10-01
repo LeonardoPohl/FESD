@@ -11,7 +11,7 @@ namespace Params
 		virtual void displayParameters() = 0;
 	};
 
-	class GlobalParameters : Parameters{
+	class GlobalParameters : Parameters {
 	public:
 		GlobalParameters(std::vector<DepthCamera*>* depth_cameras) : depth_cameras(depth_cameras) {};
 		void displayParameters() override {

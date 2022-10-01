@@ -5,10 +5,6 @@
 #include <App.h>
 
 int main() {
-    auto glsl_version = imgui::glfw_init();
-    if (!glsl_version) {
-        return 1;
-    }
 
     //# initialize openni sdk
     //#######################
@@ -19,7 +15,7 @@ int main() {
         return 1;
     }
 
-    App(*glsl_version);
+    App();
 
     //# Shutdown
     //##########

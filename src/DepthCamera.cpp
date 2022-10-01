@@ -11,11 +11,11 @@
 
 using namespace cv;
 
-std::vector<Circle*> DepthCamera::detectSpheres(Params::SphereDetectionParameters params) {
+std::vector<Circle*> DepthCamera::detectSpheres(Params::SphereDetectionParameters *params) {
     return detectSpheres(this->getDepthFrame(), params);
 }
 
-std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetectionParameters params) {
+std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetectionParameters *params) {
     if (!this->detect_circles) {
         return std::vector<Circle*>();
     }
@@ -36,8 +36,8 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetecti
     HoughCircles(edge_mat, circles,
         hough_method, 1,
         min_dist,
-        params.param1, params.param2,
-        params.min_radius, params.max_radius);
+        params->param1, params->param2,
+        params->min_radius, params->max_radius);
 
     cvtColor(edge_mat, col, COLOR_GRAY2BGR);
     std::vector<Circle*> res_circles;
@@ -48,7 +48,7 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetecti
             auto A = this->pixelToPoint(c[1], c[0], frame.at<ushort>(c[1], c[0]));
             auto B = this->pixelToPoint(c[1], c[0], frame.at<ushort>(c[1], c[0] + c[2] * 0.9));
             auto dist = calculateDistance(A, B);
-            if (dist < params.sphere_radius) {
+            if (dist < params->sphere_radius) {
                 res_circles.push_back(new Circle(c, frame.at<ushort>(c[1], c[0]), dist));
             }
         }
@@ -57,7 +57,7 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetecti
     return res_circles;
 }
 
-void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters params, bool display_edges) {
+void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters *params, bool display_edges) {
     auto spheres = this->detectSpheres(depth_frame, params);
 
     ImGui::Text("Detected Spheres: %d", spheres.size());
@@ -94,13 +94,13 @@ void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Pa
 }
 
 
-cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters params) {
+cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters *params) {
     cv::Mat edge_mat = cv::Mat::zeros(depth_frame.size[1], depth_frame.size[0], CV_8UC1);
     if (depth_frame.empty()) {
         return edge_mat;
     }
     depth_frame.convertTo(edge_mat, CV_8UC1);
-    cv::adaptiveThreshold(edge_mat, edge_mat, 255, params.adapriveThresholdType, params.thresholdType, 5, 2);
+    cv::adaptiveThreshold(edge_mat, edge_mat, 255, params->adapriveThresholdType, params->thresholdType, 5, 2);
     return edge_mat;
 }
 

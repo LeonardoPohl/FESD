@@ -17,15 +17,17 @@ public:
 	virtual bool hasColorStream() = 0;
 	virtual cv::Vec3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
-	std::vector<Circle*> detectSpheres(Params::SphereDetectionParameters params);
-	std::vector<Circle*> detectSpheres(cv::Mat frame, Params::SphereDetectionParameters params);
+	std::vector<Circle*> detectSpheres(Params::SphereDetectionParameters *params);
+	std::vector<Circle*> detectSpheres(cv::Mat frame, Params::SphereDetectionParameters *params);
 
-	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters params, bool display_edges);
+	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters *params, bool display_edges);
 
-	static cv::Mat detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters params);
+	static cv::Mat detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters *params);
 	cv::Mat getWorldFrame(cv::Mat depth_frame);
 
 	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters params);
+
+	void doUpdate(Params::GlobalParameters *global_params, Params::NormalParameters *normal_params, Params::SphereDetectionParameters *sphere_params);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -39,7 +41,7 @@ public:
 		return camera_id;
 	}
 
-	cv::Point selectedFloorPoint{-1,-1};
+	cv::Point selectedFloorPoint{-1, -1};
 
 	bool detect_circles{ false };
 	bool show_color_stream{ false };
