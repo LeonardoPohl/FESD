@@ -5,14 +5,17 @@
 #include <opencv2/core/mat.inl.hpp>
 #include <Utilities.h>
 #include <numbers>
+#include <algorithm>
+#include <iostream>
+#include <Parameters.h>
 
 using namespace cv;
 
-std::vector<Circle*> DepthCamera::detectSpheres(SphereDetectionParameters params) {
+std::vector<Circle*> DepthCamera::detectSpheres(Params::SphereDetectionParameters params) {
     return detectSpheres(this->getDepthFrame(), params);
 }
 
-std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParameters params) {
+std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, Params::SphereDetectionParameters params) {
     if (!this->detect_circles) {
         return std::vector<Circle*>();
     }
@@ -54,7 +57,7 @@ std::vector<Circle*> DepthCamera::detectSpheres(Mat frame, SphereDetectionParame
     return res_circles;
 }
 
-void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, SphereDetectionParameters params, bool display_edges) {
+void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters params, bool display_edges) {
     auto spheres = this->detectSpheres(depth_frame, params);
 
     ImGui::Text("Detected Spheres: %d", spheres.size());
@@ -91,7 +94,7 @@ void DepthCamera::displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Sp
 }
 
 
-cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, SphereDetectionParameters params) {
+cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters params) {
     cv::Mat edge_mat = cv::Mat::zeros(depth_frame.size[1], depth_frame.size[0], CV_8UC1);
     if (depth_frame.empty()) {
         return edge_mat;
@@ -118,13 +121,15 @@ cv::Mat DepthCamera::getWorldFrame(cv::Mat depth_frame)
     return cv::Mat();
 }
 
-cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetectionParameters params)
+cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters params)
 {
     if (this->selectedFloorPoint.x == -1 || depth_frame.empty()) {
-        return cv::Mat();
+       // return cv::Mat();
     }
-    Mat normals(depth_frame.size(), CV_32FC3);
-    Mat floor(depth_frame.size(), CV_32FC3);
+    int width = depth_frame.size().width;
+    int height = depth_frame.size().height;
+    Mat normals(width - 2, height - 2, CV_32FC3);
+    Mat floor(depth_frame.size(), CV_8UC3);
 
     for (int x = 1; x < depth_frame.rows; ++x)
     {
@@ -150,19 +155,37 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetection
 
             Vec3f n = normalize(d);
 
-            n[0] = (n[0] + 1) / 2;
-            n[1] = (n[1] + 1) / 2;
-            n[2] = (n[2] + 1) / 2;
-            
+            float edge_falloff = 1;
+
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 0, y + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y + 0));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y + 0));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y - 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 0, y - 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y - 1));
+
+            edge_falloff *= 1 / params.edgeCutoff;
+            edge_falloff = std::max(edge_falloff, 0.01f);
+
+            n[0] = 255 * edge_falloff * (n[0] + 1) / 2;
+            n[1] = 255 * edge_falloff * (n[1] + 1) / 2;
+            n[2] = 255 * edge_falloff * (n[2] + 1) / 2;
+
+            normals.at<Vec3f>(x - 1, y - 1) = n;
+
             // Surface should point roughly up
-            if (std::acos(n[params.whatsUp]) < params.upnessFilter) {
-                normals.at<Vec3f>(x, y) = n;
-            }
+            /*if (std::acos(n[params.whatsUp]) < params.upnessFilter) {
+                normals.at<Vec3f>(x-1, y-1) = n;
+            }*/
         }
     }
-
+    return normals;
     GaussianBlur(normals, normals, Size(9, 9), 2, 2);
     
+    // TODO: Detect sphere positioned above ground as selected floor point
+
     floodFill(normals, floor, this->selectedFloorPoint, 255);
 
     Vec3f avg_normal;
@@ -174,9 +197,10 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetection
         {
             if (floor.at<int>(x, y) == 1) {
                 floor_normals += 1;
-                avg_normal[0] += normals.at<Vec3f>(x, y)[0];
-                avg_normal[1] += normals.at<Vec3f>(x, y)[1];
-                avg_normal[2] += normals.at<Vec3f>(x, y)[2];
+                float edge_falloff = normals.at<Vec3f>(x, y)[0] + normals.at<Vec3f>(x, y)[0] + normals.at<Vec3f>(x, y)[2];
+                avg_normal[0] += normals.at<Vec3f>(x, y)[0] * edge_falloff;
+                avg_normal[1] += normals.at<Vec3f>(x, y)[1] * edge_falloff;
+                avg_normal[2] += normals.at<Vec3f>(x, y)[2] * edge_falloff;
             }
         }
     }
@@ -186,7 +210,8 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetection
     avg_normal[2] /= floor_normals;
 
     this->floorNormal = avg_normal;
-
+    std::cout << avg_normal << std::endl;
+    std::cout << floor_normals << std::endl;
     Mat col = Mat::zeros(normals.rows, normals.cols, IMREAD_COLOR);
     cvtColor(depth_frame, col, COLOR_GRAY2BGR);
 
@@ -200,5 +225,5 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, SphereDetection
         }
     }
 
-    return col;
+    return normals;
 }
