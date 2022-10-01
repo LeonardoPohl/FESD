@@ -60,7 +60,7 @@ namespace Params
 	class SphereDetectionParameters : Parameters {
 	public:
 		void displayParameters() override {
-			ImGui::Begin("SphereDetectionParameters");
+			ImGui::Begin("Sphere Detection Parameters");
 
 			ImGui::Text("Edge Detection Settings");
 
@@ -135,16 +135,14 @@ namespace Params
 	class NormalParameters : Parameters {
 	public:
 		void displayParameters() override {
-			ImGui::Separator();
-
-			ImGui::Text("Normal Settings");
+			ImGui::Begin("Normal Settings");
 
 			ImGui::SliderInt("Whats Up", &whatsUp, 0, 2);
 			ImGui::SliderFloat("How Up", &upnessFilter, 0, 2 * 3.45f);
 			ImGui::SliderInt("Number of Samples", &num_samples, 0, 50);
 			ImGui::SliderFloat("Edge cutoff", &edgeCutoff, 1, 50);
 
-			ImGui::Separator();
+			ImGui::End();
 		}
 
 		float upnessFilter{ 1 };

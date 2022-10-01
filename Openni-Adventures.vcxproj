@@ -180,6 +180,8 @@
     <ClInclude Include="include\App.h" />
     <ClInclude Include="include\Circle.h" />
     <ClInclude Include="include\DepthCamera.h" />
+    <ClInclude Include="include\OrbbecCamera.h" />
+    <ClInclude Include="include\RealsenseCamera.h" />
     <ClInclude Include="include\ImguiBootstrap.h" />
     <ClInclude Include="include\Parameters.h" />
     <ClInclude Include="include\Utilities.h" />

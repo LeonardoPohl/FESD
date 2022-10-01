@@ -1,4 +1,6 @@
 #include "App.h"
+#include <OrbbecCamera.h>
+#include <RealsenseCamera.h>
 
 App::App() {
 
@@ -70,7 +72,9 @@ void App::initAllCameras() {
 
 void App::update() {
     bool reset_walking_frames = false;
-
+    global_params.displayParameters();
+    normal_params.displayParameters();
+    sphere_params.displayParameters();
     if (reset_walking_frames) {
         for (DepthCamera* cam : depthCameras) {
             cam->walkingFrames.reset();
@@ -102,7 +106,7 @@ void App::update() {
             }
             ImGui::End();
 
-            cam->doUpdate();
+            cam->doUpdate(&global_params, &normal_params, &sphere_params);
         }
     }
 }

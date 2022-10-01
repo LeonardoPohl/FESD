@@ -22,6 +22,12 @@
     <Filter Include="Header Files\Openni">
       <UniqueIdentifier>{451d06c9-1dee-40b9-9066-a36ce1bd7ed1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cameras">
+      <UniqueIdentifier>{6a77f233-2c7f-4be1-85b8-ee9e817c94b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utilities">
+      <UniqueIdentifier>{383e8611-0f89-48c1-9ab8-7d8555c71612}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -74,29 +80,35 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\DepthCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Circle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ImguiBootstrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
       <Filter>Header Files\Openni</Filter>
     </ClInclude>
     <ClInclude Include="include\App.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utilities.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\RealsenseCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OrbbecCamera.h">
+      <Filter>Header Files\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="include\WalkingAverage.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utilities.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Circle.h">
+      <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="include\Parameters.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImguiBootstrap.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DepthCamera.h">
+      <Filter>Header Files\Cameras</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

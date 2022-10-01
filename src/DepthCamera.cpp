@@ -121,7 +121,7 @@ cv::Mat DepthCamera::getWorldFrame(cv::Mat depth_frame)
     return cv::Mat();
 }
 
-cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters params)
+cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters *params)
 {
     if (this->selectedFloorPoint.x == -1 || depth_frame.empty()) {
        // return cv::Mat();

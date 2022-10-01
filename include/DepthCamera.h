@@ -25,7 +25,7 @@ public:
 	static cv::Mat detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters *params);
 	cv::Mat getWorldFrame(cv::Mat depth_frame);
 
-	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters params);
+	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters *params);
 
 	void doUpdate(Params::GlobalParameters *global_params, Params::NormalParameters *normal_params, Params::SphereDetectionParameters *sphere_params);
 
@@ -50,57 +50,5 @@ public:
 	WalkingAverageMatrix walkingEdges{}; 
 	cv::Vec3f floorNormal;
 private:
-	int camera_id;
-};
-
-class OrbbecCamera : public DepthCamera {
-public:
-	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
-	~OrbbecCamera() override;
-
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
-	std::string getName() const override { return "Orbbec"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
-
-	void printDeviceInfo() const;
-
-	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera*> initialiseAllDevices();
-private:
-	const openni::DeviceInfo* _device_info;
-	openni::Device _device;
-	openni::VideoStream _depth_stream;
-	openni::VideoStream _color_stream;
-	openni::VideoFrameRef _frame_ref;
-	openni::Status rc;
-	int camera_id;
-};
-
-class RealSenseCamera : public DepthCamera {
-public:
-	RealSenseCamera(rs2::context* ctx, rs2::device* device, int camera_id);
-	~RealSenseCamera() override;
-
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return true; };
-	std::string getName() const override { return "Realsense"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
-
-	void printDeviceInfo() const;
-
-	static rs2::device_list getAvailableDevices(rs2::context ctx);
-	static std::vector<RealSenseCamera*> initialiseAllDevices();
-private:
-	rs2::pipeline _pipe;
-	rs2::context* _ctx{};
-	rs2::device* _device{};
-	rs2::config _cfg{};
-	rs2_intrinsics intrinsics;
-
-	// Declare depth colorizer for pretty visualization of depth data
-	rs2::colorizer _color_map{};
 	int camera_id;
 };
