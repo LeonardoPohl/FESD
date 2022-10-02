@@ -5,40 +5,6 @@
 
 namespace Params
 {
-	class Parameters {
-	public:
-		Parameters() = default;
-		virtual void displayParameters() = 0;
-	};
-
-	class GlobalParameters : Parameters {
-	public:
-		GlobalParameters(std::vector<DepthCamera*>* depth_cameras) : depth_cameras(depth_cameras) {};
-		void displayParameters() override {
-			ImGui::Begin("Global Settings");
-			ImGui::Text("%d Devices Available", depth_cameras->size());
-
-			ImGui::Text("");
-
-			for (DepthCamera* cam : *depth_cameras) {
-				ImGui::SameLine();
-				ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
-			}
-
-			ImGui::Checkbox("Display edges", &display_edges);
-			ImGui::Checkbox("Calculate Surface Normals", &calculate_surface_normals);
-			bool reset_walking_frames;
-			reset_walking_frames |= ImGui::Checkbox("Use Walking Average", &walking_average);
-
-			ImGui::End();
-		}
-		float sphere_radius;
-		bool display_edges = false;
-		bool walking_average = false;
-		bool calculate_surface_normals = false;	
-		std::vector<DepthCamera*>* depth_cameras;
-	};
-
 	// TODO Implement all parameters
 	/*
 	@param src Source 8 - bit single - channel image.
@@ -57,47 +23,27 @@ namespace Params
 	// TODO: Add save capability
 	// TODO: Investigate if this should be camera specific
 
-	class SphereDetectionParameters : Parameters {
+	class Parameters {
 	public:
-		void displayParameters() override {
-			ImGui::Begin("Sphere Detection Parameters");
+		Parameters() = default;
+		virtual void displayParameters() = 0;
+	};
 
-			ImGui::Text("Edge Detection Settings");
+	class GlobalParameters : public Parameters {
+	public:
+		GlobalParameters(std::vector<DepthCamera*>* depth_cameras) : depth_cameras(depth_cameras) {};
+		void displayParameters() override;
 
-			const char* adaptive_threshold_types[] = {
-				"Mean",
-				"Gaussian"
-			};
-			const char* threshold_types[] = {
-				"Binary",
-				"Binary Inverted",
-				"Trunc",
-				"To Zero",
-				"To Zero Inverted",
-				"Mask",
-				"Otsu",
-				"Triangle"
-			};
+		float sphere_radius;
+		bool display_edges = false;
+		bool walking_average = false;
+		bool calculate_surface_normals = false;
+		std::vector<DepthCamera*>* depth_cameras;
+	};
 
-			if (ImGui::Combo("Adaptive Threshold Type", &current_adaptive_threshold, adaptive_threshold_types, IM_ARRAYSIZE(adaptive_threshold_types))) {
-				adapriveThresholdType = adapriveThresholdTypes[current_adaptive_threshold];
-			}
-
-			if (ImGui::Combo("Threshold Type", &current_threshold, threshold_types, IM_ARRAYSIZE(threshold_types))) {
-				thresholdType = thresholdTypes[current_threshold];
-			}
-
-			ImGui::Separator();
-			ImGui::Text("Sphere Detector Settings");
-
-			ImGui::SliderFloat("Sphere Radius", &sphere_radius, 0, 100);
-			ImGui::DragIntRange2("Circle Radius", &min_radius, &max_radius, 5, 0, 100, "Min: %d", "Max: %d");
-			ImGui::SliderFloat("Canny edge detector threshold", &param1, 0, 500);
-			ImGui::SliderFloat("Accumulator threshold", &param2, 0, 500);
-
-			ImGui::Separator();
-			ImGui::End();
-		}
+	class SphereDetectionParameters : public Parameters {
+	public:
+		void displayParameters() override;
 
 		float sphere_radius{ 50 };
 
@@ -132,22 +78,13 @@ namespace Params
 		cv::ThresholdTypes thresholdType{ cv::ThresholdTypes::THRESH_BINARY };
 	};
 
-	class NormalParameters : Parameters {
+	class NormalParameters : public Parameters {
 	public:
-		void displayParameters() override {
-			ImGui::Begin("Normal Settings");
-
-			ImGui::SliderInt("Whats Up", &whatsUp, 0, 2);
-			ImGui::SliderFloat("How Up", &upnessFilter, 0, 2 * 3.45f);
-			ImGui::SliderInt("Number of Samples", &num_samples, 0, 50);
-			ImGui::SliderFloat("Edge cutoff", &edgeCutoff, 1, 50);
-
-			ImGui::End();
-		}
+		void displayParameters() override;
 
 		float upnessFilter{ 1 };
 		float edgeCutoff{ 10 };
 		int whatsUp;
 		int num_samples;
-	}; 
+	};
 }

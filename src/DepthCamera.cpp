@@ -166,7 +166,7 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalP
             edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 0, y - 1));
             edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y - 1));
 
-            edge_falloff *= 1 / params.edgeCutoff;
+            edge_falloff *= 1 / params->edgeCutoff;
             edge_falloff = std::max(edge_falloff, 0.01f);
 
             n[0] = 255 * edge_falloff * (n[0] + 1) / 2;

@@ -28,6 +28,9 @@
     <Filter Include="Header Files\Utilities">
       <UniqueIdentifier>{383e8611-0f89-48c1-9ab8-7d8555c71612}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Parameters">
+      <UniqueIdentifier>{7abcc4e3-9da6-487c-81f8-ffc36ab5d87b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -47,6 +50,15 @@
     </ClCompile>
     <ClCompile Include="src\DepthCameraUpdate.cpp">
       <Filter>Source Files\CameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NormalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SphereDetectionParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GlobalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

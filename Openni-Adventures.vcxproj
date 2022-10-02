@@ -160,9 +160,12 @@
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\DepthCamera.cpp" />
     <ClCompile Include="src\DepthCameraUpdate.cpp" />
+    <ClCompile Include="src\GlobalParameters.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\NormalParameters.cpp" />
     <ClCompile Include="src\OrbbecCamera.cpp" />
     <ClCompile Include="src\RealSenseCamera.cpp" />
+    <ClCompile Include="src\SphereDetectionParameters.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

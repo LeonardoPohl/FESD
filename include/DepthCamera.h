@@ -6,7 +6,13 @@
 
 #include <Circle.h>
 #include <WalkingAverage.h>
-#include <Parameters.h>
+
+namespace Params {
+	class GlobalParameters;
+	class SphereDetectionParameters;
+	class NormalParameters;
+}
+
 
 class DepthCamera {
 public:

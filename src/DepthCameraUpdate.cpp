@@ -1,6 +1,7 @@
 #include <DepthCamera.h>
 #include <iostream>
 #include <opencv2/highgui.hpp>
+#include <Parameters.h>
 
 void DepthCamera::doUpdate(
     Params::GlobalParameters* global_params, 

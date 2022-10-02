@@ -71,16 +71,9 @@ void App::initAllCameras() {
 }
 
 void App::update() {
-    bool reset_walking_frames = false;
     global_params.displayParameters();
     normal_params.displayParameters();
     sphere_params.displayParameters();
-    if (reset_walking_frames) {
-        for (DepthCamera* cam : depthCameras) {
-            cam->walkingFrames.reset();
-            cam->walkingEdges.reset();
-        }
-    }
 
     for (DepthCamera* cam : depthCameras) {
 
@@ -94,7 +87,6 @@ void App::update() {
                 if (ImGui::SliderInt("Moving Average Length", &cam->walkingFrames.length, 1, 100)) {
                     cam->walkingEdges.length = cam->walkingFrames.length;
                 }
-
             }
             ImGui::Checkbox("Detect Spheres", &cam->detect_circles);
 
