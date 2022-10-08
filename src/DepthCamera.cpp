@@ -128,61 +128,65 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalP
     }
     int width = depth_frame.size().width;
     int height = depth_frame.size().height;
-    Mat normals(width - 2, height - 2, CV_32FC3);
+    Mat normals(height - 2, width - 2, CV_32FC3);
     Mat floor(depth_frame.size(), CV_8UC3);
 
-    for (int x = 1; x < depth_frame.rows; ++x)
+    for (int row = 2; row < depth_frame.rows; ++row)
     {
-        for (int y = 1; y < depth_frame.cols; ++y)
+        for (int col = 2; col < depth_frame.cols; ++col)
         {
-            if ((depth_frame.at<ushort>(x, y) == 0) ||
-                (depth_frame.at<ushort>(x - 1, y) == 0) ||
-                (depth_frame.at<ushort>(x, y - 1) == 0)) {
+            if ((depth_frame.at<ushort>(row, col) == 0) ||
+                (depth_frame.at<ushort>(row - 1, col) == 0) ||
+                (depth_frame.at<ushort>(row, col - 1) == 0)) {
                 continue;
             }
 
-            if ((depth_frame.at<ushort>(x, y) == depth_frame.at<ushort>(x, y - 1)) ||
-                (depth_frame.at<ushort>(x, y) == depth_frame.at<ushort>(x - 1, y))) {
+            if ((depth_frame.at<ushort>(row, col) == depth_frame.at<ushort>(row, col - 1)) ||
+                (depth_frame.at<ushort>(row, col) == depth_frame.at<ushort>(row - 1, col))) {
                 continue;
             }
 
-            float dzdx = (depth_frame.at<ushort>(x + 1, y) - depth_frame.at<ushort>(x - 1, y));
-            float dzdy = (depth_frame.at<ushort>(x, y + 1) - depth_frame.at<ushort>(x, y - 1));
+            Vec3d t(row, col - 1, depth_frame.at<ushort>(row - 1, col)/*depth(y-1,x)*/);
+            Vec3d l(row - 1, col, depth_frame.at<ushort>(row, col - 1)/*depth(y,x-1)*/);
+            Vec3d c(row, col, depth_frame.at<ushort>(row, col)/*depth(y,x)*/);
+
+            Vec3d d = (l - c).cross(t - c);
+            Vec3d n = normalize(d);
+            /*
+            float dzdx = depth_frame.at<ushort>(row + 1, col) - depth_frame.at<ushort>(row - 1, col);
+            float dzdy = depth_frame.at<ushort>(row, col + 1) - depth_frame.at<ushort>(row, col - 1);
             
             Vec3f d(-dzdx,
                     -dzdy,
                     1);
 
-            Vec3f n = normalize(d);
-
+            Vec3f n = normalize(d);*/
             float edge_falloff = 1;
 
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y + 1));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 0, y + 1));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y + 1));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y + 0));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y + 0));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 1, y - 1));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x + 0, y - 1));
-            edge_falloff -= std::abs((float)depth_frame.at<ushort>(x, y) - depth_frame.at<ushort>(x - 1, y - 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 1, col + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 0, col + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row - 1, col + 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 1, col + 0));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row - 1, col + 0));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 1, col - 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 0, col - 1));
+            edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row - 1, col - 1));
 
             edge_falloff *= 1 / params->edgeCutoff;
             edge_falloff = std::max(edge_falloff, 0.01f);
+            
+            n[0] = 255 * edge_falloff * ((n[0] + 1) / 2);
+            n[1] = 255 * edge_falloff * ((n[1] + 1) / 2);
+            n[2] = 255 * edge_falloff * ((n[2] + 1) / 2);
 
-            n[0] = 255 * edge_falloff * (n[0] + 1) / 2;
-            n[1] = 255 * edge_falloff * (n[1] + 1) / 2;
-            n[2] = 255 * edge_falloff * (n[2] + 1) / 2;
+            normals.at<Vec3f>(row - 2, col - 2) = n;
 
-            normals.at<Vec3f>(x - 1, y - 1) = n;
-
-            // Surface should point roughly up
-            /*if (std::acos(n[params.whatsUp]) < params.upnessFilter) {
-                normals.at<Vec3f>(x-1, y-1) = n;
-            }*/
         }
     }
+    if (params->blur) {
+        GaussianBlur(normals, normals, Size(9, 9), 2, 2);
+    }
     return normals;
-    GaussianBlur(normals, normals, Size(9, 9), 2, 2);
     
     // TODO: Detect sphere positioned above ground as selected floor point
 

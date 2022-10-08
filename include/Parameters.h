@@ -86,5 +86,6 @@ namespace Params
 		float edgeCutoff{ 10 };
 		int whatsUp;
 		int num_samples;
+		bool blur;
 	};
 }

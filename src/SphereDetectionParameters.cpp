@@ -31,10 +31,10 @@ void Params::SphereDetectionParameters::displayParameters() {
 	ImGui::Separator();
 	ImGui::Text("Sphere Detector Settings");
 
-	ImGui::SliderFloat("Sphere Radius", &sphere_radius, 0, 100);
+	ImGui::SliderFloat("Sphere Radius", &sphere_radius, 0.1f, 100);
 	ImGui::DragIntRange2("Circle Radius", &min_radius, &max_radius, 5, 0, 100, "Min: %d", "Max: %d");
-	ImGui::SliderFloat("Canny edge detector threshold", &param1, 0, 500);
-	ImGui::SliderFloat("Accumulator threshold", &param2, 0, 500);
+	ImGui::SliderFloat("Canny edge detector threshold", &param1, 1, 500);
+	ImGui::SliderFloat("Accumulator threshold", &param2, 1, 500);
 
 	ImGui::Separator();
 	ImGui::End();

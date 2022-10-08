@@ -90,6 +90,7 @@
       <Filter>Resource Files\Orbbec</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="imgui.ini" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">

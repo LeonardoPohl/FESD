@@ -79,9 +79,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -175,6 +179,9 @@
     <None Include="docs\Orbbec\en\0300_SDK knowledge base.md" />
     <None Include="docs\Orbbec\en\0400_API.md" />
     <None Include="docs\Orbbec\en\0500_Product Support.md" />
+    <None Include="imgui.ini">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
     <None Include="vcpkg.json" />
@@ -190,6 +197,9 @@
     <ClInclude Include="include\Utilities.h" />
     <ClInclude Include="include\WalkingAverage.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
