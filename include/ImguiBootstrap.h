@@ -15,6 +15,7 @@
 #endif
 #include <GLFW/glfw3.h>  // Will drag system OpenGL headers
 
+
 namespace imgui {
 
     inline static void glfw_error_callback(int error, const char* description)
@@ -22,12 +23,12 @@ namespace imgui {
         fprintf(stderr, "Glfw Error %d: %s\n", error, description);
     }
 
-    inline static auto glfw_init() -> std::optional<const std::string>
+    inline static std::string glfw_init()
     {
         // Setup window
         glfwSetErrorCallback(glfw_error_callback);
         if (!glfwInit()) {
-            return {};
+            return "";
         }
 
         // Decide GL+GLSL versions
@@ -54,15 +55,14 @@ namespace imgui {
         return glsl_version;
     }
 
-    inline static auto create_window(std::string_view glsl_version)
-        -> std::optional<GLFWwindow*>
+    inline static GLFWwindow* create_window(std::string_view glsl_version)
     {
         // Create window with graphics context
         GLFWwindow* window = glfwCreateWindow(
             1920, 1080, "Camera Calibration Tool", NULL, NULL);
 
         if (window == NULL) {
-            return {};
+            return nullptr;
         }
 
         glfwMakeContextCurrent(window);
