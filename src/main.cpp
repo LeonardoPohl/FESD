@@ -16,12 +16,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "opengl_objects/TestClearColor.h"
-#include "opengl_objects/TestTexture2D.h"
+#include "obj/TestClearColor.h"
+#include "obj/TestTexture2D.h"
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
 
 #include <OpenNI.h>
+#include "cameras/CameraHandler.h"
 
 int main(void)
 {
@@ -64,6 +65,10 @@ int main(void)
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
+        auto io = &ImGui::GetIO();
+        io->Fonts->AddFontDefault();
+        io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
         Renderer r;
         GLObject::GLObject *currentTest;
         GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest);
@@ -72,31 +77,56 @@ int main(void)
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
         testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
 
+
+        //# Camera Initialisation
+        //#######################
+
+        // TODO: Make Async
+        CameraHandler cameraHandler;
+
+
         while (!glfwWindowShouldClose(window))
         {
             r.Clear();
-            if (currentTest)
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+
+            //# Test window
+            //#############
+
             {
-                currentTest->OnUpdate(0.0f);
-                currentTest->OnRender();
-
-                ImGui_ImplOpenGL3_NewFrame();
-                ImGui_ImplGlfw_NewFrame();
-
-                ImGui::NewFrame();
-                ImGui::Begin("Test");
-                if (currentTest != testMenu && ImGui::Button("<-"))
+                if (currentTest)
                 {
-                    delete currentTest;
-                    currentTest = testMenu;
+                    currentTest->OnUpdate(0.0f);
+                    currentTest->OnRender();
+
+
+                    ImGui::NewFrame();
+                    ImGui::Begin("Test");
+                    if (currentTest != testMenu && ImGui::Button("<-"))
+                    {
+                        delete currentTest;
+                        currentTest = testMenu;
+                    }
+                    currentTest->OnImGuiRender();
+                    ImGui::End();
                 }
-                currentTest->OnImGuiRender();
-                ImGui::End();
-
-                ImGui::Render();
-                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
             }
+
+            //# General Camera Window
+            //#######################
+
+            {
+                ImGui::Begin("Camera Handler");
+
+
+                ImGui::End();
+            }
+            
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
             glfwSwapBuffers(window);
 
@@ -115,3 +145,4 @@ int main(void)
     glfwTerminate();
     return 0;
 }
+

@@ -14,7 +14,6 @@
 #include <OpenNI.h>
 
 #include <cameras/DepthCamera.h>
-#include <ImguiBootstrap.h>
 #include <parameters/Parameters.h>
 
 class App {

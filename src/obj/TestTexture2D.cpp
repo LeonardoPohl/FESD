@@ -39,11 +39,11 @@ namespace GLObject
         m_VAO->AddBuffer(*m_VB, *m_VBL);
         m_IndexBuffer = std::make_unique<IndexBuffer>(indices, 6);
 
-        m_Shader = std::make_unique<Shader>("res/shaders/basic.shader");
+        m_Shader = std::make_unique<Shader>("resources/shaders/basic.shader");
         m_Shader->Bind();
         m_Shader->SetUniform4f("u_Color", 0.2f, 0.3f, 0.8f, 1.0f);
 
-        m_Texture = std::make_unique<Texture>("res/textures/ml.png");
+        m_Texture = std::make_unique<Texture>("resources/textures/ml.png");
         m_Texture->Bind();
         m_Shader->SetUniform1i("u_Texture", 0);
         glm::vec3 m_TranslationA(200, 200, 0);

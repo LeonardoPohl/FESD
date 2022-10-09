@@ -45,9 +45,6 @@
     <ClCompile Include="src\cameras\DepthCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\cameras\DepthCameraUpdate.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
@@ -60,10 +57,13 @@
     <ClCompile Include="src\parameters\GlobalParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
-    <ClCompile Include="src\opengl_objects\TestClearColor.cpp">
+    <ClCompile Include="src\obj\TestClearColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\opengl_objects\TestTexture2D.cpp">
+    <ClCompile Include="src\obj\TestTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,9 +103,6 @@
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
       <Filter>Header Files\Openni</Filter>
     </ClInclude>
-    <ClInclude Include="src\App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\cameras\RealsenseCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
@@ -124,20 +121,25 @@
     <ClInclude Include="src\parameters\Parameters.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="src\ImguiBootstrap.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\cameras\DepthCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\opengl_objects\TestClearColor.h">
+    <ClInclude Include="src\obj\TestClearColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\opengl_objects\TestTexture2D.h">
+    <ClInclude Include="src\obj\TestTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\CameraHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\ml.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
