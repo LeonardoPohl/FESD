@@ -1,6 +1,6 @@
 /// Main.cpp
+#include <GL/glew.h>
 
-#include <ImguiBootstrap.h>
 #include <OpenNI.h>
 #include <App.h>
 
@@ -18,12 +18,10 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include "imgui.h"
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
 #include <GLFW/glfw3.h>  // Will drag system OpenGL headers
-#include <GL/glew.h>
 
 #include "opengl_objects/TestClearColor.h"
 #include "opengl_objects/TestTexture2D.h"

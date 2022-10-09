@@ -1,12 +1,14 @@
 #include "TestTexture2D.h"
 
-#include <GLCore/GLErrorManager.h>
-#include <imgui.h>
+#include <GL/glew.h>
+#include "GLErrorManager.h"
+#include "imgui/imgui.h"
+
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace GLObject
+namespace test
 {
 	TestTexture2D::TestTexture2D() 
         : m_TranslationA{ 200, 200, 0 }, m_TranslationB{ 400, 200, 0 },

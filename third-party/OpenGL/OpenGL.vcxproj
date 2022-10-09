@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ae9634e0-789d-4657-9737-04247af8eee0}</ProjectGuid>
-    <RootNamespace>OpenGLCore</RootNamespace>
+    <ProjectGuid>{27a502ac-4b40-4b2a-b69c-8be54246036e}</ProjectGuid>
+    <RootNamespace>OpenGL</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,13 +70,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgInstalledDir>
-    </VcpkgInstalledDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgInstalledDir>
-    </VcpkgInstalledDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,7 +110,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)GLCore;$(ProjectDir)GLCore\vendor;$(ProjectDir)Dependencies\GLFW\include;$(ProjectDir)Dependencies\GLEW\include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -127,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)GLCore;$(ProjectDir)GLCore\vendor;$(ProjectDir)Dependencies\GLFW\include;$(ProjectDir)Dependencies\GLEW\include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -141,11 +141,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GLCore\Application.cpp" />
     <ClCompile Include="GLCore\GLErrorManager.cpp" />
+    <ClCompile Include="GLCore\GLObject.cpp" />
     <ClCompile Include="GLCore\IndexBuffer.cpp" />
     <ClCompile Include="GLCore\Renderer.cpp" />
     <ClCompile Include="GLCore\Shader.cpp" />
-    <ClCompile Include="GLCore\GLObject.cpp" />
+    <ClCompile Include="GLCore\tests\Test.cpp" />
+    <ClCompile Include="GLCore\tests\TestClearColor.cpp" />
+    <ClCompile Include="GLCore\tests\TestTexture2D.cpp" />
     <ClCompile Include="GLCore\Texture.cpp" />
     <ClCompile Include="GLCore\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui.cpp" />
@@ -160,11 +164,159 @@
     <ClCompile Include="GLCore\VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="GLCore\vendor\glm\detail\func_common.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_common_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_exponential.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_exponential_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_geometric.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_geometric_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_integer.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_integer_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_matrix.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_matrix_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_packing.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_packing_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_trigonometric.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_trigonometric_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_vector_relational.inl" />
+    <None Include="GLCore\vendor\glm\detail\func_vector_relational_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_half.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat2x2.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat2x3.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat2x4.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat3x2.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat3x3.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat3x4.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat4x2.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat4x3.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat4x4.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_mat4x4_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_quat.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_quat_simd.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_vec1.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_vec2.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_vec3.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_vec4.inl" />
+    <None Include="GLCore\vendor\glm\detail\type_vec4_simd.inl" />
+    <None Include="GLCore\vendor\glm\ext\matrix_clip_space.inl" />
+    <None Include="GLCore\vendor\glm\ext\matrix_common.inl" />
+    <None Include="GLCore\vendor\glm\ext\matrix_projection.inl" />
+    <None Include="GLCore\vendor\glm\ext\matrix_relational.inl" />
+    <None Include="GLCore\vendor\glm\ext\matrix_transform.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_common.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_common_simd.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_exponential.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_geometric.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_relational.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_transform.inl" />
+    <None Include="GLCore\vendor\glm\ext\quaternion_trigonometric.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_common.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_constants.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_integer.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_packing.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_relational.inl" />
+    <None Include="GLCore\vendor\glm\ext\scalar_ulp.inl" />
+    <None Include="GLCore\vendor\glm\ext\vector_common.inl" />
+    <None Include="GLCore\vendor\glm\ext\vector_integer.inl" />
+    <None Include="GLCore\vendor\glm\ext\vector_packing.inl" />
+    <None Include="GLCore\vendor\glm\ext\vector_relational.inl" />
+    <None Include="GLCore\vendor\glm\ext\vector_ulp.inl" />
+    <None Include="GLCore\vendor\glm\gtc\bitfield.inl" />
+    <None Include="GLCore\vendor\glm\gtc\color_space.inl" />
+    <None Include="GLCore\vendor\glm\gtc\constants.inl" />
+    <None Include="GLCore\vendor\glm\gtc\epsilon.inl" />
+    <None Include="GLCore\vendor\glm\gtc\integer.inl" />
+    <None Include="GLCore\vendor\glm\gtc\matrix_access.inl" />
+    <None Include="GLCore\vendor\glm\gtc\matrix_inverse.inl" />
+    <None Include="GLCore\vendor\glm\gtc\matrix_transform.inl" />
+    <None Include="GLCore\vendor\glm\gtc\noise.inl" />
+    <None Include="GLCore\vendor\glm\gtc\packing.inl" />
+    <None Include="GLCore\vendor\glm\gtc\quaternion.inl" />
+    <None Include="GLCore\vendor\glm\gtc\quaternion_simd.inl" />
+    <None Include="GLCore\vendor\glm\gtc\random.inl" />
+    <None Include="GLCore\vendor\glm\gtc\reciprocal.inl" />
+    <None Include="GLCore\vendor\glm\gtc\round.inl" />
+    <None Include="GLCore\vendor\glm\gtc\type_precision.inl" />
+    <None Include="GLCore\vendor\glm\gtc\type_ptr.inl" />
+    <None Include="GLCore\vendor\glm\gtc\ulp.inl" />
+    <None Include="GLCore\vendor\glm\gtx\associated_min_max.inl" />
+    <None Include="GLCore\vendor\glm\gtx\bit.inl" />
+    <None Include="GLCore\vendor\glm\gtx\closest_point.inl" />
+    <None Include="GLCore\vendor\glm\gtx\color_encoding.inl" />
+    <None Include="GLCore\vendor\glm\gtx\color_space.inl" />
+    <None Include="GLCore\vendor\glm\gtx\color_space_YCoCg.inl" />
+    <None Include="GLCore\vendor\glm\gtx\common.inl" />
+    <None Include="GLCore\vendor\glm\gtx\compatibility.inl" />
+    <None Include="GLCore\vendor\glm\gtx\component_wise.inl" />
+    <None Include="GLCore\vendor\glm\gtx\dual_quaternion.inl" />
+    <None Include="GLCore\vendor\glm\gtx\easing.inl" />
+    <None Include="GLCore\vendor\glm\gtx\euler_angles.inl" />
+    <None Include="GLCore\vendor\glm\gtx\extend.inl" />
+    <None Include="GLCore\vendor\glm\gtx\extended_min_max.inl" />
+    <None Include="GLCore\vendor\glm\gtx\exterior_product.inl" />
+    <None Include="GLCore\vendor\glm\gtx\fast_exponential.inl" />
+    <None Include="GLCore\vendor\glm\gtx\fast_square_root.inl" />
+    <None Include="GLCore\vendor\glm\gtx\fast_trigonometry.inl" />
+    <None Include="GLCore\vendor\glm\gtx\float_notmalize.inl" />
+    <None Include="GLCore\vendor\glm\gtx\functions.inl" />
+    <None Include="GLCore\vendor\glm\gtx\gradient_paint.inl" />
+    <None Include="GLCore\vendor\glm\gtx\handed_coordinate_space.inl" />
+    <None Include="GLCore\vendor\glm\gtx\hash.inl" />
+    <None Include="GLCore\vendor\glm\gtx\integer.inl" />
+    <None Include="GLCore\vendor\glm\gtx\intersect.inl" />
+    <None Include="GLCore\vendor\glm\gtx\io.inl" />
+    <None Include="GLCore\vendor\glm\gtx\log_base.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_cross_product.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_decompose.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_factorisation.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_interpolation.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_major_storage.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_operation.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_query.inl" />
+    <None Include="GLCore\vendor\glm\gtx\matrix_transform_2d.inl" />
+    <None Include="GLCore\vendor\glm\gtx\mixed_product.inl" />
+    <None Include="GLCore\vendor\glm\gtx\norm.inl" />
+    <None Include="GLCore\vendor\glm\gtx\normal.inl" />
+    <None Include="GLCore\vendor\glm\gtx\normalize_dot.inl" />
+    <None Include="GLCore\vendor\glm\gtx\number_precision.inl" />
+    <None Include="GLCore\vendor\glm\gtx\optimum_pow.inl" />
+    <None Include="GLCore\vendor\glm\gtx\orthonormalize.inl" />
+    <None Include="GLCore\vendor\glm\gtx\perpendicular.inl" />
+    <None Include="GLCore\vendor\glm\gtx\polar_coordinates.inl" />
+    <None Include="GLCore\vendor\glm\gtx\projection.inl" />
+    <None Include="GLCore\vendor\glm\gtx\quaternion.inl" />
+    <None Include="GLCore\vendor\glm\gtx\raw_data.inl" />
+    <None Include="GLCore\vendor\glm\gtx\rotate_normalized_axis.inl" />
+    <None Include="GLCore\vendor\glm\gtx\rotate_vector.inl" />
+    <None Include="GLCore\vendor\glm\gtx\scalar_relational.inl" />
+    <None Include="GLCore\vendor\glm\gtx\spline.inl" />
+    <None Include="GLCore\vendor\glm\gtx\std_based_type.inl" />
+    <None Include="GLCore\vendor\glm\gtx\string_cast.inl" />
+    <None Include="GLCore\vendor\glm\gtx\texture.inl" />
+    <None Include="GLCore\vendor\glm\gtx\transform.inl" />
+    <None Include="GLCore\vendor\glm\gtx\transform2.inl" />
+    <None Include="GLCore\vendor\glm\gtx\type_aligned.inl" />
+    <None Include="GLCore\vendor\glm\gtx\type_trait.inl" />
+    <None Include="GLCore\vendor\glm\gtx\vector_angle.inl" />
+    <None Include="GLCore\vendor\glm\gtx\vector_query.inl" />
+    <None Include="GLCore\vendor\glm\gtx\wrap.inl" />
+    <None Include="res\shaders\basic.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dependencies\GLEW\include\GL\eglew.h" />
+    <ClInclude Include="Dependencies\GLEW\include\GL\glew.h" />
+    <ClInclude Include="Dependencies\GLEW\include\GL\glxew.h" />
+    <ClInclude Include="Dependencies\GLEW\include\GL\wglew.h" />
+    <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
+    <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
     <ClInclude Include="GLCore\GLErrorManager.h" />
+    <ClInclude Include="GLCore\GLObject.h" />
     <ClInclude Include="GLCore\IndexBuffer.h" />
     <ClInclude Include="GLCore\Renderer.h" />
     <ClInclude Include="GLCore\Shader.h" />
-    <ClInclude Include="GLCore\GLObject.h" />
+    <ClInclude Include="GLCore\tests\Test.h" />
+    <ClInclude Include="GLCore\tests\TestClearColor.h" />
+    <ClInclude Include="GLCore\tests\TestTexture2D.h" />
     <ClInclude Include="GLCore\Texture.h" />
     <ClInclude Include="GLCore\vendor\glm\common.hpp" />
     <ClInclude Include="GLCore\vendor\glm\detail\compute_common.hpp" />
@@ -463,143 +615,10 @@
     <ClInclude Include="GLCore\VertexBufferLayout.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GLCore\vendor\glm\detail\func_common.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_common_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_exponential.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_exponential_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_geometric.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_geometric_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_integer.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_integer_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_matrix.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_matrix_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_packing.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_packing_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_trigonometric.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_trigonometric_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_vector_relational.inl" />
-    <None Include="GLCore\vendor\glm\detail\func_vector_relational_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_half.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat2x2.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat2x3.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat2x4.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat3x2.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat3x3.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat3x4.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat4x2.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat4x3.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat4x4.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_mat4x4_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_quat.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_quat_simd.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_vec1.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_vec2.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_vec3.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_vec4.inl" />
-    <None Include="GLCore\vendor\glm\detail\type_vec4_simd.inl" />
-    <None Include="GLCore\vendor\glm\ext\matrix_clip_space.inl" />
-    <None Include="GLCore\vendor\glm\ext\matrix_common.inl" />
-    <None Include="GLCore\vendor\glm\ext\matrix_projection.inl" />
-    <None Include="GLCore\vendor\glm\ext\matrix_relational.inl" />
-    <None Include="GLCore\vendor\glm\ext\matrix_transform.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_common.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_common_simd.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_exponential.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_geometric.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_relational.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_transform.inl" />
-    <None Include="GLCore\vendor\glm\ext\quaternion_trigonometric.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_common.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_constants.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_integer.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_packing.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_relational.inl" />
-    <None Include="GLCore\vendor\glm\ext\scalar_ulp.inl" />
-    <None Include="GLCore\vendor\glm\ext\vector_common.inl" />
-    <None Include="GLCore\vendor\glm\ext\vector_integer.inl" />
-    <None Include="GLCore\vendor\glm\ext\vector_packing.inl" />
-    <None Include="GLCore\vendor\glm\ext\vector_relational.inl" />
-    <None Include="GLCore\vendor\glm\ext\vector_ulp.inl" />
-    <None Include="GLCore\vendor\glm\gtc\bitfield.inl" />
-    <None Include="GLCore\vendor\glm\gtc\color_space.inl" />
-    <None Include="GLCore\vendor\glm\gtc\constants.inl" />
-    <None Include="GLCore\vendor\glm\gtc\epsilon.inl" />
-    <None Include="GLCore\vendor\glm\gtc\integer.inl" />
-    <None Include="GLCore\vendor\glm\gtc\matrix_access.inl" />
-    <None Include="GLCore\vendor\glm\gtc\matrix_inverse.inl" />
-    <None Include="GLCore\vendor\glm\gtc\matrix_transform.inl" />
-    <None Include="GLCore\vendor\glm\gtc\noise.inl" />
-    <None Include="GLCore\vendor\glm\gtc\packing.inl" />
-    <None Include="GLCore\vendor\glm\gtc\quaternion.inl" />
-    <None Include="GLCore\vendor\glm\gtc\quaternion_simd.inl" />
-    <None Include="GLCore\vendor\glm\gtc\random.inl" />
-    <None Include="GLCore\vendor\glm\gtc\reciprocal.inl" />
-    <None Include="GLCore\vendor\glm\gtc\round.inl" />
-    <None Include="GLCore\vendor\glm\gtc\type_precision.inl" />
-    <None Include="GLCore\vendor\glm\gtc\type_ptr.inl" />
-    <None Include="GLCore\vendor\glm\gtc\ulp.inl" />
-    <None Include="GLCore\vendor\glm\gtx\associated_min_max.inl" />
-    <None Include="GLCore\vendor\glm\gtx\bit.inl" />
-    <None Include="GLCore\vendor\glm\gtx\closest_point.inl" />
-    <None Include="GLCore\vendor\glm\gtx\color_encoding.inl" />
-    <None Include="GLCore\vendor\glm\gtx\color_space.inl" />
-    <None Include="GLCore\vendor\glm\gtx\color_space_YCoCg.inl" />
-    <None Include="GLCore\vendor\glm\gtx\common.inl" />
-    <None Include="GLCore\vendor\glm\gtx\compatibility.inl" />
-    <None Include="GLCore\vendor\glm\gtx\component_wise.inl" />
-    <None Include="GLCore\vendor\glm\gtx\dual_quaternion.inl" />
-    <None Include="GLCore\vendor\glm\gtx\easing.inl" />
-    <None Include="GLCore\vendor\glm\gtx\euler_angles.inl" />
-    <None Include="GLCore\vendor\glm\gtx\extend.inl" />
-    <None Include="GLCore\vendor\glm\gtx\extended_min_max.inl" />
-    <None Include="GLCore\vendor\glm\gtx\exterior_product.inl" />
-    <None Include="GLCore\vendor\glm\gtx\fast_exponential.inl" />
-    <None Include="GLCore\vendor\glm\gtx\fast_square_root.inl" />
-    <None Include="GLCore\vendor\glm\gtx\fast_trigonometry.inl" />
-    <None Include="GLCore\vendor\glm\gtx\float_notmalize.inl" />
-    <None Include="GLCore\vendor\glm\gtx\functions.inl" />
-    <None Include="GLCore\vendor\glm\gtx\gradient_paint.inl" />
-    <None Include="GLCore\vendor\glm\gtx\handed_coordinate_space.inl" />
-    <None Include="GLCore\vendor\glm\gtx\hash.inl" />
-    <None Include="GLCore\vendor\glm\gtx\integer.inl" />
-    <None Include="GLCore\vendor\glm\gtx\intersect.inl" />
-    <None Include="GLCore\vendor\glm\gtx\io.inl" />
-    <None Include="GLCore\vendor\glm\gtx\log_base.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_cross_product.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_decompose.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_factorisation.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_interpolation.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_major_storage.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_operation.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_query.inl" />
-    <None Include="GLCore\vendor\glm\gtx\matrix_transform_2d.inl" />
-    <None Include="GLCore\vendor\glm\gtx\mixed_product.inl" />
-    <None Include="GLCore\vendor\glm\gtx\norm.inl" />
-    <None Include="GLCore\vendor\glm\gtx\normal.inl" />
-    <None Include="GLCore\vendor\glm\gtx\normalize_dot.inl" />
-    <None Include="GLCore\vendor\glm\gtx\number_precision.inl" />
-    <None Include="GLCore\vendor\glm\gtx\optimum_pow.inl" />
-    <None Include="GLCore\vendor\glm\gtx\orthonormalize.inl" />
-    <None Include="GLCore\vendor\glm\gtx\perpendicular.inl" />
-    <None Include="GLCore\vendor\glm\gtx\polar_coordinates.inl" />
-    <None Include="GLCore\vendor\glm\gtx\projection.inl" />
-    <None Include="GLCore\vendor\glm\gtx\quaternion.inl" />
-    <None Include="GLCore\vendor\glm\gtx\raw_data.inl" />
-    <None Include="GLCore\vendor\glm\gtx\rotate_normalized_axis.inl" />
-    <None Include="GLCore\vendor\glm\gtx\rotate_vector.inl" />
-    <None Include="GLCore\vendor\glm\gtx\scalar_relational.inl" />
-    <None Include="GLCore\vendor\glm\gtx\spline.inl" />
-    <None Include="GLCore\vendor\glm\gtx\std_based_type.inl" />
-    <None Include="GLCore\vendor\glm\gtx\string_cast.inl" />
-    <None Include="GLCore\vendor\glm\gtx\texture.inl" />
-    <None Include="GLCore\vendor\glm\gtx\transform.inl" />
-    <None Include="GLCore\vendor\glm\gtx\transform2.inl" />
-    <None Include="GLCore\vendor\glm\gtx\type_aligned.inl" />
-    <None Include="GLCore\vendor\glm\gtx\type_trait.inl" />
-    <None Include="GLCore\vendor\glm\gtx\vector_angle.inl" />
-    <None Include="GLCore\vendor\glm\gtx\vector_query.inl" />
-    <None Include="GLCore\vendor\glm\gtx\wrap.inl" />
-    <None Include="res\shaders\basic.shader" />
+    <Image Include="res\textures\ml.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\vendor\glm\CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
