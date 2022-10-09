@@ -19,6 +19,7 @@ namespace GLObject
         int width = 640;
         int height = 480;
 
+        // TODO: create all points
 
         // Indices for vertices order
 
@@ -36,6 +37,7 @@ namespace GLObject
 
         m_VAO->AddBuffer(*m_VB, *m_VBL);
 
+        // TODO: https://www.youtube.com/watch?v=v5UDqm3zvcw&list=PLlrATfBNZ98f5vZ8nJ6UengEkZUMC4fy5&index=5
         int indices[] =
         {
             0, 1, 2,
@@ -60,8 +62,18 @@ namespace GLObject
     void PointCloud::OnRender()
     {
 
+        // TODO: Generate all pyramids:
+        // auto pyramid0 = point0.getVertexArray(0);
+        // auto pyramid0 = point1.getVertexArray(0);
+        // ...
+        // 
+        // Point::Vertex vertecies[640 * 480 * 5];
+        // 
+        // memcpy(vertecies, pyramid0.data(), pyramid1.size() * sizeof(Point.Vertex));
+        // memcpy(vertecies + pyramid0.size((, pyramid1.data(), pyramid1.size() * sizeof(Point.Vertex));
+        // ....
         m_IndexBuffer->Bind();
-        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        //GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
 
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
