@@ -12,10 +12,6 @@ namespace GLObject
 		GLCall(glGetFloatv(GL_COLOR_CLEAR_VALUE, m_ClearColor));
 	}
 
-	TestClearColor::~TestClearColor() {}
-
-	void TestClearColor::OnUpdate(float deltaTime) {}
-
 	void TestClearColor::OnRender()
 	{
 		GLCall(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]))

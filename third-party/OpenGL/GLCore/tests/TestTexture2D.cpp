@@ -48,8 +48,6 @@ namespace test
         m_Texture = std::make_unique<Texture>("res/textures/ml.png");
         m_Texture->Bind();
         m_Shader->SetUniform1i("u_Texture", 0);
-        glm::vec3 m_TranslationA(200, 200, 0);
-        glm::vec3 m_TranslationB(400, 200, 0);
 	}
 
 	void TestTexture2D::OnRender()

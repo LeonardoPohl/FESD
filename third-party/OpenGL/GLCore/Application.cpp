@@ -63,7 +63,7 @@ int main(void)
 
         Renderer r;
         test::Test *currentTest;
-        test::TestMenu* testMenu = new test::TestMenu(currentTest);
+        auto* testMenu = new test::TestMenu(currentTest);
         currentTest = testMenu;
 
         testMenu->RegisterTest<test::TestClearColor>("Clear Color");

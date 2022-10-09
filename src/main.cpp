@@ -1,9 +1,6 @@
 /// Main.cpp
 #include <GL/glew.h>
-
-#include <OpenNI.h>
-#include <App.h>
-
+#include <GLFW/glfw3.h>
 #include <iostream>
 
 #include <fstream>
@@ -13,32 +10,21 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include <GLCore/Renderer.h>
+#include "GLCore/Renderer.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
-#endif
-#include <GLFW/glfw3.h>  // Will drag system OpenGL headers
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #include "opengl_objects/TestClearColor.h"
 #include "opengl_objects/TestTexture2D.h"
-#include <GLCore/GLObject.h>
-#include <GLCore/GLErrorManager.h>
+#include "GLCore/GLObject.h"
+#include "GLCore/GLErrorManager.h"
 
-int main() {
+#include <OpenNI.h>
 
-    //# initialize openni sdk
-    //#######################
-
-    if (openni::OpenNI::initialize() != openni::STATUS_OK)
-    {
-        printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
-        return 1;
-    }
-
+int main(void)
+{
     GLFWwindow *window;
 
     /* Initialize the library */
@@ -127,8 +113,5 @@ int main() {
     ImGui::DestroyContext();
 
     glfwTerminate();
-    openni::OpenNI::shutdown();
-
     return 0;
 }
-
