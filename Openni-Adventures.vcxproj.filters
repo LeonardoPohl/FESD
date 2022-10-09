@@ -66,6 +66,9 @@
     <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\obj\TestTriangle2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore">
@@ -97,6 +100,8 @@
     </None>
     <None Include="packages.config" />
     <None Include="imgui.ini" />
+    <None Include="resources\shaders\texture.shader" />
+    <None Include="resources\shaders\pointcloud.shader" />
     <None Include="resources\shaders\basic.shader" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +136,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\cameras\CameraHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\TestTriangle2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

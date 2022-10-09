@@ -21,11 +21,17 @@ CameraHandler::CameraHandler()
 
 CameraHandler::~CameraHandler()
 {
+    for (auto cam : depthCameras)
+    {
+        delete cam;
+    }
     openni::OpenNI::shutdown();
 }
 
 void CameraHandler::initAllCameras()
 {
+    depthCameras.clear();
+
     auto rs_cameras = RealSenseCamera::initialiseAllDevices();
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices();
 

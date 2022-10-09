@@ -17,7 +17,9 @@
 #include "imgui_impl_opengl3.h"
 
 #include "obj/TestClearColor.h"
+#include "obj/TestTriangle2D.h"
 #include "obj/TestTexture2D.h"
+
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
 
@@ -75,9 +77,10 @@ int main(void)
         currentTest = testMenu;
 
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
+        testMenu->RegisterTest<GLObject::TestTriangle2D>("2D Plane");
         testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
 
-
+        
         //# Camera Initialisation
         //#######################
 
@@ -120,6 +123,12 @@ int main(void)
             {
                 ImGui::Begin("Camera Handler");
 
+                if (ImGui::Button("Init Cameras"))
+                {
+                    cameraHandler.initAllCameras();
+                }
+
+                cameraHandler.showCameras();
 
                 ImGui::End();
             }
