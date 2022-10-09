@@ -1,6 +1,6 @@
 #include "App.h"
-#include <OrbbecCamera.h>
-#include <RealsenseCamera.h>
+#include <cameras/OrbbecCamera.h>
+#include <cameras/RealsenseCamera.h>
 
 App::App() {
 

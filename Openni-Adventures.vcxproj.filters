@@ -36,29 +36,38 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OrbbecCamera.cpp">
+    <ClCompile Include="src\cameras\OrbbecCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\RealSenseCamera.cpp">
+    <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\DepthCamera.cpp">
+    <ClCompile Include="src\cameras\DepthCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\App.cpp">
+    <ClCompile Include="src\cameras\DepthCameraUpdate.cpp">
+      <Filter>Source Files\CameraController</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parameters\NormalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parameters\SphereDetectionParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parameters\GlobalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\TestClearColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DepthCameraUpdate.cpp">
-      <Filter>Source Files\CameraController</Filter>
+    <ClCompile Include="src\obj\TestTexture2D.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\NormalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
+    <ClCompile Include="src\cameras\CameraHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SphereDetectionParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GlobalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
+    <ClCompile Include="src\obj\TestTriangle2D.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,37 +100,54 @@
     </None>
     <None Include="packages.config" />
     <None Include="imgui.ini" />
+    <None Include="resources\shaders\texture.shader" />
+    <None Include="resources\shaders\pointcloud.shader" />
+    <None Include="resources\shaders\basic.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
       <Filter>Header Files\Openni</Filter>
     </ClInclude>
-    <ClInclude Include="include\App.h">
+    <ClInclude Include="src\cameras\RealsenseCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\OrbbecCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\WalkingAverage.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Utilities.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Circle.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parameters\Parameters.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\DepthCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\TestClearColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RealsenseCamera.h">
-      <Filter>Header Files\Cameras</Filter>
+    <ClInclude Include="src\obj\TestTexture2D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OrbbecCamera.h">
-      <Filter>Header Files\Cameras</Filter>
+    <ClInclude Include="src\cameras\CameraHandler.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\WalkingAverage.h">
-      <Filter>Header Files\Utilities</Filter>
+    <ClInclude Include="src\obj\TestTriangle2D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utilities.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Circle.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Parameters.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ImguiBootstrap.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DepthCamera.h">
-      <Filter>Header Files\Cameras</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\Roboto-Medium.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\ml.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
