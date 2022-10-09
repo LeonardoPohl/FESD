@@ -69,6 +69,9 @@
     <ClCompile Include="src\obj\TestTriangle2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\obj\TestPyramid3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore">
@@ -103,6 +106,7 @@
     <None Include="resources\shaders\texture.shader" />
     <None Include="resources\shaders\pointcloud.shader" />
     <None Include="resources\shaders\basic.shader" />
+    <None Include="resources\shaders\basic3d.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
@@ -141,12 +145,21 @@
     <ClInclude Include="src\obj\TestTriangle2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\obj\TestPyramid3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\ml.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="C:\Users\pohly\Downloads\brick.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\brick.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

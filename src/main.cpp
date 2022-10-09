@@ -19,6 +19,7 @@
 #include "obj/TestClearColor.h"
 #include "obj/TestTriangle2D.h"
 #include "obj/TestTexture2D.h"
+#include "obj/TestPyramid3D.h"
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
@@ -79,6 +80,7 @@ int main(void)
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
         testMenu->RegisterTest<GLObject::TestTriangle2D>("2D Plane");
         testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
+        testMenu->RegisterTest<GLObject::TestPyramid3D>("3D Pyramid");
 
         
         //# Camera Initialisation
@@ -128,7 +130,7 @@ int main(void)
                     cameraHandler.initAllCameras();
                 }
 
-                cameraHandler.showCameras();
+                //cameraHandler.showCameras();
 
                 ImGui::End();
             }

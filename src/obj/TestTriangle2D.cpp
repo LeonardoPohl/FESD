@@ -1,5 +1,4 @@
 #include "TestTriangle2D.h"
-#include "TestTexture2D.h"
 
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
@@ -43,7 +42,7 @@ namespace GLObject
     void TestTriangle2D::OnRender()
     {
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Renderer renderer;
 
