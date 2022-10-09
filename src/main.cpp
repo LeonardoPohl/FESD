@@ -16,10 +16,10 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "obj/TestClearColor.h"
-#include "obj/TestTriangle2D.h"
-#include "obj/TestTexture2D.h"
-#include "obj/TestPyramid3D.h"
+#include "obj/tests/TestClearColor.h"
+#include "obj/tests/TestTriangle2D.h"
+#include "obj/tests/TestTexture2D.h"
+#include "obj/tests/TestPyramid3D.h"
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
