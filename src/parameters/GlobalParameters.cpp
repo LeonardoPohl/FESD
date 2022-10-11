@@ -15,13 +15,13 @@ void Params::GlobalParameters::displayParameters() {
 	ImGui::Checkbox("Calculate Surface Normals", &calculate_surface_normals);
 	bool reset_walking_frames;
 	reset_walking_frames |= ImGui::Checkbox("Use Walking Average", &walking_average);
-
+	/*
 	if (reset_walking_frames) {
 		for (DepthCamera* cam : *depth_cameras) {
 			cam->walkingFrames.reset();
 			cam->walkingEdges.reset();
 		}
-	}
+	}*/
 
 	ImGui::End();
 }

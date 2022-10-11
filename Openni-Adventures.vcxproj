@@ -162,8 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
-    <ClCompile Include="src\cameras\DepthCamera.cpp" />
-    <ClCompile Include="src\cameras\DepthCameraUpdate.cpp" />
+    <ClCompile Include="src\obj\PointCloud.cpp" />
     <ClCompile Include="src\obj\Tests\TestBatchPyramid3D.cpp" />
     <ClCompile Include="src\obj\Tests\TestClearColor.cpp" />
     <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
@@ -197,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cameras\CameraHandler.h" />
+    <ClInclude Include="src\obj\PointCloud.h" />
     <ClInclude Include="src\obj\Tests\TestBatchPyramid3D.h" />
     <ClInclude Include="src\obj\Tests\TestClearColor.h" />
     <ClInclude Include="src\obj\Tests\TestPyramid3D.h" />

@@ -42,12 +42,6 @@
     <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\cameras\DepthCamera.cpp">
-      <Filter>Source Files\CameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="src\cameras\DepthCameraUpdate.cpp">
-      <Filter>Source Files\CameraController</Filter>
-    </ClCompile>
     <ClCompile Include="src\parameters\NormalParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
@@ -73,6 +67,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\obj\Tests\TestBatchPyramid3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\PointCloud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,6 +149,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\obj\Tests\TestBatchPyramid3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\PointCloud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
