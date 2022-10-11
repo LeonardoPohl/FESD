@@ -6,11 +6,12 @@ public:
 	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
+	void* getDepth() override;
+	//cv::Mat getDepthFrame() override;
+	//cv::Mat getColorFrame() override;
+	//bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
 	std::string getName() const override { return "Orbbec"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
+	//cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 

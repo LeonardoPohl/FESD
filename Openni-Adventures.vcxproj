@@ -164,10 +164,11 @@
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
     <ClCompile Include="src\cameras\DepthCamera.cpp" />
     <ClCompile Include="src\cameras\DepthCameraUpdate.cpp" />
-    <ClCompile Include="src\obj\TestClearColor.cpp" />
-    <ClCompile Include="src\obj\TestTriangle2D.cpp" />
-    <ClCompile Include="src\obj\TestTexture2D.cpp" />
-    <ClCompile Include="src\obj\TestPyramid3D.cpp" />
+    <ClCompile Include="src\obj\Tests\TestBatchPyramid3D.cpp" />
+    <ClCompile Include="src\obj\Tests\TestClearColor.cpp" />
+    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
+    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp" />
+    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp" />
     <ClCompile Include="src\parameters\GlobalParameters.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\parameters\NormalParameters.cpp" />
@@ -196,10 +197,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cameras\CameraHandler.h" />
-    <ClInclude Include="src\obj\TestClearColor.h" />
-    <ClInclude Include="src\obj\TestTriangle2D.h" />
-    <ClInclude Include="src\obj\TestTexture2D.h" />
-    <ClInclude Include="src\obj\TestPyramid3D.h" />
+    <ClInclude Include="src\obj\Tests\TestBatchPyramid3D.h" />
+    <ClInclude Include="src\obj\Tests\TestClearColor.h" />
+    <ClInclude Include="src\obj\Tests\TestPyramid3D.h" />
+    <ClInclude Include="src\obj\Tests\TestTexture2D.h" />
+    <ClInclude Include="src\obj\Tests\TestTriangle2D.h" />
     <ClInclude Include="src\utilities\Circle.h" />
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />

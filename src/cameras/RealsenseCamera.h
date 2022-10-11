@@ -7,11 +7,8 @@ public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, int camera_id);
 	~RealSenseCamera() override;
 
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return true; };
+	void* getDepth() override;
 	std::string getName() const override { return "Realsense"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 

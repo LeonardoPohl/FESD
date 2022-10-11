@@ -8,6 +8,7 @@
 #include "OrbbecCamera.h"
 
 #include <OpenNI.h>
+#include <iostream>
 
 CameraHandler::CameraHandler()
 {
@@ -28,20 +29,30 @@ CameraHandler::~CameraHandler()
     openni::OpenNI::shutdown();
 }
 
+void CameraHandler::findAllCameras()
+{
+    depthCameras.clear();
+
+    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices();
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices();
+
+    std::cout << "[INFO] Queried all devices" << std::endl;
+
+    depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
+    depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
+}
+
 void CameraHandler::initAllCameras()
 {
     depthCameras.clear();
 
-    auto rs_cameras = RealSenseCamera::initialiseAllDevices();
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices();
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices();
+
+    std::cout << "[INFO] Queried all devices" << std::endl;
 
     depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
-
-    for (auto cam : depthCameras)
-    {
-        cv::namedWindow(cam->getWindowName());
-    }
 }
 
 void CameraHandler::showCameras()

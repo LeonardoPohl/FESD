@@ -17,23 +17,24 @@ namespace Params {
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
-	virtual cv::Mat getDepthFrame() = 0;
-	virtual cv::Mat getColorFrame() = 0;
+	virtual void *getDepth();
 	virtual std::string getName() const = 0; 
-	virtual bool hasColorStream() = 0;
-	virtual cv::Vec3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
-	std::vector<Circle*> detectSpheres(Params::SphereDetectionParameters *params);
-	std::vector<Circle*> detectSpheres(cv::Mat frame, Params::SphereDetectionParameters *params);
+	int getDepthStreamWidth() const
+	{
+		return depth_width;
+	}	
 
-	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters *params, bool display_edges);
+	int getDepthStreamHeigth() const
+	{
+		return depth_height;
+	}
 
-	static cv::Mat detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters *params);
-	cv::Mat getWorldFrame(cv::Mat depth_frame);
+	int getDepthStreamDepth() const
+	{
+		return max_depth;
+	}
 
-	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters *params);
-
-	void doUpdate(Params::GlobalParameters *global_params, Params::NormalParameters *normal_params, Params::SphereDetectionParameters *sphere_params);
 
 	std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -43,18 +44,17 @@ public:
 		return this->getName() + " Camera " + std::to_string(this->camera_id);
 	}
 
-	int getCameraId() const {
+	int getCameraId() const
+	{
 		return camera_id;
 	}
 
-	cv::Point selectedFloorPoint{-1, -1};
-
-	bool detect_circles{ false };
-	bool show_color_stream{ false };
 	bool is_enabled{ true };
-	WalkingAverageMatrix walkingFrames{};
-	WalkingAverageMatrix walkingEdges{}; 
-	cv::Vec3f floorNormal;
 private:
 	int camera_id;
+
+	int max_depth;
+
+	int depth_width;
+	int depth_height;
 };

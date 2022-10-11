@@ -47,43 +47,6 @@ RealSenseCamera::~RealSenseCamera() {
 	}
 }
 
-cv::Mat RealSenseCamera::getDepthFrame() {
-	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	frame depth = data.get_depth_frame();
-
-	// Query frame size (width and height)
-	const int w = depth.as<video_frame>().get_width();
-	const int h = depth.as<video_frame>().get_height();
-
-	// Create OpenCV matrix of size (w,h) from the colorized depth data
-	return cv::Mat(cv::Size(w, h), CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP) * 10;
-}
-
-cv::Mat RealSenseCamera::getColorFrame() {
-	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	frame depth = data.get_color_frame();
-
-	// Query frame size (width and height)
-	const int w = depth.as<video_frame>().get_width();
-	const int h = depth.as<video_frame>().get_height();
-
-	// Create OpenCV matrix of size (w,h) from the colorized depth data
-	return cv::Mat(cv::Size(w, h), CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP) * 10;
-}
-
-cv::Vec3f RealSenseCamera::pixelToPoint(int x, int y, ushort depth) const
-{
-	float pixel[3] = { x, y, depth };
-	rs2_intrinsics* intrinsics;
-	rs2_stream_profile* profile;
-	//rs2_open(, profile, this->roc);
-	//rs2_get_video_stream_intrinsics(RS2_STREAM_DEPTH, intrinsics);
-	//rs2_deproject_pixel_to_point(pt, intrinsics)
-	cv::Vec3f pt;
-	//CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt.x, &pt.y, &pt.z);
-	return pt;
-}
-
 // Utils
 void RealSenseCamera::printDeviceInfo() const {
 	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));

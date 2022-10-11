@@ -14,6 +14,7 @@ public:
 	CameraHandler();
 	~CameraHandler();
 
+	void findAllCameras();
 	void initAllCameras();
 	void showCameras();
 private:

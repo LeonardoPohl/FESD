@@ -1,5 +1,4 @@
 #include "OrbbecCamera.h"
-#include <opencv2/highgui.hpp>
 #include <iostream>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
@@ -119,90 +118,6 @@ OrbbecCamera::~OrbbecCamera() {
     this->_color_stream.destroy();
 
     this->_device.close();
-}
-
-cv::Mat OrbbecCamera::getDepthFrame() {
-    int changedStreamDummy;
-    VideoStream* pStream = &this->_depth_stream;
-
-    //# Wait a new frame
-    //##################
-    this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "Wait failed! (timeout is ";
-        error_string += std::to_string(READ_WAIT_TIMEOUT);
-        error_string += " ms)\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //# Get depth frame
-    //#################
-    this->rc = this->_depth_stream.readFrame(&this->_frame_ref);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "Read failed!\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //# Check if the frame format is depth frame format
-    //#################################################
-    if (this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
-    {
-        std::string error_string = "Unexpected frame format!";
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-    //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
-    auto* pDepth = (DepthPixel*)this->_frame_ref.getData();
-    return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_16UC1, pDepth, cv::Mat::AUTO_STEP) * 10;
-}
-
-cv::Mat OrbbecCamera::getColorFrame() {
-    int changedStreamDummy;
-    VideoStream* pStream = &this->_color_stream;
-
-    //# Wait a new frame
-    //##################
-    this->rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "hhuhiWait failed! (timeout is ";
-        error_string += std::to_string(READ_WAIT_TIMEOUT);
-        error_string += " ms)\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //# Get color frame
-    //#################
-    this->rc = this->_color_stream.readFrame(&this->_frame_ref);
-    if (this->rc != STATUS_OK)
-    {
-        std::string error_string = "Read failed!\n";
-        error_string += OpenNI::getExtendedError();
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //# Check if the frame format is color frame format
-    //#################################################
-    if (this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_RGB888 && this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_JPEG)
-    {
-        std::string error_string = "Unexpected frame format!";
-        throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
-    }
-
-    //https://opencv.org/working-with-orbbec-astra-3d-cameras-using-opencv/ for the matrix type
-    auto* pDepth = (DepthPixel*)this->_frame_ref.getData();
-    return cv::Mat(cv::Size(this->_frame_ref.getWidth(), this->_frame_ref.getHeight()), CV_8UC3, pDepth, cv::Mat::AUTO_STEP) * 10;
-}
-
-cv::Vec3f OrbbecCamera::pixelToPoint(int x, int y, ushort depth) const
-{
-    cv::Vec3f pt{};
-    CoordinateConverter::convertDepthToWorld(this->_depth_stream, x, y, ((DepthPixel*)this->_frame_ref.getData())[x * this->_frame_ref.getWidth() + y], &pt[0], &pt[1], &pt[2]);
-    return pt;
 }
 
 // Utils

@@ -11,7 +11,7 @@
 #include <parameters/Parameters.h>
 
 using namespace cv;
-
+/*
 std::vector<Circle*> DepthCamera::detectSpheres(Params::SphereDetectionParameters *params) {
     return detectSpheres(this->getDepthFrame(), params);
 }
@@ -104,7 +104,6 @@ cv::Mat DepthCamera::detectEdges(cv::Mat depth_frame, Params::SphereDetectionPar
     cv::adaptiveThreshold(edge_mat, edge_mat, 255, params->adapriveThresholdType, params->thresholdType, 5, 2);
     return edge_mat;
 }
-
 cv::Mat DepthCamera::getWorldFrame(cv::Mat depth_frame)
 {
     Mat world_frame(depth_frame.size(), CV_32FC3);
@@ -147,9 +146,9 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalP
                 continue;
             }
 
-            Vec3d t(row, col - 1, depth_frame.at<ushort>(row - 1, col)/*depth(y-1,x)*/);
-            Vec3d l(row - 1, col, depth_frame.at<ushort>(row, col - 1)/*depth(y,x-1)*/);
-            Vec3d c(row, col, depth_frame.at<ushort>(row, col)/*depth(y,x)*/);
+            Vec3d t(row, col - 1, depth_frame.at<ushort>(row - 1, col)/*depth(y-1,x)/);
+            Vec3d l(row - 1, col, depth_frame.at<ushort>(row, col - 1)/*depth(y,x-1)/);
+            Vec3d c(row, col, depth_frame.at<ushort>(row, col)/*depth(y,x)/);
 
             Vec3d d = (l - c).cross(t - c);
             Vec3d n = normalize(d);
@@ -161,7 +160,7 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalP
                     -dzdy,
                     1);
 
-            Vec3f n = normalize(d);*/
+            Vec3f n = normalize(d);/
             float edge_falloff = 1;
 
             edge_falloff -= std::abs((float)depth_frame.at<ushort>(row, col) - depth_frame.at<ushort>(row + 1, col + 1));
@@ -232,3 +231,5 @@ cv::Mat DepthCamera::calculateSelectedFloor(cv::Mat depth_frame, Params::NormalP
 
     return normals;
 }
+
+*/
