@@ -1,31 +1,52 @@
 #shader vertex
 #version 330 core
 
-layout(location = 0) in vec4 position;
-layout(location = 0) in float depth;
+// Positions/Coordinates
+layout(location = 0) in vec3 aPos;
+// Colors
+layout(location = 1) in vec3 aColor;
+// Texture Coordinates
+layout(location = 2) in vec2 aTex;
 
-out vec2 v_TexCoord;
 
+// Outputs the color for the Fragment Shader
+out vec3 color;
+// Outputs the texture coordinates to the fragment shader
+out vec2 texCoord;
+
+// Controls the scale of the vertices
+uniform float u_scale;
+
+// Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 u_MVP;
 
 void main()
 {
-    gl_Position = u_MVP * position;
-
-};
+	// Outputs the positions/coordinates of all vertices
+	gl_Position = u_MVP * vec4(u_scale * aPos, 1.0);
+	// Assigns the colors from the Vertex Data to "color"
+	color = aColor;
+	// Assigns the texture coordinates from the Vertex Data to "texCoord"
+	texCoord = aTex;
+}
 
 #shader fragment
 #version 330 core
 
-layout(location = 0) out vec4 color;
+// Outputs colors in RGBA
+out vec4 FragColor;
 
-in vec2 v_TexCoord;
 
-uniform vec4 u_Color;
+// Inputs the color from the Vertex Shader
+in vec3 color;
+// Inputs the texture coordinates from the Vertex Shader
+in vec2 texCoord;
+
+// Gets the Texture Unit from the main function
 uniform sampler2D u_Texture;
+
 
 void main()
 {
-    vec4 texColor = texture(u_Texture, v_TexCoord);
-    color = texColor;
-};
+	FragColor = texture(u_Texture, texCoord);
+}

@@ -85,8 +85,6 @@ int main(void)
         
         //# Camera Initialisation
         //#######################
-
-        // TODO: Make Async
         CameraHandler cameraHandler;
 
 
@@ -127,9 +125,10 @@ int main(void)
 
                 if (ImGui::Button("Init Cameras"))
                 {
+                    // TODO: Make Async
                     cameraHandler.initAllCameras();
                 }
-
+                cameraHandler.OnImGuiRender();
                 //cameraHandler.showCameras();
 
                 ImGui::End();
