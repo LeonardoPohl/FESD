@@ -1,7 +1,4 @@
 #pragma once
-#include <OpenNI.h>				// Include OpenNI
-#include <opencv2/core.hpp>		// Include OpenCV
-#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
 
 #include <utilities/Circle.h>
@@ -13,48 +10,46 @@ namespace Params {
 	class NormalParameters;
 }
 
-
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
-	virtual void *getDepth();
+	virtual const void *getDepth() = 0;
 	virtual std::string getName() const = 0; 
 
-	int getDepthStreamWidth() const
+	inline unsigned int getDepthStreamWidth() const
 	{
 		return depth_width;
 	}	
 
-	int getDepthStreamHeigth() const
+	inline unsigned int getDepthStreamHeight() const
 	{
 		return depth_height;
 	}
 
-	int getDepthStreamDepth() const
+	inline unsigned int getDepthStreamDepth() const
 	{
 		return max_depth;
 	}
 
-
-	std::string getWindowName() const {
+	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
 	}
 
-	std::string getCameraName() const {
+	inline std::string getCameraName() const {
 		return this->getName() + " Camera " + std::to_string(this->camera_id);
 	}
 
-	int getCameraId() const
+	inline unsigned int getCameraId() const
 	{
 		return camera_id;
 	}
 
 	bool is_enabled{ true };
-private:
-	int camera_id;
+protected:
+	unsigned int camera_id;
 
-	int max_depth;
+	unsigned int max_depth;
 
-	int depth_width;
-	int depth_height;
+	unsigned int depth_width;
+	unsigned int depth_height;
 };

@@ -1,22 +1,19 @@
 #pragma once
 #include "DepthCamera.h"
+#include <OpenNI.h>
 
 class OrbbecCamera : public DepthCamera {
 public:
 	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
-	void* getDepth() override;
-	//cv::Mat getDepthFrame() override;
-	//cv::Mat getColorFrame() override;
-	//bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
+	const void* getDepth() override;
 	std::string getName() const override { return "Orbbec"; }
-	//cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera*> initialiseAllDevices();
+	static std::vector<OrbbecCamera*> initialiseAllDevices(int *starting_id);
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
@@ -24,5 +21,4 @@ private:
 	openni::VideoStream _color_stream;
 	openni::VideoFrameRef _frame_ref;
 	openni::Status rc;
-	int camera_id;
 };
