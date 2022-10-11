@@ -1,4 +1,4 @@
-#include "TestPyramid3D.h"
+#include "TestBatchPyramid3D.h"
 
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
@@ -8,12 +8,14 @@
 
 namespace GLObject
 {
-    TestPyramid3D::TestPyramid3D()
+    TestBatchPyramid3D::TestBatchPyramid3D()
         : m_Color{ 0.2f, 0.3f, 0.8f, 1.0f }, m_RotationFactor(0), 
         m_Scale(0.5f), m_Rotation{ 0.0f, 1.0f, 0.0f }, m_Translation{ 0.0f, 1.0f, 0.0f }
     {
         GLfloat vertices[] =
-        { //     COORDINATES     /        COLORS      /   TexCoord  //
+        { 
+            //     COORDINATES    /        COLORS        /   TexCoord   //
+            // # Pyramid 1
             -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f, // 0
             -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f, // 1
              0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f, // 2
@@ -56,7 +58,7 @@ namespace GLObject
         m_Shader->SetUniform1i("u_Texture", 0);
     }
 
-    void TestPyramid3D::OnRender()
+    void TestBatchPyramid3D::OnRender()
     {
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -72,7 +74,7 @@ namespace GLObject
         model = glm::translate(glm::mat4(1.0f), m_Translation) * glm::rotate(model, glm::radians(m_RotationFactor), m_Rotation);
 
         view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-        proj = glm::perspective(glm::radians(45.0f), (float)960.0f / 540.0f, 0.1f, 100.0f);
+        proj = glm::perspective(glm::radians(60.0f), (float)960.0f / 540.0f, 0.1f, 100.0f);
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_model", model);
@@ -84,7 +86,7 @@ namespace GLObject
         
     }
 
-    void TestPyramid3D::OnImGuiRender()
+    void TestBatchPyramid3D::OnImGuiRender()
     {
         ImGui::SliderFloat("Rotation Factor", &m_RotationFactor, 0.0f, 360.0f);
         ImGui::SliderFloat3("Rotation", &m_Rotation.x, 0.0f, 1.0f);

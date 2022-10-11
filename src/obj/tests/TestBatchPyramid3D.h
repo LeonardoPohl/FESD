@@ -11,10 +11,10 @@
 
 namespace GLObject
 {
-	class TestPyramid3D : public GLObject
+	class TestBatchPyramid3D : public GLObject
 	{
 	public:
-		TestPyramid3D();
+		TestBatchPyramid3D();
 
 		void OnRender() override;
 		void OnImGuiRender() override;
