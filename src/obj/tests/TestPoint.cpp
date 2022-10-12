@@ -5,6 +5,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <utilities/Consts.h>
 
 namespace GLObject
 {
@@ -14,15 +15,19 @@ namespace GLObject
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+        m_Width = WINDOW_WIDTH;
+        m_Height = WINDOW_HEIGHT;
+        m_MaxDepth = 500;
+
         m_VAO = std::make_unique<VertexArray>();
-        m_Position = {30.0f, 40.0f};
+        m_Position = {2.0f * 40.0f/ m_Width - 1, 2.0f * 30.0f/ m_Height - 1};
         m_Depth = 30.0f;
         Point p;
         p.Position = m_Position;
-        p.Depth = m_Depth;
-        p.HalfLength = 50;
+        p.Depth = 2.0f * m_Depth / m_MaxDepth - 1;
+        p.HalfLength = 1.0f;
         p.setVertexArray();
-        for (int i = 0; i < p.VertexCount; i ++)
+        for (int i = 0; i < Point::VertexCount; i ++)
         {
             std::cout << p.Vertices[i].Position[0] << ", ";
             std::cout << p.Vertices[i].Position[1] << ", ";
@@ -49,10 +54,8 @@ namespace GLObject
         m_Shader = std::make_unique<Shader>("resources/shaders/pointcloud.shader");
         m_Shader->Bind();      
 
-        m_Width = 300;
-        m_Height = 300;
-        m_MaxDepth = 300;
-        m_Proj = glm::ortho(0.0f, (float)m_Width, 0.0f, (float)m_Height, 0.0f, (float)m_MaxDepth);
+        m_Proj = glm::perspective(glm::radians(45.0f), (float)m_Width / m_Height, 0.1f, (float)m_MaxDepth);
+        //m_Proj = glm::ortho(0.0f, (float)m_Width, 0.0f, (float)m_Height, 0.0f, (float)m_MaxDepth);
     }
 
     void TestPoint::OnRender()
@@ -77,9 +80,9 @@ namespace GLObject
     {
 
         ImGui::Text("Model Translation");
-        ImGui::SliderFloat("X", &m_ModelTranslation.x, 0.0f, m_Width);
-        ImGui::SliderFloat("Y", &m_ModelTranslation.y, 0.0f, m_Height);
-        ImGui::SliderFloat("Z", &m_ModelTranslation.z, 0.0f, m_MaxDepth);
+        ImGui::SliderFloat("X", &m_ModelTranslation.x, -1.0f, 1.0f);
+        ImGui::SliderFloat("Y", &m_ModelTranslation.y, -1.0f, 1.0f);
+        ImGui::SliderFloat("Z", &m_ModelTranslation.z, -1.0f, 1.0f);
 
         ImGui::Text("Model Rotation");
         ImGui::SliderFloat("Rotation Factor", &m_RotationFactor, 0.0f, 360.0f);

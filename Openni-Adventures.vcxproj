@@ -209,6 +209,7 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\parameters\Parameters.h" />
+    <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\Point.h" />
     <ClInclude Include="src\utilities\Utilities.h" />
     <ClInclude Include="src\utilities\WalkingAverage.h" />
