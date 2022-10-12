@@ -20,8 +20,14 @@ namespace GLObject
         Point p;
         p.Position = m_Position;
         p.Depth = m_Depth;
-        p.HalfLength = 20;
+        p.HalfLength = 50;
         p.setVertexArray();
+        for (int i = 0; i < p.VertexCount; i ++)
+        {
+            std::cout << p.Vertices[i].Position[0] << ", ";
+            std::cout << p.Vertices[i].Position[1] << ", ";
+            std::cout << p.Vertices[i].Position[2] << std::endl;
+        }
         m_VB = std::make_unique<VertexBuffer>(&p.Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
         m_VBL = std::make_unique<VertexBufferLayout>();
 
@@ -29,7 +35,16 @@ namespace GLObject
         m_VBL->Push<float>(3);
 
         m_VAO->AddBuffer(*m_VB, *m_VBL);
-        m_IndexBuffer = std::make_unique<IndexBuffer>(Point::getIndices(0), Point::IndexCount);
+
+        auto indices = Point::getIndices(0);
+        for (int i = 0; i < p.IndexCount; i += 3)
+        {
+            std::cout << *(indices + i);
+            std::cout << *(indices + i + 1);
+            std::cout << *(indices + i + 2) << std::endl;
+        }
+        std::cout << *indices << std::endl;
+        m_IndexBuffer = std::make_unique<IndexBuffer>(indices, Point::IndexCount);
 
         m_Shader = std::make_unique<Shader>("resources/shaders/pointcloud.shader");
         m_Shader->Bind();      
