@@ -66,10 +66,13 @@
     <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\Tests\TestBatchPyramid3D.cpp">
+    <ClCompile Include="src\obj\Tests\TestBatchPoints.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\obj\PointCloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\tests\TestPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -148,10 +151,16 @@
     <ClInclude Include="src\obj\Tests\TestTriangle2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\Tests\TestBatchPyramid3D.h">
+    <ClInclude Include="src\obj\Tests\TestBatchPoints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\obj\PointCloud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\tests\TestPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

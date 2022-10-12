@@ -9,34 +9,27 @@
 
 #include <array>
 #include <memory>
-#include <cameras/DepthCamera.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
 #include "utilities/Point.h"
 
 namespace GLObject
 {
-	class PointCloud : public GLObject
+	class TestBatchPoints : public GLObject
 	{
 	public:
-		PointCloud()
-		{
-			std::cout << "Do not initialise the point cloud without a depth camera.";
-			return;
-		}
-		PointCloud(DepthCamera* depthCamera);
+		TestBatchPoints();
 
 		void OnRender() override;
 		void OnImGuiRender() override;
 		bool m_RenderPointCloud = false;
 	private:
-		std::array<float,4> m_Color{ 0.2f, 0.3f, 0.8f, 1.0f };
+		std::array<float, 4> m_Color{ 0.2f, 0.3f, 0.8f, 1.0f };
 
-		DepthCamera *m_DepthCamera;
-
-		Point *m_Points; 
-		Point::Vertex *m_Vertices; 
+		Point *m_Points;
+		Point::Vertex *m_Vertices;
 
 		std::unique_ptr<VertexArray> m_VAO;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
@@ -49,11 +42,11 @@ namespace GLObject
 		glm::mat4 m_Proj;
 
 		// TODO: Very Low Prio current is fine: Replace with Transformation gizmo
-		float m_RotationFactor {0};
-		glm::vec3 m_Rotation { 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_Translation { 0.0f, 1.0f, 0.0f };
+		float m_RotationFactor{ 0 };
+		glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
+		glm::vec3 m_Translation{ 0.0f, 1.0f, 0.0f };
 
-		float m_Scale {0.5f};
-
+		float m_Scale{ 0.5f };
+		float m_ClearColor[4];
 	};
 };

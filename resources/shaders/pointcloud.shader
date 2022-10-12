@@ -5,17 +5,12 @@
 layout(location = 0) in vec3 aPos;
 // Colors
 layout(location = 1) in vec3 aColor;
-// Texture Coordinates
-layout(location = 2) in vec2 aTex;
-
 
 // Outputs the color for the Fragment Shader
-out vec3 color;
-// Outputs the texture coordinates to the fragment shader
-out vec2 texCoord;
+out vec3 v_Color;
 
 // Controls the scale of the vertices
-uniform float u_scale;
+uniform float u_Scale;
 
 // Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 u_MVP;
@@ -23,11 +18,9 @@ uniform mat4 u_MVP;
 void main()
 {
 	// Outputs the positions/coordinates of all vertices
-	gl_Position = u_MVP * vec4(u_scale * aPos, 1.0);
+	gl_Position = u_MVP * vec4(u_Scale * aPos, 1.0);
 	// Assigns the colors from the Vertex Data to "color"
-	color = aColor;
-	// Assigns the texture coordinates from the Vertex Data to "texCoord"
-	texCoord = aTex;
+	v_Color = aColor;
 }
 
 #shader fragment
@@ -36,17 +29,10 @@ void main()
 // Outputs colors in RGBA
 out vec4 FragColor;
 
-
 // Inputs the color from the Vertex Shader
-in vec3 color;
-// Inputs the texture coordinates from the Vertex Shader
-in vec2 texCoord;
-
-// Gets the Texture Unit from the main function
-uniform sampler2D u_Texture;
-
+in vec3 v_Color;
 
 void main()
 {
-	FragColor = texture(u_Texture, texCoord);
+	FragColor = vec4(v_Color, 1);
 }

@@ -7,41 +7,44 @@
 #include <GLCore/VertexBuffer.h>
 #include <GLCore/VertexBufferLayout.h>
 
+#include <array>
 #include <memory>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "utilities/Point.h"
 
 namespace GLObject
 {
-	class TestBatchPyramid3D : public GLObject
+	class TestPoint : public GLObject
 	{
 	public:
-		TestBatchPyramid3D();
+		TestPoint();
 
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
-		float m_Color[4];
+		std::array<float, 2> m_Position;
+		uint8_t m_Depth;
 
-		glm::vec2 m_LeftRightOrtho;
-		glm::vec2 m_BottomTopOrtho;
-		glm::vec2 m_NearFarOrtho;
+		unsigned int m_Width;
+		unsigned int m_Height;
+		unsigned int m_MaxDepth;
+
+		float m_Scale {0.5};
+		float m_RotationFactor;
+		glm::vec3 m_Rotation;
 
 		glm::vec3 m_ModelTranslation;
 		glm::vec3 m_ViewTranslation;
 
+		glm::mat4 m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, -2.0f)) };
+		glm::mat4 m_Proj;
+
 		std::unique_ptr<VertexArray> m_VAO;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<Texture> m_Texture;
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
-
-		glm::mat4 m_View;
-		glm::mat4 m_Proj;
-
-		float m_RotationFactor;
-		glm::vec3 m_Rotation;
-		glm::vec3 m_Translation;
-
-		float m_Scale;
 	};
 }
