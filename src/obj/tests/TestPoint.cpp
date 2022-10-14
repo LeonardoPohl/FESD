@@ -15,12 +15,12 @@ namespace GLObject
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-        m_Width = WINDOW_WIDTH;
-        m_Height = WINDOW_HEIGHT;
+        const unsigned int numElements = 2;
+        const unsigned int numIndex = numElements * Point::IndexCount;
 
         m_Position = {0.0f,0.0f};
         m_Depth = 0.0f;
-        m_Points = new Point[2];
+        m_Points = new Point[numElements];
         
         m_Points[0].Position = m_Position;
         m_Points[0].HalfLength = 1.0f / WINDOW_WIDTH;
@@ -28,12 +28,13 @@ namespace GLObject
         m_Points[0].updateDepth(m_Depth);
 
         m_Points[1].Position = { 0.5f, -0.5f };
-        m_Points[1].HalfLength = 1.0f / WINDOW_WIDTH;
+        m_Points[1].HalfLength = 2.0f / WINDOW_WIDTH;
         m_Points[1].Depth = -0.5f;
         m_Points[1].updateVertexArray();
 
+
         m_Vertices = new Point::Vertex[2 * Point::VertexCount]{};
-        unsigned int *indices = new unsigned int[2 * Point::IndexCount];
+        unsigned int *indices = new unsigned int[numIndex];
 
         memcpy(indices + 0 * Point::IndexCount, Point::getIndices(0), Point::IndexCount * sizeof(unsigned int));
         memcpy(indices + 1 * Point::IndexCount, Point::getIndices(1), Point::IndexCount * sizeof(unsigned int));
@@ -52,7 +53,7 @@ namespace GLObject
         m_Shader = std::make_unique<Shader>("resources/shaders/pointcloud.shader");
         m_Shader->Bind();      
 
-        m_Proj = glm::perspective(glm::radians(45.0f), (float)m_Width / (float)m_Height, -1.0f, 1.0f);
+        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
         //m_Proj = glm::ortho(0.0f, (float)m_Width, 0.0f, (float)m_Height, 0.0f, (float)m_MaxDepth);
     }
 
@@ -73,16 +74,14 @@ namespace GLObject
         m_IndexBuffer->Bind();
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * 2 * Point::VertexCount, m_Vertices));
 
-        Renderer renderer;
-
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(m_RotationFactor), m_Rotation), m_ModelTranslation);
-
         glm::mat4 mvp = m_Proj * m_View * model;
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);
         m_Shader->SetUniform1f("u_Scale", m_Scale);
 
+        Renderer renderer;
         renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
     }
 

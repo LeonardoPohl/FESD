@@ -29,7 +29,6 @@ namespace GLObject
 
 		void OnRender() override;
 		void OnImGuiRender() override;
-		bool m_RenderPointCloud = false;
 	private:
 		std::array<float,4> m_Color{ 0.2f, 0.3f, 0.8f, 1.0f };
 
@@ -52,8 +51,8 @@ namespace GLObject
 		float m_RotationFactor {0};
 		glm::vec3 m_Rotation { 0.0f, 1.0f, 0.0f };
 		glm::vec3 m_Translation { 0.0f, 1.0f, 0.0f };
+		glm::vec3 m_ModelTranslation{ 0.0f };
 
 		float m_Scale {0.5f};
-
 	};
 };

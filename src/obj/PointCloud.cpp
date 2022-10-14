@@ -3,16 +3,23 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 
+#include <utilities/Consts.h>
+#include <utilities/Utilities.h>
+
 namespace GLObject
 {
     PointCloud::PointCloud(DepthCamera *depth_camera)
         : m_DepthCamera(depth_camera)
     {
+        GLCall(glEnable(GL_DEPTH_TEST));
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
         const int width = m_DepthCamera->getDepthStreamWidth();
         const int height = m_DepthCamera->getDepthStreamHeight();
 
-        const size_t numElements = width * height;
-        const size_t numIndex = numElements * Point::IndexCount;
+        const unsigned int numElements = width * height;
+        const unsigned int numIndex = numElements * Point::IndexCount;
 
         m_Points = new Point[numElements];
         unsigned int *indices = new unsigned int[numIndex];
@@ -22,22 +29,20 @@ namespace GLObject
             for (unsigned int w = 0; w < width; w++)
             {
                 int i = h * width + w;
-                m_Points[i].Position = new std::array{ (float)h, (float)w };
-                
-                memcpy(indices + i * Point::IndexCount, m_Points[i].getIndices(i), Point::IndexCount * sizeof(unsigned int));
+                m_Points[i].Position = { ((float)h / (float)height),
+                                         ((float)w / (float)width) };
+
+                m_Points[i].HalfLength = 2.0f / (float)height;
+                m_Points[i].Depth = 0.0f;
                 m_Points[i].updateVertexArray();
+
+                memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
             }
         }
 
-        // Indices for vertices order
-
-        GLCall(glEnable(GL_DEPTH_TEST));
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
         m_VAO = std::make_unique<VertexArray>();
 
-        m_VB = std::make_unique<VertexBuffer>(width * height * Point::VertexCount * sizeof(Point::Vertex));
+        m_VB = std::make_unique<VertexBuffer>(numElements * Point::VertexCount * sizeof(Point::Vertex));
         m_VBL = std::make_unique<VertexBufferLayout>();
 
         m_VBL->Push<GLfloat>(3);
@@ -50,60 +55,69 @@ namespace GLObject
         m_Shader = std::make_unique<Shader>("resources/shaders/pointcloud.shader");
         m_Shader->Bind();
 
-        m_Vertices = new Point::Vertex[width * height * Point::VertexCount] {};
+        m_Vertices = new Point::Vertex[numElements * Point::VertexCount] {};
 
-        //m_Proj = { glm::perspective(glm::radians(60.0f), (float)960.0f / 540.0f, 0.1f, 100.0f) };
-        m_Proj = glm::ortho(0, width, 0, height, 0, 6000);
+        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
     }
 
     void PointCloud::OnRender()
     {
-        if (!m_RenderPointCloud)
-        {
-            return;
-        }
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        auto depth = m_DepthCamera->getDepth();
+        auto depth = (uint16_t *)m_DepthCamera->getDepth();
 
         const unsigned int width = m_DepthCamera->getDepthStreamWidth();
         const unsigned int height = m_DepthCamera->getDepthStreamHeight();
+
+        const unsigned int numElements = width * height;
+        ushort maxDepth = 0, minDepth = USHRT_MAX;
 
         for (unsigned int h = 0; h < height; h++)
         {
             for (unsigned int w = 0; w < width; w++)
             {
                 int i = h * width + w;
+
+                if (depth[i] > maxDepth)
+                {
+                    maxDepth = depth[i];
+                }
+                if (depth[i] < minDepth)
+                {
+                    minDepth = depth[i];
+                }
+
                 // Read depth data
-                m_Points[i].updateDepth((float)(((uint8_t *)depth)[i]));
-                m_Points[i].Position = new std::array{ (float)h, (float)w };
+                m_Points[i].updateDepth(Normalisem11((float)(depth[i])/ (float)m_DepthCamera->getDepthStreamMaxDepth()));
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
-
-        m_IndexBuffer->Bind();
-        
-        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Vertices) * width * height * Point::VertexCount, m_Vertices));
-
-        Renderer renderer;
-
-        glm::mat4 model = glm::mat4(1.0f);        
+        std::cout << minDepth << " - " << maxDepth << std::endl;
+        m_IndexBuffer->Bind();        
+        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
-        model = glm::translate(glm::mat4(1.0f), m_Translation) * glm::rotate(model, glm::radians(m_RotationFactor), m_Rotation);
-
+        glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(m_RotationFactor), m_Rotation), m_Translation);
         glm::mat4 mvp = m_Proj * m_View * model;
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);
-        m_Shader->SetUniform1f("u_scale", m_Scale);
+        m_Shader->SetUniform1f("u_Scale", m_Scale);
+
+        Renderer renderer;
         renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
     }
 
     void PointCloud::OnImGuiRender()
     {
+        /*
+        ImGui::Text("Point Cloud Translation");
+        ImGui::SliderFloat("X", &m_ModelTranslation.x, -1.0f, 1.0f);
+        ImGui::SliderFloat("Y", &m_ModelTranslation.y, -1.0f, 1.0f);
+        ImGui::SliderFloat("Z", &m_ModelTranslation.z, -2.0f, 2.0f);*/
+
         ImGui::SliderFloat("Rotation Factor", &m_RotationFactor, 0.0f, 360.0f);
         ImGui::SliderFloat3("Rotation", &m_Rotation.x, 0.0f, 1.0f);
         ImGui::SliderFloat3("Translation", &m_Translation.x, -1.0f, 1.0f);
