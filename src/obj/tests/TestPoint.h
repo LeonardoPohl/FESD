@@ -35,6 +35,8 @@ namespace GLObject
 		float m_RotationFactor;
 		glm::vec3 m_Rotation {0.0f, 1.0f, 0.0f};
 
+		Point::Vertex *m_Vertices;
+
 		glm::vec3 m_ModelTranslation;
 		glm::vec3 m_ViewTranslation;
 
