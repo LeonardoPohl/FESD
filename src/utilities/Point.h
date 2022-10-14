@@ -28,14 +28,19 @@ public:
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLength;
 
-	Point() : Position{ 0, 0 }
+	Point() : Position{0.0f, 0.0f}
 	{
 	}
 
-	inline std::array<float, 3> getColorFromDepth(float depth)
+	inline std::array<float, 3> getColorFromDepth()
 	{
 		// TODO: Implement
-		return { 1.0f, 1.0f, 1.0f };
+		float grey =  (Depth + 1) / 2.0f;
+
+		if (grey == 1.0f)
+			grey = 0.0f;
+		
+		return { grey, grey, grey };
 	}
 
 	inline void updateDepth(float depth)
@@ -82,9 +87,9 @@ public:
 		return &indices[0];
 	}
 
-	inline void setVertexArray()
+	inline void updateVertexArray()
 	{
-		std::array<float, 3> Color = getColorFromDepth(Depth);
+		std::array<float, 3> Color = getColorFromDepth();
 
 		/*
 		   4
@@ -110,15 +115,15 @@ public:
 		Vertices[2] = { {  HalfLength + Position[0],       0.0f + Position[1], -HalfLength }, Color };
 		Vertices[3] = { {  HalfLength + Position[0],       0.0f + Position[1],  HalfLength }, Color };
 		Vertices[4] = { {        0.0f + Position[0], HalfLength + Position[1],        0.0f }, Color };*/
-		Vertices[0] = { { -HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, {1.0f, 0.0f, 0.0f} };
-		Vertices[1] = { {  HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, {1.0f, 0.0f, 1.0f} };
-		Vertices[2] = { {  HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, {1.0f, 1.0f, 0.0f} };
-		Vertices[3] = { { -HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, {1.0f, 1.0f, 1.0f} };
-																						    
-		Vertices[4] = { { -HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, {0.0f, 0.0f, 0.0f} };
-		Vertices[5] = { {  HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, {0.0f, 0.0f, 1.0f} };
-		Vertices[6] = { {  HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, {0.0f, 1.0f, 0.0f} };
-		Vertices[7] = { { -HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, {0.0f, 1.0f, 1.0f} };
+		Vertices[0] = { { -HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, Color };
+		Vertices[1] = { {  HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, Color };
+		Vertices[2] = { {  HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, Color };
+		Vertices[3] = { { -HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, Color };
+
+		Vertices[4] = { { -HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, Color };
+		Vertices[5] = { {  HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, Color };
+		Vertices[6] = { {  HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, Color };
+		Vertices[7] = { { -HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, Color };
 	}
 
 };

@@ -21,7 +21,6 @@
 #include "obj/tests/TestTexture2D.h"
 #include "obj/tests/TestPyramid3D.h"
 #include "obj/tests/TestPoint.h"
-#include "obj/tests/TestBatchPoints.h"
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
@@ -86,7 +85,6 @@ int main(void)
         testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
         testMenu->RegisterTest<GLObject::TestPyramid3D>("3D Pyramid");
         testMenu->RegisterTest<GLObject::TestPoint>("3D Point");
-        testMenu->RegisterTest<GLObject::TestBatchPoints>("Batch Points");
 
         
         //# Camera Initialisation

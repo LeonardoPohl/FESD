@@ -162,8 +162,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
-    <ClCompile Include="src\obj\PointCloud.cpp" />
-    <ClCompile Include="src\obj\Tests\TestBatchPoints.cpp" />
     <ClCompile Include="src\obj\Tests\TestClearColor.cpp" />
     <ClCompile Include="src\obj\tests\TestPoint.cpp" />
     <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
@@ -197,8 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\cameras\CameraHandler.h" />
-    <ClInclude Include="src\obj\PointCloud.h" />
-    <ClInclude Include="src\obj\Tests\TestBatchPoints.h" />
     <ClInclude Include="src\obj\Tests\TestClearColor.h" />
     <ClInclude Include="src\obj\tests\TestPoint.h" />
     <ClInclude Include="src\obj\Tests\TestPyramid3D.h" />

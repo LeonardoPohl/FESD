@@ -22,10 +22,10 @@ namespace GLObject
             for (unsigned int w = 0; w < width; w++)
             {
                 int i = h * width + w;
-                m_Points[i].Position = { (float)h, (float)w };
+                m_Points[i].Position = new std::array{ (float)h, (float)w };
                 
                 memcpy(indices + i * Point::IndexCount, m_Points[i].getIndices(i), Point::IndexCount * sizeof(unsigned int));
-                m_Points[i].setVertexArray();
+                m_Points[i].updateVertexArray();
             }
         }
 
@@ -77,14 +77,13 @@ namespace GLObject
                 int i = h * width + w;
                 // Read depth data
                 m_Points[i].updateDepth((float)(((uint8_t *)depth)[i]));
-                m_Points[i].Position = { (float)h, (float)w };
+                m_Points[i].Position = new std::array{ (float)h, (float)w };
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
 
         m_IndexBuffer->Bind();
-        std::cout << sizeof(m_Vertices) * width * height * Point::VertexCount << std::endl;
         
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_Vertices) * width * height * Point::VertexCount, m_Vertices));
 

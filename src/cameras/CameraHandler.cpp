@@ -49,7 +49,7 @@ void CameraHandler::initAllCameras()
 
     for (auto depthCam : depthCameras)
     {
-        pointClouds.insert({ depthCam->getCameraId(), new GLObject::PointCloud{ depthCam } });
+        //pointClouds.insert({ depthCam->getCameraId(), new GLObject::PointCloud{ depthCam } });
     }
 }
 
@@ -68,10 +68,10 @@ void CameraHandler::OnImGuiRender()
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
-            ImGui::Checkbox("Show Pointcloud", &pointClouds.at(cam->getCameraId())->m_RenderPointCloud);
+            //ImGui::Checkbox("Show Pointcloud", &pointClouds.at(cam->getCameraId())->m_RenderPointCloud);
 
-            pointClouds.at(cam->getCameraId())->OnRender();
-            pointClouds.at(cam->getCameraId())->OnImGuiRender();
+            //pointClouds.at(cam->getCameraId())->OnRender();
+            //pointClouds.at(cam->getCameraId())->OnImGuiRender();
         }
     }
 }
