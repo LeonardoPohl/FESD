@@ -13,23 +13,12 @@ namespace Params {
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
-	virtual const void *getDepth() = 0;
+	virtual const uint16_t *getDepth() = 0;
 	virtual std::string getName() const = 0; 
 
-	inline unsigned int getDepthStreamWidth() const
-	{
-		return depth_width;
-	}	
-
-	inline unsigned int getDepthStreamHeight() const
-	{
-		return depth_height;
-	}
-
-	inline unsigned int getDepthStreamDepth() const
-	{
-		return max_depth;
-	}
+	virtual unsigned int getDepthStreamWidth() const;
+	virtual unsigned int getDepthStreamHeight() const;
+	virtual unsigned int getDepthStreamMaxDepth() const;
 
 	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -48,8 +37,4 @@ public:
 protected:
 	unsigned int camera_id;
 
-	unsigned int max_depth;
-
-	unsigned int depth_width;
-	unsigned int depth_height;
 };

@@ -106,8 +106,12 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
 
+    this->_video_mode = this->_frame_ref.getVideoMode();
+    this->_video_mode.setPixelFormat(PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
+
     this->depth_width = this->_frame_ref.getWidth();
     this->depth_height = this->_frame_ref.getHeight();
+    this->max_depth = this->_depth_stream.getMaxPixelValue();
 }
 
 /// <summary>
@@ -117,13 +121,11 @@ OrbbecCamera::~OrbbecCamera() {
     printf("Shutting down [Orbbec] %s...\n", this->getCameraName().c_str());
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
-    this->_color_stream.stop();
-    this->_color_stream.destroy();
 
     this->_device.close();
 }
 
-const void *OrbbecCamera::getDepth()
+const uint16_t *OrbbecCamera::getDepth()
 {
     int changedStreamDummy;
     VideoStream *pStream = &this->_depth_stream;
@@ -151,13 +153,13 @@ const void *OrbbecCamera::getDepth()
 
     //# Check if the frame format is depth frame format
     //#################################################
-    if (this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_frame_ref.getVideoMode().getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
+    if (this->_video_mode.getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_video_mode.getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
     {
         std::string error_string = "Unexpected frame format!";
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
-    //auto *pDepth = (DepthPixel *);
-    return this->_frame_ref.getData();
+
+    return (uint16_t*)this->_frame_ref.getData();
 }
 
 // Utils

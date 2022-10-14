@@ -5,6 +5,8 @@
 
 using namespace rs2;
 
+// TODO: Add depth tuning
+
 device_list RealSenseCamera::getAvailableDevices(context ctx) {
 	return ctx.query_devices();
 }
@@ -41,6 +43,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
 	// Query frame size (width and height)
 	this->depth_width = depth.as<video_frame>().get_width();
 	this->depth_height = depth.as<video_frame>().get_height();
+
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -54,13 +57,13 @@ RealSenseCamera::~RealSenseCamera() {
 	}
 }
 
-const void *RealSenseCamera::getDepth()
+const uint16_t *RealSenseCamera::getDepth()
 {
 	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
 	frame depth = data.get_depth_frame();
 
 	// Create OpenCV matrix of size (w,h) from the colorized depth data
-	return depth.get_data();
+	return (uint16_t *)depth.get_data();
 }
 
 // Utils
