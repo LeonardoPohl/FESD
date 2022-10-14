@@ -34,7 +34,7 @@ public:
 
 	inline std::array<float, 3> getColorFromDepth()
 	{
-		// TODO: Implement
+		// TODO: (Possibly) Add color schemes if bored
 		float grey =  (Depth + 1) / 2.0f;
 
 		if (grey == 1.0f)
