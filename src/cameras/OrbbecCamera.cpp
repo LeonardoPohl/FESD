@@ -1,6 +1,7 @@
 #include "OrbbecCamera.h"
 
 #include <iostream>
+#include <vector>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 

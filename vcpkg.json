@@ -3,7 +3,6 @@
   "name": "laughing-eureka",
   "version": "0.0.1",
   "dependencies": [
-    "opencv",
     "realsense2",
     {
       "name": "imgui",
@@ -13,6 +12,7 @@
     "glad",
     "glm",
     "stb",
-    "opengl"
+    "opengl",
+    "xtensor"
   ]
 }

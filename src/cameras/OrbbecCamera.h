@@ -1,6 +1,7 @@
 #pragma once
 #include "DepthCamera.h"
 #include <OpenNI.h>
+#include <vector>
 
 class OrbbecCamera : public DepthCamera {
 public:

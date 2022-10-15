@@ -173,7 +173,7 @@
     <ClCompile Include="src\parameters\NormalParameters.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\parameters\SphereDetectionParameters.cpp" />
+    <ClCompile Include="src\utilities\Point.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -202,15 +202,14 @@
     <ClInclude Include="src\obj\Tests\TestPyramid3D.h" />
     <ClInclude Include="src\obj\Tests\TestTexture2D.h" />
     <ClInclude Include="src\obj\Tests\TestTriangle2D.h" />
-    <ClInclude Include="src\utilities\Circle.h" />
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\parameters\Parameters.h" />
     <ClInclude Include="src\utilities\Consts.h" />
+    <ClInclude Include="src\utilities\ColorMaps.h" />
     <ClInclude Include="src\utilities\Point.h" />
     <ClInclude Include="src\utilities\Utilities.h" />
-    <ClInclude Include="src\utilities\WalkingAverage.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>

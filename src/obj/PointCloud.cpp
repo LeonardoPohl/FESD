@@ -71,7 +71,7 @@ namespace GLObject
         const unsigned int height = m_DepthCamera->getDepthStreamHeight();
 
         const unsigned int numElements = width * height;
-        ushort maxDepth = 0, minDepth = USHRT_MAX;
+        uint8_t maxDepth = 0;
 
         for (unsigned int h = 0; h < height; h++)
         {
@@ -79,22 +79,18 @@ namespace GLObject
             {
                 int i = h * width + w;
 
-                if (depth[i] > maxDepth)
+                if (depth[i] > maxDepth && depth[i] > m_MaxDepth)
                 {
                     maxDepth = depth[i];
                 }
-                if (depth[i] < minDepth)
-                {
-                    minDepth = depth[i];
-                }
 
                 // Read depth data
-                m_Points[i].updateDepth(Normalisem11((float)(depth[i])/ (float)m_DepthCamera->getDepthStreamMaxDepth()));
+                m_Points[i].updateDepth(Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)));
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
-        std::cout << minDepth << " - " << maxDepth << std::endl;
+        //m_MaxDepth = (float)maxDepth;
         m_IndexBuffer->Bind();        
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 

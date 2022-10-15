@@ -1,6 +1,5 @@
 #include "CameraHandler.h"
 
-#include <opencv2/highgui.hpp>
 #include <imgui.h>
 
 #include <parameters/Parameters.h>
@@ -17,7 +16,6 @@ CameraHandler::CameraHandler()
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
 
     global_params = std::make_unique<Params::GlobalParameters>(&depthCameras);
-    sphere_params = std::make_unique<Params::SphereDetectionParameters>();
     normal_params = std::make_unique<Params::NormalParameters>();
 }
 

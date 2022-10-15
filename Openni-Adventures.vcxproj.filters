@@ -45,9 +45,6 @@
     <ClCompile Include="src\parameters\NormalParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
-    <ClCompile Include="src\parameters\SphereDetectionParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
     <ClCompile Include="src\parameters\GlobalParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
@@ -70,6 +67,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\obj\PointCloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\Point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -118,13 +118,7 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\WalkingAverage.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Utilities.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\Circle.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\parameters\Parameters.h">
@@ -158,6 +152,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\obj\PointCloud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\ColorMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

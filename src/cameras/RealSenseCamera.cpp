@@ -1,5 +1,4 @@
 #include "RealsenseCamera.h"
-#include <opencv2/highgui.hpp>
 #include <iostream>
 #include <exception>
 

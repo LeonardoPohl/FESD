@@ -1,8 +1,6 @@
 #pragma once
 #include <stdexcept>
-
-#include <utilities/Circle.h>
-#include <utilities/WalkingAverage.h>
+#include <string>
 
 namespace Params {
 	class GlobalParameters;
@@ -16,9 +14,9 @@ public:
 	virtual const uint16_t *getDepth() = 0;
 	virtual std::string getName() const = 0; 
 
-	virtual unsigned int getDepthStreamWidth() const;
-	virtual unsigned int getDepthStreamHeight() const;
-	virtual unsigned int getDepthStreamMaxDepth() const;
+	virtual unsigned int getDepthStreamWidth() const = 0;
+	virtual unsigned int getDepthStreamHeight() const = 0;
+	virtual unsigned int getDepthStreamMaxDepth() const = 0;
 
 	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();

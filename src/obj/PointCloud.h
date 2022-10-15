@@ -54,5 +54,6 @@ namespace GLObject
 		glm::vec3 m_ModelTranslation{ 0.0f };
 
 		float m_Scale {0.5f};
+		float m_MaxDepth {0.0f};
 	};
 };
