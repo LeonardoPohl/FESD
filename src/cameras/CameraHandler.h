@@ -2,8 +2,6 @@
 #include <vector>
 #include "DepthCamera.h"
 
-#include "obj/PointCloud.h"
-
 namespace Params
 {
 	class GlobalParameters;
@@ -25,7 +23,5 @@ private:
 
 	std::unique_ptr<Params::GlobalParameters> global_params;
 	std::unique_ptr<Params::NormalParameters> normal_params;
-
-	std::unordered_map<int, GLObject::PointCloud *> pointClouds;
 };
 

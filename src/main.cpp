@@ -30,6 +30,8 @@
 
 #include "utilities/Consts.h"
 
+void window_size_callback(GLFWwindow *window, int width, int height);
+
 int main(void)
 {
     GLFWwindow *window;
@@ -44,6 +46,7 @@ int main(void)
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenNi Adventures", nullptr, nullptr);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     if (!window)
     {
         glfwTerminate();
@@ -94,7 +97,7 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
-            glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
+            //glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
             r.Clear();
             
             ImGui_ImplOpenGL3_NewFrame();
@@ -139,7 +142,6 @@ int main(void)
                 ImGui::End();
             }
             
-
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -161,3 +163,8 @@ int main(void)
     return 0;
 }
 
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+}

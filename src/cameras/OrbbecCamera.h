@@ -2,6 +2,7 @@
 #include "DepthCamera.h"
 #include <OpenNI.h>
 #include <vector>
+#include <memory>
 
 class OrbbecCamera : public DepthCamera {
 public:
@@ -30,6 +31,9 @@ public:
 	{
 		return max_depth;
 	}
+
+	void OnPointCloudRender() const override;
+	void OnPointCloudOnImGuiRender() const override;
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
@@ -41,4 +45,5 @@ private:
 
 	unsigned int depth_width;
 	unsigned int depth_height;
+	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
 };

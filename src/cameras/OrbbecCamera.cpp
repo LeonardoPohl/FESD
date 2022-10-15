@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "obj/PointCloud.h"
+
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
 using namespace openni;
@@ -113,6 +115,8 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     this->depth_width = this->_frame_ref.getWidth();
     this->depth_height = this->_frame_ref.getHeight();
     this->max_depth = this->_depth_stream.getMaxPixelValue();
+
+    m_pointcloud = std::make_unique<GLObject::PointCloud>( this );
 }
 
 /// <summary>
@@ -161,6 +165,16 @@ const uint16_t *OrbbecCamera::getDepth()
     }
 
     return (uint16_t*)this->_frame_ref.getData();
+}
+
+inline void OrbbecCamera::OnPointCloudRender() const
+{
+    m_pointcloud->OnRender();
+}
+
+inline void OrbbecCamera::OnPointCloudOnImGuiRender() const
+{
+    m_pointcloud->OnImGuiRender();
 }
 
 // Utils

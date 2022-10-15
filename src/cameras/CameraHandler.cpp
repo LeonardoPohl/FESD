@@ -38,18 +38,13 @@ void CameraHandler::initAllCameras()
     depthCameras.clear();
 
     int id = 0;
-    //auto rs_cameras = RealSenseCamera::initialiseAllDevices(&id);
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices(&id);
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(&id);
 
     std::cout << "[INFO] Queried all devices" << std::endl;
 
-    //depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
+    depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
-
-    for (auto depthCam : depthCameras)
-    {
-        pointClouds.insert({ depthCam->getCameraId(), new GLObject::PointCloud{ depthCam } });
-    }
 }
 
 void CameraHandler::showCameras()
@@ -67,8 +62,8 @@ void CameraHandler::OnImGuiRender()
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
-            pointClouds.at(cam->getCameraId())->OnRender();
-            pointClouds.at(cam->getCameraId())->OnImGuiRender();
+            cam->OnPointCloudRender();
+            cam->OnPointCloudOnImGuiRender();
         }
     }
 }

@@ -2,6 +2,7 @@
 
 #include "DepthCamera.h"
 #include <librealsense2/rs.hpp>
+#include <memory>
 
 class RealSenseCamera : public DepthCamera {
 public:
@@ -30,6 +31,9 @@ public:
 	{
 		return max_depth;
 	}
+
+	inline void OnPointCloudRender() const override;
+	inline void OnPointCloudOnImGuiRender() const override;
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx{};
@@ -43,4 +47,5 @@ private:
 
 	unsigned int depth_width;
 	unsigned int depth_height;
+	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
 };

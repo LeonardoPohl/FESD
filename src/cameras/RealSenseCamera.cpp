@@ -1,7 +1,7 @@
 #include "RealsenseCamera.h"
 #include <iostream>
 #include <exception>
-
+#include "obj/PointCloud.h"
 using namespace rs2;
 
 // TODO: Add depth tuning
@@ -43,6 +43,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
 	this->depth_width = depth.as<video_frame>().get_width();
 	this->depth_height = depth.as<video_frame>().get_height();
 
+	m_pointcloud = std::make_unique<GLObject::PointCloud>(this);
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -61,8 +62,17 @@ const uint16_t *RealSenseCamera::getDepth()
 	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
 	frame depth = data.get_depth_frame();
 
-	// Create OpenCV matrix of size (w,h) from the colorized depth data
 	return (uint16_t *)depth.get_data();
+}
+
+inline void RealSenseCamera::OnPointCloudRender() const
+{
+	m_pointcloud->OnRender();
+}
+
+inline void RealSenseCamera::OnPointCloudOnImGuiRender() const
+{
+	m_pointcloud->OnImGuiRender();
 }
 
 // Utils

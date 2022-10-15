@@ -1,11 +1,18 @@
 #pragma once
 #include <stdexcept>
 #include <string>
+#include <GLCore/GLObject.h>
 
-namespace Params {
+namespace Params 
+{
 	class GlobalParameters;
 	class SphereDetectionParameters;
 	class NormalParameters;
+}
+
+namespace GLObject
+{
+	class PointCloud;
 }
 
 class DepthCamera {
@@ -17,6 +24,9 @@ public:
 	virtual unsigned int getDepthStreamWidth() const = 0;
 	virtual unsigned int getDepthStreamHeight() const = 0;
 	virtual unsigned int getDepthStreamMaxDepth() const = 0;
+
+	virtual void OnPointCloudRender() const = 0;
+	virtual void OnPointCloudOnImGuiRender() const = 0;
 
 	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -31,7 +41,7 @@ public:
 		return camera_id;
 	}
 
-	bool is_enabled{ true };
+	bool is_enabled{ false };
 protected:
 	unsigned int camera_id;
 
