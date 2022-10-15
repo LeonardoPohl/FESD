@@ -1,15 +1,17 @@
 #include "Point.h"
 #include "ColorMaps.h"
+#include "Consts.h"
+
+static auto PC_COLORMAP = colormap::viridis(NUM_COLORS);
 
 std::array<float, 3> Point::getColorFromDepth()
 {
-	// TODO: (Possibly) Add color schemes if bored
-	float grey = (Depth + 1) / 2.0f;
+	if (Depth == -1.0f)
+		return { 0.0f };
 
-	if (grey == 1.0f)
-		grey = 0.0f;
-
-	return { grey, grey, grey };
+	auto col = xt::row(PC_COLORMAP, (int)((float)NUM_COLORS * (1.0f + Depth) / 2.0f));
+		
+	return { (float)col[0], (float)col[1], (float)col[2] };
 }
 
 void Point::updateDepth(float depth)

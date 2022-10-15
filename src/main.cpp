@@ -94,8 +94,9 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
+            glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
             r.Clear();
-
+            
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
 

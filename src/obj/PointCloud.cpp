@@ -57,7 +57,6 @@ namespace GLObject
 
         m_Vertices = new Point::Vertex[numElements * Point::VertexCount] {};
 
-        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
     }
 
     void PointCloud::OnRender()
@@ -67,8 +66,8 @@ namespace GLObject
 
         auto depth = (uint16_t *)m_DepthCamera->getDepth();
 
-        const unsigned int width = m_DepthCamera->getDepthStreamWidth();
-        const unsigned int height = m_DepthCamera->getDepthStreamHeight();
+        const unsigned int height = m_DepthCamera->getDepthStreamWidth();
+        const unsigned int width = m_DepthCamera->getDepthStreamHeight();
 
         const unsigned int numElements = width * height;
         uint8_t maxDepth = 0;
@@ -95,6 +94,8 @@ namespace GLObject
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
+        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
+
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(m_RotationFactor), m_Rotation), m_Translation);
         glm::mat4 mvp = m_Proj * m_View * model;
 
