@@ -22,7 +22,7 @@ namespace GLObject
         const unsigned int numIndex = numElements * Point::IndexCount;
 
         m_Points = new Point[numElements];
-        unsigned int *indices = new unsigned int[numIndex];
+        auto *indices = new unsigned int[numIndex];
 
         for (unsigned int h = 0; h < height; h++)
         {
@@ -59,11 +59,8 @@ namespace GLObject
 
     }
 
-    void PointCloud::OnRender()
+    void PointCloud::OnUpdate(float deltaTime = 0)
     {
-        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         auto depth = m_DepthCamera->getDepth();
 
         const unsigned int height = m_DepthCamera->getDepthStreamWidth();
@@ -90,11 +87,17 @@ namespace GLObject
             }
         }
         //m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
-        m_IndexBuffer->Bind();        
+        m_IndexBuffer->Bind();
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
         m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
+    }
+
+    void PointCloud::OnRender()
+    {
+        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), m_RotationFactor, m_Rotation), m_Translation);
         glm::mat4 mvp = m_Proj * m_View * model;

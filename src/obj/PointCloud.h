@@ -27,6 +27,7 @@ namespace GLObject
 		}
 		PointCloud(DepthCamera* depthCamera);
 
+		void OnUpdate(float deltaTime = 0) override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
