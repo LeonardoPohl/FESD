@@ -1,22 +1,39 @@
 #pragma once
 
 #include "DepthCamera.h"
+#include <librealsense2/rs.hpp>
+#include <memory>
 
 class RealSenseCamera : public DepthCamera {
 public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, int camera_id);
 	~RealSenseCamera() override;
 
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return true; };
+	const uint16_t * getDepth() override;
 	std::string getName() const override { return "Realsense"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
-	static std::vector<RealSenseCamera*> initialiseAllDevices();
+	static std::vector<RealSenseCamera*> initialiseAllDevices(int *starting_id);
+
+	inline unsigned int getDepthStreamWidth() const override
+	{
+		return depth_width;
+	}
+
+	inline unsigned int getDepthStreamHeight() const override
+	{
+		return depth_height;
+	}
+
+	inline unsigned int getDepthStreamMaxDepth() const override
+	{
+		return max_depth;
+	}
+
+	inline void OnPointCloudRender() const override;
+	inline void OnPointCloudOnImGuiRender() const override;
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx{};
@@ -26,5 +43,9 @@ private:
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};
-	int camera_id;
+	unsigned int max_depth;
+
+	unsigned int depth_width;
+	unsigned int depth_height;
+	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
 };

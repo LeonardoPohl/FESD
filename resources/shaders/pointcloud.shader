@@ -1,31 +1,38 @@
 #shader vertex
 #version 330 core
 
-layout(location = 0) in vec4 position;
-layout(location = 0) in float depth;
+// Positions/Coordinates
+layout(location = 0) in vec3 aPos;
+// Colors
+layout(location = 1) in vec3 aColor;
 
-out vec2 v_TexCoord;
+// Outputs the color for the Fragment Shader
+out vec3 v_Color;
 
+// Controls the scale of the vertices
+uniform float u_Scale;
+
+// Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 u_MVP;
 
 void main()
 {
-    gl_Position = u_MVP * position;
-
-};
+	// Outputs the positions/coordinates of all vertices
+	gl_Position = u_MVP * vec4(u_Scale * aPos, 1.0);
+	// Assigns the colors from the Vertex Data to "color"
+	v_Color = aColor;
+}
 
 #shader fragment
 #version 330 core
 
-layout(location = 0) out vec4 color;
+// Outputs colors in RGBA
+out vec4 FragColor;
 
-in vec2 v_TexCoord;
-
-uniform vec4 u_Color;
-uniform sampler2D u_Texture;
+// Inputs the color from the Vertex Shader
+in vec3 v_Color;
 
 void main()
 {
-    vec4 texColor = texture(u_Texture, v_TexCoord);
-    color = texColor;
-};
+	FragColor = vec4(v_Color, 1);
+}

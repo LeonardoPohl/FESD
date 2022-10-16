@@ -16,15 +16,21 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "obj/TestClearColor.h"
-#include "obj/TestTriangle2D.h"
-#include "obj/TestTexture2D.h"
+#include "obj/tests/TestClearColor.h"
+#include "obj/tests/TestTriangle2D.h"
+#include "obj/tests/TestTexture2D.h"
+#include "obj/tests/TestPyramid3D.h"
+#include "obj/tests/TestPoint.h"
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
 
 #include <OpenNI.h>
 #include "cameras/CameraHandler.h"
+
+#include "utilities/Consts.h"
+
+void window_size_callback(GLFWwindow *window, int width, int height);
 
 int main(void)
 {
@@ -39,7 +45,8 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 540, "Hello World", nullptr, nullptr);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenNi Adventures", nullptr, nullptr);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     if (!window)
     {
         glfwTerminate();
@@ -79,19 +86,20 @@ int main(void)
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
         testMenu->RegisterTest<GLObject::TestTriangle2D>("2D Plane");
         testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
+        testMenu->RegisterTest<GLObject::TestPyramid3D>("3D Pyramid");
+        testMenu->RegisterTest<GLObject::TestPoint>("3D Point");
 
         
         //# Camera Initialisation
         //#######################
-
-        // TODO: Make Async
         CameraHandler cameraHandler;
 
 
         while (!glfwWindowShouldClose(window))
         {
+            //glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
             r.Clear();
-
+            
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
 
@@ -125,15 +133,15 @@ int main(void)
 
                 if (ImGui::Button("Init Cameras"))
                 {
+                    // TODO: Make Async
                     cameraHandler.initAllCameras();
                 }
-
-                cameraHandler.showCameras();
+                cameraHandler.OnImGuiRender();
+                //cameraHandler.showCameras();
 
                 ImGui::End();
             }
             
-
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -155,3 +163,8 @@ int main(void)
     return 0;
 }
 
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+}

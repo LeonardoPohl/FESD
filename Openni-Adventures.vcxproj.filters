@@ -42,31 +42,34 @@
     <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\cameras\DepthCamera.cpp">
-      <Filter>Source Files\CameraController</Filter>
-    </ClCompile>
-    <ClCompile Include="src\cameras\DepthCameraUpdate.cpp">
-      <Filter>Source Files\CameraController</Filter>
-    </ClCompile>
     <ClCompile Include="src\parameters\NormalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\parameters\SphereDetectionParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
     <ClCompile Include="src\parameters\GlobalParameters.cpp">
       <Filter>Source Files\Parameters</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\TestClearColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\TestTexture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\TestTriangle2D.cpp">
+    <ClCompile Include="src\obj\Tests\TestClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\tests\TestPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\PointCloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\Point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,6 +106,7 @@
     <None Include="resources\shaders\texture.shader" />
     <None Include="resources\shaders\pointcloud.shader" />
     <None Include="resources\shaders\basic.shader" />
+    <None Include="resources\shaders\basic3d.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
@@ -114,13 +118,7 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\WalkingAverage.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Utilities.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\Circle.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\parameters\Parameters.h">
@@ -129,16 +127,34 @@
     <ClInclude Include="src\cameras\DepthCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\TestClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\TestTexture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\cameras\CameraHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\TestTriangle2D.h">
+    <ClInclude Include="src\obj\Tests\TestClearColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestPyramid3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestTriangle2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\tests\TestPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\PointCloud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\ColorMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -147,6 +163,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\ml.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="C:\Users\pohly\Downloads\brick.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\brick.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

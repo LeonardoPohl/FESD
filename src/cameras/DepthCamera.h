@@ -1,60 +1,48 @@
 #pragma once
-#include <OpenNI.h>				// Include OpenNI
-#include <opencv2/core.hpp>		// Include OpenCV
-#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <stdexcept>
+#include <string>
+#include <GLCore/GLObject.h>
 
-#include <utilities/Circle.h>
-#include <utilities/WalkingAverage.h>
-
-namespace Params {
+namespace Params 
+{
 	class GlobalParameters;
 	class SphereDetectionParameters;
 	class NormalParameters;
 }
 
+namespace GLObject
+{
+	class PointCloud;
+}
 
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
-	virtual cv::Mat getDepthFrame() = 0;
-	virtual cv::Mat getColorFrame() = 0;
+	virtual const uint16_t *getDepth() = 0;
 	virtual std::string getName() const = 0; 
-	virtual bool hasColorStream() = 0;
-	virtual cv::Vec3f pixelToPoint(int x, int y, ushort depth) const = 0;
 
-	std::vector<Circle*> detectSpheres(Params::SphereDetectionParameters *params);
-	std::vector<Circle*> detectSpheres(cv::Mat frame, Params::SphereDetectionParameters *params);
+	virtual unsigned int getDepthStreamWidth() const = 0;
+	virtual unsigned int getDepthStreamHeight() const = 0;
+	virtual unsigned int getDepthStreamMaxDepth() const = 0;
 
-	void displaySphereTable(cv::Mat depth_frame, cv::Mat edge_frame, Params::SphereDetectionParameters *params, bool display_edges);
+	virtual void OnPointCloudRender() const = 0;
+	virtual void OnPointCloudOnImGuiRender() const = 0;
 
-	static cv::Mat detectEdges(cv::Mat depth_frame, Params::SphereDetectionParameters *params);
-	cv::Mat getWorldFrame(cv::Mat depth_frame);
-
-	cv::Mat calculateSelectedFloor(cv::Mat depth_frame, Params::NormalParameters *params);
-
-	void doUpdate(Params::GlobalParameters *global_params, Params::NormalParameters *normal_params, Params::SphereDetectionParameters *sphere_params);
-
-	std::string getWindowName() const {
+	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
 	}
 
-	std::string getCameraName() const {
+	inline std::string getCameraName() const {
 		return this->getName() + " Camera " + std::to_string(this->camera_id);
 	}
 
-	int getCameraId() const {
+	inline unsigned int getCameraId() const
+	{
 		return camera_id;
 	}
 
-	cv::Point selectedFloorPoint{-1, -1};
+	bool is_enabled{ false };
+protected:
+	unsigned int camera_id;
 
-	bool detect_circles{ false };
-	bool show_color_stream{ false };
-	bool is_enabled{ true };
-	WalkingAverageMatrix walkingFrames{};
-	WalkingAverageMatrix walkingEdges{}; 
-	cv::Vec3f floorNormal;
-private:
-	int camera_id;
 };

@@ -1,27 +1,49 @@
 #pragma once
 #include "DepthCamera.h"
+#include <OpenNI.h>
+#include <vector>
+#include <memory>
 
 class OrbbecCamera : public DepthCamera {
 public:
 	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
-	cv::Mat getDepthFrame() override;
-	cv::Mat getColorFrame() override;
-	bool hasColorStream() { return _device.hasSensor(openni::SENSOR_COLOR); };
+	const uint16_t * getDepth() override;
 	std::string getName() const override { return "Orbbec"; }
-	cv::Vec3f pixelToPoint(int x, int y, ushort depth) const override;
 
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera*> initialiseAllDevices();
+	static std::vector<OrbbecCamera*> initialiseAllDevices(int *starting_id);
+
+	inline unsigned int getDepthStreamWidth() const override
+	{
+		return depth_width;
+	}
+
+	inline unsigned int getDepthStreamHeight() const override
+	{
+		return depth_height;
+	}
+
+	inline unsigned int getDepthStreamMaxDepth() const override
+	{
+		return max_depth;
+	}
+
+	void OnPointCloudRender() const override;
+	void OnPointCloudOnImGuiRender() const override;
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
 	openni::VideoStream _depth_stream;
-	openni::VideoStream _color_stream;
 	openni::VideoFrameRef _frame_ref;
+	openni::VideoMode _video_mode;
 	openni::Status rc;
-	int camera_id;
+	unsigned int max_depth;
+
+	unsigned int depth_width;
+	unsigned int depth_height;
+	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
 };
