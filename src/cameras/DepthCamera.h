@@ -49,29 +49,29 @@ public:
 	/// <summary>
 	/// Call update Functions
 	/// </summary>
-	virtual void OnUpdate() const = 0;
+	virtual void OnUpdate() = 0;
 
 	/// <summary>
 	/// Execute Render
 	/// </summary>
-	virtual void OnPointCloudRender() const = 0;
+	virtual void OnRender() = 0;
 
 	/// <summary>
 	/// Execute ImGui Render
 	/// </summary>
-	virtual void OnPointCloudOnImGuiRender() const = 0;
+	virtual void OnImGuiRender() = 0;
 
 	/// <summary>
 	/// Start recording to file
 	/// </summary>
 	/// <param name="sessionName">Name of the session used for file naming and multi file synchronisation</param>
 	/// <param name="numFrames">Number of Frames, if 0 recording has to be manually stopped</param>
-	virtual void startRecording(std::string sessionName, unsigned int numFrames = 0) const = 0;
+	virtual void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) = 0;
 
 	/// <summary>
 	/// Stop recording
 	/// </summary>
-	virtual void stopRecording() const = 0;
+	virtual void stopRecording() = 0;
 
 	/// <returns>Window Name (Display: *Camera Name*)</returns>
 	inline std::string getWindowName() const {

@@ -12,7 +12,7 @@ namespace GLObject
 		GLObject() {}
 		virtual ~GLObject() {}
 
-		virtual void OnUpdate(float deltaTime = 0) {}
+		virtual void OnUpdate() {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
 	};

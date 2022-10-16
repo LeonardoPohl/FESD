@@ -109,7 +109,7 @@ int main(void)
             {
                 if (currentTest)
                 {
-                    currentTest->OnUpdate(0.0f);
+                    currentTest->OnUpdate();
                     currentTest->OnRender();
 
 

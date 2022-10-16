@@ -59,7 +59,7 @@ namespace GLObject
 
     }
 
-    void PointCloud::OnUpdate(float deltaTime = 0)
+    void PointCloud::OnUpdate()
     {
         auto depth = m_DepthCamera->getDepth();
 

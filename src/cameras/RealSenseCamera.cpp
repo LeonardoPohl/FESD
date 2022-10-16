@@ -65,12 +65,27 @@ const uint16_t *RealSenseCamera::getDepth()
 	return (uint16_t *)depth.get_data();
 }
 
-inline void RealSenseCamera::OnPointCloudRender() const
+void RealSenseCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
+{
+
+}
+
+void RealSenseCamera::stopRecording()
+{
+
+}
+
+void RealSenseCamera::OnUpdate()
+{
+
+}
+
+inline void RealSenseCamera::OnRender()
 {
 	m_pointcloud->OnRender();
 }
 
-inline void RealSenseCamera::OnPointCloudOnImGuiRender() const
+inline void RealSenseCamera::OnImGuiRender()
 {
 	m_pointcloud->OnImGuiRender();
 }
