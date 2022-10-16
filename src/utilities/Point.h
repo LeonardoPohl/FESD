@@ -8,11 +8,11 @@ public:
 	struct Vertex
 	{
 		std::array<float, 3> Position;
-		std::array<float, 3> Color;
+		std::array<float, 4> Color;
 
-		Vertex() :Position{ 0.0f, 0.0f, 0.0f }, Color{ 0.0f, 0.0f, 0.0f } {}
+		Vertex() :Position{ 0.0f, 0.0f, 0.0f }, Color{ 0.0f, 0.0f, 0.0f, 0.0f } {}
 		Vertex(std::array<float, 3> position,
-			   std::array<float, 3> color)
+			   std::array<float, 4> color)
 			: Position(position), Color(color) {}
 	};
 
@@ -26,7 +26,7 @@ public:
 
 	Point() : Position{0.0f, 0.0f}{}
 
-	std::array<float, 3> getColorFromDepth();
+	std::array<float, 4> getColorFromDepth();
 	void updateDepth(float depth);
 	static unsigned int *getIndices(int i);
 	void updateVertexArray();

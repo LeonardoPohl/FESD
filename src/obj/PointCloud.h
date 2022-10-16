@@ -20,7 +20,7 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud()
+		PointCloud() : m_DepthCamera(nullptr), m_Points(nullptr), m_Vertices(nullptr), m_Proj()
 		{
 			std::cout << "Do not initialise the point cloud without a depth camera.";
 			return;
@@ -50,10 +50,10 @@ namespace GLObject
 		// TODO: Very Low Prio current is fine: Replace with Transformation gizmo
 		float m_RotationFactor {0};
 		glm::vec3 m_Rotation { 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_Translation { 0.0f, 1.0f, 0.0f };
+		glm::vec3 m_Translation { 0.0f };
 		glm::vec3 m_ModelTranslation{ 0.0f };
 
-		float m_Scale {0.5f};
+		float m_Scale {1.0f};
 		float m_MaxDepth {0.0f};
 	};
 };

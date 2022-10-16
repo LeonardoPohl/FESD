@@ -1,23 +1,25 @@
 #include "Point.h"
 #include "ColorMaps.h"
 #include "Consts.h"
+#include <functional>
 
 static auto PC_COLORMAP = colormap::viridis(NUM_COLORS);
 
-std::array<float, 3> Point::getColorFromDepth()
+std::array<float, 4> Point::getColorFromDepth()
 {
-	if (Depth == -1.0f)
+	auto depth = std::clamp(Depth, -1.0f, 1.0f);
+	if (depth == -1.0f)
 		return { 0.0f };
 
-	auto col = xt::row(PC_COLORMAP, (int)((float)NUM_COLORS * (1.0f + Depth) / 2.0f));
+	auto col = xt::row(PC_COLORMAP, (int)((float)NUM_COLORS * (1.0f + depth) / 2.0f));
 		
-	return { (float)col[0], (float)col[1], (float)col[2] };
+	return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
 }
 
 void Point::updateDepth(float depth)
 {
-	this->Depth = depth;
-	std::array<float, 3> Color = getColorFromDepth();
+	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth);
+	std::array<float, 4> Color = getColorFromDepth();
 
 	Vertices[0].Position[2] = -HalfLength + depth;
 	Vertices[0].Color = Color;
@@ -42,26 +44,29 @@ unsigned int *Point::getIndices(int i)
 {
 	std::array<unsigned int, IndexCount> indices
 	{
-		0 + i * VertexCount, 1 + i * VertexCount, 2 + i * VertexCount,
-		0 + i * VertexCount, 2 + i * VertexCount, 3 + i * VertexCount,
-		0 + i * VertexCount, 1 + i * VertexCount, 5 + i * VertexCount,
-		0 + i * VertexCount, 5 + i * VertexCount, 4 + i * VertexCount,
-		0 + i * VertexCount, 3 + i * VertexCount, 7 + i * VertexCount,
-		0 + i * VertexCount, 7 + i * VertexCount, 4 + i * VertexCount,
-		1 + i * VertexCount, 2 + i * VertexCount, 6 + i * VertexCount,
-		1 + i * VertexCount, 6 + i * VertexCount, 5 + i * VertexCount,
-		2 + i * VertexCount, 3 + i * VertexCount, 7 + i * VertexCount,
-		2 + i * VertexCount, 7 + i * VertexCount, 6 + i * VertexCount,
-		4 + i * VertexCount, 5 + i * VertexCount, 6 + i * VertexCount,
-		4 + i * VertexCount, 6 + i * VertexCount, 7 + i * VertexCount
+		0, 1, 2,
+		0, 2, 3,
+		0, 1, 5,
+		0, 5, 4,
+		0, 3, 7,
+		0, 7, 4,
+		1, 2, 6,
+		1, 6, 5,
+		2, 3, 7,
+		2, 7, 6,
+		4, 5, 6,
+		4, 6, 7
 	};
-
+	
+	for (int k = 0; k < IndexCount; k++)
+		indices[k] += i * VertexCount;
+	
 	return &indices[0];
 }
 
 void Point::updateVertexArray()
 {
-	std::array<float, 3> Color = getColorFromDepth();
+	std::array<float, 4> Color = getColorFromDepth();
 
 	/*
 		7      6

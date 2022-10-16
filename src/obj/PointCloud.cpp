@@ -32,7 +32,7 @@ namespace GLObject
                 m_Points[i].Position = { ((float)h / (float)height),
                                          ((float)w / (float)width) };
 
-                m_Points[i].HalfLength = 2.0f / (float)height;
+                m_Points[i].HalfLength = 0.25f / (float)width;
                 m_Points[i].Depth = 0.0f;
                 m_Points[i].updateVertexArray();
 
@@ -46,7 +46,7 @@ namespace GLObject
         m_VBL = std::make_unique<VertexBufferLayout>();
 
         m_VBL->Push<GLfloat>(3);
-        m_VBL->Push<GLfloat>(3);
+        m_VBL->Push<GLfloat>(4);
 
         m_VAO->AddBuffer(*m_VB, *m_VBL);
 
@@ -64,7 +64,7 @@ namespace GLObject
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        auto depth = (uint16_t *)m_DepthCamera->getDepth();
+        auto depth = m_DepthCamera->getDepth();
 
         const unsigned int height = m_DepthCamera->getDepthStreamWidth();
         const unsigned int width = m_DepthCamera->getDepthStreamHeight();
@@ -89,14 +89,14 @@ namespace GLObject
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
-        //m_MaxDepth = (float)maxDepth;
+        //m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
         m_IndexBuffer->Bind();        
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
         m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
 
-        glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(m_RotationFactor), m_Rotation), m_Translation);
+        glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), m_RotationFactor, m_Rotation), m_Translation);
         glm::mat4 mvp = m_Proj * m_View * model;
 
         m_Shader->Bind();
@@ -109,15 +109,9 @@ namespace GLObject
 
     void PointCloud::OnImGuiRender()
     {
-        /*
-        ImGui::Text("Point Cloud Translation");
-        ImGui::SliderFloat("X", &m_ModelTranslation.x, -1.0f, 1.0f);
-        ImGui::SliderFloat("Y", &m_ModelTranslation.y, -1.0f, 1.0f);
-        ImGui::SliderFloat("Z", &m_ModelTranslation.z, -2.0f, 2.0f);*/
-
-        ImGui::SliderFloat("Rotation Factor", &m_RotationFactor, 0.0f, 360.0f);
+        ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
         ImGui::SliderFloat3("Rotation", &m_Rotation.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3("Translation", &m_Translation.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
         ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
