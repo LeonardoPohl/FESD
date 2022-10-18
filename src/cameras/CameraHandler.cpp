@@ -10,7 +10,8 @@
 #include <iostream>
 #include <obj/PointCloud.h>
 
-CameraHandler::CameraHandler()
+
+CameraHandler::CameraHandler(Camera *cam) : cam(cam)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
@@ -38,8 +39,8 @@ void CameraHandler::initAllCameras()
     depthCameras.clear();
 
     int id = 0;
-    auto rs_cameras = RealSenseCamera::initialiseAllDevices(&id);
-    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(&id);
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices(cam, &id);
+    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(cam, &id);
 
     std::cout << "[INFO] Queried all devices" << std::endl;
 

@@ -14,12 +14,14 @@ namespace GLObject
 	class TestPyramid3D : public GLObject
 	{
 	public:
-		TestPyramid3D();
+		TestPyramid3D(Arguments *args = nullptr) : GLObject(args) { }
+		TestPyramid3D(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
 
+		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
-		float m_Color[4];
+		float m_Color[4]{ 0.2f, 0.3f, 0.8f, 1.0f };
 
 		glm::vec2 m_LeftRightOrtho;
 		glm::vec2 m_BottomTopOrtho;
@@ -38,10 +40,10 @@ namespace GLObject
 		glm::mat4 m_View;
 		glm::mat4 m_Proj;
 
-		float m_RotationFactor;
-		glm::vec3 m_Rotation;
-		glm::vec3 m_Translation;
+		float m_RotationFactor{0};
+		glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
+		glm::vec3 m_Translation{ 0.0f, 1.0f, 0.0f };
 
-		float m_Scale;
+		float m_Scale{0.5f};
 	};
 }

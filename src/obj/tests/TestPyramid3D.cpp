@@ -8,9 +8,7 @@
 
 namespace GLObject
 {
-    TestPyramid3D::TestPyramid3D()
-        : m_Color{ 0.2f, 0.3f, 0.8f, 1.0f }, m_RotationFactor(0), 
-        m_Scale(0.5f), m_Rotation{ 0.0f, 1.0f, 0.0f }, m_Translation{ 0.0f, 1.0f, 0.0f }
+    void TestPyramid3D::OnStart()
     {
         GLfloat vertices[] =
         { //     COORDINATES     /        COLORS      /   TexCoord  //
@@ -64,19 +62,19 @@ namespace GLObject
         Renderer renderer;
 
         glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
+        //glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 proj = glm::mat4(1.0f);
         
 
         // Assigns different transformations to each matrix
         model = glm::translate(glm::mat4(1.0f), m_Translation) * glm::rotate(model, glm::radians(m_RotationFactor), m_Rotation);
 
-        view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+        //view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
         proj = glm::perspective(glm::radians(45.0f), (float)960.0f / 540.0f, 0.1f, 100.0f);
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_model", model);
-        m_Shader->SetUniformMat4f("u_view", view);
+        m_Shader->SetUniformMat4f("u_view", camera->getViewProjection());
         m_Shader->SetUniformMat4f("u_proj", proj);
         m_Shader->SetUniform1f("u_scale", m_Scale);
         m_Texture->Bind();

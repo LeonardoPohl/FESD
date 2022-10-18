@@ -3,18 +3,20 @@
 
 namespace GLObject
 {
-	TestMenu::TestMenu(GLObject *&currentTestPointer)
-		: m_CurrentTest(currentTestPointer)
+	void TestMenu::OnStart(Arguments *args)
 	{
+		auto testMenuArgs = (TestMenuArguments *)args;
+
+		m_CurrentTest = testMenuArgs->currentTestPointer;
 	}
 
 	void TestMenu::OnImGuiRender()
 	{
-		for (auto &test : m_Tests)
+		for (auto const &test : m_Tests)
 		{
 			if (ImGui::Button(test.first.c_str()))
 			{
-				m_CurrentTest = test.second();
+				m_CurrentTest = test.second(camera);
 			}
 		}
 	}

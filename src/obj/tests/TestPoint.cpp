@@ -9,7 +9,7 @@
 
 namespace GLObject
 {
-    TestPoint::TestPoint()
+    void TestPoint::OnStart()
     {
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
@@ -18,7 +18,7 @@ namespace GLObject
         const unsigned int numElements = 2;
         const unsigned int numIndex = numElements * Point::IndexCount;
 
-        m_Position = {0.0f,0.0f};
+        m_Position = {0.0f, 0.0f};
         m_Depth = 0.0f;
         m_Points = new Point[numElements];
         

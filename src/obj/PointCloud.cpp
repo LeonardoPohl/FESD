@@ -8,9 +8,12 @@
 
 namespace GLObject
 {
-    PointCloud::PointCloud(DepthCamera *depth_camera)
-        : m_DepthCamera(depth_camera)
+    void PointCloud::OnStart(Arguments *args)
     {
+        auto pcargs = (PointCloudArguments *)args;
+
+        m_DepthCamera = pcargs->depthCamera;
+
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -56,7 +59,6 @@ namespace GLObject
         m_Shader->Bind();
 
         m_Vertices = new Point::Vertex[numElements * Point::VertexCount] {};
-
     }
 
     void PointCloud::OnUpdate()

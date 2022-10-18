@@ -7,7 +7,7 @@
 namespace GLObject
 {
 
-	TestClearColor::TestClearColor() 
+	void TestClearColor::OnStart() 
 	{
 		GLCall(glGetFloatv(GL_COLOR_CLEAR_VALUE, m_ClearColor));
 	}

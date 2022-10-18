@@ -8,8 +8,7 @@
 
 namespace GLObject
 {
-    TestTriangle2D::TestTriangle2D()
-        : m_Color{0.2f, 0.3f, 0.8f, 1.0f}
+    void TestTriangle2D::OnStart()
     {
         float positions[] = {
             -50.0f, -50.0f,  // 0

@@ -14,13 +14,15 @@ namespace GLObject
 	class TestTexture2D : public GLObject
 	{
 	public:
-		TestTexture2D();
-		
+		TestTexture2D(Arguments *args = nullptr) : GLObject(args) { }
+		TestTexture2D(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+
+		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
-		glm::vec3 m_TranslationA;
-		glm::vec3 m_TranslationB;
+		glm::vec3 m_TranslationA{ 200, 200, 0 };
+		glm::vec3 m_TranslationB{ 400, 200, 0 };
 		std::unique_ptr<VertexArray> m_VAO;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 		std::unique_ptr<Shader> m_Shader;
@@ -28,7 +30,7 @@ namespace GLObject
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
 
-		glm::mat4 m_View;
-		glm::mat4 m_Proj;
+		glm::mat4 m_View = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		glm::mat4 m_Proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
 	};
 }

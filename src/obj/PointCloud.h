@@ -17,15 +17,20 @@
 
 namespace GLObject
 {
+	struct PointCloudArguments : Arguments
+	{
+		DepthCamera *depthCamera;
+
+		PointCloudArguments(DepthCamera *depthCamera) : depthCamera(depthCamera) { }
+	};
+
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud() : m_DepthCamera(nullptr), m_Points(nullptr), m_Vertices(nullptr), m_Proj()
-		{
-			std::cout << "Do not initialise the point cloud without a depth camera.";
-			return;
-		}
-		PointCloud(DepthCamera* depthCamera);
+		PointCloud(Arguments *args = nullptr) : GLObject(args) { }
+		PointCloud(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+
+		void OnStart(Arguments *args) override;
 
 		void OnUpdate() override;
 		void OnRender() override;

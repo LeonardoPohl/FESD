@@ -24,6 +24,7 @@
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
+#include "GLCore/Camera.h"
 
 #include <OpenNI.h>
 #include "cameras/CameraHandler.h"
@@ -78,9 +79,12 @@ int main(void)
         io->Fonts->AddFontDefault();
         io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+        Camera cam;
+
         Renderer r;
-        GLObject::GLObject *currentTest;
-        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest);
+        GLObject::GLObject *currentTest = nullptr;
+        GLObject::Arguments *testMenuArguments = new GLObject::TestMenuArguments { currentTest };
+        GLObject::TestMenu *testMenu = new GLObject::TestMenu(&cam, testMenuArguments);
         currentTest = testMenu;
 
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
@@ -92,12 +96,11 @@ int main(void)
         
         //# Camera Initialisation
         //#######################
-        CameraHandler cameraHandler;
+        CameraHandler cameraHandler{&cam};
 
 
         while (!glfwWindowShouldClose(window))
         {
-            //glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
             r.Clear();
             
             ImGui_ImplOpenGL3_NewFrame();
@@ -105,13 +108,12 @@ int main(void)
 
             //# Test window
             //#############
-
+            cam.updateTest();
             {
                 if (currentTest)
                 {
                     currentTest->OnUpdate();
                     currentTest->OnRender();
-
 
                     ImGui::NewFrame();
                     ImGui::Begin("Test");

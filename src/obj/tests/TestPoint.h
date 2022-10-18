@@ -19,8 +19,10 @@ namespace GLObject
 	class TestPoint : public GLObject
 	{
 	public:
-		TestPoint();
+		TestPoint(Arguments *args = nullptr) : GLObject(args) { }
+		TestPoint(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
 
+		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
