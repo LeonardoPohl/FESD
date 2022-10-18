@@ -6,6 +6,7 @@
 
 #include "obj/PointCloud.h"
 #include <imgui.h>
+#include <filesystem>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
@@ -225,6 +226,8 @@ const uint16_t *OrbbecCamera::getDepth()
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
 void OrbbecCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
 {
+    
+    std::filesystem::create_directory("Recordings");
     std::string fileName = std::to_string(startOn) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
 
     setNumFrames(numFrames);
@@ -263,12 +266,14 @@ void OrbbecCamera::OnUpdate()
         {
             // check if we need to discard first frame
             // start recording
+            g_Capture.recorder.attach(_depth_stream);
             g_Capture.recorder.start();
             g_Capture.State = CAPTURING;
         }
     }
     else if (g_Capture.State == CAPTURING)
     {
+        
         if (limit_frames && decFramesLeft())
             stopRecording();
     }else
