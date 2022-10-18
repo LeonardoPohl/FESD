@@ -17,23 +17,25 @@ public:
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 	static std::vector<OrbbecCamera*> initialiseAllDevices(int *starting_id);
 
-	inline unsigned int getDepthStreamWidth() const override
-	{
-		return depth_width;
-	}
+	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
+	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
+	inline uint16_t getDepthStreamMaxDepth() const override { return max_depth; }
 
-	inline unsigned int getDepthStreamHeight() const override
-	{
-		return depth_height;
-	}
+	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
+	void stopRecording() override;
 
-	inline unsigned int getDepthStreamMaxDepth() const override
+	void OnUpdate() override;
+	void OnRender() override;
+	void OnImGuiRender() override;
+	inline void setNumFrames(int numFrames)
 	{
-		return max_depth;
+		this->frames_left = numFrames;
+		this->num_frames = numFrames;
 	}
-
-	void OnPointCloudRender() const override;
-	void OnPointCloudOnImGuiRender() const override;
+	inline bool decFramesLeft()
+	{
+		return this->frames_left-- <= 0 ;
+	}
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
@@ -42,6 +44,11 @@ private:
 	openni::VideoMode _video_mode;
 	openni::Status rc;
 	unsigned int max_depth;
+
+	int frames_left{ 0 };
+	int num_frames{ 0 };
+	int delay{ 0 };
+	bool limit_frames = true;
 
 	unsigned int depth_width;
 	unsigned int depth_height;

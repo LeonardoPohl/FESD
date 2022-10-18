@@ -2,12 +2,67 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #include "obj/PointCloud.h"
+#include <imgui.h>
+#include <filesystem>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
 using namespace openni;
+
+// --------------------------------
+// Types
+// --------------------------------
+using CapturingState = enum
+{
+    NOT_CAPTURING,
+    SHOULD_CAPTURE,
+    CAPTURING,
+};
+
+using CaptureSourceType = enum
+{
+    CAPTURE_DEPTH_STREAM,
+    CAPTURE_COLOR_STREAM,
+    CAPTURE_IR_STREAM,
+    CAPTURE_STREAM_COUNT
+};
+
+using StreamCaptureType = enum
+{
+    STREAM_CAPTURE_LOSSLESS = FALSE,
+    STREAM_CAPTURE_LOSSY = TRUE,
+    STREAM_DONT_CAPTURE,
+};
+
+using StreamCapturingData = struct StreamCapturingData
+{
+    StreamCaptureType captureType;
+    const char *name;
+    bool bRecording;
+    openni::VideoFrameRef &(*getFrameFunc)();
+    openni::VideoStream &(*getStream)();
+    bool (*isStreamOn)();
+    int startFrame;
+};
+
+using CapturingData = struct CapturingData
+{
+    openni::Recorder recorder;
+    char csFileName[256];
+    long long nStartOn; // time to start, in seconds
+    CapturingState State;
+    int nCapturedFrameUniqueID;
+    char csDisplayMessage[500];
+};
+
+
+// --------------------------------
+// Static Global Variables
+// --------------------------------
+CapturingData g_Capture;
 
 void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
@@ -167,17 +222,112 @@ const uint16_t *OrbbecCamera::getDepth()
     return (uint16_t*)this->_frame_ref.getData();
 }
 
-inline void OrbbecCamera::OnPointCloudRender() const
+
+//https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
+void OrbbecCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
+{
+    
+    std::filesystem::create_directory("Recordings");
+    std::string fileName = std::to_string(startOn) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
+
+    setNumFrames(numFrames);
+
+    openni::Status rc = g_Capture.recorder.create(fileName.c_str());
+
+    if (rc != openni::STATUS_OK)
+    {
+        std::cout << "[ERROR] Failed to create recorder!" << std::endl;
+        return;
+    }
+
+    g_Capture.nStartOn = startOn;
+    g_Capture.State = SHOULD_CAPTURE;
+}
+
+void OrbbecCamera::stopRecording()
+{
+    if (g_Capture.recorder.isValid())
+    {
+        g_Capture.recorder.destroy();
+        g_Capture.State = NOT_CAPTURING;
+    }
+}
+
+// Should these be inline?
+void OrbbecCamera::OnUpdate()
+{
+    if (g_Capture.State == SHOULD_CAPTURE)
+    {
+        auto epoch = std::chrono::system_clock::now().time_since_epoch();
+        auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+
+        // check if time has arrived
+        if (startTimestamp.count() >= g_Capture.nStartOn)
+        {
+            // check if we need to discard first frame
+            // start recording
+            g_Capture.recorder.attach(_depth_stream);
+            g_Capture.recorder.start();
+            g_Capture.State = CAPTURING;
+        }
+    }
+    else if (g_Capture.State == CAPTURING)
+    {
+        
+        if (limit_frames && decFramesLeft())
+            stopRecording();
+    }else
+    {
+        m_pointcloud->OnUpdate();
+    }
+}
+
+void OrbbecCamera::OnRender()
 {
     m_pointcloud->OnRender();
 }
 
-inline void OrbbecCamera::OnPointCloudOnImGuiRender() const
+void OrbbecCamera::OnImGuiRender()
 {
+    if ((g_Capture.State != CAPTURING && g_Capture.State != SHOULD_CAPTURE))
+    {
+        ImGui::Checkbox("Limit Frames", &limit_frames);
+
+        if (limit_frames)
+        {
+            ImGui::SliderInt("Number of Frames", &num_frames, 1, 100000);
+        }
+
+        ImGui::SliderInt("Delay in ms", &delay, 1, 1000);
+
+        if (ImGui::Button("Start Recording"))
+        {
+            auto epoch = std::chrono::system_clock::now().time_since_epoch();
+            auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+            startRecording("Test Session", startTimestamp.count() + (long long)delay, num_frames);
+        }
+    }
+    else if (g_Capture.State == SHOULD_CAPTURE)
+    {
+        auto epoch = std::chrono::system_clock::now().time_since_epoch();
+        auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+        ImGui::Text(("Capturing in: " + std::to_string(g_Capture.nStartOn - startTimestamp.count()) + " ms").c_str());
+    }
+    else if (g_Capture.State == CAPTURING)
+    {
+        ImGui::Text("Capturing");
+        if (limit_frames)
+        {
+            ImGui::ProgressBar(1.0f - (float)frames_left / (float)num_frames);
+        }
+        if (ImGui::Button("Stop Recording"))
+        {
+            stopRecording();
+        }
+    }
     m_pointcloud->OnImGuiRender();
 }
 
-// Utils
 void OrbbecCamera::printDeviceInfo() const  {
     printf("---\nDevice: %s\n", this->_device_info->getName());
     printf("URI: %s\n", this->_device_info->getUri());
