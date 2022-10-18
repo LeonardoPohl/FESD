@@ -14,10 +14,9 @@ namespace GLObject
 	class TestPyramid3D : public GLObject
 	{
 	public:
-		TestPyramid3D(Arguments *args = nullptr) : GLObject(args) { }
-		TestPyramid3D(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+		TestPyramid3D();
+		TestPyramid3D(Camera *cam);
 
-		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
@@ -45,5 +44,6 @@ namespace GLObject
 		glm::vec3 m_Translation{ 0.0f, 1.0f, 0.0f };
 
 		float m_Scale{0.5f};
+		Camera *camera{nullptr};
 	};
 }

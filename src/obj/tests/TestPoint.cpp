@@ -9,7 +9,8 @@
 
 namespace GLObject
 {
-    void TestPoint::OnStart()
+    TestPoint::TestPoint() : TestPoint(nullptr) { }
+    TestPoint::TestPoint(Camera* cam) : camera(cam)
     {
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
@@ -75,7 +76,7 @@ namespace GLObject
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * 2 * Point::VertexCount, m_Vertices));
 
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), glm::radians(m_RotationFactor), m_Rotation), m_ModelTranslation);
-        glm::mat4 mvp = m_Proj * m_View * model;
+        glm::mat4 mvp = (camera ? camera->getViewProjection() : m_Proj * m_View) * model;
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);

@@ -19,10 +19,9 @@ namespace GLObject
 	class TestPoint : public GLObject
 	{
 	public:
-		TestPoint(Arguments *args = nullptr) : GLObject(args) { }
-		TestPoint(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+		TestPoint();
+		TestPoint(Camera *cam);
 
-		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
@@ -49,5 +48,7 @@ namespace GLObject
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
+
+		Camera *camera{nullptr};
 	};
 }

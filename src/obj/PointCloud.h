@@ -17,20 +17,11 @@
 
 namespace GLObject
 {
-	struct PointCloudArguments : Arguments
-	{
-		DepthCamera *depthCamera;
-
-		PointCloudArguments(DepthCamera *depthCamera) : depthCamera(depthCamera) { }
-	};
-
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud(Arguments *args = nullptr) : GLObject(args) { }
-		PointCloud(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
-
-		void OnStart(Arguments *args) override;
+		PointCloud(DepthCamera *depthCamera);
+		PointCloud(Camera *cam, DepthCamera *depthCamera);
 
 		void OnUpdate() override;
 		void OnRender() override;
@@ -49,7 +40,6 @@ namespace GLObject
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
 
-		// TODO: Replace with camera
 		glm::mat4 m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, -2.0f)) };
 		glm::mat4 m_Proj;
 
@@ -61,5 +51,7 @@ namespace GLObject
 
 		float m_Scale {1.0f};
 		float m_MaxDepth {0.0f};
+
+		Camera *camera{ nullptr };
 	};
 };

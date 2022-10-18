@@ -8,7 +8,8 @@
 
 namespace GLObject
 {
-    void TestTriangle2D::OnStart()
+    TestTriangle2D::TestTriangle2D() : TestTriangle2D(nullptr) { }
+    TestTriangle2D::TestTriangle2D(Camera *cam) : camera(cam)
     {
         float positions[] = {
             -50.0f, -50.0f,  // 0

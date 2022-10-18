@@ -7,10 +7,8 @@ namespace GLObject
 	class TestClearColor : public GLObject
 	{
 	public:
-		TestClearColor(Arguments *args = nullptr) : GLObject(args) { }
-		TestClearColor(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+		TestClearColor();
 
-		void OnStart() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:

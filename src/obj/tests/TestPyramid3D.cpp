@@ -8,7 +8,8 @@
 
 namespace GLObject
 {
-    void TestPyramid3D::OnStart()
+    TestPyramid3D::TestPyramid3D() : TestPyramid3D(nullptr) { }
+    TestPyramid3D::TestPyramid3D(Camera *cam) : camera(cam)
     {
         GLfloat vertices[] =
         { //     COORDINATES     /        COLORS      /   TexCoord  //
@@ -74,8 +75,16 @@ namespace GLObject
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_model", model);
-        m_Shader->SetUniformMat4f("u_view", camera->getViewProjection());
-        m_Shader->SetUniformMat4f("u_proj", proj);
+        if (camera)
+        {
+            m_Shader->SetUniformMat4f("u_view", camera->getView());
+            m_Shader->SetUniformMat4f("u_proj", camera->getProjection());
+        }
+        else
+        {
+            m_Shader->SetUniformMat4f("u_view", m_View);
+            m_Shader->SetUniformMat4f("u_proj", proj);
+        }
         m_Shader->SetUniform1f("u_scale", m_Scale);
         m_Texture->Bind();
         renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);

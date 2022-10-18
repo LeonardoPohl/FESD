@@ -17,7 +17,17 @@ public:
 
 	void updateTest();
 
-	glm::mat4 getViewProjection()
+	inline glm::mat4 getView() const
+	{
+		return view;
+	}
+
+	inline glm::mat4 getProjection() const
+	{
+		return proj;
+	}
+
+	inline glm::mat4 getViewProjection() const
 	{
 		return view;
 	}

@@ -13,47 +13,21 @@ namespace GLObject
 	class GLObject
 	{
 	public:
-		GLObject(Arguments *args = nullptr)
-		{
-			if (args)
-				OnStart(args);
-			else
-				OnStart();
-		}
-
-		GLObject(Camera *cam, Arguments *args = nullptr) : camera(cam)
-		{
-			if (args)
-				OnStart(args);
-			else
-				OnStart();
-		}
-
+		GLObject();
+		GLObject(Camera *cam);
 		virtual ~GLObject() = default;
 
-		virtual void OnStart() { }
-		virtual void OnStart(Arguments *args) { }
 		virtual void OnUpdate() { }
 		virtual void OnRender() { }
 		virtual void OnImGuiRender() { }
-	protected:
-		Camera *camera;
-	};
-
-	struct TestMenuArguments : Arguments
-	{
-		GLObject *currentTestPointer;
-
-		TestMenuArguments(GLObject *currentTestPointer) : currentTestPointer(currentTestPointer) { }
 	};
 
 	class TestMenu : public GLObject
 	{
 	public:
-		TestMenu(Arguments *args = nullptr) : GLObject(args) { }
-		TestMenu(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
+		TestMenu(GLObject *&currentTestPointer);
+		TestMenu(Camera *cam, GLObject *&currentTestPointer);
 
-		void OnStart(Arguments *args) override;
 		void OnImGuiRender() override;
 
 		template<typename GLObject>
@@ -66,7 +40,8 @@ namespace GLObject
 											 }));
 		}
 	private:
-		GLObject* m_CurrentTest{};
+		GLObject*& m_CurrentTest;
+		Camera *camera;
 		std::vector<std::pair<std::string, std::function<GLObject*(Camera *)>>> m_Tests;
 	};
 }

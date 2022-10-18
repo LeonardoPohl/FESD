@@ -82,9 +82,8 @@ int main(void)
         Camera cam;
 
         Renderer r;
-        GLObject::GLObject *currentTest = nullptr;
-        GLObject::Arguments *testMenuArguments = new GLObject::TestMenuArguments { currentTest };
-        GLObject::TestMenu *testMenu = new GLObject::TestMenu(&cam, testMenuArguments);
+        GLObject::GLObject *currentTest;
+        GLObject::TestMenu *testMenu = new GLObject::TestMenu(&cam, currentTest);
         currentTest = testMenu;
 
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");

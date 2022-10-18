@@ -3,12 +3,15 @@
 
 namespace GLObject
 {
-	void TestMenu::OnStart(Arguments *args)
-	{
-		auto testMenuArgs = (TestMenuArguments *)args;
+	TestMenu::TestMenu(GLObject *&currentTestPointer)
+		: m_CurrentTest(currentTestPointer) { }
 
-		m_CurrentTest = testMenuArgs->currentTestPointer;
+	TestMenu::TestMenu(Camera *cam, GLObject *&currentTestPointer)
+		: m_CurrentTest(currentTestPointer)		
+	{
+		camera = cam;
 	}
+
 
 	void TestMenu::OnImGuiRender()
 	{

@@ -8,7 +8,8 @@
 
 namespace GLObject
 {
-	void TestTexture2D::OnStart() 
+    TestTexture2D::TestTexture2D() : TestTexture2D(nullptr) { }
+    TestTexture2D::TestTexture2D(Camera *cam) : camera(cam)
 	{
         float positions[] = {
             -50.0f, -50.0f, 0.0f, 0.0f,  // 0
@@ -58,7 +59,7 @@ namespace GLObject
 
         {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), m_TranslationA);
-            glm::mat4 mvp = m_Proj * m_View * model;
+            glm::mat4 mvp = (camera ? camera->getViewProjection() : m_Proj * m_View) * model;
 
             m_Shader->Bind();
             m_Shader->SetUniformMat4f("u_MVP", mvp);
@@ -67,7 +68,7 @@ namespace GLObject
 
         {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), m_TranslationB);
-            glm::mat4 mvp = m_Proj * m_View * model;
+            glm::mat4 mvp = (camera ? camera->getViewProjection() : m_Proj * m_View) * model;
 
             m_Shader->Bind();
             m_Shader->SetUniformMat4f("u_MVP", mvp);

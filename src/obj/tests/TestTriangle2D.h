@@ -14,10 +14,9 @@ namespace GLObject
 	class TestTriangle2D : public GLObject
 	{
 	public:
-		TestTriangle2D(Arguments *args = nullptr) : GLObject(args) { }
-		TestTriangle2D(Camera *cam, Arguments *args = nullptr) : GLObject(cam, args) { }
-
-		void OnStart() override;
+		TestTriangle2D();
+		TestTriangle2D(Camera *cam);
+		
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
@@ -38,5 +37,7 @@ namespace GLObject
 
 		glm::mat4 m_View;
 		glm::mat4 m_Proj;
+
+		Camera *camera{ nullptr };
 	};
 }

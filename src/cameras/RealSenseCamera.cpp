@@ -43,7 +43,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int 
 	this->depth_width = depth.as<video_frame>().get_width();
 	this->depth_height = depth.as<video_frame>().get_height();
 
-	m_pointcloud = std::make_unique<GLObject::PointCloud>(cam, new GLObject::PointCloudArguments{ this });
+	m_pointcloud = std::make_unique<GLObject::PointCloud>(cam, this);
 }
 
 RealSenseCamera::~RealSenseCamera() {
