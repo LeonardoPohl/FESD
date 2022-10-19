@@ -83,7 +83,7 @@ int main(void)
 
         Renderer r;
         GLObject::GLObject *currentTest;
-        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest);
+        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest, &cam);
         currentTest = testMenu;
 
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");

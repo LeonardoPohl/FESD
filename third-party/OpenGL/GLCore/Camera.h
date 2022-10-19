@@ -13,7 +13,7 @@ public:
 		cameraDirection(glm::normalize(cameraPos - cameraTarget)), 
 		cameraRight(glm::normalize(glm::cross(UP, cameraDirection))),
 		cameraUp(glm::cross(cameraDirection, cameraRight)),
-		view(glm::lookAt(cameraPos, cameraTarget, UP)) {}
+		view(glm::lookAt(cameraPos, cameraTarget, UP)) { }
 
 	void updateTest();
 
@@ -40,6 +40,6 @@ private:
 	glm::vec3 cameraUp;
 
 	glm::mat4 view;
-	glm::mat4 proj;
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), 960.0f / 540.0f, -1.0f, 1.0f);
 
 };
