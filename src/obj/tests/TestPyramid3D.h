@@ -14,8 +14,7 @@ namespace GLObject
 	class TestPyramid3D : public GLObject
 	{
 	public:
-		TestPyramid3D();
-		TestPyramid3D(Camera *cam);
+		TestPyramid3D(const Camera *cam = nullptr);
 
 		void OnRender() override;
 		void OnImGuiRender() override;
@@ -36,7 +35,7 @@ namespace GLObject
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
 
-		glm::mat4 m_View;
+		glm::mat4 m_View = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		glm::mat4 m_Proj;
 
 		float m_RotationFactor{0};
@@ -44,6 +43,5 @@ namespace GLObject
 		glm::vec3 m_Translation{ 0.0f, 1.0f, 0.0f };
 
 		float m_Scale{0.5f};
-		Camera *camera{nullptr};
 	};
 }

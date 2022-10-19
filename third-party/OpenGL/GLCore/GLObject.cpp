@@ -3,10 +3,7 @@
 
 namespace GLObject
 {
-	TestMenu::TestMenu(GLObject *&currentTestPointer)
-		: m_CurrentTest(currentTestPointer) { }
-
-	TestMenu::TestMenu(Camera *cam, GLObject *&currentTestPointer)
+	TestMenu::TestMenu(GLObject *&currentTestPointer, const Camera *cam)
 		: m_CurrentTest(currentTestPointer)		
 	{
 		camera = cam;

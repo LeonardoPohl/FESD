@@ -171,7 +171,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, Camera *cam, int camer
     this->depth_height = this->_frame_ref.getHeight();
     this->max_depth = this->_depth_stream.getMaxPixelValue();
 
-    m_pointcloud = std::make_unique<GLObject::PointCloud>(cam, this);
+    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
 /// <summary>

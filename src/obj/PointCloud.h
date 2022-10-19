@@ -20,8 +20,7 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud(DepthCamera *depthCamera);
-		PointCloud(Camera *cam, DepthCamera *depthCamera);
+		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr);
 
 		void OnUpdate() override;
 		void OnRender() override;
@@ -51,7 +50,5 @@ namespace GLObject
 
 		float m_Scale {1.0f};
 		float m_MaxDepth {0.0f};
-
-		Camera *camera{ nullptr };
 	};
 };

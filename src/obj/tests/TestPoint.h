@@ -19,8 +19,7 @@ namespace GLObject
 	class TestPoint : public GLObject
 	{
 	public:
-		TestPoint();
-		TestPoint(Camera *cam);
+		TestPoint(const Camera *cam = nullptr);
 
 		void OnRender() override;
 		void OnImGuiRender() override;
@@ -48,7 +47,5 @@ namespace GLObject
 		std::unique_ptr<Shader> m_Shader;
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
-
-		Camera *camera{nullptr};
 	};
 }

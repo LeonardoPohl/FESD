@@ -14,8 +14,7 @@ namespace GLObject
 	class TestTexture2D : public GLObject
 	{
 	public:
-		TestTexture2D();
-		TestTexture2D(Camera *cam);
+		TestTexture2D(const Camera *cam = nullptr);
 
 		void OnRender() override;
 		void OnImGuiRender() override;
@@ -31,6 +30,5 @@ namespace GLObject
 
 		glm::mat4 m_View = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		glm::mat4 m_Proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-		Camera *camera{nullptr};
 	};
 }

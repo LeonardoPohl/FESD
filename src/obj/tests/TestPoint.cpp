@@ -9,9 +9,10 @@
 
 namespace GLObject
 {
-    TestPoint::TestPoint() : TestPoint(nullptr) { }
-    TestPoint::TestPoint(Camera* cam) : camera(cam)
+    TestPoint::TestPoint(const Camera* cam)
     {
+        this->camera = cam;
+
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));

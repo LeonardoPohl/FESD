@@ -8,9 +8,9 @@
 
 namespace GLObject
 {
-    TestPyramid3D::TestPyramid3D() : TestPyramid3D(nullptr) { }
-    TestPyramid3D::TestPyramid3D(Camera *cam) : camera(cam)
+    TestPyramid3D::TestPyramid3D(const Camera *cam)
     {
+        this->camera = cam;
         GLfloat vertices[] =
         { //     COORDINATES     /        COLORS      /   TexCoord  //
             -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f, // 0

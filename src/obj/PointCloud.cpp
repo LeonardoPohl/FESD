@@ -8,9 +8,9 @@
 
 namespace GLObject
 {
-    PointCloud::PointCloud(DepthCamera *depthCamera) : PointCloud(nullptr, depthCamera) { }
-    PointCloud::PointCloud(Camera *cam, DepthCamera *depthCamera) : camera(cam), m_DepthCamera(depthCamera)
+    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam) : m_DepthCamera(depthCamera)
     {
+        this->camera = cam;
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));

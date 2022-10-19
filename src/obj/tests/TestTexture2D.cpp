@@ -8,9 +8,9 @@
 
 namespace GLObject
 {
-    TestTexture2D::TestTexture2D() : TestTexture2D(nullptr) { }
-    TestTexture2D::TestTexture2D(Camera *cam) : camera(cam)
-	{
+    TestTexture2D::TestTexture2D(const Camera *cam)
+    {
+        this->camera = cam;
         float positions[] = {
             -50.0f, -50.0f, 0.0f, 0.0f,  // 0
              50.0f, -50.0f, 1.0f, 0.0f,  // 1
