@@ -97,9 +97,15 @@ int main(void)
         //#######################
         CameraHandler cameraHandler{&cam};
 
+        float deltaTime = 0.0f;	// Time between current frame and last frame
+        float lastFrame = 0.0f; // Time of last frame
 
         while (!glfwWindowShouldClose(window))
         {
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
             r.Clear();
             
             ImGui_ImplOpenGL3_NewFrame();
@@ -107,7 +113,9 @@ int main(void)
 
             //# Test window
             //#############
+            cam.processInput(window, deltaTime);
             cam.updateTest();
+
             {
                 if (currentTest)
                 {
