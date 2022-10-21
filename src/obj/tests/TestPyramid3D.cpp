@@ -71,7 +71,7 @@ namespace GLObject
         model = glm::translate(glm::mat4(1.0f), m_Translation) * glm::rotate(model, glm::radians(m_RotationFactor), m_Rotation);
 
         //view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-        proj = glm::perspective(glm::radians(45.0f), (float)960.0f / 540.0f, 0.1f, 100.0f);
+        proj = glm::perspective(glm::radians(45.0f), (float)960.0f / 540.0f, -1.0f, 1.0f);
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_model", model);
