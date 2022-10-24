@@ -126,7 +126,7 @@ int main(void)
             //# Test window
             //#############
             cam->processKeyboardInput(deltaTime);
-            
+            cam->updateImGui();
             {
                 if (currentTest)
                 {

@@ -1,11 +1,8 @@
 #include "Camera.h"
 #include <GLFW/glfw3.h>
+#include "imgui/imgui.h"
 
-Camera::Camera(GLFWwindow *window) :
-    window(window),
-    cameraDirection(glm::normalize(cameraPos - cameraTarget)),
-    cameraRight(glm::normalize(glm::cross(UP, cameraDirection))),
-    cameraUp(glm::cross(cameraDirection, cameraRight))
+Camera::Camera(GLFWwindow *window) : window(window)
 { 
     updateView();
     updateProjection();
@@ -21,13 +18,13 @@ void Camera::processKeyboardInput(float deltaTime)
     update |= glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraFront * cameraSpeed;
+        Position += Front * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraFront * cameraSpeed;
+        Position -= Front * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        Position -= glm::normalize(glm::cross(Front, Up)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        Position += glm::normalize(glm::cross(Front, Up)) * cameraSpeed;
 
     if (update)
         updateView();
@@ -85,13 +82,57 @@ void Camera::updateProjection()
     int width;
     int height;
     glfwGetWindowSize(window, &width, &height);
-    proj = glm::perspective(glm::radians(fov), (float)width / (float)height, -1.0f, 100.0f);
+    proj = glm::perspective(glm::radians(fov), (float)width / (float)height, -1.f, 1.f);
 }
 
 void Camera::updateView()
 {
     updateCameraVectors();
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    view = glm::lookAt(Position, Position + Front, Up);
+}
+
+void Camera::updateImGui()
+{
+    bool update = false;
+    ImGui::Begin("Camera Controller");
+
+    if (ImGui::Button("Reset Camera"))
+    {
+        update = true;
+        pitch = PITCH;
+        yaw = YAW;
+        Position = glm::vec3{ 0.0f };
+    }
+
+    ImGui::Text("Angles");
+
+    update |= ImGui::SliderFloat("Pitch", &pitch, -90.0f, 90.f);
+    update |= ImGui::SliderFloat("Yaw", &yaw, 0.0f, 360.f);
+
+    if (ImGui::SliderFloat("Fov", &fov, 1.0f, 60.0f))
+    {
+        updateProjection();
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Position");
+
+    update |= ImGui::SliderFloat3("Position", &Position.x, -20.0f, 20.f);
+
+    ImGui::BeginDisabled();
+
+    ImGui::SliderFloat3("Front", &Front.x, -1.0f, 1.f);
+    ImGui::SliderFloat3("Right", &Right.x, -1.0f, 1.f);
+    ImGui::SliderFloat3("Up", &Up.x, -1.0f, 1.f);
+
+    ImGui::EndDisabled();
+
+    ImGui::End();
+
+    if (update)
+    {
+        updateView();
+    }
 }
 
 void Camera::updateCameraVectors()
@@ -101,8 +142,8 @@ void Camera::updateCameraVectors()
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));
     front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(front);
+    Front = glm::normalize(front);
     // also re-calculate the Right and Up vector
-    cameraRight = glm::normalize(glm::cross(cameraFront, UP));
-    cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
+    Right = glm::normalize(glm::cross(Front, UP));
+    Up = glm::normalize(glm::cross(Right, Front));
 }
