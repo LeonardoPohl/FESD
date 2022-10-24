@@ -3,6 +3,8 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 
+#include "utilities/Consts.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -23,17 +25,18 @@ namespace GLObject
         // Indices for vertices order
         GLuint indices[] =
         {
-            0, 1, 2,
-            0, 2, 3,
-            0, 1, 4,
-            1, 2, 4,
-            2, 3, 4,
-            3, 0, 4
+           1, 0, 2,
+           2, 0, 3,
+           1, 0, 4,
+           2, 1, 4,
+           3, 2, 4,
+           0, 3, 4,
         };
 
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        //GLCall(glEnable(GL_CULL_FACE));
 
         m_VAO = std::make_unique<VertexArray>();
 
@@ -53,6 +56,7 @@ namespace GLObject
         m_Texture = std::make_unique<Texture>("resources/textures/brick.png");
         m_Texture->Bind();
         m_Shader->SetUniform1i("u_Texture", 0);
+        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
     }
 
     void TestPyramid3D::OnRender()
@@ -63,19 +67,15 @@ namespace GLObject
         Renderer renderer;
 
         glm::mat4 model = glm::mat4(1.0f);
-        //glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 proj = glm::mat4(1.0f);
         
 
         // Assigns different transformations to each matrix
         model = glm::translate(glm::mat4(1.0f), m_Translation) * glm::rotate(model, glm::radians(m_RotationFactor), m_Rotation);
 
-        //view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-        proj = glm::perspective(glm::radians(45.0f), (float)960.0f / 540.0f, -1.0f, 1.0f);
-
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_model", model);
-        if (camera)
+        if (useCamera && camera)
         {
             m_Shader->SetUniformMat4f("u_view", camera->getView());
             m_Shader->SetUniformMat4f("u_proj", camera->getProjection());
@@ -83,7 +83,7 @@ namespace GLObject
         else
         {
             m_Shader->SetUniformMat4f("u_view", m_View);
-            m_Shader->SetUniformMat4f("u_proj", proj);
+            m_Shader->SetUniformMat4f("u_proj", m_Proj);
         }
         m_Shader->SetUniform1f("u_scale", m_Scale);
         m_Texture->Bind();
@@ -95,7 +95,7 @@ namespace GLObject
     {
         ImGui::SliderFloat("Rotation Factor", &m_RotationFactor, 0.0f, 360.0f);
         ImGui::SliderFloat3("Rotation", &m_Rotation.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3("Translation", &m_Translation.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3("Translation", &m_Translation.x, -5.0f, 5.0f);
         ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

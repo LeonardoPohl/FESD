@@ -38,9 +38,11 @@ namespace GLObject
 		glm::mat4 m_View = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		glm::mat4 m_Proj;
 
+		bool useCamera {true};
+
 		float m_RotationFactor{0};
 		glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_Translation{ 0.0f, 1.0f, 0.0f };
+		glm::vec3 m_Translation{ 0.0f, 1.0f, -5.0f };
 
 		float m_Scale{0.5f};
 	};
