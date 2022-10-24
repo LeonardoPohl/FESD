@@ -62,8 +62,9 @@ void CameraHandler::OnImGuiRender()
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
-            cam->OnPointCloudRender();
-            cam->OnPointCloudOnImGuiRender();
+            cam->OnUpdate();
+            cam->OnRender();
+            cam->OnImGuiRender();
         }
     }
 }

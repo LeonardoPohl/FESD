@@ -27,13 +27,17 @@ public:
 		return depth_height;
 	}
 
-	inline unsigned int getDepthStreamMaxDepth() const override
+	inline uint16_t getDepthStreamMaxDepth() const override
 	{
 		return max_depth;
 	}
 
-	inline void OnPointCloudRender() const override;
-	inline void OnPointCloudOnImGuiRender() const override;
+	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
+	void stopRecording() override;
+
+	void OnUpdate() override;
+	void OnRender() override;
+	void OnImGuiRender() override;
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx{};

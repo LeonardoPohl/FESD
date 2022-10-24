@@ -59,7 +59,7 @@ namespace GLObject
 
     }
 
-    void PointCloud::OnRender()
+    void PointCloud::OnUpdate()
     {
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -89,13 +89,19 @@ namespace GLObject
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
-        m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
+        //m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
         m_IndexBuffer->Bind();
 
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
         m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
+    }
+
+    void PointCloud::OnRender()
+    {
+        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), m_RotationFactor, m_Rotation), m_Translation);
         glm::mat4 mvp = m_Proj * m_View * model;
