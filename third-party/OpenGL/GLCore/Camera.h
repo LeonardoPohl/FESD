@@ -32,7 +32,7 @@ public:
 
 	inline glm::mat4 getViewProjection() const
 	{
-		return view * proj;
+		return proj * view;
 	}
 
 	void processKeyboardInput(float deltaTime = 0);

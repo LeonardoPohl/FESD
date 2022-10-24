@@ -33,7 +33,8 @@ void Camera::processKeyboardInput(float deltaTime)
 void Camera::processMousePosUpdate(double xpos, double ypos)
 {
     bool mouseControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL)  == GLFW_PRESS ||
-                        glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+                        glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS ||
+                        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS;
     if (firstMouse || !mouseControl)
     {
         if (!firstMouse && glfwGetInputMode(window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL)
