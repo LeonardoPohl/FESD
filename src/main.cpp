@@ -1,8 +1,9 @@
 /// Main.cpp
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 
+#include <iostream>
+#include <functional>
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -24,13 +25,18 @@
 
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
+#include "GLCore/Camera.h"
 
 #include <OpenNI.h>
 #include "cameras/CameraHandler.h"
 
 #include "utilities/Consts.h"
 
+Camera *cam = nullptr;
+
 void window_size_callback(GLFWwindow *window, int width, int height);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xpos, double ypos);
 
 int main(void)
 {
@@ -47,6 +53,11 @@ int main(void)
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenNi Adventures", nullptr, nullptr);
     glfwSetWindowSizeCallback(window, window_size_callback);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
     if (!window)
     {
         glfwTerminate();
@@ -67,20 +78,22 @@ int main(void)
     {
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::StyleColorsDark();
+
+        ImGui::GetIO().Fonts->AddFontDefault();
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-        auto io = &ImGui::GetIO();
-        io->Fonts->AddFontDefault();
-        io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
+        cam = new Camera{window};
+        
         Renderer r;
         GLObject::GLObject *currentTest;
-        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest);
+        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest, cam);
         currentTest = testMenu;
 
         testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
@@ -92,28 +105,34 @@ int main(void)
         
         //# Camera Initialisation
         //#######################
-        CameraHandler cameraHandler;
+        CameraHandler cameraHandler{cam};
+
+        float deltaTime = 0.0f;	// Time between current frame and last frame
+        float lastFrame = 0.0f; // Time of last frame
 
 
         while (!glfwWindowShouldClose(window))
         {
-            //glfwGetWindowSize(window, &WINDOW_WIDTH, &WINDOW_HEIGHT);
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
             r.Clear();
             
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
             //# Test window
             //#############
-
+            cam->processKeyboardInput(deltaTime);
+            cam->updateImGui();
             {
                 if (currentTest)
                 {
                     currentTest->OnUpdate();
                     currentTest->OnRender();
 
-
-                    ImGui::NewFrame();
                     ImGui::Begin("Test");
                     if (currentTest != testMenu && ImGui::Button("<-"))
                     {
@@ -141,10 +160,10 @@ int main(void)
 
                 ImGui::End();
             }
-            
+
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+            
             glfwSwapBuffers(window);
 
             glfwPollEvents();
@@ -167,4 +186,14 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 {
     WINDOW_WIDTH = width;
     WINDOW_HEIGHT = height;
+}
+
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    cam->processMousePosUpdate(xpos, ypos);
+}
+
+void scroll_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    cam->processScroll(xpos, ypos);
 }

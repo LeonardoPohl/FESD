@@ -8,9 +8,9 @@
 
 namespace GLObject
 {
-    PointCloud::PointCloud(DepthCamera *depth_camera)
-        : m_DepthCamera(depth_camera)
+    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam) : m_DepthCamera(depthCamera)
     {
+        this->camera = cam;
         GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -56,7 +56,6 @@ namespace GLObject
         m_Shader->Bind();
 
         m_Vertices = new Point::Vertex[numElements * Point::VertexCount] {};
-
     }
 
     void PointCloud::OnUpdate()
@@ -100,7 +99,7 @@ namespace GLObject
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), m_RotationFactor, m_Rotation), m_Translation);
-        glm::mat4 mvp = m_Proj * m_View * model;
+        glm::mat4 mvp = (camera ? camera->getViewProjection() : m_Proj * m_View) * model;
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);

@@ -15,15 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GLCore\tests\Test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GLCore\tests\TestClearColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GLCore\tests\TestTexture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GLCore\vendor\glm\detail\glm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,7 +66,7 @@
     <ClCompile Include="GLCore\VertexBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GLCore\Application.cpp">
+    <ClCompile Include="GLCore\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -491,15 +482,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GLCore\tests\Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLCore\tests\TestClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLCore\tests\TestTexture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GLCore\vendor\glm\detail\_features.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1419,6 +1401,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLCore\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

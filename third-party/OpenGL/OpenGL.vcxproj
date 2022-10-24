@@ -141,15 +141,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GLCore\Application.cpp" />
+    <ClCompile Include="GLCore\Camera.cpp" />
     <ClCompile Include="GLCore\GLErrorManager.cpp" />
     <ClCompile Include="GLCore\GLObject.cpp" />
     <ClCompile Include="GLCore\IndexBuffer.cpp" />
     <ClCompile Include="GLCore\Renderer.cpp" />
     <ClCompile Include="GLCore\Shader.cpp" />
-    <ClCompile Include="GLCore\tests\Test.cpp" />
-    <ClCompile Include="GLCore\tests\TestClearColor.cpp" />
-    <ClCompile Include="GLCore\tests\TestTexture2D.cpp" />
     <ClCompile Include="GLCore\Texture.cpp" />
     <ClCompile Include="GLCore\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui.cpp" />
@@ -309,14 +306,12 @@
     <ClInclude Include="Dependencies\GLEW\include\GL\wglew.h" />
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
+    <ClInclude Include="GLCore\Camera.h" />
     <ClInclude Include="GLCore\GLErrorManager.h" />
     <ClInclude Include="GLCore\GLObject.h" />
     <ClInclude Include="GLCore\IndexBuffer.h" />
     <ClInclude Include="GLCore\Renderer.h" />
     <ClInclude Include="GLCore\Shader.h" />
-    <ClInclude Include="GLCore\tests\Test.h" />
-    <ClInclude Include="GLCore\tests\TestClearColor.h" />
-    <ClInclude Include="GLCore\tests\TestTexture2D.h" />
     <ClInclude Include="GLCore\Texture.h" />
     <ClInclude Include="GLCore\vendor\glm\common.hpp" />
     <ClInclude Include="GLCore\vendor\glm\detail\compute_common.hpp" />

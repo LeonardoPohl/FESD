@@ -8,9 +8,9 @@
 
 namespace GLObject
 {
-    TestTriangle2D::TestTriangle2D()
-        : m_Color{0.2f, 0.3f, 0.8f, 1.0f}
+    TestTriangle2D::TestTriangle2D(const Camera *cam)
     {
+        this->camera = cam;
         float positions[] = {
             -50.0f, -50.0f,  // 0
              50.0f, -50.0f,  // 1
