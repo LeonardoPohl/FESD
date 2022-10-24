@@ -27,7 +27,7 @@ namespace GLObject
         m_Points[0].Position = m_Position;
         m_Points[0].HalfLength = 1.0f / WINDOW_WIDTH;
         m_Points[0].updateVertexArray();
-        m_Points[0].updateDepth(m_Depth);
+        m_Points[0].updateDepth(m_Depth, 1.f);
 
         m_Points[1].Position = { 0.5f, -0.5f };
         m_Points[1].HalfLength = 2.0f / WINDOW_WIDTH;

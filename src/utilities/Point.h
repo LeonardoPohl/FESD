@@ -27,7 +27,7 @@ public:
 	Point() : Position{0.0f, 0.0f}{}
 
 	std::array<float, 4> getColorFromDepth();
-	void updateDepth(float depth);
+	void updateDepth(float depth, float depth_scale);
 	static unsigned int *getIndices(int i);
 	void updateVertexArray();
 };

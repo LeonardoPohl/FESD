@@ -16,9 +16,9 @@ std::array<float, 4> Point::getColorFromDepth()
 	return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
 }
 
-void Point::updateDepth(float depth)
+void Point::updateDepth(float depth, float depth_scale)
 {
-	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth);
+	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth / depth_scale);
 	std::array<float, 4> Color = getColorFromDepth();
 
 	Vertices[0].Position[2] = -HalfLength + depth;

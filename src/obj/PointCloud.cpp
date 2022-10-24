@@ -16,6 +16,8 @@ namespace GLObject
 
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+        GLCall(glGetFloatv(GL_COLOR_CLEAR_VALUE, m_ClearColor));
+
         const int width = m_DepthCamera->getDepthStreamWidth();
         const int height = m_DepthCamera->getDepthStreamHeight();
 
@@ -81,7 +83,7 @@ namespace GLObject
                 }
 
                 // Read depth data
-                m_Points[i].updateDepth(-1.0f * Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)));
+                m_Points[i].updateDepth(m_Depth_Scale * -1.0f * Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)), m_Depth_Scale);
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
@@ -94,7 +96,7 @@ namespace GLObject
 
     void PointCloud::OnRender()
     {
-        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+        GLCall(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::translate(glm::mat4(1.0f), m_Translation);
@@ -111,6 +113,7 @@ namespace GLObject
     void PointCloud::OnImGuiRender()
     {
         ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
+        ImGui::SliderFloat("Depth Scale", &m_Depth_Scale, 0.0f, 10.0f);
         ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
     }
 }
