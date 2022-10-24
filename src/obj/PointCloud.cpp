@@ -11,8 +11,9 @@ namespace GLObject
     PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam) : m_DepthCamera(depthCamera)
     {
         this->camera = cam;
-        GLCall(glEnable(GL_DEPTH_TEST));
         GLCall(glEnable(GL_BLEND));
+        GLCall(glEnable(GL_CULL_FACE));
+
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         const int width = m_DepthCamera->getDepthStreamWidth();
@@ -29,10 +30,10 @@ namespace GLObject
             for (unsigned int w = 0; w < width; w++)
             {
                 int i = h * width + w;
-                m_Points[i].Position = { ((float)h / (float)height),
-                                         ((float)w / (float)width) };
+                m_Points[i].Position = { Normalisem11((float)h / (float)height),
+                                         Normalisem11((float)w / (float)width) };
 
-                m_Points[i].HalfLength = 0.75f / (float)width;
+                m_Points[i].HalfLength = 1.5f / (float)width;
                 m_Points[i].Depth = 0.0f;
                 m_Points[i].updateVertexArray();
 
@@ -68,9 +69,9 @@ namespace GLObject
         const unsigned int numElements = width * height;
         uint16_t maxDepth = 0;
 
-        for (unsigned int h = 0; h < height; h++)
+        for (unsigned int h = height - 1; h > 0; --h)
         {
-            for (unsigned int w = 0; w < width; w++)
+            for (unsigned int w = width; w > 0; --w)
             {
                 int i = h * width + w;
 
@@ -89,9 +90,6 @@ namespace GLObject
         m_IndexBuffer->Bind();
         
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
-
-        // Assigns different transformations to each matrix
-        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
     }
 
     void PointCloud::OnRender()
@@ -99,8 +97,8 @@ namespace GLObject
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 model = glm::translate(glm::rotate(glm::mat4(1.0f), m_RotationFactor, m_Rotation), m_Translation);
-        glm::mat4 mvp = (camera ? camera->getViewProjection() : m_Proj * m_View) * model;
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), m_Translation);
+        glm::mat4 mvp = camera->getViewProjection() * model;
 
         m_Shader->Bind();
         m_Shader->SetUniformMat4f("u_MVP", mvp);
@@ -112,11 +110,7 @@ namespace GLObject
 
     void PointCloud::OnImGuiRender()
     {
-        ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
-        ImGui::SliderFloat3("Rotation", &m_Rotation.x, -1.0f, 1.0f);
         ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
         ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     }
 }
