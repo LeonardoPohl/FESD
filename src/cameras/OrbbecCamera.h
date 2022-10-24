@@ -6,7 +6,7 @@
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo* deviceInfo, Camera *cam, int camera_id);
+	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
 	const uint16_t * getDepth() override;
@@ -15,7 +15,7 @@ public:
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera*> initialiseAllDevices(Camera *cam, int *starting_id);
+	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, int *starting_id);
 
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
@@ -27,6 +27,9 @@ public:
 	void OnUpdate() override;
 	void OnRender() override;
 	void OnImGuiRender() override;
+
+	void makePointCloud(Camera *cam);
+
 	inline void setNumFrames(int numFrames)
 	{
 		this->frames_left = numFrames;

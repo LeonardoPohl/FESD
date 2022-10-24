@@ -68,7 +68,7 @@ void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
 }
 
-std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera *cam, int *starting_id) {
+std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, int *starting_id) {
     openni::Array<openni::DeviceInfo> orbbec_devices;
     OrbbecCamera::getAvailableDevices(&orbbec_devices);
 
@@ -76,7 +76,9 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera *cam, int *
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         try {
-            depthCameras.push_back(new OrbbecCamera(&orbbec_devices[i], cam, (*starting_id)++));
+            OrbbecCamera *d_cam = new OrbbecCamera(&orbbec_devices[i], (*starting_id)++);
+            d_cam->makePointCloud(cam);
+            depthCameras.push_back(d_cam);
             std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
         }
         catch (const std::system_error& ex) {
@@ -90,7 +92,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera *cam, int *
     return depthCameras;
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, Camera *cam, int camera_id) :
+OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     _device_info(device_info) {
     this->camera_id = camera_id;
     printDeviceInfo();
@@ -170,8 +172,6 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, Camera *cam, int camer
     this->depth_width = this->_frame_ref.getWidth();
     this->depth_height = this->_frame_ref.getHeight();
     this->max_depth = this->_depth_stream.getMaxPixelValue();
-
-    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
 /// <summary>
@@ -183,6 +183,11 @@ OrbbecCamera::~OrbbecCamera() {
     this->_depth_stream.destroy();
 
     this->_device.close();
+}
+
+void OrbbecCamera::makePointCloud(Camera *cam)
+{
+    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
 const uint16_t *OrbbecCamera::getDepth()
