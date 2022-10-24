@@ -19,7 +19,7 @@ namespace GLObject
 	class TestPoint : public GLObject
 	{
 	public:
-		TestPoint();
+		TestPoint(const Camera *cam = nullptr);
 
 		void OnRender() override;
 		void OnImGuiRender() override;

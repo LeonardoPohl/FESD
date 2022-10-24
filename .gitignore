@@ -34,3 +34,4 @@ x64/
 vcpkg_installed/
 *.htm
 packages/
+*.oni

@@ -10,21 +10,21 @@ device_list RealSenseCamera::getAvailableDevices(context ctx) {
 	return ctx.query_devices();
 }
 
-std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(int *starting_id) {
+std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, int *starting_id) {
 	rs2::context ctx;
 
 	std::vector<RealSenseCamera*> depthCameras;
 
 	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
 	{
-		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, (*starting_id)++));
+		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, (*starting_id)++));
 		std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
 	}
 
 	return depthCameras;
 }
 
-RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
+RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int camera_id) :
 	_pipe(pipeline(*ctx)), 
 	_ctx(ctx), 
 	_device(device)
@@ -43,7 +43,7 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, int camera_id) :
 	this->depth_width = depth.as<video_frame>().get_width();
 	this->depth_height = depth.as<video_frame>().get_height();
 
-	m_pointcloud = std::make_unique<GLObject::PointCloud>(this);
+	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
 RealSenseCamera::~RealSenseCamera() {

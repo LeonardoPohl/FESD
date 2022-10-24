@@ -6,6 +6,7 @@
 
 #include "obj/PointCloud.h"
 #include <imgui.h>
+#include <filesystem>
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
@@ -67,7 +68,7 @@ void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
     OpenNI::enumerateDevices(available_devices);
 }
 
-std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(int *starting_id) {
+std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera *cam, int *starting_id) {
     openni::Array<openni::DeviceInfo> orbbec_devices;
     OrbbecCamera::getAvailableDevices(&orbbec_devices);
 
@@ -75,7 +76,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(int *starting_id) 
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         try {
-            depthCameras.push_back(new OrbbecCamera(&orbbec_devices[i], (*starting_id)++));
+            depthCameras.push_back(new OrbbecCamera(&orbbec_devices[i], cam, (*starting_id)++));
             std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
         }
         catch (const std::system_error& ex) {
@@ -89,7 +90,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(int *starting_id) 
     return depthCameras;
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
+OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, Camera *cam, int camera_id) :
     _device_info(device_info) {
     this->camera_id = camera_id;
     printDeviceInfo();
@@ -170,7 +171,7 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     this->depth_height = this->_frame_ref.getHeight();
     this->max_depth = this->_depth_stream.getMaxPixelValue();
 
-    m_pointcloud = std::make_unique<GLObject::PointCloud>( this );
+    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
 /// <summary>
@@ -224,7 +225,9 @@ const uint16_t *OrbbecCamera::getDepth()
 
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
 void OrbbecCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
-{
+{    
+    std::filesystem::create_directory("Recordings");
+
     std::string fileName = std::to_string(startOn) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
 
     setNumFrames(numFrames);
@@ -263,6 +266,7 @@ void OrbbecCamera::OnUpdate()
         {
             // check if we need to discard first frame
             // start recording
+            g_Capture.recorder.attach(_depth_stream);
             g_Capture.recorder.start();
             g_Capture.State = CAPTURING;
         }

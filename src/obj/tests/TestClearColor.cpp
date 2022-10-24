@@ -6,8 +6,7 @@
 
 namespace GLObject
 {
-
-	TestClearColor::TestClearColor() 
+	TestClearColor::TestClearColor(const Camera *cam) 
 	{
 		GLCall(glGetFloatv(GL_COLOR_CLEAR_VALUE, m_ClearColor));
 	}

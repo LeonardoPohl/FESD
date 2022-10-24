@@ -14,12 +14,12 @@ namespace GLObject
 	class TestTriangle2D : public GLObject
 	{
 	public:
-		TestTriangle2D();
-
+		TestTriangle2D(const Camera *cam = nullptr);
+		
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
-		float m_Color[4];
+		float m_Color[4]{ 0.2f, 0.3f, 0.8f, 1.0f };
 
 		glm::vec2 m_LeftRightOrtho;
 		glm::vec2 m_BottomTopOrtho;

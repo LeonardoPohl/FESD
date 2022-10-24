@@ -20,12 +20,7 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud() : m_DepthCamera(nullptr), m_Points(nullptr), m_Vertices(nullptr), m_Proj()
-		{
-			std::cout << "Do not initialise the point cloud without a depth camera.";
-			return;
-		}
-		PointCloud(DepthCamera* depthCamera);
+		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr);
 
 		void OnUpdate() override;
 		void OnRender() override;
@@ -44,7 +39,6 @@ namespace GLObject
 		std::unique_ptr<VertexBuffer> m_VB;
 		std::unique_ptr<VertexBufferLayout> m_VBL;
 
-		// TODO: Replace with camera
 		glm::mat4 m_View{ glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, -2.0f)) };
 		glm::mat4 m_Proj;
 

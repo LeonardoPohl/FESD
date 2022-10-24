@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "DepthCamera.h"
+#include "GLCore/Camera.h"
 
 namespace Params
 {
@@ -11,7 +12,7 @@ namespace Params
 class CameraHandler
 {
 public:
-	CameraHandler();
+	CameraHandler(Camera *cam);
 	~CameraHandler();
 
 	void findAllCameras();
@@ -19,6 +20,8 @@ public:
 	void showCameras();
 	void OnImGuiRender();
 private:
+	Camera *cam;
+
 	std::vector<DepthCamera *> depthCameras;
 
 	std::unique_ptr<Params::GlobalParameters> global_params;
