@@ -32,7 +32,7 @@ namespace GLObject
                 m_Points[i].Position = { ((float)h / (float)height),
                                          ((float)w / (float)width) };
 
-                m_Points[i].HalfLength = 0.25f / (float)width;
+                m_Points[i].HalfLength = 0.75f / (float)width;
                 m_Points[i].Depth = 0.0f;
                 m_Points[i].updateVertexArray();
 
@@ -66,7 +66,7 @@ namespace GLObject
         const unsigned int width = m_DepthCamera->getDepthStreamHeight();
 
         const unsigned int numElements = width * height;
-        uint8_t maxDepth = 0;
+        uint16_t maxDepth = 0;
 
         for (unsigned int h = 0; h < height; h++)
         {
@@ -80,13 +80,14 @@ namespace GLObject
                 }
 
                 // Read depth data
-                m_Points[i].updateDepth(Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)));
+                m_Points[i].updateDepth(-1.0f * Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)));
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
         //m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
         m_IndexBuffer->Bind();
+        
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
 
         // Assigns different transformations to each matrix
@@ -112,7 +113,7 @@ namespace GLObject
     void PointCloud::OnImGuiRender()
     {
         ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
-        ImGui::SliderFloat3("Rotation", &m_Rotation.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Rotation", &m_Rotation.x, -1.0f, 1.0f);
         ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
         ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
 

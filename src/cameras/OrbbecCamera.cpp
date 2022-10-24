@@ -225,9 +225,9 @@ const uint16_t *OrbbecCamera::getDepth()
 
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
 void OrbbecCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
-{
-    
+{    
     std::filesystem::create_directory("Recordings");
+
     std::string fileName = std::to_string(startOn) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
 
     setNumFrames(numFrames);
@@ -273,7 +273,6 @@ void OrbbecCamera::OnUpdate()
     }
     else if (g_Capture.State == CAPTURING)
     {
-        
         if (limit_frames && decFramesLeft())
             stopRecording();
     }else

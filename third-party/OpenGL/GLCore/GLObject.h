@@ -20,6 +20,7 @@ namespace GLObject
 		virtual void OnImGuiRender() { }
 	protected:
 		const Camera *camera{nullptr};
+
 	};
 
 	class TestMenu : public GLObject
