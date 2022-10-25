@@ -173,7 +173,9 @@
     <ClCompile Include="src\parameters\NormalParameters.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
+    <ClCompile Include="src\utilities\ImGuiHelper.cpp" />
     <ClCompile Include="src\utilities\Point.cpp" />
+    <ClCompile Include="src\utilities\GLFWHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -206,9 +208,13 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\parameters\Parameters.h" />
+    <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\ColorMaps.h" />
+    <ClInclude Include="src\utilities\GLFWHelper.h" />
+    <ClInclude Include="src\utilities\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\Point.h" />
+    <ClInclude Include="src\utilities\TestMenuHelper.h" />
     <ClInclude Include="src\utilities\Utilities.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
