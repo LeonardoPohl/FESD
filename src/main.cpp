@@ -78,6 +78,8 @@ int main(void)
     {
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        GLCall(glClearColor(0.15f, 0.15f, 0.15f, 1.0f));
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGui::StyleColorsDark();

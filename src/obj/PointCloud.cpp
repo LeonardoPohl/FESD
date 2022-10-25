@@ -16,8 +16,6 @@ namespace GLObject
 
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-        GLCall(glGetFloatv(GL_COLOR_CLEAR_VALUE, m_ClearColor));
-
         const int width = m_DepthCamera->getDepthStreamWidth();
         const int height = m_DepthCamera->getDepthStreamHeight();
 
@@ -27,13 +25,14 @@ namespace GLObject
         m_Points = new Point[numElements];
         auto *indices = new unsigned int[numIndex];
 
-        for (unsigned int h = 0; h < height; h++)
+        for (unsigned int w = 0; w < width; w++)
         {
-            for (unsigned int w = 0; w < width; w++)
+            for (unsigned int h = 0; h < height; h++)
             {
                 int i = h * width + w;
-                m_Points[i].Position = { Normalisem11((float)h / (float)height),
-                                         Normalisem11((float)w / (float)width) };
+                m_Points[i].Position = { Normalisem11((float)w / (float)width) ,
+                                         Normalisem11((float)h / (float)height),
+                                        };
 
                 m_Points[i].HalfLength = 1.5f / (float)width;
                 m_Points[i].Depth = 0.0f;
@@ -65,27 +64,28 @@ namespace GLObject
     {
         auto depth = m_DepthCamera->getDepth();
 
-        const unsigned int height = m_DepthCamera->getDepthStreamWidth();
-        const unsigned int width = m_DepthCamera->getDepthStreamHeight();
+        const unsigned int height = m_DepthCamera->getDepthStreamHeight();
+        const unsigned int width = m_DepthCamera->getDepthStreamWidth();
 
         const unsigned int numElements = width * height;
         uint16_t maxDepth = 0;
 
-        for (unsigned int h = height - 1; h > 0; --h)
+        for (unsigned int w = 0; w < width; w++)
         {
-            for (unsigned int w = width; w > 0; --w)
+            for (unsigned int h = 0; h < height; h++)
             {
-                int i = h * width + w;
+                int point_i = h * width + w;
+                int depth_i = (height - h) * width + (width - w);
 
-                if (depth[i] > maxDepth && depth[i] > m_MaxDepth)
+                if (depth[depth_i] > maxDepth && depth[depth_i] > m_MaxDepth)
                 {
-                    maxDepth = depth[i];
+                    maxDepth = depth[depth_i];
                 }
 
                 // Read depth data
-                m_Points[i].updateDepth(m_Depth_Scale * -1.0f * Normalisem11((float)(depth[i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)), m_Depth_Scale);
+                m_Points[point_i].updateDepth(m_Depth_Scale * -1.0f * Normalisem11((float)(depth[depth_i]) / (m_MaxDepth == 0.0f ? (float)m_DepthCamera->getDepthStreamMaxDepth() : m_MaxDepth)), m_Depth_Scale);
                 // Copy vertices into vertex array
-                memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+                memcpy(m_Vertices + point_i * Point::VertexCount, &m_Points[point_i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
             }
         }
         //m_MaxDepth = std::max(m_MaxDepth, (float)maxDepth);
@@ -96,7 +96,6 @@ namespace GLObject
 
     void PointCloud::OnRender()
     {
-        GLCall(glClearColor(m_ClearColor[0], m_ClearColor[1], m_ClearColor[2], m_ClearColor[3]));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model = glm::translate(glm::mat4(1.0f), m_Translation);

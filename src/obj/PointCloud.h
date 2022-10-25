@@ -40,8 +40,6 @@ namespace GLObject
 		glm::vec3 m_Translation { 0.f, 0.f, -5.f };
 		glm::vec3 m_ModelTranslation{ 0.0f };
 
-		float m_ClearColor[4];
-
 		float m_Scale {1.0f};
 		float m_Depth_Scale {1.0f};
 		float m_MaxDepth {0.0f};
