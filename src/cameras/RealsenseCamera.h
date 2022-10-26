@@ -9,7 +9,9 @@ public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, int camera_id);
 	~RealSenseCamera() override;
 
-	const uint16_t * getDepth() override;
+	const void * getDepth() override;
+	size_t getDepthSize() override;
+
 	std::string getName() const override { return "Realsense"; }
 
 	void printDeviceInfo() const;
@@ -45,9 +47,11 @@ private:
 	rs2::config _cfg{};
 	rs2_intrinsics intrinsics;
 
+	size_t pixel_size{ 0 };
+
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};
-	unsigned int max_depth;
+	unsigned int max_depth { 32766 };
 
 	unsigned int depth_width;
 	unsigned int depth_height;

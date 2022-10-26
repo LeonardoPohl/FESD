@@ -190,7 +190,7 @@ void OrbbecCamera::makePointCloud(Camera *cam)
     m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
 
-const uint16_t *OrbbecCamera::getDepth()
+const void *OrbbecCamera::getDepth()
 {
     int changedStreamDummy;
     VideoStream *pStream = &this->_depth_stream;
@@ -329,6 +329,7 @@ void OrbbecCamera::OnImGuiRender()
             stopRecording();
         }
     }
+
     m_pointcloud->OnImGuiRender();
 }
 

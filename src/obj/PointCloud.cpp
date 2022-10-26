@@ -62,12 +62,15 @@ namespace GLObject
 
     void PointCloud::OnUpdate()
     {
-        auto depth = m_DepthCamera->getDepth();
+        auto tmp_depth = m_DepthCamera->getDepth();
 
         const unsigned int height = m_DepthCamera->getDepthStreamHeight();
         const unsigned int width = m_DepthCamera->getDepthStreamWidth();
 
         const unsigned int numElements = width * height;
+
+        auto depth = (int16_t *)tmp_depth;
+
         uint16_t maxDepth = 0;
 
         for (unsigned int w = 0; w < width; w++)
@@ -96,8 +99,6 @@ namespace GLObject
 
     void PointCloud::OnRender()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glm::mat4 model = glm::translate(glm::mat4(1.0f), m_Translation);
         glm::mat4 mvp = camera->getViewProjection() * model;
 

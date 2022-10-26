@@ -9,7 +9,9 @@ public:
 	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
 	~OrbbecCamera() override;
 
-	const uint16_t * getDepth() override;
+	const void * getDepth() override;
+	inline size_t getDepthSize() override { return sizeof(int16_t); }
+
 	std::string getName() const override { return "Orbbec"; }
 
 	void printDeviceInfo() const;

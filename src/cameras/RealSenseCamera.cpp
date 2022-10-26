@@ -57,12 +57,26 @@ RealSenseCamera::~RealSenseCamera() {
 	}
 }
 
-const uint16_t *RealSenseCamera::getDepth()
+const void *RealSenseCamera::getDepth()
 {
 	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	frame depth = data.get_depth_frame();
+	depth_frame depth = data.get_depth_frame();
+	pixel_size = depth.get_data_size();
 
-	return (uint16_t *)depth.get_data();
+	return depth.get_data();
+}
+
+size_t RealSenseCamera::getDepthSize()
+{
+	if (pixel_size != 0)
+	{
+		return pixel_size;
+	}
+	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	depth_frame depth = data.get_depth_frame();
+	pixel_size = depth.get_data_size();
+
+	return depth.get_data_size();
 }
 
 void RealSenseCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
@@ -77,7 +91,7 @@ void RealSenseCamera::stopRecording()
 
 void RealSenseCamera::OnUpdate()
 {
-
+	m_pointcloud->OnUpdate();
 }
 
 inline void RealSenseCamera::OnRender()

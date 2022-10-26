@@ -23,7 +23,10 @@ public:
 	/// Gets current depth frame
 	/// </summary>
 	/// <returns>Pointer to first depth pixel</returns>
-	virtual const uint16_t *getDepth() = 0;
+	virtual const void *getDepth() = 0;
+
+	/// <returns>Returns size of depth pixel</returns>
+	virtual size_t getDepthSize() = 0;
 
 	/// <summary>
 	/// Gets the Name of the Camera
