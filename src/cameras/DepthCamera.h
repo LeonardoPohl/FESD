@@ -76,6 +76,8 @@ public:
 	/// </summary>
 	virtual void stopRecording() = 0;
 
+	virtual glm::mat4 getIntrinsics() const = 0;
+
 	/// <returns>Window Name (Display: *Camera Name*)</returns>
 	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -95,5 +97,4 @@ public:
 	bool is_enabled{ false };
 protected:
 	unsigned int camera_id;
-
 };

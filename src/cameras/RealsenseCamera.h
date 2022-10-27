@@ -40,6 +40,18 @@ public:
 	void OnUpdate() override;
 	void OnRender() override;
 	void OnImGuiRender() override;
+
+	inline glm::mat4 getIntrinsics() const override
+	{
+		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
+		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
+
+		return { fx, 0.0f, 0.0f, 0.0f,
+				 0.0f,   fy, 0.0f, 0.0f,
+				 0.0f, 0.0f, 1.0f, 0.0f,
+				 0.0f, 0.0f, 0.0f, 1.0f, };
+	}
+
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx{};
@@ -52,6 +64,11 @@ private:
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};
 	unsigned int max_depth { 32766 };
+
+	// TODO fix these
+	const float hfov{ glm::radians(-1.0f) };
+	const float vfov{ glm::radians(-1.0f) };
+	const float dfov{ glm::radians(-1.0f) }; // no Idea what that is
 
 	unsigned int depth_width;
 	unsigned int depth_height;

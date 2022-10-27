@@ -216,7 +216,6 @@
     <Font Include="resources\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="C:\Users\pohly\Downloads\brick.png" />
     <Image Include="resources\textures\brick.png" />
     <Image Include="resources\textures\ml.png" />
   </ItemGroup>

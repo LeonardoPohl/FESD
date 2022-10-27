@@ -3,6 +3,7 @@
 #include <OpenNI.h>
 #include <vector>
 #include <memory>
+#include <glm/glm.hpp>
 
 class OrbbecCamera : public DepthCamera {
 public:
@@ -41,6 +42,19 @@ public:
 	{
 		return this->frames_left-- <= 0 ;
 	}
+
+	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
+	inline glm::mat4 getIntrinsics() const override
+	{
+		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
+		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
+
+		return {   fx, 0.0f, 0.0f, 0.0f,
+				 0.0f,   fy, 0.0f, 0.0f,
+				 0.0f, 0.0f, 1.0f, 0.0f,
+			     0.0f, 0.0f, 0.0f, 1.0f, };
+	}
+
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
@@ -54,6 +68,10 @@ private:
 	int num_frames{ 0 };
 	int delay{ 0 };
 	bool limit_frames = true;
+
+	const float hfov{ glm::radians(60.0f) };
+	const float vfov{ glm::radians(49.5f) };
+	const float dfov{ glm::radians(73.0f) }; // no Idea what that is
 
 	unsigned int depth_width;
 	unsigned int depth_height;

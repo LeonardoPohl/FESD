@@ -67,7 +67,6 @@ void CameraHandler::OnImGuiRender()
             cam->OnUpdate();
             cam->OnRender();
             cam->OnImGuiRender();
-            
         }
     }
 }

@@ -3,23 +3,62 @@
 #include "Consts.h"
 #include <functional>
 
-static auto PC_COLORMAP = colormap::viridis(NUM_COLORS);
+const char *Point::CMAP_NAMES[] = {"Viridis", "Magma", "Inferno", "HSV", "Terrain", "Greyscale"};
 
-std::array<float, 4> Point::getColorFromDepth()
+static const auto VIRIDIS = colormap::viridis(NUM_COLORS);
+static const auto MAGMA = colormap::magma(NUM_COLORS);
+static const auto INFERNO = colormap::inferno(NUM_COLORS);
+static const auto HSV = colormap::hsv(NUM_COLORS);
+static const auto TERRAIN = colormap::terrain(NUM_COLORS);
+static const auto GREY = colormap::bone(NUM_COLORS);
+
+std::array<float, 4> Point::getColorFromDepth(CMAP cmap) const 
 {
 	auto depth = std::clamp(Depth, -1.0f, 1.0f);
+
 	if (depth == -1.0f)
 		return { 0.0f };
 
-	auto col = xt::row(PC_COLORMAP, (int)((float)NUM_COLORS * (1.0f + depth) / 2.0f));
-		
-	return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	auto color_index = (int)((float)NUM_COLORS * (1.0f + depth) / 2.0f);
+
+	if (cmap == CMAP::VIRIDIS)
+	{
+		auto col = xt::row(VIRIDIS, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
+	else if (cmap == CMAP::MAGMA)
+	{
+		auto col = xt::row(MAGMA, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
+	else if (cmap == CMAP::INFERNO)
+	{
+		auto col = xt::row(INFERNO, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
+	else if (cmap == CMAP::TERRAIN)
+	{
+		auto col = xt::row(TERRAIN, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
+	else if (cmap == CMAP::HSV)
+	{
+		auto col = xt::row(HSV, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
+	else
+	{
+		auto col = xt::row(GREY, color_index);
+		return { (float)col[0], (float)col[1], (float)col[2], 1.0f };
+	}
 }
 
-void Point::updateDepth(float depth, float depth_scale)
+void Point::updateDepth(float depth, float depth_scale, glm::mat4 *intrinsics, CMAP cmap)
 {
 	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth / depth_scale);
-	std::array<float, 4> Color = getColorFromDepth();
+	std::array<float, 4> Color = getColorFromDepth(cmap);
+
+
 
 	Vertices[0].Position[2] = -HalfLength + depth;
 	Vertices[0].Color = Color;
@@ -64,9 +103,9 @@ unsigned int *Point::getIndices(int i)
 	return &indices[0];
 }
 
-void Point::updateVertexArray()
+void Point::updateVertexArray(CMAP cmap)
 {
-	std::array<float, 4> Color = getColorFromDepth();
+	std::array<float, 4> Color = getColorFromDepth(cmap);
 
 	/*
 		7      6
