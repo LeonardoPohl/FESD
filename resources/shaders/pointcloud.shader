@@ -12,9 +12,6 @@ out vec3 v_Color;
 // Controls the scale of the vertices
 uniform float u_Scale;
 
-// Controls the scale of the vertices
-uniform mat4 u_Intrinsics;
-
 // Inputs the matrices needed for 3D viewing with perspective
 uniform mat4 u_MVP;
 

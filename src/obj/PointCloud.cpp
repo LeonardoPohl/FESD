@@ -30,22 +30,23 @@ namespace GLObject
         const unsigned int numIndex = numElements * Point::IndexCount;
 
         m_Points = new Point[numElements];
-        auto indices = std::make_unique<unsigned int[]>(numElements);
+
+        auto *indices = new unsigned int[numIndex];
 
         for (unsigned int w = 0; w < width; w++)
         {
             for (unsigned int h = 0; h < height; h++)
             {
                 int i = h * width + w;
-                // Initialise with (w-cx) / f_x instead
-                m_Points[i].Position = { (width - cx)  / fx,
-                                         (height - cy) / fy };
 
-                m_Points[i].HalfLength = 1.5f / (float)width;
-                m_Points[i].Depth = 0.0f;
-                m_Points[i].updateVertexArray();
+                m_Points[i].PositionFunction = { ((float)w - cx) / fx,
+                                                 ((float)h - cy) / fy };
 
-                memcpy(indices.get() + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
+                m_Points[i].HalfLength = 1.5f;
+                m_Points[i].Scale = width;
+                m_Points[i].updateVertexArray(0.1f, m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
+
+                memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
             }
         }
 
@@ -76,8 +77,8 @@ namespace GLObject
         const unsigned int height = m_DepthCamera->getDepthStreamHeight();
 
         const unsigned int numElements = width * height;
-
-        auto depth = (int16_t *)m_DepthCamera->getDepth();
+        
+        auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
 
         for (unsigned int w = 0; w < width; w++)
         {
@@ -86,11 +87,11 @@ namespace GLObject
                 int point_i = h * width + w;
                 int depth_i = (height - h) * width + (width - w);
 
-                auto normalised_depth = Normalisem11((float)(depth[depth_i]) / (float)m_DepthCamera->getDepthStreamMaxDepth());
-                auto scaled_depth = m_Depth_Scale * -1.0f * normalised_depth;
+                //auto normalised_depth = Normalisem11((float)(depth[depth_i]) / (float)m_DepthCamera->getDepthStreamMaxDepth());
+                //auto scaled_depth = m_Depth_Scale * -1.0f * normalised_depth;
 
                 // Read depth data
-                m_Points[point_i].updateDepth(scaled_depth, m_Depth_Scale, cmap);
+                m_Points[point_i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
 
                 // Copy vertices into vertex array
                 memcpy(m_Vertices + point_i * Point::VertexCount, &m_Points[point_i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
@@ -111,7 +112,6 @@ namespace GLObject
 
         m_Shader->Bind();
         m_Shader->SetUniform1f("u_Scale", m_Scale);
-        m_Shader->SetUniformMat4f("u_Intrinsics", m_DepthCamera->getIntrinsics());
         m_Shader->SetUniformMat4f("u_MVP", mvp);
 
         Renderer renderer;
@@ -132,7 +132,7 @@ namespace GLObject
         }
 
         ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
-        ImGui::SliderFloat("Depth Scale", &m_Depth_Scale, 0.0f, 10.0f);
-        ImGui::SliderFloat("Scale", &m_Scale, 0.0f, 10.0f);
+        ImGui::SliderFloat("Depth Scale", &m_Depth_Scale, 0.001f, 10.0f);
+        ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
     }
 }

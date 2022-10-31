@@ -3,23 +3,59 @@
 #include "Consts.h"
 #include <functional>
 
-const char *Point::CMAP_NAMES[] = {"Viridis", "Magma", "Inferno", "HSV", "Terrain", "Greyscale"};
-
-static const auto VIRIDIS = colormap::viridis(NUM_COLORS);
-static const auto MAGMA = colormap::magma(NUM_COLORS);
-static const auto INFERNO = colormap::inferno(NUM_COLORS);
-static const auto HSV = colormap::hsv(NUM_COLORS);
-static const auto TERRAIN = colormap::terrain(NUM_COLORS);
-static const auto GREY = colormap::bone(NUM_COLORS);
-
-std::array<float, 4> Point::getColorFromDepth(CMAP cmap) const 
+void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 {
-	auto depth = std::clamp(Depth, -1.0f, 1.0f);
+	/*
+		7      6
+	   .+------+
+	4.' |  5 .'|
+	+---+--+'  |
+	|   | p|   |
+	|  .+--+---+2
+	|.' 3  | .'a
+	+------+'
+	0	   1
+	*/
 
-	if (depth == -1.0f)
+	// maybe add cache?
+	std::array<float, 4> Color = getColorFromDepth(depth, depth_scale, cmap);
+
+	auto x = (PositionFunction[0] * depth) / Scale;
+	auto y = (PositionFunction[1] * depth) / Scale;
+	auto z = depth * depth_scale;
+	auto a = HalfLength / Scale;
+
+	if (cmap != CMAP::VIRIDIS && depth != 0.0f)
+		std::cout << x << ", " << y << ", " << z << "=" <<depth << "/" << depth_scale << a << std::endl;
+
+	Vertices[0] = { { x - a, y - a, z - a}, Color };
+	Vertices[1] = { { x + a, y - a, z - a}, Color };
+	Vertices[2] = { { x + a, y - a, z + a}, Color };
+	Vertices[3] = { { x - a, y - a, z + a}, Color };
+
+	Vertices[4] = { { x - a, y + a, z - a}, Color };
+	Vertices[5] = { { x + a, y + a, z - a}, Color };
+	Vertices[6] = { { x + a, y + a, z + a}, Color };
+	Vertices[7] = { { x - a, y + a, z + a}, Color };
+}
+
+const char *Point::CMAP_NAMES[] = { "Viridis", "Magma", "Inferno", "HSV", "Terrain", "Greyscale" };
+
+const auto VIRIDIS = colormap::viridis(NUM_COLORS);
+const auto MAGMA = colormap::magma(NUM_COLORS);
+const auto INFERNO = colormap::inferno(NUM_COLORS);
+const auto HSV = colormap::hsv(NUM_COLORS);
+const auto TERRAIN = colormap::terrain(NUM_COLORS);
+const auto GREY = colormap::bone(NUM_COLORS);
+
+inline std::array<float, 4> Point::getColorFromDepth(float depth, float depth_scale, CMAP cmap) const
+{
+	auto z = std::clamp(depth / depth_scale, 0.0f, 1.0f);
+
+	if (z == -1.0f)
 		return { 0.0f };
 
-	auto color_index = (int)((float)NUM_COLORS * (1.0f + depth) / 2.0f);
+	auto color_index = (int)((float)NUM_COLORS * z);
 
 	if (cmap == CMAP::VIRIDIS)
 	{
@@ -53,30 +89,6 @@ std::array<float, 4> Point::getColorFromDepth(CMAP cmap) const
 	}
 }
 
-void Point::updateDepth(float depth, float depth_scale, CMAP cmap)
-{
-	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth / depth_scale);
-	std::array<float, 4> Color = getColorFromDepth(cmap);
-
-	Vertices[0].Position[2] = -HalfLength + depth;
-	Vertices[0].Color = Color;
-	Vertices[1].Position[2] = -HalfLength + depth;
-	Vertices[1].Color = Color;
-	Vertices[2].Position[2] = HalfLength + depth;
-	Vertices[2].Color = Color;
-	Vertices[3].Position[2] = HalfLength + depth;
-	Vertices[3].Color = Color;
-
-	Vertices[4].Position[2] = -HalfLength + depth;
-	Vertices[4].Color = Color;
-	Vertices[5].Position[2] = -HalfLength + depth;
-	Vertices[5].Color = Color;
-	Vertices[6].Position[2] = HalfLength + depth;
-	Vertices[6].Color = Color;
-	Vertices[7].Position[2] = HalfLength + depth;
-	Vertices[7].Color = Color;
-}
-
 unsigned int *Point::getIndices(int i)
 {
 	std::array<unsigned int, IndexCount> indices
@@ -94,35 +106,9 @@ unsigned int *Point::getIndices(int i)
 		5, 4, 6,
 		6, 4, 7
 	};
-	
+
 	for (int k = 0; k < IndexCount; k++)
 		indices[k] += i * VertexCount;
-	
+
 	return &indices[0];
-}
-
-void Point::updateVertexArray(CMAP cmap)
-{
-	std::array<float, 4> Color = getColorFromDepth(cmap);
-
-	/*
-		7      6
-	   .+------+
-	4.' |  5 .'|
-	+---+--+'  |
-	|   |  |   |
-	|  .+--+---+2
-	|.' 3  | .'Length = 2 * HalfLength
-	+------+'
-	0	   1
-	*/
-	Vertices[0] = { { -HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, Color };
-	Vertices[1] = { {  HalfLength + Position[0], -HalfLength + Position[1], -HalfLength + Depth }, Color };
-	Vertices[2] = { {  HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, Color };
-	Vertices[3] = { { -HalfLength + Position[0], -HalfLength + Position[1],  HalfLength + Depth }, Color };
-
-	Vertices[4] = { { -HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, Color };
-	Vertices[5] = { {  HalfLength + Position[0],  HalfLength + Position[1], -HalfLength + Depth }, Color };
-	Vertices[6] = { {  HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, Color };
-	Vertices[7] = { { -HalfLength + Position[0],  HalfLength + Position[1],  HalfLength + Depth }, Color };
 }

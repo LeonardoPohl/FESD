@@ -20,9 +20,10 @@ public:
 	static const int VertexCount = 8;
 	static const int IndexCount = 3 * 12;
 
-	std::array<float, 2> Position{ 0.0f, 0.0f };
+	//std::array<int, 2> Position{ 0.0f, 0.0f };
 	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
 	float Depth{ 0 };
+	float Scale{ 0 };
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLength;
 
@@ -39,8 +40,7 @@ public:
 		GREY
 	};
 
-	std::array<float, 4> getColorFromDepth(CMAP cmap) const;
-	void updateDepth(float depth, float depth_scale, CMAP cmap = CMAP::VIRIDIS);
+	std::array<float, 4> getColorFromDepth(float depth, float depth_scale, CMAP cmap) const;
 	static unsigned int *getIndices(int i);
-	void updateVertexArray(CMAP cmap = CMAP::VIRIDIS);
+	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
 };

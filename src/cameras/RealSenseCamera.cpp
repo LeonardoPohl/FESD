@@ -34,14 +34,19 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int 
 	this->printDeviceInfo();
 	this->_device->query_sensors();
 	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-	this->_pipe.start(this->_cfg);
+	
+	auto profile = this->_pipe.start(this->_cfg);
 
 	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
 	frame depth = data.get_depth_frame();
 
+	// Get Intrinsics
+	auto depth_profile = depth.get_profile().as<rs2::video_stream_profile>();
+	this->intrinsics   = depth_profile.get_intrinsics();
+	
 	// Query frame size (width and height)
-	this->depth_width = depth.as<video_frame>().get_width();
-	this->depth_height = depth.as<video_frame>().get_height();
+	this->depth_width  = intrinsics.width;
+	this->depth_height = intrinsics.height;
 
 	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
 }
