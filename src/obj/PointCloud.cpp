@@ -80,26 +80,39 @@ namespace GLObject
         
         auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
 
-        for (unsigned int w = 0; w < width; w++)
+        if (!doFloorDetection)
         {
-            for (unsigned int h = 0; h < height; h++)
+            for (unsigned int w = 0; w < width; w++)
             {
-                int point_i = h * width + w;
-                int depth_i = (height - h) * width + (width - w);
+                for (unsigned int h = 0; h < height; h++)
+                {
+                    int point_i = h * width + w;
+                    int depth_i = (height - h) * width + (width - w);
 
-                //auto normalised_depth = Normalisem11((float)(depth[depth_i]) / (float)m_DepthCamera->getDepthStreamMaxDepth());
-                //auto scaled_depth = m_Depth_Scale * -1.0f * normalised_depth;
+                    // Read depth data
+                    m_Points[point_i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
 
-                // Read depth data
-                m_Points[point_i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
-
-                // Copy vertices into vertex array
-                memcpy(m_Vertices + point_i * Point::VertexCount, &m_Points[point_i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+                    // Copy vertices into vertex array
+                    memcpy(m_Vertices + point_i * Point::VertexCount, &m_Points[point_i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+                }
             }
+            m_IndexBuffer->Bind();
+
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
         }
-        m_IndexBuffer->Bind();
-        
-        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * numElements * Point::VertexCount, m_Vertices));
+        else
+        {
+            // While Plane with more points is not found
+            // Select 3 Points at random (?) that were not part of a plane before
+            // 
+            // Create a Plane using those Points
+            // 
+            // iterate all points and check if they are part of plane & count
+            // (Extra, color points)
+            // 
+            // Store Plane with number of matches in map
+        }
+        // Add plane display mode, where planes with points are shown
     }
 
     void PointCloud::OnRender()

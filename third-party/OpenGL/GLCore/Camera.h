@@ -10,7 +10,7 @@ const glm::vec3 UP{ 0.0f, 1.0f, 0.0f };
 struct GLFWwindow;
 
 // Default camera values
-const float YAW = -90.0f;
+const float YAW = 0.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
