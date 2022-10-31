@@ -15,6 +15,14 @@ namespace GLObject
 	class PointCloud;
 }
 
+enum class INTRINSICS
+{
+	FX,
+	FY,
+	CX,
+	CY
+};
+
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
@@ -76,7 +84,8 @@ public:
 	/// </summary>
 	virtual void stopRecording() = 0;
 
-	virtual glm::mat4 getIntrinsics() const = 0;
+	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
+	virtual glm::mat3 getIntrinsics() const = 0;
 
 	/// <returns>Window Name (Display: *Camera Name*)</returns>
 	inline std::string getWindowName() const {

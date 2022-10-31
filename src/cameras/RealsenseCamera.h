@@ -41,15 +41,28 @@ public:
 	void OnRender() override;
 	void OnImGuiRender() override;
 
-	inline glm::mat4 getIntrinsics() const override
+	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
-		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
-		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
+		switch (intrin)
+		{
+			case INTRINSICS::FX:
+				return intrinsics.fx;
+			case INTRINSICS::FY:
+				return intrinsics.fy;
+			case INTRINSICS::CX:
+				return intrinsics.ppx;
+			case INTRINSICS::CY:
+				return intrinsics.ppy;
+			default:
+				break;
+		}
+	}
 
-		return { fx, 0.0f, 0.0f, 0.0f,
-				 0.0f,   fy, 0.0f, 0.0f,
-				 0.0f, 0.0f, 1.0f, 0.0f,
-				 0.0f, 0.0f, 0.0f, 1.0f, };
+	inline glm::mat3 getIntrinsics() const override
+	{
+		return { intrinsics.fx,		     0.0f, intrinsics.ppx,
+						  0.0f, intrinsics.fy, intrinsics.ppy,
+						  0.0f,		     0.0f,           1.0f };
 	}
 
 private:

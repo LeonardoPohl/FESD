@@ -44,17 +44,36 @@ public:
 	}
 
 	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
-	inline glm::mat4 getIntrinsics() const override
+	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
 		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
 		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
+		auto cx = getDepthStreamWidth() / 2;
+		auto cy = getDepthStreamHeight() / 2;
 
-		return {   fx, 0.0f, 0.0f, 0.0f,
-				 0.0f,   fy, 0.0f, 0.0f,
-				 0.0f, 0.0f, 1.0f, 0.0f,
-			     0.0f, 0.0f, 0.0f, 1.0f, };
+		switch (intrin)
+		{
+			using enum INTRINSICS;
+			case FX:
+				return fx;
+			case FY:
+				return fy;
+			case CX:
+				return cx;
+			case CY:
+				return cy;
+			default:
+				break;
+		}
+		return INFINITE;
 	}
 
+	inline glm::mat3 getIntrinsics() const override
+	{
+		return { getIntrinsics(INTRINSICS::FX),							 0.0f, getIntrinsics(INTRINSICS::CX), 
+										  0.0f,	getIntrinsics(INTRINSICS::FY), getIntrinsics(INTRINSICS::CY), 
+										  0.0f,							 0.0f,							1.0f };
+	}
 private:
 	const openni::DeviceInfo* _device_info;
 	openni::Device _device;
