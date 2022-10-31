@@ -43,7 +43,7 @@ namespace GLObject
 		glm::vec3 m_ModelTranslation{ 0.0f };
 
 		float m_Scale {1.0f};
-		float m_Depth_Scale {1.0f};
+		float m_Depth_Scale {5.0f};
 		float m_MaxDepth {0.0f};
 
 		bool doUpdate{ true };

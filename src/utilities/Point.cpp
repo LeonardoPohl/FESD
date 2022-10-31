@@ -53,12 +53,10 @@ std::array<float, 4> Point::getColorFromDepth(CMAP cmap) const
 	}
 }
 
-void Point::updateDepth(float depth, float depth_scale, glm::mat4 *intrinsics, CMAP cmap)
+void Point::updateDepth(float depth, float depth_scale, CMAP cmap)
 {
 	this->Depth = isnan(depth) ? -1.0f : (isinf(depth) ? 1.0f : depth / depth_scale);
 	std::array<float, 4> Color = getColorFromDepth(cmap);
-
-
 
 	Vertices[0].Position[2] = -HalfLength + depth;
 	Vertices[0].Color = Color;

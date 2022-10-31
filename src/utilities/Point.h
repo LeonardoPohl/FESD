@@ -15,14 +15,13 @@ public:
 		Vertex(std::array<float, 3> position,
 			   std::array<float, 4> color)
 			: Position(position), Color(color) {}
-
-		void update(float halfLength, float depth, )
 	};
 
 	static const int VertexCount = 8;
 	static const int IndexCount = 3 * 12;
 
 	std::array<float, 2> Position{ 0.0f, 0.0f };
+	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
 	float Depth{ 0 };
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLength;
@@ -41,7 +40,7 @@ public:
 	};
 
 	std::array<float, 4> getColorFromDepth(CMAP cmap) const;
-	void updateDepth(float depth, float depth_scale, glm::mat4 *intrinsics, CMAP cmap = CMAP::VIRIDIS);
+	void updateDepth(float depth, float depth_scale, CMAP cmap = CMAP::VIRIDIS);
 	static unsigned int *getIndices(int i);
 	void updateVertexArray(CMAP cmap = CMAP::VIRIDIS);
 };

@@ -21,26 +21,31 @@ namespace GLObject
         const int width = m_DepthCamera->getDepthStreamWidth();
         const int height = m_DepthCamera->getDepthStreamHeight();
 
+        float fx = m_DepthCamera->getIntrinsics(INTRINSICS::FX);
+        float fy = m_DepthCamera->getIntrinsics(INTRINSICS::FY);
+        float cx = m_DepthCamera->getIntrinsics(INTRINSICS::CX);
+        float cy = m_DepthCamera->getIntrinsics(INTRINSICS::CY);
+
         const unsigned int numElements = width * height;
         const unsigned int numIndex = numElements * Point::IndexCount;
 
         m_Points = new Point[numElements];
-        auto *indices = new unsigned int[numIndex];
+        auto indices = std::make_unique<unsigned int[]>(numElements);
 
         for (unsigned int w = 0; w < width; w++)
         {
             for (unsigned int h = 0; h < height; h++)
             {
                 int i = h * width + w;
-                m_Points[i].Position = { Normalisem11((float)w / (float)width) ,
-                                         Normalisem11((float)h / (float)height),
-                                        };
+                // Initialise with (w-cx) / f_x instead
+                m_Points[i].Position = { (width - cx)  / fx,
+                                         (height - cy) / fy };
 
                 m_Points[i].HalfLength = 1.5f / (float)width;
                 m_Points[i].Depth = 0.0f;
                 m_Points[i].updateVertexArray();
 
-                memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
+                memcpy(indices.get() + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
             }
         }
 
