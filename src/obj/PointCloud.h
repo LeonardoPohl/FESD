@@ -11,9 +11,12 @@
 #include <memory>
 #include <cameras/DepthCamera.h>
 
+#include <unordered_map>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "utilities/Point.h"
+#include "utilities/Plane.h"
 
 namespace GLObject
 {
@@ -45,11 +48,15 @@ namespace GLObject
 		float m_Scale {1.0f};
 		float m_Depth_Scale {5.0f};
 		float m_MaxDepth {0.0f};
+		float m_DistanceThreshold{0.0f};
 
 		bool doUpdate{ true };
 		bool doFloorDetection{ false };
 
 		Point::CMAP cmap{ Point::CMAP::VIRIDIS };
 		int cmap_elem{ 0 };
+
+		std::vector<std::pair<Plane, int>> pointCountByPlane;
+		int maxPointCount{ 0 };
 	};
 };

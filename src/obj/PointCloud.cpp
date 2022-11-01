@@ -6,6 +6,8 @@
 #include <utilities/Consts.h>
 #include <utilities/Utilities.h>
 
+#include <ranges>
+
 namespace GLObject
 {
     PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam) : m_DepthCamera(depthCamera)
@@ -78,10 +80,10 @@ namespace GLObject
 
         const unsigned int numElements = width * height;
         
-        auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
-
         if (!doFloorDetection)
         {
+            auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
+
             for (unsigned int w = 0; w < width; w++)
             {
                 for (unsigned int h = 0; h < height; h++)
@@ -102,6 +104,40 @@ namespace GLObject
         }
         else
         {
+            Plane p{ 
+                m_Points[rand() % numElements].getPoint(),
+                m_Points[rand() % numElements].getPoint(),
+                m_Points[rand() % numElements].getPoint()
+            };
+
+            std::vector<int> points{};
+
+            for (int i : std::views::iota(0, (int)(numElements - 1)))
+                if (p.inDistance(m_Points[i].getPoint(), m_DistanceThreshold))
+                    points.push_back(i);
+
+            if (maxPointCount < points.size())
+            {
+                pointCountByPlane.push_back({ p, points.size() });
+                maxPointCount = points.size();
+
+                std::array<float, 4> randColor{ rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f, 1.0f };
+
+                for (int i : std::views::iota(0, (int)(numElements - 1)))
+                {
+                    for (int v : std::views::iota(0, Point::VertexCount))
+                    {
+                        m_Points[i].Vertices[v].Color = randColor;
+                    }
+
+                    memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+                }
+
+                m_IndexBuffer->Bind();
+
+                GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) *numElements *Point::VertexCount, m_Vertices));
+            }
+
             // While Plane with more points is not found
             // Select 3 Points at random (?) that were not part of a plane before
             // 
@@ -133,16 +169,28 @@ namespace GLObject
 
     void PointCloud::OnImGuiRender()
     {
-        ImGui::Checkbox("Update Pointcloud", &doUpdate);
-
-        ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
-        ImGui::SliderFloat3("Rotation", &m_Rotation.x, -1.0f, 1.0f);
+        if (doFloorDetection)
+        {
+            ImGui::Text("Number of planes: %d", pointCountByPlane.size());
+            ImGui::Text("Max Number of Points: %d", maxPointCount);
+            if (ImGui::SliderFloat("Distance Threshold", &m_DistanceThreshold, 0.0f, 10.0f))
+                pointCountByPlane.clear();
+        }
+        else
+        {
+            ImGui::Checkbox("Update Pointcloud", &doUpdate);
+        }
+        if (ImGui::Checkbox("Detect floor", &doFloorDetection))
+            pointCountByPlane.clear();
 
         const char *elem_name = Point::CMAP_NAMES[cmap_elem];
         if (ImGui::SliderInt("Color map", &cmap_elem, 0, Point::CMAP_COUNT - 1, elem_name))
         {
             cmap = static_cast<Point::CMAP>(cmap_elem);
         }
+
+        ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
+        ImGui::SliderFloat3("Rotation", &m_Rotation.x, -1.0f, 1.0f);
 
         ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
         ImGui::SliderFloat("Depth Scale", &m_Depth_Scale, 0.001f, 10.0f);

@@ -17,6 +17,8 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	0	   1
 	*/
 
+	Depth = depth;
+
 	// maybe add cache?
 	std::array<float, 4> Color = getColorFromDepth(depth, depth_scale, cmap);
 
@@ -37,6 +39,11 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	Vertices[5] = { { x + a, y + a, z - a}, Color };
 	Vertices[6] = { { x + a, y + a, z + a}, Color };
 	Vertices[7] = { { x - a, y + a, z + a}, Color };
+}
+
+glm::vec3 Point::getPoint()
+{
+	return { (PositionFunction[0] * Depth), (PositionFunction[1] * Depth),  Depth };
 }
 
 const char *Point::CMAP_NAMES[] = { "Viridis", "Magma", "Inferno", "HSV", "Terrain", "Greyscale" };

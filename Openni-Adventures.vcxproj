@@ -195,6 +195,7 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\utilities\Plane.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
     <ClInclude Include="src\obj\PointCloud.h" />
     <ClInclude Include="src\obj\Tests\TestClearColor.h" />

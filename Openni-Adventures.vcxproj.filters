@@ -157,6 +157,9 @@
     <ClInclude Include="src\utilities\ColorMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\utilities\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />

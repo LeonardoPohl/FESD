@@ -43,4 +43,5 @@ public:
 	std::array<float, 4> getColorFromDepth(float depth, float depth_scale, CMAP cmap) const;
 	static unsigned int *getIndices(int i);
 	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
+	glm::vec3 getPoint();
 };
