@@ -12,6 +12,7 @@
 #include <cameras/DepthCamera.h>
 
 #include <unordered_map>
+#include <random>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -48,10 +49,14 @@ namespace GLObject
 		float m_Scale {1.0f};
 		float m_Depth_Scale {5.0f};
 		float m_MaxDepth {0.0f};
-		float m_DistanceThreshold{0.0f};
+		float m_DistanceThreshold{1.0f};
+		int m_PointCountThreshold{ 150000 };
 
 		bool doUpdate{ true };
 		bool doFloorDetection{ false };
+
+		std::default_random_engine m_Generator;
+		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
 
 		Point::CMAP cmap{ Point::CMAP::VIRIDIS };
 		int cmap_elem{ 0 };

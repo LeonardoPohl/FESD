@@ -68,6 +68,8 @@ namespace GLObject
         m_Shader->Bind();
 
         m_Vertices = new Point::Vertex[numElements * Point::VertexCount] {};
+        
+        m_Distribution = std::make_unique<std::uniform_int_distribution<int>>(0, numElements - 1);
     }
 
     void PointCloud::OnUpdate()
@@ -104,10 +106,16 @@ namespace GLObject
         }
         else
         {
+            std::vector<int> plane_points{};
+            
+            plane_points.push_back(m_Distribution->operator()(m_Generator));
+            plane_points.push_back(m_Distribution->operator()(m_Generator));
+            plane_points.push_back(m_Distribution->operator()(m_Generator));
+
             Plane p{ 
-                m_Points[rand() % numElements].getPoint(),
-                m_Points[rand() % numElements].getPoint(),
-                m_Points[rand() % numElements].getPoint()
+                m_Points[plane_points[0]].getPoint(),
+                m_Points[plane_points[1]].getPoint(),
+                m_Points[plane_points[2]].getPoint()
             };
 
             std::vector<int> points{};
@@ -116,19 +124,20 @@ namespace GLObject
                 if (p.inDistance(m_Points[i].getPoint(), m_DistanceThreshold))
                     points.push_back(i);
 
-            if (maxPointCount < points.size())
+            if (m_PointCountThreshold < points.size())
             {
                 pointCountByPlane.push_back({ p, points.size() });
-                maxPointCount = points.size();
+                
+                maxPointCount = maxPointCount > points.size() ? maxPointCount : points.size();
 
                 std::array<float, 4> randColor{ rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f, 1.0f };
 
                 for (int i : std::views::iota(0, (int)(numElements - 1)))
                 {
-                    for (int v : std::views::iota(0, Point::VertexCount))
-                    {
-                        m_Points[i].Vertices[v].Color = randColor;
-                    }
+                    
+                    if (std::binary_search(points.begin(), points.end(), i))
+                        for (int v : std::views::iota(0, Point::VertexCount))
+                            m_Points[i].Vertices[v].Color = randColor;
 
                     memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
                 }
@@ -173,6 +182,8 @@ namespace GLObject
         {
             ImGui::Text("Number of planes: %d", pointCountByPlane.size());
             ImGui::Text("Max Number of Points: %d", maxPointCount);
+            if (ImGui::SliderInt("Point Count Threshold", &m_PointCountThreshold, 0, 100000))
+                pointCountByPlane.clear();
             if (ImGui::SliderFloat("Distance Threshold", &m_DistanceThreshold, 0.0f, 10.0f))
                 pointCountByPlane.clear();
         }
