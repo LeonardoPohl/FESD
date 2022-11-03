@@ -168,9 +168,7 @@
     <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
     <ClCompile Include="src\obj\Tests\TestTexture2D.cpp" />
     <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp" />
-    <ClCompile Include="src\parameters\GlobalParameters.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\parameters\NormalParameters.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
     <ClCompile Include="src\utilities\ImGuiHelper.cpp" />
@@ -208,7 +206,6 @@
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
-    <ClInclude Include="src\parameters\Parameters.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\ColorMaps.h" />

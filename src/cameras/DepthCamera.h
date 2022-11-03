@@ -3,13 +3,6 @@
 #include <string>
 #include <GLCore/GLObject.h>
 
-namespace Params 
-{
-	class GlobalParameters;
-	class SphereDetectionParameters;
-	class NormalParameters;
-}
-
 namespace GLObject
 {
 	class PointCloud;

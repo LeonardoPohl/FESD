@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include <parameters/Parameters.h>
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
 
@@ -15,9 +14,6 @@ CameraHandler::CameraHandler(Camera *cam) : cam(cam)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
-
-    global_params = std::make_unique<Params::GlobalParameters>(&depthCameras);
-    normal_params = std::make_unique<Params::NormalParameters>();
 }
 
 CameraHandler::~CameraHandler()

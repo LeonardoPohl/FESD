@@ -3,12 +3,6 @@
 #include "DepthCamera.h"
 #include "GLCore/Camera.h"
 
-namespace Params
-{
-	class GlobalParameters;
-	class SphereDetectionParameters;
-	class NormalParameters;
-}
 class CameraHandler
 {
 public:
@@ -25,8 +19,5 @@ private:
 	Camera *cam;
 
 	std::vector<DepthCamera *> depthCameras;
-
-	std::unique_ptr<Params::GlobalParameters> global_params;
-	std::unique_ptr<Params::NormalParameters> normal_params;
 };
 

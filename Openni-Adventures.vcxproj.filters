@@ -42,12 +42,6 @@
     <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\parameters\NormalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\parameters\GlobalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
     <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -125,9 +119,6 @@
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\Utilities.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="src\parameters\Parameters.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\cameras\DepthCamera.h">
