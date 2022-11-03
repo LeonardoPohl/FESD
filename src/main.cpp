@@ -1,102 +1,120 @@
 /// Main.cpp
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+#include <functional>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "GLCore/Renderer.h"
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#include "GLCore/GLObject.h"
+#include "GLCore/GLErrorManager.h"
+#include "GLCore/Camera.h"
 
 #include <OpenNI.h>
-#include <iostream>
-#include <vector>
-#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
-#include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>     // Basic OpenCV structures (cv::Mat)
-#include <opencv2/videoio.hpp>  // Video write
+#include "cameras/CameraHandler.h"
 
-#include "DepthCamera.h"
-#include "CameraCalibration.h"
+#include "utilities/Consts.h"
 
-constexpr int NUM_FRAMES = 500;
+#include "utilities/GLFWHelper.h"
+#include "utilities/ImGuiHelper.h"
+#include "utilities/TestMenuHelper.h"
 
-void shut_down(const std::vector<DepthCamera*>* depthCameras);
+Camera *cam = nullptr;
 
-int main() {
-    //initialize openni sdk and rs context
-    openni::Status rc = openni::OpenNI::initialize();
-    if (rc != openni::STATUS_OK)
+void window_size_callback(GLFWwindow *window, int width, int height);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xpos, double ypos);
+
+int main(void)
+{
+    STATUS status;
+    GLFWwindow *window = InitialiseGLFWWindow(status);
+
+    if (status == ERR)
     {
-        printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
-        return 1;
+        glfwTerminate();
+        return -1;
     }
 
-    rs2::context ctx;
+    glfwSetWindowSizeCallback(window, window_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
-    // Get devices
-
-    openni::Array<openni::DeviceInfo> orbbec_devices;
-    rs2::device_list rs_devices = RealSenseCamera::getAvailableDevices(ctx);
-    OrbbecCamera::getAvailableDevices(&orbbec_devices);
-
-    // Initialise Devices
-    std::vector<DepthCamera*> depthCameras;
-    std::vector<std::string> windows;
-    int id = 0;
-
-    for (auto&& dev : rs_devices)
     {
-        depthCameras.push_back(new RealSenseCamera(&ctx, &dev, ("Camera " + std::to_string(id)).c_str()));
-        windows.push_back("Window Camera " + std::to_string(id));
-        id++;
-    }
-
-    for (int i = 0; i < orbbec_devices.getSize(); i++) {
-        auto dev = &orbbec_devices[i];
-        try {
-            depthCameras.push_back(new OrbbecCamera(dev, ("Camera " + std::to_string(id)).c_str()));
-            windows.push_back("Window Camera " + std::to_string(id));
-            id++;
-        }
-        catch (const std::system_error& ex) {
-            std::cout << std::endl << std::endl;
-            std::cout << ex.code() << std::endl;
-            std::cout << ex.code().message() << std::endl;
-            std::cout << ex.what() << std::endl << std::endl;
-        }
-    }
-
-    auto count = 0;
-    std::vector<cv::Mat> frames {};
-    cv::Mat result;
-    while (cv::waitKey(1) < 0 && count < NUM_FRAMES) {
-        count++;
-        std::cout << "\r" << count << " / " << NUM_FRAMES << " Frames (" << 100 * count / NUM_FRAMES << "%)";
-        try {
-            frames.clear();
-            for (DepthCamera* cam : depthCameras) {
-                frames.push_back(detectionSpheres(cam->getFrame()));
-            }
-
-            for (int i = 0; i < frames.size(); i++) {
-                cv::imshow(windows[i], frames[i]);
-                cv::resizeWindow(windows[i], frames[i].size[1], frames[i].size[0]);
-            }
-        }
-        catch (cv::Exception e) {
-            
-            std::cout << " | " << e.msg;
-            shut_down(&depthCameras);
-            return 1;
-        }
-
-        std::cout << std::flush;
-    }
-
-    //Shutdown
-    std::cout << std::endl;
-    shut_down(&depthCameras);
     
+        ImGuiHelper::initImGui(window);
+        cam = new Camera{window};
+        
+        Renderer r;
+
+        TestMenuHelper tmh{ cam };
+        
+        //# Camera Initialisation
+        //#######################
+        CameraHandler cameraHandler{cam};
+
+        float deltaTime = 0.0f;	// Time between current frame and last frame
+        float lastFrame = 0.0f; // Time of last frame
+
+        while (!glfwWindowShouldClose(window))
+        {
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
+            r.Clear();
+            
+            ImGuiHelper::beginFrame();
+
+            //# Test window
+            //#############
+            cam->processKeyboardInput(deltaTime);
+            cam->updateImGui();
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            tmh.update();
+
+            cameraHandler.OnUpdate();
+            cameraHandler.OnRender();
+            cameraHandler.OnImGuiRender();
+
+            ImGuiHelper::endFrame();
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
+    }
+
+    ImGuiHelper::terminateImGui();
+
+    glfwTerminate();
     return 0;
 }
 
-void shut_down(const std::vector<DepthCamera*> *depthCameras) {
-    for (DepthCamera* cam : *depthCameras) {
-        delete cam;
-    }
+void window_size_callback(GLFWwindow *window, int width, int height)
+{
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+}
 
-    openni::OpenNI::shutdown();
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    cam->processMousePosUpdate(xpos, ypos);
+}
+
+void scroll_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    cam->processScroll(xpos, ypos);
 }

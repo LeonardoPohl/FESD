@@ -8,3 +8,22 @@ To use the code in this repository some things have to be installed, this might 
 
 - Astra Driver
 - Realsense Driver
+
+## Refocus of the thesis
+
+Original plan:
+- Build a structure that allows us to find the relative position of multiple cameras
+- Align the point clouds
+- Find errors in Skeleton detection using multiple angles
+- Use these errors to improve the skeleton detection
+
+Proposed plan:
+- Build a structure that allows us to find the relative position of multiple cameras
+- Find the exact relative position and rotation of each camera
+- Calculate the error of the positioning
+- Given a preconfigured set-up show what needs to change to be set up correctly
+- If using multiple cameras:
+	- Overlay the point clouds
+	- Calculate the error of the point clouds
+
+I believe that this will still be challenging and very exciting. Such a tool would be very useful

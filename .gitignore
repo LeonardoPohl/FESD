@@ -32,4 +32,6 @@
 .vs/
 x64/
 vcpkg_installed/
-UpgradeLog.htm
+*.htm
+packages/
+*.oni

@@ -22,19 +22,61 @@
     <Filter Include="Header Files\Openni">
       <UniqueIdentifier>{451d06c9-1dee-40b9-9066-a36ce1bd7ed1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cameras">
+      <UniqueIdentifier>{6a77f233-2c7f-4be1-85b8-ee9e817c94b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utilities">
+      <UniqueIdentifier>{383e8611-0f89-48c1-9ab8-7d8555c71612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Parameters">
+      <UniqueIdentifier>{7abcc4e3-9da6-487c-81f8-ffc36ab5d87b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OrbbecCamera.cpp">
+    <ClCompile Include="src\cameras\OrbbecCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\RealSenseCamera.cpp">
+    <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\DepthCamera.cpp">
-      <Filter>Source Files\CameraController</Filter>
+    <ClCompile Include="src\parameters\NormalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parameters\GlobalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cameras\CameraHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\tests\TestPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\PointCloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\GLFWHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\ImGuiHelper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,40 +86,108 @@
     <None Include="Readme.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\Orbbec\en\0000_Overview.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0100_Installation.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0200_Code samples.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0300_SDK knowledge base.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0400_API.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\en\0500_Product Support.md">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
-    <None Include="resources\Orbbec\Orbbec-OpenNI2 Extended API Instruction.pdf">
-      <Filter>Resource Files\Orbbec</Filter>
-    </None>
     <None Include="vcpkg.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="docs\Orbbec\en\0000_Overview.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0100_Installation.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0200_Code samples.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0300_SDK knowledge base.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0400_API.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="docs\Orbbec\en\0500_Product Support.md">
+      <Filter>Resource Files\Orbbec</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="imgui.ini" />
+    <None Include="resources\shaders\texture.shader" />
+    <None Include="resources\shaders\pointcloud.shader" />
+    <None Include="resources\shaders\basic.shader" />
+    <None Include="resources\shaders\basic3d.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\DepthCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Circle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenNI_SDK\Include\OpenNI.h">
+    <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
       <Filter>Header Files\Openni</Filter>
     </ClInclude>
+    <ClInclude Include="src\cameras\RealsenseCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\OrbbecCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Utilities.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parameters\Parameters.h">
+      <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\DepthCamera.h">
+      <Filter>Header Files\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameras\CameraHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestClearColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestPyramid3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Tests\TestTriangle2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\tests\TestPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Consts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\PointCloud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\ColorMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\GLFWHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Callbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\ImGuiHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\TestMenuHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\Roboto-Medium.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\ml.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\brick.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
