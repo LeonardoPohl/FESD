@@ -1,0 +1,163 @@
+{
+  "main": {
+    "id": "5c0738c56ebf2e25",
+    "type": "split",
+    "children": [
+      {
+        "id": "2a910ab47d00a635",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4bca003282815d9a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Topics/Camera Calibration.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "b9c683f0839e8746",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "ac9b5ccbb9d4ee2c",
+    "type": "split",
+    "children": [
+      {
+        "id": "1805f19e52c5828c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "74e818d0036d6057",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "5b461d5e191b757a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "e863829241a2c7d2",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "19237165655d90b1",
+    "type": "split",
+    "children": [
+      {
+        "id": "68259e1fac708aa0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4dfa8d7147d842a8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "5fc0ba9a131cb1e7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "6aff15bd26f0ec8b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "8a8d641fdcf761e2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "b9c683f0839e8746",
+  "lastOpenFiles": [
+    "Topics/Camera Calibration.md",
+    "Papers/Collections/Camera Calibration.md",
+    "Topics/Camera Linking.md",
+    "Topics/Related Work.md",
+    "Papers/Collections/Related Work/Depth Estimation.md",
+    "Papers/Papers.md",
+    "Papers/Collections/Related Work/Depth Completion.md",
+    "Topics/Camera Hardware.md",
+    "Thesis Research.md",
+    "Papers/Collections/Camera Hardware.md"
+  ]
+}
