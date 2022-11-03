@@ -54,24 +54,6 @@ int main(void)
     {
     
         ImGuiHelper::initImGui(window);
-        
-        // TODO
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        GLCall(glClearColor(0.15f, 0.15f, 0.15f, 1.0f));
-
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGui::StyleColorsDark();
-
-        ImGui::GetIO().Fonts->AddFontDefault();
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
-        
-
         cam = new Camera{window};
         
         Renderer r;
@@ -99,49 +81,13 @@ int main(void)
             //#############
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
-            
-            {
-                if (currentTest)
-                {
-                    currentTest->OnUpdate();
-                    currentTest->OnRender();
-
-                    ImGui::Begin("Test");
-                    if (currentTest != testMenu && ImGui::Button("<-"))
-                    {
-                        delete currentTest;
-                        currentTest = testMenu;
-                    }
-                    currentTest->OnImGuiRender();
-                    ImGui::End();
-                }
-            }
-
-            //# General Camera Window
-            //#######################
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            {
-                ImGui::Begin("Camera Handler");
-
-                if (ImGui::Button("Init Cameras"))
-                {
-                    // TODO: Make Async
-                    cameraHandler.initAllCameras();
-                }
-                cameraHandler.OnImGuiRender();
-                //cameraHandler.showCameras();
-
-                ImGui::End();
-            }
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            
-            glfwSwapBuffers(window);
 
             tmh.update();
 
+            cameraHandler.OnUpdate();
+            cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
 
             ImGuiHelper::endFrame();

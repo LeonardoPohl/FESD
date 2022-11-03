@@ -57,6 +57,31 @@ void CameraHandler::showCameras()
     }
 }
 
+void CameraHandler::OnUpdate()
+{
+    // TODO: Implement (#21 Find and not initialise all cameras)
+    //cameraHandler.showCameras();
+
+    for (auto cam : depthCameras)
+    {
+        if (cam->is_enabled)
+        {
+            cam->OnUpdate();
+        }
+    }
+}
+
+void CameraHandler::OnRender()
+{
+    for (auto cam : depthCameras)
+    {
+        if (cam->is_enabled)
+        {
+            cam->OnRender();
+        }
+    }
+}
+
 void CameraHandler::OnImGuiRender()
 {
 
@@ -78,8 +103,6 @@ void CameraHandler::OnImGuiRender()
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
-            cam->OnUpdate();
-            cam->OnRender();
             cam->OnImGuiRender();
         }
     }

@@ -146,22 +146,12 @@ namespace GLObject
 
                 GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) *numElements *Point::VertexCount, m_Vertices));
             }
-
-            // While Plane with more points is not found
-            // Select 3 Points at random (?) that were not part of a plane before
-            // 
-            // Create a Plane using those Points
-            // 
-            // iterate all points and check if they are part of plane & count
-            // (Extra, color points)
-            // 
-            // Store Plane with number of matches in map
         }
-        // Add plane display mode, where planes with points are shown
     }
 
     void PointCloud::OnRender()
     {
+
         glm::mat4 model{ 1.0f };
         model = glm::rotate(model, m_RotationFactor, m_Rotation);
         model = glm::translate(model, m_Translation);
