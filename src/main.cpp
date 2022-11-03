@@ -17,12 +17,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "obj/tests/TestClearColor.h"
-#include "obj/tests/TestTriangle2D.h"
-#include "obj/tests/TestTexture2D.h"
-#include "obj/tests/TestPyramid3D.h"
-#include "obj/tests/TestPoint.h"
-
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
 #include "GLCore/Camera.h"
@@ -32,6 +26,10 @@
 
 #include "utilities/Consts.h"
 
+#include "utilities/GLFWHelper.h"
+#include "utilities/ImGuiHelper.h"
+#include "utilities/TestMenuHelper.h"
+
 Camera *cam = nullptr;
 
 void window_size_callback(GLFWwindow *window, int width, int height);
@@ -40,42 +38,24 @@ void scroll_callback(GLFWwindow *window, double xpos, double ypos);
 
 int main(void)
 {
-    GLFWwindow *window;
+    STATUS status;
+    GLFWwindow *window = InitialiseGLFWWindow(status);
 
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenNi Adventures", nullptr, nullptr);
-    glfwSetWindowSizeCallback(window, window_size_callback);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-
-    if (!window)
+    if (status == ERR)
     {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    if (glewInit() != GLEW_OK)
-    {
-        std::cout << "Error!" << std::endl;
-    }
-
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    glfwSetWindowSizeCallback(window, window_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     {
+    
+        ImGuiHelper::initImGui(window);
+        
+        // TODO
         GLCall(glEnable(GL_BLEND));
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glClearColor(0.15f, 0.15f, 0.15f, 1.0f));
@@ -90,20 +70,13 @@ int main(void)
 
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
+        
 
         cam = new Camera{window};
         
         Renderer r;
-        GLObject::GLObject *currentTest;
-        GLObject::TestMenu *testMenu = new GLObject::TestMenu(currentTest, cam);
-        currentTest = testMenu;
 
-        testMenu->RegisterTest<GLObject::TestClearColor>("Clear Color");
-        testMenu->RegisterTest<GLObject::TestTriangle2D>("2D Plane");
-        testMenu->RegisterTest<GLObject::TestTexture2D>("2D Texture");
-        testMenu->RegisterTest<GLObject::TestPyramid3D>("3D Pyramid");
-        testMenu->RegisterTest<GLObject::TestPoint>("3D Point");
-
+        TestMenuHelper tmh{ cam };
         
         //# Camera Initialisation
         //#######################
@@ -111,7 +84,6 @@ int main(void)
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
-
 
         while (!glfwWindowShouldClose(window))
         {
@@ -121,14 +93,13 @@ int main(void)
 
             r.Clear();
             
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+            ImGuiHelper::beginFrame();
 
             //# Test window
             //#############
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
+            
             {
                 if (currentTest)
                 {
@@ -169,17 +140,18 @@ int main(void)
             
             glfwSwapBuffers(window);
 
+            tmh.update();
+
+            cameraHandler.OnImGuiRender();
+
+            ImGuiHelper::endFrame();
+
+            glfwSwapBuffers(window);
             glfwPollEvents();
         }
-
-        delete currentTest;
-        if (currentTest != testMenu)
-            delete testMenu;
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    ImGuiHelper::terminateImGui();
 
     glfwTerminate();
     return 0;

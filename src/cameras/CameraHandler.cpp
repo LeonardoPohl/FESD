@@ -59,6 +59,20 @@ void CameraHandler::showCameras()
 
 void CameraHandler::OnImGuiRender()
 {
+
+    //# General Camera Window
+    //#######################
+    ImGui::Begin("Camera Handler");
+
+    if (ImGui::Button("Init Cameras"))
+    {
+        // TODO: Make Async (#21 Async Camera Initialisation)
+        initAllCameras();
+    }
+
+    // TODO: Implement (#21 Find and not initialise all cameras)
+    //cameraHandler.showCameras();
+
     for (auto cam : depthCameras)
     {
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
@@ -69,4 +83,6 @@ void CameraHandler::OnImGuiRender()
             cam->OnImGuiRender();
         }
     }
+
+    ImGui::End();
 }
