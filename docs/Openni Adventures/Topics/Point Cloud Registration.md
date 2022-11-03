@@ -4,3 +4,4 @@ In order to work with multiple cameras a number the cameras have to be in the sa
 
 A very general approach for overlapping depth images is feature detection. In feature detection we try to find features that are 
 
+NDT - Normal Distribution Transform - Important

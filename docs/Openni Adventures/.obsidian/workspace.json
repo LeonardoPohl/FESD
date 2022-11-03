@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Topics/Camera Calibration.md",
+                "file": "Topics/Point Cloud Registration.md",
                 "mode": "source",
                 "source": false
               }
@@ -27,8 +27,7 @@
               "state": {}
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -94,6 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Topics/Point Cloud Registration.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,6 +110,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Topics/Point Cloud Registration.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -131,7 +132,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Topics/Point Cloud Registration.md"
+              }
             }
           }
         ]
@@ -141,15 +144,15 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "b9c683f0839e8746",
+  "active": "4bca003282815d9a",
   "lastOpenFiles": [
-    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
-    "Topics/Camera Calibration.md",
-    "Papers/Collections/Camera Calibration.md",
-    "Topics/Camera Linking.md",
     "Topics/Related Work.md",
-    "Papers/Collections/Related Work/Depth Estimation.md",
+    "Topics/Camera Calibration.md",
     "Papers/Papers.md",
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+    "Topics/Point Cloud Registration.md",
+    "Papers/Collections/Camera Calibration.md",
+    "Papers/Collections/Related Work/Depth Estimation.md",
     "Papers/Collections/Related Work/Depth Completion.md",
     "Topics/Camera Hardware.md",
     "Thesis Research.md"
