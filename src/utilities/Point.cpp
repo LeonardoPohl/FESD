@@ -27,9 +27,6 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	auto z = depth * depth_scale;
 	auto a = HalfLength / Scale;
 
-	if (cmap != CMAP::VIRIDIS && depth != 0.0f)
-		std::cout << x << ", " << y << ", " << z << "=" <<depth << "/" << depth_scale << a << std::endl;
-
 	Vertices[0] = { { x - a, y - a, z - a}, Color };
 	Vertices[1] = { { x + a, y - a, z - a}, Color };
 	Vertices[2] = { { x + a, y - a, z + a}, Color };

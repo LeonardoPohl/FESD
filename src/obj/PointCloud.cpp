@@ -82,6 +82,8 @@ namespace GLObject
 
         const unsigned int numElements = width * height;
         
+        // Do switch State
+
         if (!doFloorDetection)
         {
             auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
@@ -92,6 +94,16 @@ namespace GLObject
                 {
                     int point_i = h * width + w;
                     int depth_i = (height - h) * width + (width - w);
+
+                    auto p = m_Points[point_i].getPoint();
+
+                    if (p.x > m_MaxBoundingPoint.x) m_MaxBoundingPoint.x = p.x;
+                    if (p.y > m_MaxBoundingPoint.y) m_MaxBoundingPoint.y = p.y;
+                    if (p.z > m_MaxBoundingPoint.z) m_MaxBoundingPoint.z = p.z;
+
+                    if (p.x < m_MinBoundingPoint.x) m_MinBoundingPoint.x = p.x;
+                    if (p.y < m_MinBoundingPoint.y) m_MinBoundingPoint.y = p.y;
+                    if (p.z < m_MinBoundingPoint.z) m_MinBoundingPoint.z = p.z;
 
                     // Read depth data
                     m_Points[point_i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
@@ -106,6 +118,46 @@ namespace GLObject
         }
         else
         {
+            float xCellSize = (m_MaxBoundingPoint.x - m_MinBoundingPoint.x) / (float)m_OctTreeDevisions;
+            float yCellSize = (m_MaxBoundingPoint.y - m_MinBoundingPoint.y) / (float)m_OctTreeDevisions;
+            float zCellSize = (m_MaxBoundingPoint.z - m_MinBoundingPoint.z) / (float)m_OctTreeDevisions;
+
+            std::cout << m_MaxBoundingPoint.x << "-" << m_MinBoundingPoint.x << "=" << (m_MaxBoundingPoint.x - m_MinBoundingPoint.x) << ", ";
+            std::cout << m_MaxBoundingPoint.y << "-" << m_MinBoundingPoint.y << "=" << (m_MaxBoundingPoint.y - m_MinBoundingPoint.y) << ", ";
+            std::cout << m_MaxBoundingPoint.z << "-" << m_MinBoundingPoint.z << "=" << (m_MaxBoundingPoint.z - m_MinBoundingPoint.z) << std::endl;
+
+            for (int i = 0; i < numElements; i++)
+            {
+                auto p = m_Points[i].getPoint();
+                // Store quadrant in point I guess?
+                int x = std::round((p.x - m_MinBoundingPoint.x) / xCellSize);
+                int y = std::round((p.y - m_MinBoundingPoint.y) / yCellSize);
+                int z = std::round((p.z - m_MinBoundingPoint.z) / zCellSize);
+                std::string key = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
+                if (colorByCell.find(key) == colorByCell.end())
+                {
+                    glm::vec3 color {rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f };
+                    colorByCell.insert(std::make_pair( key, color));
+                }
+
+                auto col = colorByCell.at(key);
+
+                /*std::cout << x << ", " << (float)x / (1 + (float)m_OctTreeDevisions) << ", ";
+                std::cout << y << ", " << (float)y / (1 + (float)m_OctTreeDevisions) << ", ";
+                std::cout << z << ", " << (float)z / (1 + (float)m_OctTreeDevisions) << std::endl;*/
+                for (int v : std::views::iota(0, Point::VertexCount))
+                    m_Points[i].Vertices[v].Color = { col.x,
+                                                      col.y,
+                                                      col.z,
+                                                      1.0f };
+
+                memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+            }
+            m_IndexBuffer->Bind();
+
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) *numElements *Point::VertexCount, m_Vertices));
+
+            /*
             std::vector<int> plane_points{};
             
             plane_points.push_back(m_Distribution->operator()(m_Generator));
@@ -145,7 +197,7 @@ namespace GLObject
                 m_IndexBuffer->Bind();
 
                 GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) *numElements *Point::VertexCount, m_Vertices));
-            }
+            }*/
         }
     }
 
@@ -170,6 +222,8 @@ namespace GLObject
     {
         if (doFloorDetection)
         {
+            ImGui::SliderInt("Oct Tree Devision", &m_OctTreeDevisions, 0, 200);
+
             ImGui::Text("Number of planes: %d", pointCountByPlane.size());
             ImGui::Text("Max Number of Points: %d", maxPointCount);
             if (ImGui::SliderInt("Point Count Threshold", &m_PointCountThreshold, 0, 100000))

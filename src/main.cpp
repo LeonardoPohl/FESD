@@ -26,9 +26,9 @@
 
 #include "utilities/Consts.h"
 
-#include "utilities/GLFWHelper.h"
-#include "utilities/ImGuiHelper.h"
-#include "utilities/TestMenuHelper.h"
+#include "utilities/helper/GLFWHelper.h"
+#include "utilities/helper/ImGuiHelper.h"
+#include "utilities/helper/TestMenuHelper.h"
 
 Camera *cam = nullptr;
 

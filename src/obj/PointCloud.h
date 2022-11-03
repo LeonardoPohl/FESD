@@ -30,6 +30,13 @@ namespace GLObject
 		void OnRender() override;
 		void OnImGuiRender() override;
 	private:
+		enum State
+		{
+			STREAM
+		};
+
+		State state{ STREAM };
+
 		DepthCamera *m_DepthCamera;
 
 		Point *m_Points; 
@@ -63,5 +70,12 @@ namespace GLObject
 
 		std::vector<std::pair<Plane, int>> pointCountByPlane;
 		int maxPointCount{ 0 };
+
+		int m_OctTreeDevisions{ 200 };
+
+		std::unordered_map<std::string, glm::vec3> colorByCell;
+		// TODO low prio: draw bounding box
+		glm::vec3 m_MinBoundingPoint{};
+		glm::vec3 m_MaxBoundingPoint{};
 	};
 };
