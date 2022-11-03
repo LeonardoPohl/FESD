@@ -8,74 +8,24 @@
         "type": "tabs",
         "children": [
           {
-            "id": "4eef221f497741e3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Thesis Research.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "9e63087163b61418",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Thesis Research.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "05d8ff1e2b62c4f9",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Papers/Papers.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "e701fb1cddf5d3f3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Papers/Camera Hardware.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "de60776c8fc92b7a",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Papers/Camera Calibration.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "4bca003282815d9a",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Papers/Papers.md",
+                "file": "Topics/Camera Calibration.md",
                 "mode": "source",
                 "source": false
+              }
+            }
+          },
+          {
+            "id": "b9c683f0839e8746",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
               }
             }
           }
@@ -146,7 +96,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Thesis Research.md",
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -163,7 +113,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Thesis Research.md",
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -186,7 +136,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Thesis Research.md"
+                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
               }
             }
           }
@@ -197,17 +147,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "9e63087163b61418",
+  "active": "b9c683f0839e8746",
   "lastOpenFiles": [
+    "Topics/Camera Calibration.md",
+    "Papers/Collections/Camera Calibration.md",
+    "Topics/Camera Linking.md",
+    "Topics/Related Work.md",
+    "Papers/Collections/Related Work/Depth Estimation.md",
+    "Papers/Papers.md",
+    "Papers/Collections/Related Work/Depth Completion.md",
     "Topics/Camera Hardware.md",
     "Thesis Research.md",
-    "Topics/Camera Calibration.md",
-    "Papers/Papers.md",
-    "Papers/Human Pose Estimation.md",
-    "Papers/Camera Calibration.md",
-    "Papers/Camera Hardware.md",
-    "Papers/Point Clouds.md",
-    "Papers/Papers/PENet - Towards Precise and Efficient Image Guided Depth Completion.pdf",
-    "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf"
+    "Papers/Collections/Camera Hardware.md"
   ]
 }
