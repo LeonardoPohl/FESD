@@ -32,7 +32,12 @@ namespace GLObject
 	private:
 		enum State
 		{
-			STREAM
+			STREAM,
+			IDLE,
+			START
+			CALC_NORMALS,
+			ASSIGN_CELLS,
+			CALC_CELLS
 		};
 
 		State state{ STREAM };

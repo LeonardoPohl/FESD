@@ -129,10 +129,11 @@ namespace GLObject
             for (int i = 0; i < numElements; i++)
             {
                 auto p = m_Points[i].getPoint();
-                // Store quadrant in point I guess?
+
                 int x = std::round((p.x - m_MinBoundingPoint.x) / xCellSize);
                 int y = std::round((p.y - m_MinBoundingPoint.y) / yCellSize);
                 int z = std::round((p.z - m_MinBoundingPoint.z) / zCellSize);
+
                 std::string key = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
                 if (colorByCell.find(key) == colorByCell.end())
                 {
@@ -142,9 +143,6 @@ namespace GLObject
 
                 auto col = colorByCell.at(key);
 
-                /*std::cout << x << ", " << (float)x / (1 + (float)m_OctTreeDevisions) << ", ";
-                std::cout << y << ", " << (float)y / (1 + (float)m_OctTreeDevisions) << ", ";
-                std::cout << z << ", " << (float)z / (1 + (float)m_OctTreeDevisions) << std::endl;*/
                 for (int v : std::views::iota(0, Point::VertexCount))
                     m_Points[i].Vertices[v].Color = { col.x,
                                                       col.y,
