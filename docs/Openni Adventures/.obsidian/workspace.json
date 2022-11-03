@@ -23,10 +23,8 @@
             "id": "b9c683f0839e8746",
             "type": "leaf",
             "state": {
-              "type": "pdf",
-              "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
-              }
+              "type": "graph",
+              "state": {}
             }
           }
         ],
@@ -96,7 +94,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +110,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -135,9 +131,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
-              }
+              "state": {}
             }
           }
         ]
@@ -149,6 +143,7 @@
   },
   "active": "b9c683f0839e8746",
   "lastOpenFiles": [
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
     "Topics/Camera Calibration.md",
     "Papers/Collections/Camera Calibration.md",
     "Topics/Camera Linking.md",
@@ -157,7 +152,6 @@
     "Papers/Papers.md",
     "Papers/Collections/Related Work/Depth Completion.md",
     "Topics/Camera Hardware.md",
-    "Thesis Research.md",
-    "Papers/Collections/Camera Hardware.md"
+    "Thesis Research.md"
   ]
 }
