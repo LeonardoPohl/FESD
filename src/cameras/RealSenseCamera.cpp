@@ -106,6 +106,7 @@ inline void RealSenseCamera::OnRender()
 
 inline void RealSenseCamera::OnImGuiRender()
 {
+
 	m_pointcloud->OnImGuiRender();
 }
 

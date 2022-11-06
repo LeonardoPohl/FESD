@@ -293,43 +293,44 @@ void OrbbecCamera::OnRender()
 
 void OrbbecCamera::OnImGuiRender()
 {
-    if ((g_Capture.State != CAPTURING && g_Capture.State != SHOULD_CAPTURE))
-    {
-        ImGui::Checkbox("Limit Frames", &limit_frames);
-
-        if (limit_frames)
+    if (ImGui::CollapsingHeader("Recorder")){
+        if (g_Capture.State != CAPTURING && g_Capture.State != SHOULD_CAPTURE)
         {
-            ImGui::SliderInt("Number of Frames", &num_frames, 1, 100000);
+            ImGui::Checkbox("Limit Frames", &limit_frames);
+
+            if (limit_frames)
+            {
+                ImGui::SliderInt("Number of Frames", &num_frames, 1, 100000);
+            }
+
+            ImGui::SliderInt("Delay in ms", &delay, 1, 1000);
+
+            if (ImGui::Button("Start Recording"))
+            {
+                auto epoch = std::chrono::system_clock::now().time_since_epoch();
+                auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
+                startRecording("Test Session", startTimestamp.count() + (long long)delay, num_frames);
+            }
         }
-
-        ImGui::SliderInt("Delay in ms", &delay, 1, 1000);
-
-        if (ImGui::Button("Start Recording"))
+        else if (g_Capture.State == SHOULD_CAPTURE)
         {
             auto epoch = std::chrono::system_clock::now().time_since_epoch();
             auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
-            startRecording("Test Session", startTimestamp.count() + (long long)delay, num_frames);
+            ImGui::Text(("Capturing in: " + std::to_string(g_Capture.nStartOn - startTimestamp.count()) + " ms").c_str());
         }
-    }
-    else if (g_Capture.State == SHOULD_CAPTURE)
-    {
-        auto epoch = std::chrono::system_clock::now().time_since_epoch();
-        auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
-        ImGui::Text(("Capturing in: " + std::to_string(g_Capture.nStartOn - startTimestamp.count()) + " ms").c_str());
-    }
-    else if (g_Capture.State == CAPTURING)
-    {
-        ImGui::Text("Capturing");
-        if (limit_frames)
+        else if (g_Capture.State == CAPTURING)
         {
-            ImGui::ProgressBar(1.0f - (float)frames_left / (float)num_frames);
-        }
-        if (ImGui::Button("Stop Recording"))
-        {
-            stopRecording();
+            ImGui::Text("Capturing");
+            if (limit_frames)
+            {
+                ImGui::ProgressBar(1.0f - (float)frames_left / (float)num_frames);
+            }
+            if (ImGui::Button("Stop Recording"))
+            {
+                stopRecording();
+            }
         }
     }
-
     m_pointcloud->OnImGuiRender();
 }
 

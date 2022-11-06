@@ -27,6 +27,8 @@ public:
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLength;
 
+	glm::vec3 normal{ 0.f };
+
 	static const int CMAP_COUNT = 6;
 	static const char * CMAP_NAMES[];
 	
@@ -44,4 +46,10 @@ public:
 	static unsigned int *getIndices(int i);
 	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
 	glm::vec3 getPoint();
+	glm::vec3 getNormal()
+	{
+		return normal;
+	}
+
+	glm::vec3 calculateNormal(Point *p, int point_count);
 };

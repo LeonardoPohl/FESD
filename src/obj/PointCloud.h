@@ -29,18 +29,42 @@ namespace GLObject
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
+
 	private:
+
+		void pauseStream()
+		{
+			state_elem = 1;
+			state = IDLE;
+		}
+
+		void resumeStream()
+		{
+			state_elem = 0;
+			state = STREAM;
+			calculatedNormals = false;
+			calculatedCells = false;
+		}
+
+		void streamDepth();
+		void calculateNormals();
+		void assignCells();
+		void calculateCells();
+
+		static const int StateCount = 6;
+		static const char *StateNames[];
+
 		enum State
 		{
 			STREAM,
 			IDLE,
-			START
-			CALC_NORMALS,
-			ASSIGN_CELLS,
+			NORMALS,
+			CELLS,
 			CALC_CELLS
 		};
 
 		State state{ STREAM };
+		int state_elem{ 0 };
 
 		DepthCamera *m_DepthCamera;
 
@@ -64,9 +88,6 @@ namespace GLObject
 		float m_DistanceThreshold{1.0f};
 		int m_PointCountThreshold{ 150000 };
 
-		bool doUpdate{ true };
-		bool doFloorDetection{ false };
-
 		std::default_random_engine m_Generator;
 		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
 
@@ -76,11 +97,18 @@ namespace GLObject
 		std::vector<std::pair<Plane, int>> pointCountByPlane;
 		int maxPointCount{ 0 };
 
-		int m_OctTreeDevisions{ 200 };
+		int m_OctTreeDevisions{ 600 };
+		int m_NumElements{ 0 };
+		int m_StreamWidth{ 0 };
+		int m_StreamHeight{ 0 };
 
 		std::unordered_map<std::string, glm::vec3> colorByCell;
+
 		// TODO low prio: draw bounding box
 		glm::vec3 m_MinBoundingPoint{};
 		glm::vec3 m_MaxBoundingPoint{};
+
+		bool calculatedNormals{ false };
+		bool calculatedCells{ false };
 	};
 };

@@ -96,11 +96,13 @@ void CameraHandler::OnImGuiRender()
 
     for (auto cam : depthCameras)
     {
+        ImGui::Begin(cam->getCameraName().c_str());
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
             cam->OnImGuiRender();
         }
+        ImGui::End();
     }
 
     ImGui::End();
