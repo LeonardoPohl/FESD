@@ -1,3 +1,9 @@
+They all mean the same
+
+## A benchmark for point clouds registration algorithms
+
+![[A benchmark for point clouds registration algorithms.pdf]]
+
 ## The Normal Distributions Transform: A New Approach to Laser Scan Matching
 
 ![[The Normal Distributions Transform A New Approach to Laser Scan.pdf]]
