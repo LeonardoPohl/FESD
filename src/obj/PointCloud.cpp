@@ -46,7 +46,6 @@ namespace GLObject
                 m_Points[i].PositionFunction = { ((float)w - cx) / fx,
                                                  ((float)h - cy) / fy };
 
-                m_Points[i].HalfLength = 1.5f;
                 m_Points[i].HalfLengthFun = 1 / fy;
                 m_Points[i].Scale = m_StreamWidth;
                 m_Points[i].updateVertexArray(0.1f, m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
