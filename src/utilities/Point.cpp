@@ -25,7 +25,7 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	auto x = (PositionFunction[0] * depth) / Scale;
 	auto y = (PositionFunction[1] * depth) / Scale;
 	auto z = depth * depth_scale;
-	auto a = HalfLength / Scale;
+	auto a = (HalfLengthFun * depth) / Scale;
 
 	Vertices[0] = { { x - a, y - a, z - a}, Color };
 	Vertices[1] = { { x + a, y - a, z - a}, Color };

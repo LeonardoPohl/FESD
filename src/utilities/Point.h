@@ -26,6 +26,7 @@ public:
 	float Scale{ 0 };
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLength;
+	float HalfLengthFun;
 
 	glm::vec3 normal{ 0.f };
 
