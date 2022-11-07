@@ -12,7 +12,7 @@ namespace GLObject
 {
     const char *PointCloud::StateNames[] = { "Stream", "Idle", "Show Normals", "Show Cells", "Calculate Cells" };
 
-    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam) : m_DepthCamera(depthCamera)
+    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam, Renderer *renderer) : m_DepthCamera(depthCamera), renderer(renderer)
     {
         this->camera = cam;
         GLCall(glEnable(GL_BLEND));
@@ -109,8 +109,7 @@ namespace GLObject
         m_Shader->SetUniform1f("u_Scale", m_Scale);
         m_Shader->SetUniformMat4f("u_MVP", mvp);
 
-        Renderer renderer;
-        renderer.Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
+        renderer->Draw(*m_VAO, *m_IndexBuffer, *m_Shader);
     }
 
     void PointCloud::OnImGuiRender()
@@ -308,7 +307,6 @@ namespace GLObject
         state_elem = 4;
 
         assignCells();
-        calculateCells();
     }
 
     /*

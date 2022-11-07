@@ -1,6 +1,6 @@
 ﻿#include "Cell.h"
 
-Cell::Cell(glm::vec3 index, float m_PlanarThreshold) : m_Index(index), m_PlanarThreshold(m_PlanarThreshold) { }
+Cell::Cell(glm::vec3 index, float m_PlanarThreshold) : m_PlanarThreshold(m_PlanarThreshold), m_Index(index) { }
 
 /// <summary>
 /// Calculates the Cell Parameters
@@ -8,14 +8,7 @@ Cell::Cell(glm::vec3 index, float m_PlanarThreshold) : m_Index(index), m_PlanarT
 /// <returns>True if λ1/λ2 ≤ te</returns>
 bool Cell::calculateNDT()
 {
-	glm::vec3 normal;
-	
-	for (auto p : m_Points)
-	{
-		normal += p->getNormal();
-	}
-
-	m_AverageNormal = glm::normalize(normal);
+	//m_AverageNormal = getNormalisedNormal();
 
 	// Covariance Matrix
 	// ⎡   var(x), cov(x,y), cov(x,z) ⎤

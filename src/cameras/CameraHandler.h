@@ -2,11 +2,12 @@
 #include <vector>
 #include "DepthCamera.h"
 #include "GLCore/Camera.h"
+#include "GLCore/Renderer.h"
 
 class CameraHandler
 {
 public:
-	CameraHandler(Camera *cam);
+	CameraHandler(Camera *cam, Renderer *r);
 	~CameraHandler();
 
 	void findAllCameras();
@@ -16,6 +17,7 @@ public:
 	void OnImGuiRender();
 private:
 	Camera *cam;
+	Renderer *renderer;
 
 	std::vector<DepthCamera *> depthCameras;
 };

@@ -10,8 +10,6 @@
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
-using namespace openni;
-
 // --------------------------------
 // Types
 // --------------------------------
@@ -64,11 +62,11 @@ using CapturingData = struct CapturingData
 // --------------------------------
 CapturingData g_Capture;
 
-void OrbbecCamera::getAvailableDevices(Array<DeviceInfo> *available_devices) {
-    OpenNI::enumerateDevices(available_devices);
+void OrbbecCamera::getAvailableDevices(openni::Array<openni::DeviceInfo> *available_devices) {
+    openni::OpenNI::enumerateDevices(available_devices);
 }
 
-std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, int *starting_id) {
+std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id) {
     openni::Array<openni::DeviceInfo> orbbec_devices;
     OrbbecCamera::getAvailableDevices(&orbbec_devices);
 
@@ -77,7 +75,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, int *
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         try {
             OrbbecCamera *d_cam = new OrbbecCamera(&orbbec_devices[i], (*starting_id)++);
-            d_cam->makePointCloud(cam);
+            d_cam->makePointCloud(cam, renderer);
             depthCameras.push_back(d_cam);
             std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
         }
@@ -92,7 +90,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, int *
     return depthCameras;
 }
 
-OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
+OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id) :
     _device_info(device_info) {
     this->camera_id = camera_id;
     printDeviceInfo();
@@ -101,40 +99,40 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     //##########################
     this->rc = this->_device.open(device_info->getUri());
 
-    if (this->rc != STATUS_OK)
+    if (this->rc != openni::STATUS_OK)
     {
         std::string error_string = "Couldn't open device\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
 
     //# Create depth and color stream
     //###############################
-    if (this->_device.getSensorInfo(SENSOR_DEPTH) != nullptr)
+    if (this->_device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr)
     {
         //# Create depth stream
         //###############################
-        this->rc = this->_depth_stream.create(this->_device, SENSOR_DEPTH);
-        if (this->rc != STATUS_OK)
+        this->rc = this->_depth_stream.create(this->_device, openni::SENSOR_DEPTH);
+        if (this->rc != openni::STATUS_OK)
         {
             std::string error_string = "Couldn't create depth stream\n";
-            error_string += OpenNI::getExtendedError();
+            error_string += openni::OpenNI::getExtendedError();
             throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
         }
     }
     else {
-        printf("Error getting Sensor Info for %d\n", SENSOR_DEPTH);
+        printf("Error getting Sensor Info for %d\n", openni::SENSOR_DEPTH);
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
 
     //# Start depth and color stream
     //##############################
     this->rc = this->_depth_stream.start();
-    if (this->rc != STATUS_OK)
+    if (this->rc != openni::STATUS_OK)
     {
         std::string error_string = "Couldn't start depth stream\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
     else {
@@ -142,32 +140,32 @@ OrbbecCamera::OrbbecCamera(const DeviceInfo *device_info, int camera_id) :
     }
 
     int changedStreamDummy;
-    VideoStream *pStream = &this->_depth_stream;
+    openni::VideoStream *pStream = &this->_depth_stream;
 
     //# Wait a new frame
     //##################
-    auto rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    if (rc != STATUS_OK)
+    auto rc = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+    if (rc != openni::STATUS_OK)
     {
         std::string error_string = "[ERROR]: Wait failed! (timeout is ";
         error_string += std::to_string(READ_WAIT_TIMEOUT);
         error_string += " ms)\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
 
     //# Get depth frame
     //#################
     rc = this->_depth_stream.readFrame(&this->_frame_ref);
-    if (rc != STATUS_OK)
+    if (rc != openni::STATUS_OK)
     {
         std::string error_string = "Read failed!\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
 
     this->_video_mode = this->_frame_ref.getVideoMode();
-    this->_video_mode.setPixelFormat(PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
+    this->_video_mode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 
     this->depth_width = this->_frame_ref.getWidth();
     this->depth_height = this->_frame_ref.getHeight();
@@ -185,40 +183,40 @@ OrbbecCamera::~OrbbecCamera() {
     this->_device.close();
 }
 
-void OrbbecCamera::makePointCloud(Camera *cam)
+void OrbbecCamera::makePointCloud(Camera *cam, Renderer *renderer)
 {
-    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
+    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer);
 }
 
 const void *OrbbecCamera::getDepth()
 {
     int changedStreamDummy;
-    VideoStream *pStream = &this->_depth_stream;
+    openni::VideoStream *pStream = &this->_depth_stream;
 
     //# Wait a new frame
     //##################
-    auto rc = OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    if (rc != STATUS_OK)
+    auto rc = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+    if (rc != openni::STATUS_OK)
     {
         std::string error_string = "Wait failed! (timeout is ";
         error_string += std::to_string(READ_WAIT_TIMEOUT);
         error_string += " ms)\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
     //# Get depth frame
     //#################
     rc = this->_depth_stream.readFrame(&this->_frame_ref);
-    if (rc != STATUS_OK)
+    if (rc != openni::STATUS_OK)
     {
         std::string error_string = "Read failed!\n";
-        error_string += OpenNI::getExtendedError();
+        error_string += openni::OpenNI::getExtendedError();
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
 
     //# Check if the frame format is depth frame format
     //#################################################
-    if (this->_video_mode.getPixelFormat() != PIXEL_FORMAT_DEPTH_1_MM && this->_video_mode.getPixelFormat() != PIXEL_FORMAT_DEPTH_100_UM)
+    if (this->_video_mode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_MM && this->_video_mode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_100_UM)
     {
         std::string error_string = "Unexpected frame format!";
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);

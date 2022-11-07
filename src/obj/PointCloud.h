@@ -26,14 +26,13 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr);
+		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr, Renderer *renderer = nullptr);
 
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
 
 	private:
-
 		void pauseStream()
 		{
 			state_elem = 1;
@@ -72,6 +71,7 @@ namespace GLObject
 		State state{ STREAM };
 		int state_elem{ 0 };
 
+		Renderer *renderer;
 		DepthCamera *m_DepthCamera;
 
 		Point *m_Points; 
@@ -90,11 +90,7 @@ namespace GLObject
 
 		float m_Scale {1.0f};
 		float m_Depth_Scale {5.0f};
-		/*
-		float m_MaxDepth {0.0f};
-		float m_DistanceThreshold{1.0f};
-		int m_PointCountThreshold{ 150000 };
-		*/
+
 		std::default_random_engine m_Generator;
 		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
 
