@@ -10,8 +10,10 @@ class Cell
 public:
 	Cell(glm::vec3 index, float m_PlanarThreshold = 0.04f);
 
-	inline void addPoint(Point p)
+	inline void addPoint(Point const *p)
 	{
+		if (p->Depth > 0)
+			m_AverageNormal += p->getNormal();
 		m_Points.push_back(p);
 	}
 
@@ -22,9 +24,14 @@ public:
 		return m_Index;
 	}
 
-	std::vector<Point> getPoints() const
+	std::vector<const Point*> getPoints() const
 	{
 		return m_Points;
+	}
+
+	glm::vec3 getNormalisedNormal() const
+	{
+		return glm::normalize(m_AverageNormal);
 	}
 
 	bool operator==(Cell other) const 
@@ -35,7 +42,7 @@ public:
 private:
 	float m_PlanarThreshold;
 
-	std::vector<Point> m_Points;
+	std::vector<const Point*> m_Points;
 	glm::vec3 m_Index;
 	glm::vec3 m_AverageNormal{ 0.0f };
 	glm::vec3 m_Covariance{ 0.0f };

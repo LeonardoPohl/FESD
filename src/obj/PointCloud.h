@@ -14,10 +14,12 @@
 #include <unordered_map>
 #include <random>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "utilities/Point.h"
 #include "utilities/Plane.h"
+#include "utilities/Cell.h"
 
 namespace GLObject
 {
@@ -42,8 +44,12 @@ namespace GLObject
 		{
 			state_elem = 0;
 			state = STREAM;
-			calculatedNormals = false;
-			calculatedCells = false;
+
+			for (auto key : cellByKey)
+				delete key.second;
+
+			cellByKey.clear();
+			colorByCell.clear();
 		}
 
 		void streamDepth();
@@ -84,10 +90,11 @@ namespace GLObject
 
 		float m_Scale {1.0f};
 		float m_Depth_Scale {5.0f};
+		/*
 		float m_MaxDepth {0.0f};
 		float m_DistanceThreshold{1.0f};
 		int m_PointCountThreshold{ 150000 };
-
+		*/
 		std::default_random_engine m_Generator;
 		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
 
@@ -97,18 +104,20 @@ namespace GLObject
 		std::vector<std::pair<Plane, int>> pointCountByPlane;
 		int maxPointCount{ 0 };
 
-		int m_OctTreeDevisions{ 600 };
+		int m_OctTreeDevisions{ 200 };
 		int m_NumElements{ 0 };
 		int m_StreamWidth{ 0 };
 		int m_StreamHeight{ 0 };
 
-		std::unordered_map<std::string, glm::vec3> colorByCell;
+		std::unordered_map<Cell*, glm::vec3> colorByCell;
+		std::unordered_map<std::string, Cell*> cellByKey;
 
 		// TODO low prio: draw bounding box
 		glm::vec3 m_MinBoundingPoint{};
 		glm::vec3 m_MaxBoundingPoint{};
 
-		bool calculatedNormals{ false };
-		bool calculatedCells{ false };
+		bool m_CellsAssigned{ false };
+		bool m_ShowAverageNormals{ false };
+		bool m_NormalsCalculated{ false };
 	};
 };

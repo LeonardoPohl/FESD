@@ -12,7 +12,7 @@ bool Cell::calculateNDT()
 	
 	for (auto p : m_Points)
 	{
-		normal += p.getNormal();
+		normal += p->getNormal();
 	}
 
 	m_AverageNormal = glm::normalize(normal);

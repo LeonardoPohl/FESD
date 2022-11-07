@@ -86,7 +86,6 @@ int main(void)
 
             tmh.update();
 
-            cameraHandler.OnUpdate();
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
 

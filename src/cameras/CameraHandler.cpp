@@ -53,26 +53,13 @@ void CameraHandler::showCameras()
     }
 }
 
-void CameraHandler::OnUpdate()
-{
-    // TODO: Implement (#21 Find and not initialise all cameras)
-    //cameraHandler.showCameras();
-
-    for (auto cam : depthCameras)
-    {
-        if (cam->is_enabled)
-        {
-            cam->OnUpdate();
-        }
-    }
-}
-
 void CameraHandler::OnRender()
 {
     for (auto cam : depthCameras)
     {
         if (cam->is_enabled)
         {
+            cam->OnUpdate();
             cam->OnRender();
         }
     }
@@ -80,7 +67,6 @@ void CameraHandler::OnRender()
 
 void CameraHandler::OnImGuiRender()
 {
-
     //# General Camera Window
     //#######################
     ImGui::Begin("Camera Handler");

@@ -46,10 +46,15 @@ public:
 	static unsigned int *getIndices(int i);
 	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
 	glm::vec3 getPoint();
-	glm::vec3 getNormal()
+	glm::vec3 getNormal() const
 	{
 		return normal;
 	}
 
-	glm::vec3 calculateNormal(Point *p, int point_count);
+	glm::vec3 calculateNormal(glm::vec3 p1, glm::vec3 p2)
+	{
+		auto p = getPoint();
+		normal = glm::normalize(glm::cross((p1 - p), (p2 - p)));
+		return normal;
+	}
 };

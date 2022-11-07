@@ -47,6 +47,7 @@ namespace GLObject
                                                  ((float)h - cy) / fy };
 
                 m_Points[i].HalfLength = 1.5f;
+                m_Points[i].HalfLengthFun = 1 / fx;
                 m_Points[i].Scale = m_StreamWidth;
                 m_Points[i].updateVertexArray(0.1f, m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
 
@@ -136,6 +137,17 @@ namespace GLObject
         if (state != CALC_CELLS && ImGui::Button("Calculate Cells"))
             calculateCells();
 
+        if (state == CELLS)
+        {
+            ImGui::Checkbox("Show Average Normals", &m_ShowAverageNormals);
+            if (ImGui::SliderInt("Chunk devisions", &m_OctTreeDevisions, 0, 400))
+            {
+                m_CellsAssigned = false;
+                colorByCell.clear();
+                cellByKey.clear();
+            }
+        }
+
         if (ImGui::CollapsingHeader("Translation"))
         {
             ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
@@ -143,41 +155,37 @@ namespace GLObject
 
             ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
         }
+
         if (ImGui::CollapsingHeader("Scale"))
         {
             ImGui::SliderFloat("Depth Scale", &m_Depth_Scale, 0.001f, 30.0f);
             ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
         }
-
     }
 
     void PointCloud::streamDepth()
     {
         auto depth = static_cast<const int16_t *>(m_DepthCamera->getDepth());
 
-        for (unsigned int w = 0; w < m_StreamWidth; w++)
+        for (int i = 1; i < m_NumElements; i++)
         {
-            for (unsigned int h = 0; h < m_StreamHeight; h++)
-            {
-                int point_i = h * m_StreamWidth + w;
-                int depth_i = (m_StreamHeight - h) * m_StreamWidth + (m_StreamWidth - w);
+            int depth_i = m_StreamWidth * (m_StreamHeight + 1) - i;
 
-                auto p = m_Points[point_i].getPoint();
+            auto p = m_Points[i].getPoint();
 
-                if (p.x > m_MaxBoundingPoint.x) m_MaxBoundingPoint.x = p.x;
-                if (p.y > m_MaxBoundingPoint.y) m_MaxBoundingPoint.y = p.y;
-                if (p.z > m_MaxBoundingPoint.z) m_MaxBoundingPoint.z = p.z;
+            if (p.x > m_MaxBoundingPoint.x) m_MaxBoundingPoint.x = p.x;
+            if (p.y > m_MaxBoundingPoint.y) m_MaxBoundingPoint.y = p.y;
+            if (p.z > m_MaxBoundingPoint.z) m_MaxBoundingPoint.z = p.z;
 
-                if (p.x < m_MinBoundingPoint.x) m_MinBoundingPoint.x = p.x;
-                if (p.y < m_MinBoundingPoint.y) m_MinBoundingPoint.y = p.y;
-                if (p.z < m_MinBoundingPoint.z) m_MinBoundingPoint.z = p.z;
+            if (p.x < m_MinBoundingPoint.x) m_MinBoundingPoint.x = p.x;
+            if (p.y < m_MinBoundingPoint.y) m_MinBoundingPoint.y = p.y;
+            if (p.z < m_MinBoundingPoint.z) m_MinBoundingPoint.z = p.z;
 
-                // Read depth data
-                m_Points[point_i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
+            // Read depth data
+            m_Points[i].updateVertexArray(depth[depth_i], m_Depth_Scale / (float)m_DepthCamera->getDepthStreamMaxDepth(), cmap);
 
-                // Copy vertices into vertex array
-                memcpy(m_Vertices + point_i * Point::VertexCount, &m_Points[point_i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
-            }
+            // Copy vertices into vertex array
+            memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
         }
         m_IndexBuffer->Bind();
 
@@ -188,19 +196,33 @@ namespace GLObject
     {
         state = NORMALS;
         state_elem = 2;
+        m_NormalsCalculated = true;
 
-        for (int i = 0; i < m_NumElements; i++)
+        for (int i = 1; i < m_NumElements; i++)
         {
             auto p = m_Points[i].getPoint();
 
+            int i_y = i - 1;
+            int i_x = i;
 
+            if (i < m_StreamWidth)
+            {
+                i_x += m_StreamWidth;
+            }
+            else
+            {
+                i_x -= m_StreamWidth;
+            }
 
-            glm::vec3 col{};
+            auto p1 = m_Points[i_y].getPoint();
+            auto p2 = m_Points[i_x].getPoint();
+
+            auto normal = m_Points[i].calculateNormal(p1, p2);
 
             for (int v : std::views::iota(0, Point::VertexCount))
-                m_Points[i].Vertices[v].Color = { col.x,
-                                                  col.y,
-                                                  col.z,
+                m_Points[i].Vertices[v].Color = { (normal.x + 1) / 2.0f,
+                                                  (normal.y + 1) / 2.0f,
+                                                  (normal.z + 1) / 2.0f,
                                                   1.0f };
 
             memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
@@ -212,12 +234,39 @@ namespace GLObject
 
     void PointCloud::assignCells()
     {
+        if (!m_NormalsCalculated)
+            calculateNormals();
+        
         state = CELLS;
         state_elem = 3; 
         
         float xCellSize = (m_MaxBoundingPoint.x - m_MinBoundingPoint.x) / (float)m_OctTreeDevisions;
         float yCellSize = (m_MaxBoundingPoint.y - m_MinBoundingPoint.y) / (float)m_OctTreeDevisions;
         float zCellSize = (m_MaxBoundingPoint.z - m_MinBoundingPoint.z) / (float)m_OctTreeDevisions;
+        
+        if (!m_CellsAssigned)
+        {
+            for (int i = 0; i < m_NumElements; i++)
+            {
+                auto p = m_Points[i].getPoint();
+
+                int x = std::round((p.x - m_MinBoundingPoint.x) / xCellSize);
+                int y = std::round((p.y - m_MinBoundingPoint.y) / yCellSize);
+                int z = std::round((p.z - m_MinBoundingPoint.z) / zCellSize);
+
+                std::string key = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
+
+                if (cellByKey.find(key) == cellByKey.end())
+                {
+                    glm::vec3 color{ rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f };
+                    cellByKey.insert(std::make_pair(key, new Cell({x, y, z})));
+                    colorByCell.insert(std::make_pair(cellByKey[key], color));
+                }
+                cellByKey[key]->addPoint(&m_Points[i]);
+            }
+            
+            m_CellsAssigned = true;
+        }
 
         for (int i = 0; i < m_NumElements; i++)
         {
@@ -228,13 +277,18 @@ namespace GLObject
             int z = std::round((p.z - m_MinBoundingPoint.z) / zCellSize);
 
             std::string key = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
-            if (colorByCell.find(key) == colorByCell.end())
-            {
-                glm::vec3 color{ rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f };
-                colorByCell.insert(std::make_pair(key, color));
-            }
 
-            auto col = colorByCell.at(key);
+            glm::vec3 col;
+
+            if (m_ShowAverageNormals)
+            {
+                auto normal = cellByKey[key]->getNormalisedNormal();
+                col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
+            }
+            else
+            {
+                col = colorByCell[cellByKey[key]];
+            }
 
             for (int v : std::views::iota(0, Point::VertexCount))
                 m_Points[i].Vertices[v].Color = { col.x,

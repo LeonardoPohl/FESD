@@ -12,7 +12,6 @@ public:
 	void findAllCameras();
 	void initAllCameras();
 	void showCameras();
-	void OnUpdate();
 	void OnRender();
 	void OnImGuiRender();
 private:
