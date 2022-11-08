@@ -38,7 +38,7 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	Vertices[7] = { { x - a, y + a, z + a}, Color };
 }
 
-glm::vec3 Point::getPoint()
+inline glm::vec3 Point::getPoint() const
 {
 	return { (PositionFunction[0] * Depth), (PositionFunction[1] * Depth),  Depth };
 }
