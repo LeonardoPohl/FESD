@@ -1,21 +1,46 @@
 #pragma once
 #include <random>
 #include <iostream>
+#include <glm/glm.hpp>
 
-float Normalisem11(float val01)
+struct BoundingBox
 {
-	/*if (val01 > 1.0f || val01 < 0.0f)
-	{
-		std::cout << "[WARNING] " << val01 << " not in correct range (0..1)" << std::endl;
-	}*/
-	return (isnan(val01) ? 0.0f : (isinf(val01) ? 1.0f : val01)	* 2.0f) - 1.0f;
-}
+public:
+	// TODO low prio: draw bounding box
+	glm::vec3 minBoundingPoint{};
+	glm::vec3 maxBoundingPoint{};
 
-float Normalise01(float valm11)
-{
-	/*if (valm11 > 1.0f || valm11 < -1.0f)
+	inline bool updateBox(glm::vec3 p)
 	{
-		std::cout << "[WARNING] " << valm11 << " not in correct range (0..1)" << std::endl;
-	}*/
-	return (isnan(valm11) ? -1.0f : (isinf(valm11) ? 1.0f : valm11) + 1.0f) / 2.0f;
-}
+		bool isUpdated = false;
+
+		if (p.x > maxBoundingPoint.x){ 
+			maxBoundingPoint.x = p.x; 
+			isUpdated = true;
+		}
+		if (p.y > maxBoundingPoint.y){ 
+			maxBoundingPoint.y = p.y; 
+			isUpdated = true;
+		}
+		if (p.z > maxBoundingPoint.z){ 
+			maxBoundingPoint.z = p.z; 
+			isUpdated = true;
+		}
+
+		if (p.x < minBoundingPoint.x){ 
+			minBoundingPoint.x = p.x; 
+			isUpdated = true;
+		}
+		if (p.y < minBoundingPoint.y){ 
+			minBoundingPoint.y = p.y; 
+			isUpdated = true;
+		}
+		if (p.z < minBoundingPoint.z)
+		{
+			minBoundingPoint.z = p.z; 
+			isUpdated = true;
+		}
+
+		return isUpdated;
+	}
+};

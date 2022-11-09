@@ -1,5 +1,6 @@
 #pragma once
 #include "Point.h"
+#include "Utilities.h"
 
 #include <vector>
 #include <string>
@@ -11,7 +12,7 @@ public:
 	Cell(glm::vec3 index, float m_PlanarThreshold = 0.04f);
 	Cell(std::string key, float m_PlanarThreshold = 0.04f);
 
-	inline void addPoint(Point const *p)
+	inline void addPoint(Point *p)
 	{
 		if (p->Depth > 0)
 			m_AverageNormal += p->getNormal();
@@ -25,7 +26,7 @@ public:
 		return m_Index;
 	}
 
-	std::vector<const Point*> getPoints() const
+	std::vector<Point*> getPoints() const
 	{
 		return m_Points;
 	}
@@ -54,9 +55,9 @@ public:
 		return type;
 	}
 
-	static inline std::string getKey(glm::vec3 minBoundingBox, glm::vec3 cellSize, glm::vec3 point)
+	static inline std::string getKey(BoundingBox boundingBox, glm::vec3 cellSize, glm::vec3 point)
 	{
-		auto coords = (point - minBoundingBox) / cellSize;
+		auto coords = (point - boundingBox.minBoundingPoint) / cellSize;
 
 		int x = std::round(coords.x);
 		int y = std::round(coords.y);
@@ -65,9 +66,9 @@ public:
 		return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
 	}
 
-	static inline glm::vec3 getCellSize(glm::vec3 minBoundingBox, glm::vec3 maxBoundingBox, int devisions)
+	static inline glm::vec3 getCellSize(BoundingBox boundingBox, int devisions)
 	{
-		return (maxBoundingBox - minBoundingBox) / (float)devisions;
+		return (boundingBox.maxBoundingPoint - boundingBox.minBoundingPoint) / (float)devisions;
 	}
 
 private:
@@ -75,7 +76,7 @@ private:
 
 	NDT_TYPE type{ NDT_TYPE::None };
 
-	std::vector<const Point*> m_Points;
+	std::vector<Point*> m_Points;
 	glm::vec3 m_Index;
 	glm::vec3 m_AverageNormal{ 0.0f };
 	glm::vec3 m_Covariance{ 0.0f };

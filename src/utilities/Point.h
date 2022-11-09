@@ -16,22 +16,7 @@ public:
 			   std::array<float, 4> color)
 			: Position(position), Color(color) {}
 	};
-
-	static const int VertexCount = 8;
-	static const int IndexCount = 3 * 12;
-
-	//std::array<int, 2> Position{ 0.0f, 0.0f };
-	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
-	float Depth{ 0 };
-	float Scale{ 0 };
-	std::array<Vertex, VertexCount> Vertices;
-	float HalfLengthFun;
-
-	glm::vec3 normal{ 0.f };
-
-	static const int CMAP_COUNT = 6;
-	static const char * CMAP_NAMES[];
-	
+		
 	static enum class CMAP
 	{
 		VIRIDIS,
@@ -45,7 +30,12 @@ public:
 	std::array<float, 4> getColorFromDepth(float depth, float depth_scale, CMAP cmap) const;
 	static unsigned int *getIndices(int i);
 	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
-	glm::vec3 getPoint() const;
+
+	inline glm::vec3 getPoint() const
+	{
+		return { (PositionFunction[0] * Depth), (PositionFunction[1] * Depth),  Depth };
+	}
+
 	inline glm::vec3 getNormal() const
 	{
 		return normal;
@@ -57,4 +47,18 @@ public:
 		normal = glm::normalize(glm::cross((p1 - p), (p2 - p)));
 		return normal;
 	}
+
+	static const int VertexCount = 8;
+	static const int IndexCount = 3 * 12;
+
+	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
+	float Depth{ 0 };
+	float Scale{ 0 };
+	std::array<Vertex, VertexCount> Vertices;
+	float HalfLengthFun;
+
+	glm::vec3 normal{ 0.f };
+
+	static const int CMAP_COUNT = 6;
+	static const char *CMAP_NAMES[];
 };

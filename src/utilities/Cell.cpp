@@ -18,7 +18,7 @@ Cell::Cell(std::string key, float m_PlanarThreshold) : m_PlanarThreshold(m_Plana
 /// <returns>Covariance of the inserted values</returns>
 float cov(const std::vector<float> *a, const std::vector<float> *b)
 {
-
+	return 0.0f;
 }
 
 /// <summary>
@@ -31,11 +31,12 @@ bool Cell::calculateNDT()
 	std::vector<float> y;
 	std::vector<float> z;
 
-	for (auto p : m_Points)
+	for (auto pixel : m_Points)
 	{
-		x.push_back(p->getPoint().x);
-		y.push_back(p->getPoint().y);
-		z.push_back(p->getPoint().z);
+		auto p = pixel->getPoint();
+		x.push_back(p.x);
+		y.push_back(p.y);
+		z.push_back(p.z);
 	}
 
 	// Covariance Matrix

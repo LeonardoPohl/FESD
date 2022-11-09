@@ -20,6 +20,9 @@
 #include "utilities/Point.h"
 #include "utilities/Plane.h"
 #include "utilities/Cell.h"
+#include "utilities/Utilities.h"
+
+#include "PointCloudHelper.h"
 
 namespace GLObject
 {
@@ -27,7 +30,7 @@ namespace GLObject
 	{
 	public:
 		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr, Renderer *renderer = nullptr);
-
+		
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
@@ -35,69 +38,42 @@ namespace GLObject
 	private:
 		void pauseStream()
 		{
-			m_StateElem = 1;
-			m_State = IDLE;
+			m_State.setState(PointCloudStreamState::IDLE);
 		}
 
 		void resumeStream()
 		{
-			m_StateElem = 0;
-			m_State = STREAM;
+			m_State.setState(PointCloudStreamState::STREAM);
 
 			for (auto key : m_pCellByKey)
 				delete key.second;
 
 			m_pCellByKey.clear();
 			m_ColorBypCell.clear();
-			mp_PlanarCells.clear();
-			mp_NonPlanarPoints.clear();
+			m_PlanarpCells.clear();
+			m_NonPlanarpPoints.clear();
 		}
 
 		void streamDepth(int i, const int16_t *depth);
 		void startNormalCalculation();
 		void calculateNormals(int i);
 		void startCellAssignment();
-		void assignCells(int i, glm::vec3 cellSize);
+		void assignCells(int i);
 		void startCellCalculation();
-		void calculateCells(int i, glm::vec3 cellSize);
+		void calculateCells(int i);
 
-		enum State
-		{
-			STREAM,
-			IDLE,
-			NORMALS,
-			CELLS,
-			CALC_CELLS
-		};
-
-		static const int m_StateCount = 6;
-		static const char *m_StateNames[];
-
-		State m_State{ STREAM };
-		int m_StateElem{ 0 };
+		PointCloudStreamState m_State{ };
 
 		DepthCamera *mp_DepthCamera;
 
 		Point *m_Points; 
-		Point::Vertex *m_Vertices; 
+		Point::Vertex *m_Vertices;
 
-		Renderer *mp_Renderer;
-		std::unique_ptr<VertexArray> m_VAO;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<VertexBuffer> m_VB;
-		std::unique_ptr<VertexBufferLayout> m_VBL;
-
-		float m_RotationFactor{ 0 };
-		glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_Translation{ 0.f, 0.f, 0.f };
-		glm::vec3 m_ModelTranslation{ 0.0f };
-
-		float m_Scale{ 1.0f };
-		float m_Depth_Scale {5.0f};
+		GLUtil m_GLUtil{};
 
 		std::default_random_engine m_Generator;
-		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
+		std::unique_ptr<std::uniform_int_distribution<int>> m_PointDistribution{};
+		std::unique_ptr<std::uniform_int_distribution<int>> m_ColorDistribution{};
 
 		Point::CMAP m_CMAP{ Point::CMAP::VIRIDIS };
 		int m_CMAPElem{ 0 };
@@ -113,12 +89,11 @@ namespace GLObject
 		std::unordered_map<Cell*, glm::vec3> m_ColorBypCell;
 		std::unordered_map<std::string, Cell*> m_pCellByKey;
 
-		std::vector<Cell *> mp_PlanarCells;
-		std::vector<Point *> mp_NonPlanarPoints;
+		std::vector<Cell *> m_PlanarpCells;
+		std::vector<Point *> m_NonPlanarpPoints;
 
-		// TODO low prio: draw bounding box
-		glm::vec3 m_MinBoundingPoint{};
-		glm::vec3 m_MaxBoundingPoint{};
+		BoundingBox m_BoundingBox{ };
+		glm::vec3 m_CellSize{ };
 
 		bool m_CellsAssigned{ false };
 		bool m_ShowAverageNormals{ false };

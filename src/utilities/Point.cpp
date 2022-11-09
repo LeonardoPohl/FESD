@@ -38,11 +38,6 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	Vertices[7] = { { x - a, y + a, z + a}, Color };
 }
 
-inline glm::vec3 Point::getPoint() const
-{
-	return { (PositionFunction[0] * Depth), (PositionFunction[1] * Depth),  Depth };
-}
-
 const char *Point::CMAP_NAMES[] = { "Viridis", "Magma", "Inferno", "HSV", "Terrain", "Greyscale" };
 
 const auto VIRIDIS = colormap::viridis(NUM_COLORS);
