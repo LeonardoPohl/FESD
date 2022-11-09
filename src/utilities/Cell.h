@@ -71,6 +71,10 @@ public:
 		return (boundingBox.maxBoundingPoint - boundingBox.minBoundingPoint) / (float)devisions;
 	}
 
+	float setPlanarThreshold(float te)
+	{
+		m_PlanarThreshold = te;
+	}
 private:
 	float m_PlanarThreshold;
 
@@ -80,4 +84,6 @@ private:
 	glm::vec3 m_Index;
 	glm::vec3 m_AverageNormal{ 0.0f };
 	glm::vec3 m_Covariance{ 0.0f };
+
+	glm::vec3 m_EigenVector{ 0.0f };
 };

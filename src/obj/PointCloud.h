@@ -95,6 +95,8 @@ namespace GLObject
 		BoundingBox m_BoundingBox{ };
 		glm::vec3 m_CellSize{ };
 
+		float m_PlanarThreshold{ 0.004f };
+
 		bool m_CellsAssigned{ false };
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
