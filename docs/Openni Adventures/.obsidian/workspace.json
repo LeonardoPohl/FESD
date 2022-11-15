@@ -11,6 +11,24 @@
             "id": "4bca003282815d9a",
             "type": "leaf",
             "state": {
+              "type": "pdf",
+              "state": {
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+              }
+            }
+          },
+          {
+            "id": "7fc8e9599f20798e",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {}
+            }
+          },
+          {
+            "id": "b9c683f0839e8746",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "Papers/Collections/Point Clouds.md",
@@ -20,12 +38,12 @@
             }
           },
           {
-            "id": "920a3fd1ad7e94f3",
+            "id": "7db26903f11bf517",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
+                "file": "Thesis Research.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +116,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +132,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -137,9 +153,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -149,17 +163,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "920a3fd1ad7e94f3",
+  "active": "7fc8e9599f20798e",
   "lastOpenFiles": [
-    "Topics/Point Cloud Registration.md",
+    "Topics/Human Pose Estimation.md",
     "Papers/Collections/Point Clouds.md",
-    "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
-    "Topics/Camera Hardware.md",
-    "Papers/Collections/Human Pose Estimation.md",
+    "Thesis Research.md",
+    "Topics/Pointcloud Misc.md",
     "Papers/Papers.md",
-    "Papers/Papers/download-1.pdf",
-    "Papers/Papers/SemAttNet - Towards Attention-based Semantic Aware Guided Depth Completion.pdf",
-    "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf",
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+    "Topics/Camera Calibration.md",
+    "Topics/Camera Hardware.md",
+    "Topics/Point Cloud Registration.md",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
+    "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf"
   ]
 }
