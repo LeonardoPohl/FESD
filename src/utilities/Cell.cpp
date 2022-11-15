@@ -58,6 +58,9 @@ bool Cell::calculateNDT()
 	std::vector<float> y;
 	std::vector<float> z;
 
+	if (m_Points.size() == 0)
+		return false;
+
 	for (auto pixel : m_Points)
 	{
 		auto p = pixel->getPoint();
@@ -109,8 +112,14 @@ bool Cell::calculateNDT()
 		m_EigenVector = { eig1, eig2, eig3 };
 	}
 
-	if (m_EigenVector.y == 0)
+	if (m_EigenVector.z == 0 || m_EigenVector.y == 0)
 		return false;
 
-	return m_EigenVector.x / m_EigenVector.y <= m_PlanarThreshold;
+	if (m_EigenVector.y / m_EigenVector.z <= m_PlanarThreshold)
+		m_Type = NDT_TYPE::Linear;
+	else if(m_EigenVector.x / m_EigenVector.y <= m_PlanarThreshold)
+		m_Type = NDT_TYPE::Planar;
+	else
+		m_Type = NDT_TYPE::Spherical;
+	return true;
 }

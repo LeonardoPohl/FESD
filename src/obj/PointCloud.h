@@ -51,7 +51,11 @@ namespace GLObject
 			m_pCellByKey.clear();
 			m_ColorBypCell.clear();
 			m_PlanarpCells.clear();
-			m_NonPlanarpPoints.clear();
+			m_NonPlanarpCells.clear();
+
+			m_CellsAssigned = false;
+			m_ShowAverageNormals = false;
+			m_NormalsCalculated = false;
 		}
 
 		void streamDepth(int i, const int16_t *depth);
@@ -90,7 +94,7 @@ namespace GLObject
 		std::unordered_map<std::string, Cell*> m_pCellByKey;
 
 		std::vector<Cell *> m_PlanarpCells;
-		std::vector<Point *> m_NonPlanarpPoints;
+		std::vector<Cell *> m_NonPlanarpCells;
 
 		BoundingBox m_BoundingBox{ };
 		glm::vec3 m_CellSize{ };

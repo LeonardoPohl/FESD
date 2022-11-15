@@ -52,7 +52,7 @@ public:
 
 	inline NDT_TYPE getType() const
 	{
-		return type;
+		return m_Type;
 	}
 
 	static inline std::string getKey(BoundingBox boundingBox, glm::vec3 cellSize, glm::vec3 point)
@@ -78,7 +78,7 @@ public:
 private:
 	float m_PlanarThreshold;
 
-	NDT_TYPE type{ NDT_TYPE::None };
+	NDT_TYPE m_Type{ NDT_TYPE::None };
 
 	std::vector<Point*> m_Points;
 	glm::vec3 m_Index;

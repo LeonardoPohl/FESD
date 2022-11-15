@@ -166,7 +166,7 @@ namespace GLObject
                 m_ColorBypCell.clear();
                 m_pCellByKey.clear();
                 m_PlanarpCells.clear();
-                m_NonPlanarpPoints.clear();
+                m_NonPlanarpCells.clear();
             }
         }
 
@@ -280,13 +280,13 @@ namespace GLObject
 
     void PointCloud::startCellCalculation()
     {
-        m_State.setState(PointCloudStreamState::CALC_CELLS);
-
         if (!m_CellsAssigned)
         {
-            auto cellSize = Cell::getCellSize(m_BoundingBox, m_OctTreeDevisions);
-            PixIter assignCells(i);
+            startCellAssignment();
+            //PixIter assignCells(i);
         }
+
+        m_State.setState(PointCloudStreamState::CALC_CELLS);
 
         if (m_PlanarpCells.empty())
         {
@@ -297,7 +297,7 @@ namespace GLObject
                 if (cell->getType() == Cell::NDT_TYPE::Planar)
                     m_PlanarpCells.push_back(cell);
                 else
-                    m_NonPlanarpPoints.insert(m_NonPlanarpPoints.end(), cell->getPoints().begin(), cell->getPoints().end());
+                    m_NonPlanarpCells.push_back(cell);
             }
         }
     }
