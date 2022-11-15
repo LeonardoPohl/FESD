@@ -13,7 +13,7 @@
             "state": {
               "type": "pdf",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+                "file": "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf"
               }
             }
           },
@@ -91,7 +91,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "file": "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -108,7 +108,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "file": "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -131,7 +131,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+                "file": "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf"
               }
             }
           }
@@ -144,11 +144,11 @@
   },
   "active": "4bca003282815d9a",
   "lastOpenFiles": [
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
     "Topics/Point Cloud Registration.md",
     "Topics/Related Work.md",
     "Topics/Camera Calibration.md",
     "Papers/Papers.md",
-    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
     "Papers/Collections/Camera Calibration.md",
     "Papers/Collections/Related Work/Depth Estimation.md",
     "Papers/Collections/Related Work/Depth Completion.md",

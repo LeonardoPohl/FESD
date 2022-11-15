@@ -65,6 +65,7 @@ namespace GLObject
 		void assignCells(int i);
 		void startCellCalculation();
 		void calculateCells(int i);
+		void doPlaneSegmentation();
 
 		PointCloudStreamState m_State{ };
 

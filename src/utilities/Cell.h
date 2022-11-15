@@ -9,8 +9,8 @@
 class Cell
 {
 public:
-	Cell(glm::vec3 index, float m_PlanarThreshold = 0.04f);
-	Cell(std::string key, float m_PlanarThreshold = 0.04f);
+	Cell(glm::vec3 index, float *m_PlanarThreshold);
+	Cell(std::string key, float *m_PlanarThreshold);
 
 	inline void addPoint(Point *p)
 	{
@@ -20,6 +20,8 @@ public:
 	}
 
 	bool calculateNDT();
+
+	void updateNDTType();
 
 	glm::vec3 getIndex() const
 	{
@@ -70,14 +72,8 @@ public:
 	{
 		return (boundingBox.maxBoundingPoint - boundingBox.minBoundingPoint) / (float)devisions;
 	}
-
-	float setPlanarThreshold(float te)
-	{
-		m_PlanarThreshold = te;
-	}
 private:
-	float m_PlanarThreshold;
-
+	float *m_PlanarThreshold;
 	NDT_TYPE m_Type{ NDT_TYPE::None };
 
 	std::vector<Point*> m_Points;

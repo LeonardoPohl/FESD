@@ -170,6 +170,23 @@ namespace GLObject
             }
         }
 
+        if (m_State == m_State.CALC_CELLS) {
+            if (ImGui::SliderFloat("Planar Threshold", &m_PlanarThreshold, 0.0001f, 1.0f))
+            {
+                m_PlanarpCells.clear();
+                m_NonPlanarpCells.clear();
+                for (auto const &[_, cell] : m_pCellByKey)
+                {
+                    cell->updateNDTType();
+
+                    if (cell->getType() == Cell::NDT_TYPE::Planar)
+                        m_PlanarpCells.push_back(cell);
+                    else
+                        m_NonPlanarpCells.push_back(cell);
+                }
+            }
+        }
+
         m_GLUtil.manipulateTranslation();
     }
 
@@ -243,7 +260,7 @@ namespace GLObject
                     glm::vec3 color{ m_ColorDistribution->operator()(m_Generator), 
                                      m_ColorDistribution->operator()(m_Generator), 
                                      m_ColorDistribution->operator()(m_Generator) };
-                    m_pCellByKey.insert(std::make_pair(key, new Cell(key)));
+                    m_pCellByKey.insert(std::make_pair(key, new Cell(key, &m_PlanarThreshold)));
                     m_ColorBypCell.insert(std::make_pair(m_pCellByKey[key], color));
                 }
                 m_pCellByKey[key]->addPoint(&m_Points[i]);
@@ -299,6 +316,7 @@ namespace GLObject
                 else
                     m_NonPlanarpCells.push_back(cell);
             }
+            m_PointDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, m_PlanarpCells.size());
         }
     }
 
@@ -322,8 +340,10 @@ namespace GLObject
         {
             if (type == Cell::NDT_TYPE::Planar)
                 col = glm::vec3{ 0.0f, 0.0f, 1.0f };
-            else
+            else if (type == Cell::NDT_TYPE::Linear)
                 col = glm::vec3{ 1.0f, 0.0f, 0.0f };
+            else if (type == Cell::NDT_TYPE::Spherical)
+                col = glm::vec3{ 0.0f, 1.0f, 0.0f };
         }
 
         for (int v : std::views::iota(0, Point::VertexCount))
@@ -334,48 +354,11 @@ namespace GLObject
 
     }
 
-    /*
-    void PointCloud::randomSample()
+    void PointCloud::doPlaneSegmentation()
     {
         std::vector<int> plane_points{};
 
         plane_points.push_back(m_PointDistribution->operator()(m_Generator));
-        plane_points.push_back(m_PointDistribution->operator()(m_Generator));
-        plane_points.push_back(m_PointDistribution->operator()(m_Generator));
-
-        Plane p{
-            m_Points[plane_points[0]].getPoint(),
-            m_Points[plane_points[1]].getPoint(),
-            m_Points[plane_points[2]].getPoint()
-        };
-
-        std::vector<int> points{};
-
-        for (int i : std::views::iota(0, (int)(numElements - 1)))
-            if (p.inDistance(m_Points[i].getPoint(), m_DistanceThreshold))
-                points.push_back(i);
-
-        if (m_PointCountThreshold < points.size())
-        {
-            pointCountByPlane.push_back({ p, points.size() });
-
-            maxPointCount = maxPointCount > points.size() ? maxPointCount : points.size();
-
-            std::array<float, 4> randColor{ rand() % 255 / 255.f, rand() % 255 / 255.f, rand() % 255 / 255.f, 1.0f };
-
-            for (int i : std::views::iota(0, (int)(numElements - 1)))
-            {
-
-                if (std::binary_search(points.begin(), points.end(), i))
-                    for (int v : std::views::iota(0, Point::VertexCount))
-                        m_Points[i].Vertices[v].Color = randColor;
-
-                memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
-            }
-
-            m_IndexBuffer->Bind();
-
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) *numElements *Point::VertexCount, m_Vertices));
-        }
-    }*/
+        
+    }
 }

@@ -3,8 +3,8 @@
 #include <numeric>
 #include <cmath>
 
-Cell::Cell(glm::vec3 index, float m_PlanarThreshold) : m_PlanarThreshold(m_PlanarThreshold), m_Index(index) { }
-Cell::Cell(std::string key, float m_PlanarThreshold) : m_PlanarThreshold(m_PlanarThreshold) 
+Cell::Cell(glm::vec3 index, float *m_PlanarThreshold) : m_PlanarThreshold(m_PlanarThreshold), m_Index(index) { }
+Cell::Cell(std::string key, float *m_PlanarThreshold) : m_PlanarThreshold(m_PlanarThreshold) 
 {
 	int x = stoi(key.substr(0, key.find(",")));
 	key.erase(0, key.find(",") + 1);
@@ -93,7 +93,7 @@ bool Cell::calculateNDT()
 		auto p = glm::sqrt(p2 / 6);
 		auto B = (float)(1.0f / p) * (covariance - q * identity);
 
-		auto r = calcSymmetricalDeterminant(covariance);
+		auto r = calcSymmetricalDeterminant(B) / 2;
 
 		// In exact arithmetic for a symmetric matrix - 1 <= r <= 1
 		// but computation error can leave it slightly outside this range.
@@ -112,14 +112,22 @@ bool Cell::calculateNDT()
 		m_EigenVector = { eig1, eig2, eig3 };
 	}
 
-	if (m_EigenVector.z == 0 || m_EigenVector.y == 0)
-		return false;
+	updateNDTType();
+	
+	return true;
+}
 
-	if (m_EigenVector.y / m_EigenVector.z <= m_PlanarThreshold)
+void Cell::updateNDTType() {
+
+	if (m_EigenVector.z == 0 || m_EigenVector.y == 0) {
+		m_Type = NDT_TYPE::None;
+		return;
+	}
+
+	if (m_EigenVector.y / m_EigenVector.z <= *m_PlanarThreshold)
 		m_Type = NDT_TYPE::Linear;
-	else if(m_EigenVector.x / m_EigenVector.y <= m_PlanarThreshold)
+	else if (m_EigenVector.x / m_EigenVector.y <= *m_PlanarThreshold)
 		m_Type = NDT_TYPE::Planar;
 	else
 		m_Type = NDT_TYPE::Spherical;
-	return true;
 }
