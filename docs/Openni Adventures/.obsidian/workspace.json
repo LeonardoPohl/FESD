@@ -9,14 +9,14 @@
         "dimension": 36.56812339331619,
         "children": [
           {
-            "id": "7fc8e9599f20798e",
+            "id": "9deaead2f9028843",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
                 "file": "Papers/Collections/Human Pose Estimation.md",
                 "mode": "source",
-                "source": true
+                "source": false
               }
             }
           }
@@ -87,7 +87,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "19237165655d90b1",
@@ -103,7 +104,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +121,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -143,7 +144,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md"
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
           }
@@ -154,17 +155,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "7fc8e9599f20798e",
+  "active": "79402b6245dd7036",
   "lastOpenFiles": [
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Papers/Collections/Human Pose Estimation.md",
+    "Papers/Papers/Sensor fusion for 3D human body tracking with an Articulated 3D Body Model.pdf",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Papers/Collections/Camera Calibration.md",
     "Papers/Collections/Camera Hardware.md",
     "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
     "Papers/Collections/Point Clouds.md",
     "Tasks.md",
     "Topics/Point Cloud Registration.md",
-    "Topics/Human Pose Estimation.md",
-    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+    "Topics/Human Pose Estimation.md"
   ]
 }

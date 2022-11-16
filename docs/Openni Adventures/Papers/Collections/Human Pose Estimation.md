@@ -8,11 +8,11 @@
 
 ### Important papers mentioned
 
-4. HPE for rehabilitation training
+4. [[A Depth Camera-based Human Activity Recognition via Deep Learning Recurrent Neural Network for Health and Social Care Services.pdf]]
 7. Point cloud library
 8. Open3D
-9. [[Sensor_fusion_for_3D_human_body_tracking_with_an_a.pdf]]
-	1. process 2D and 3D input data from different sensors
+9. [[Sensor fusion for 3D human body tracking with an Articulated 3D Body Model.pdf]]
+10. 
 
 
 ### Summary
