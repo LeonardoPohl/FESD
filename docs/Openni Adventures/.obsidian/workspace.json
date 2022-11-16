@@ -6,9 +6,29 @@
       {
         "id": "2a910ab47d00a635",
         "type": "tabs",
+        "dimension": 36.56812339331619,
         "children": [
           {
-            "id": "4bca003282815d9a",
+            "id": "7fc8e9599f20798e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Papers/Collections/Human Pose Estimation.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "13195498cbbef299",
+        "type": "tabs",
+        "dimension": 63.4318766066838,
+        "children": [
+          {
+            "id": "79402b6245dd7036",
             "type": "leaf",
             "state": {
               "type": "pdf",
@@ -16,41 +36,8 @@
                 "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
-          },
-          {
-            "id": "7fc8e9599f20798e",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {}
-            }
-          },
-          {
-            "id": "b9c683f0839e8746",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Papers/Collections/Point Clouds.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "7db26903f11bf517",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Thesis Research.md",
-                "mode": "source",
-                "source": false
-              }
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -100,7 +87,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "19237165655d90b1",
@@ -116,6 +104,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Papers/Collections/Human Pose Estimation.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,6 +121,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Papers/Collections/Human Pose Estimation.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -153,7 +143,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Papers/Collections/Human Pose Estimation.md"
+              }
             }
           }
         ]
@@ -165,15 +157,15 @@
   },
   "active": "7fc8e9599f20798e",
   "lastOpenFiles": [
-    "Topics/Human Pose Estimation.md",
-    "Papers/Collections/Point Clouds.md",
-    "Thesis Research.md",
-    "Topics/Pointcloud Misc.md",
-    "Papers/Papers.md",
-    "Topics/Camera Calibration.md",
-    "Topics/Camera Hardware.md",
-    "Topics/Point Cloud Registration.md",
     "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
-    "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf"
+    "Papers/Collections/Human Pose Estimation.md",
+    "Papers/Collections/Camera Calibration.md",
+    "Papers/Collections/Camera Hardware.md",
+    "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
+    "Papers/Collections/Point Clouds.md",
+    "Tasks.md",
+    "Topics/Point Cloud Registration.md",
+    "Topics/Human Pose Estimation.md",
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
   ]
 }
