@@ -16,7 +16,7 @@
               "state": {
                 "file": "Papers/Collections/Human Pose Estimation.md",
                 "mode": "source",
-                "source": false
+                "source": true
               }
             }
           }
@@ -87,8 +87,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "19237165655d90b1",
