@@ -12,7 +12,10 @@
 7. Point cloud library
 8. Open3D
 9. [[Sensor fusion for 3D human body tracking with an Articulated 3D Body Model.pdf]]
-10. 
+18. [[Real-time Simultaneous Pose and Shape Estimation for Articulated Objects Using a Single Depth Camera.pdf]]
+	1. single camera pose estimation
+	2. uses first few frames to acquire human pose in the dynamic scenes -> usually does not provide complete information
+19. 
 
 
 ### Summary
@@ -135,6 +138,16 @@
 	- Geometric Model
 		- roughly divide the human body into several parts
 		- usually cylinder ellipse or rectangles 
+		- Head-Neck-Trunk (HNT)
+		- Some methods (paper 15) uses face detection for 2D image first to segment the human
+	- Mathematical model
+		- transfer conceptual knowledge commonly used in mathematics to model construction
+		- build a model with the representation of probability distribution to list each possible result and give their probabilities
+		- mainly Gaussian Mixture Model (GMM)
+			- Establish mixed model based on multiple gaussian distributions for each pixel of the image
+			- parameters are continuously updated according to observed image
+			- Background estimation is performed simultaneously
+			- 
 
 
 ## Point2Skeleton: Learning Skeletal Representations from Point Clouds
