@@ -88,7 +88,6 @@ struct GLUtil
 	glm::vec3 m_ModelTranslation{ 0.0f };
 
 	float m_Scale{ 1.0f };
-	float m_DepthScale{ 5.0f };
 
 	void manipulateTranslation()
 	{
@@ -102,7 +101,6 @@ struct GLUtil
 
 		if (ImGui::CollapsingHeader("Scale"))
 		{
-			ImGui::SliderFloat("Depth Scale", &m_DepthScale, 0.001f, 30.0f);
 			ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
 		}
 	}

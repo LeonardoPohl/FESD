@@ -27,9 +27,9 @@ public:
 		GREY
 	};
 
-	std::array<float, 4> getColorFromDepth(float depth, float depth_scale, CMAP cmap) const;
+	std::array<float, 4> getColorFromDepth(float depth, CMAP cmap) const;
 	static unsigned int *getIndices(int i);
-	void updateVertexArray(float depth, float depth_scale = 0.0f, CMAP cmap = CMAP::VIRIDIS);
+	void updateVertexArray(float depth, CMAP cmap = CMAP::VIRIDIS);
 
 	inline glm::vec3 getPoint() const
 	{
@@ -53,7 +53,6 @@ public:
 
 	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
 	float Depth{ 0 };
-	float Scale{ 0 };
 	std::array<Vertex, VertexCount> Vertices;
 	float HalfLengthFun;
 

@@ -3,7 +3,7 @@
 #include "Consts.h"
 #include <functional>
 
-void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
+void Point::updateVertexArray(float depth, CMAP cmap)
 {
 	/*
 		7      6
@@ -20,7 +20,7 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	Depth = depth;
 
 	// maybe add cache?
-	std::array<float, 4> Color = getColorFromDepth(depth, depth_scale, cmap);
+	std::array<float, 4> Color = getColorFromDepth(depth, cmap);
 
 	auto x = (PositionFunction[0] * depth);
 	auto y = (PositionFunction[1] * depth);
@@ -47,9 +47,9 @@ const auto HSV = colormap::hsv(NUM_COLORS);
 const auto TERRAIN = colormap::terrain(NUM_COLORS);
 const auto GREY = colormap::bone(NUM_COLORS);
 
-inline std::array<float, 4> Point::getColorFromDepth(float depth, float depth_scale, CMAP cmap) const
+inline std::array<float, 4> Point::getColorFromDepth(float depth, CMAP cmap) const
 {
-	auto z = std::clamp(depth / depth_scale, 0.0f, 1.0f);
+	auto z = std::clamp(depth / 6.0f, 0.0f, 1.0f);
 
 	if (z == -1.0f)
 		return { 0.0f };

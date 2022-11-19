@@ -86,7 +86,7 @@ namespace GLObject
 		std::vector<std::pair<Plane, int>> m_PointCountByPlane;
 		int m_MaxPointCount{ 0 };
 
-		int m_OctTreeDevisions{ 200 };
+		int m_NumCellDevisions{ 200 };
 		int m_NumElements{ 0 };
 		int m_StreamWidth{ 0 };
 		int m_StreamHeight{ 0 };

@@ -47,8 +47,7 @@ namespace GLObject
                                                  ((float)h - cy) / fy };
 
                 m_Points[i].HalfLengthFun = 0.5f / fy;
-                m_Points[i].Scale = 1;//m_StreamWidth;
-                m_Points[i].updateVertexArray(0.1f, m_GLUtil.m_DepthScale / (float)mp_DepthCamera->getDepthStreamMaxDepth(), m_CMAP);
+                m_Points[i].updateVertexArray(1.f, m_CMAP);
 
                 memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
             }
@@ -159,9 +158,9 @@ namespace GLObject
         if (m_State == m_State.CELLS || m_State == m_State.CALC_CELLS)
         {
             ImGui::Checkbox("Show Average Normals", &m_ShowAverageNormals);
-            if (ImGui::SliderInt("Chunk devisions", &m_OctTreeDevisions, 0, 400))
+            if (ImGui::SliderInt("Cell devisions", &m_NumCellDevisions, 0, 400))
             {
-                m_CellSize = Cell::getCellSize(m_BoundingBox, m_OctTreeDevisions);
+                m_CellSize = Cell::getCellSize(m_BoundingBox, m_NumCellDevisions);
                 m_CellsAssigned = false;
                 m_ColorBypCell.clear();
                 m_pCellByKey.clear();
@@ -196,11 +195,11 @@ namespace GLObject
 
         if (m_BoundingBox.updateBox(m_Points[i].getPoint()))
         {
-            m_CellSize = Cell::getCellSize(m_BoundingBox, m_OctTreeDevisions);
+            m_CellSize = Cell::getCellSize(m_BoundingBox, m_NumCellDevisions);
         }
 
         // Read depth data
-        m_Points[i].updateVertexArray((float)depth[depth_i] * m_MetersPerUnit, m_GLUtil.m_DepthScale / (float)mp_DepthCamera->getDepthStreamMaxDepth(), m_CMAP);
+        m_Points[i].updateVertexArray((float)depth[depth_i] * m_MetersPerUnit, m_CMAP);
     }
 
     void PointCloud::startNormalCalculation()
