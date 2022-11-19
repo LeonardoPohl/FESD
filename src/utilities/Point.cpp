@@ -22,10 +22,10 @@ void Point::updateVertexArray(float depth, float depth_scale, CMAP cmap)
 	// maybe add cache?
 	std::array<float, 4> Color = getColorFromDepth(depth, depth_scale, cmap);
 
-	auto x = (PositionFunction[0] * depth) / Scale;
-	auto y = (PositionFunction[1] * depth) / Scale;
-	auto z = depth * depth_scale;
-	auto a = (HalfLengthFun * depth) / Scale;
+	auto x = (PositionFunction[0] * depth);
+	auto y = (PositionFunction[1] * depth);
+	auto z = depth;
+	auto a = (HalfLengthFun * depth);
 
 	Vertices[0] = { { x - a, y - a, z - a}, Color };
 	Vertices[1] = { { x + a, y - a, z - a}, Color };

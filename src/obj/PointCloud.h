@@ -29,7 +29,7 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr, Renderer *renderer = nullptr);
+		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr, Renderer *renderer = nullptr, float metersPerUnit = 0.0f);
 		
 		void OnUpdate() override;
 		void OnRender() override;
@@ -105,5 +105,8 @@ namespace GLObject
 		bool m_CellsAssigned{ false };
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
+
+		// Meters per unit
+		float m_MetersPerUnit = 0.0f;
 	};
 };

@@ -185,7 +185,10 @@ OrbbecCamera::~OrbbecCamera() {
 
 void OrbbecCamera::makePointCloud(Camera *cam, Renderer *renderer)
 {
-    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer);
+    // -> 1 unit = 1 mm
+    // -> 1 m = 1000 units 
+    // -> meters per unit = 1/1000
+    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f/1000.f);
 }
 
 const void *OrbbecCamera::getDepth()

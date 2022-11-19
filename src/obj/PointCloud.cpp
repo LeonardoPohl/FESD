@@ -12,7 +12,7 @@
 
 namespace GLObject
 {
-    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam, Renderer *renderer) : mp_DepthCamera(depthCamera)
+    PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam, Renderer *renderer, float metersPerUnit) : mp_DepthCamera(depthCamera), m_MetersPerUnit(metersPerUnit)
     {
         this->camera = cam;
         GLCall(glEnable(GL_BLEND));
@@ -47,7 +47,7 @@ namespace GLObject
                                                  ((float)h - cy) / fy };
 
                 m_Points[i].HalfLengthFun = 0.5f / fy;
-                m_Points[i].Scale = m_StreamWidth;
+                m_Points[i].Scale = 1;//m_StreamWidth;
                 m_Points[i].updateVertexArray(0.1f, m_GLUtil.m_DepthScale / (float)mp_DepthCamera->getDepthStreamMaxDepth(), m_CMAP);
 
                 memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
@@ -194,14 +194,13 @@ namespace GLObject
     {
         int depth_i = m_StreamWidth * (m_StreamHeight + 1) - i;
 
-
         if (m_BoundingBox.updateBox(m_Points[i].getPoint()))
         {
             m_CellSize = Cell::getCellSize(m_BoundingBox, m_OctTreeDevisions);
         }
 
         // Read depth data
-        m_Points[i].updateVertexArray(depth[depth_i], m_GLUtil.m_DepthScale / (float)mp_DepthCamera->getDepthStreamMaxDepth(), m_CMAP);
+        m_Points[i].updateVertexArray((float)depth[depth_i] * m_MetersPerUnit, m_GLUtil.m_DepthScale / (float)mp_DepthCamera->getDepthStreamMaxDepth(), m_CMAP);
     }
 
     void PointCloud::startNormalCalculation()

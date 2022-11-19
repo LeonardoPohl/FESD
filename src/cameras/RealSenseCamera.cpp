@@ -48,7 +48,9 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 	this->depth_width  = intrinsics.width;
 	this->depth_height = intrinsics.height;
 
-	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer);
+	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
+
+	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
 RealSenseCamera::~RealSenseCamera() {
