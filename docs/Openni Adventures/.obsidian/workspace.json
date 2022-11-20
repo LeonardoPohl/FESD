@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md",
+                "file": "Meeting Erwin.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md",
+                "file": "Meeting Erwin.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md",
+                "file": "Meeting Erwin.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Collections/Human Pose Estimation.md"
+                "file": "Meeting Erwin.md"
               }
             }
           }
@@ -138,15 +138,15 @@
   },
   "active": "9deaead2f9028843",
   "lastOpenFiles": [
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Papers/Collections/Human Pose Estimation.md",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+    "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf",
+    "Papers/Papers/Multi-view Depth Estimation using Epipolar Spatio-Temporal Networks.pdf",
+    "Papers/Papers/Non-Local Spatial Propagation Network for Depth Completion.pdf",
+    "Topics/Camera Linking.md",
+    "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf",
     "Papers/Papers/Sensor fusion for 3D human body tracking with an Articulated 3D Body Model.pdf",
-    "Papers/Collections/Camera Calibration.md",
-    "Papers/Collections/Camera Hardware.md",
-    "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
-    "Papers/Collections/Point Clouds.md",
-    "Tasks.md",
-    "Topics/Point Cloud Registration.md",
-    "Topics/Human Pose Estimation.md"
+    "Papers/Collections/Camera Calibration.md"
   ]
 }

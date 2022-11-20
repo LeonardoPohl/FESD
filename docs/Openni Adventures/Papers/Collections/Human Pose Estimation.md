@@ -147,7 +147,7 @@
 			- Establish mixed model based on multiple gaussian distributions for each pixel of the image
 			- parameters are continuously updated according to observed image
 			- Background estimation is performed simultaneously
-			- 
+			- Continuous depth data [21, 22]: each new frame initialises a new template --> reduces ambiguity
 
 
 ## Point2Skeleton: Learning Skeletal Representations from Point Clouds
