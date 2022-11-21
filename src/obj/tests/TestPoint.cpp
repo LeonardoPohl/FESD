@@ -24,15 +24,13 @@ namespace GLObject
         m_Depth = 0.0f;
         m_Points = new Point[numElements];
         
-        m_Points[0].Position = m_Position;
+        m_Points[0].PositionFunction = m_Position;
         m_Points[0].HalfLength = 1.0f / WINDOW_WIDTH;
-        m_Points[0].updateVertexArray();
-        m_Points[0].updateDepth(m_Depth);
+        m_Points[0].updateVertexArray(m_Depth, 1.f);
 
-        m_Points[1].Position = { 0.5f, -0.5f };
+        m_Points[1].PositionFunction = { 0.5f, -0.5f };
         m_Points[1].HalfLength = 2.0f / WINDOW_WIDTH;
-        m_Points[1].Depth = -0.5f;
-        m_Points[1].updateVertexArray();
+        m_Points[1].updateVertexArray(m_Depth, 0.f);
 
 
         m_Vertices = new Point::Vertex[2 * Point::VertexCount]{};
@@ -64,11 +62,9 @@ namespace GLObject
         GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_Points[0].Position = m_Position;
-        m_Points[0].Depth = m_Depth;
-        m_Points[0].updateVertexArray();
-        m_Points[1].Depth = -0.5f;
-        m_Points[0].updateVertexArray();
+        m_Points[0].PositionFunction = m_Position;
+        m_Points[0].updateVertexArray(m_Depth);
+        m_Points[0].updateVertexArray(-0.5f);
 
         memcpy(m_Vertices + 0 * Point::VertexCount, &m_Points[0].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
         memcpy(m_Vertices + 1 * Point::VertexCount, &m_Points[1].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));

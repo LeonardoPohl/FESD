@@ -52,8 +52,8 @@ int main(void)
     glfwSetScrollCallback(window, scroll_callback);
 
     {
+    
         ImGuiHelper::initImGui(window);
-
         cam = new Camera{window};
         
         Renderer r;
@@ -82,8 +82,12 @@ int main(void)
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
 
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             tmh.update();
 
+            cameraHandler.OnUpdate();
+            cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
 
             ImGuiHelper::endFrame();

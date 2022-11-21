@@ -120,13 +120,16 @@ void Camera::updateImGui()
 
     update |= ImGui::SliderFloat3("Position", &Position.x, -20.0f, 20.f);
 
-    ImGui::BeginDisabled();
+    if (ImGui::TreeNode("Orientation"))
+    {
+        ImGui::BeginDisabled();
 
-    ImGui::SliderFloat3("Front", &Front.x, -1.0f, 1.f);
-    ImGui::SliderFloat3("Right", &Right.x, -1.0f, 1.f);
-    ImGui::SliderFloat3("Up", &Up.x, -1.0f, 1.f);
+        ImGui::SliderFloat3("Front", &Front.x, -1.0f, 1.f);
+        ImGui::SliderFloat3("Right", &Right.x, -1.0f, 1.f);
+        ImGui::SliderFloat3("Up", &Up.x, -1.0f, 1.f);
 
-    ImGui::EndDisabled();
+        ImGui::EndDisabled();
+    }
 
     ImGui::End();
 

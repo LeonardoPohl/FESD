@@ -15,6 +15,14 @@ namespace GLObject
 	class PointCloud;
 }
 
+enum class INTRINSICS
+{
+	FX,
+	FY,
+	CX,
+	CY
+};
+
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
@@ -23,7 +31,10 @@ public:
 	/// Gets current depth frame
 	/// </summary>
 	/// <returns>Pointer to first depth pixel</returns>
-	virtual const uint16_t *getDepth() = 0;
+	virtual const void *getDepth() = 0;
+
+	/// <returns>Returns size of depth pixel</returns>
+	virtual size_t getDepthSize() = 0;
 
 	/// <summary>
 	/// Gets the Name of the Camera
@@ -73,6 +84,9 @@ public:
 	/// </summary>
 	virtual void stopRecording() = 0;
 
+	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
+	virtual glm::mat3 getIntrinsics() const = 0;
+
 	/// <returns>Window Name (Display: *Camera Name*)</returns>
 	inline std::string getWindowName() const {
 		return "Display: " + this->getCameraName();
@@ -92,5 +106,4 @@ public:
 	bool is_enabled{ false };
 protected:
 	unsigned int camera_id;
-
 };

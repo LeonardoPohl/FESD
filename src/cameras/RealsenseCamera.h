@@ -9,7 +9,9 @@ public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, int camera_id);
 	~RealSenseCamera() override;
 
-	const uint16_t * getDepth() override;
+	const void * getDepth() override;
+	size_t getDepthSize() override;
+
 	std::string getName() const override { return "Realsense"; }
 
 	void printDeviceInfo() const;
@@ -38,6 +40,31 @@ public:
 	void OnUpdate() override;
 	void OnRender() override;
 	void OnImGuiRender() override;
+
+	inline float getIntrinsics(INTRINSICS intrin) const override
+	{
+		switch (intrin)
+		{
+			case INTRINSICS::FX:
+				return intrinsics.fx;
+			case INTRINSICS::FY:
+				return intrinsics.fy;
+			case INTRINSICS::CX:
+				return intrinsics.ppx;
+			case INTRINSICS::CY:
+				return intrinsics.ppy;
+			default:
+				break;
+		}
+	}
+
+	inline glm::mat3 getIntrinsics() const override
+	{
+		return { intrinsics.fx,		     0.0f, intrinsics.ppx,
+						  0.0f, intrinsics.fy, intrinsics.ppy,
+						  0.0f,		     0.0f,           1.0f };
+	}
+
 private:
 	rs2::pipeline _pipe;
 	rs2::context* _ctx{};
@@ -45,9 +72,16 @@ private:
 	rs2::config _cfg{};
 	rs2_intrinsics intrinsics;
 
+	size_t pixel_size{ 0 };
+
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer _color_map{};
-	unsigned int max_depth;
+	unsigned int max_depth { 32766 };
+
+	// TODO fix these
+	const float hfov{ glm::radians(-1.0f) };
+	const float vfov{ glm::radians(-1.0f) };
+	const float dfov{ glm::radians(-1.0f) }; // no Idea what that is
 
 	unsigned int depth_width;
 	unsigned int depth_height;
