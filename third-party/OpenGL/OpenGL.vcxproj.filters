@@ -1406,6 +1406,9 @@
     <ClInclude Include="GLCore\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GLCore\GLObjectUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\ml.png">

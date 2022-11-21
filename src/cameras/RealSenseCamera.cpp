@@ -2,30 +2,30 @@
 #include <iostream>
 #include <exception>
 #include "obj/PointCloud.h"
-using namespace rs2;
 
 // TODO: Add depth tuning
 
-device_list RealSenseCamera::getAvailableDevices(context ctx) {
+rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
 	return ctx.query_devices();
 }
 
-std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, int *starting_id) {
+std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id) {
 	rs2::context ctx;
 
 	std::vector<RealSenseCamera*> depthCameras;
 
 	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
 	{
-		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, (*starting_id)++));
+		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++));
 		std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
 	}
 
 	return depthCameras;
 }
 
-RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int camera_id) :
-	_pipe(pipeline(*ctx)), 
+RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera *cam, Renderer *renderer, int camera_id)
+	:
+	_pipe(rs2::pipeline(*ctx)),
 	_ctx(ctx), 
 	_device(device)
 	 {
@@ -37,8 +37,8 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int 
 	
 	auto profile = this->_pipe.start(this->_cfg);
 
-	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	frame depth = data.get_depth_frame();
+	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	rs2::frame depth = data.get_depth_frame();
 
 	// Get Intrinsics
 	auto depth_profile = depth.get_profile().as<rs2::video_stream_profile>();
@@ -48,7 +48,9 @@ RealSenseCamera::RealSenseCamera(context* ctx, device* device, Camera *cam, int 
 	this->depth_width  = intrinsics.width;
 	this->depth_height = intrinsics.height;
 
-	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam);
+	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
+
+	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -64,8 +66,8 @@ RealSenseCamera::~RealSenseCamera() {
 
 const void *RealSenseCamera::getDepth()
 {
-	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	depth_frame depth = data.get_depth_frame();
+	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	rs2::depth_frame depth = data.get_depth_frame();
 	pixel_size = depth.get_data_size();
 
 	return depth.get_data();
@@ -77,8 +79,8 @@ size_t RealSenseCamera::getDepthSize()
 	{
 		return pixel_size;
 	}
-	frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	depth_frame depth = data.get_depth_frame();
+	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	rs2::depth_frame depth = data.get_depth_frame();
 	pixel_size = depth.get_data_size();
 
 	return depth.get_data_size();
@@ -106,6 +108,7 @@ inline void RealSenseCamera::OnRender()
 
 inline void RealSenseCamera::OnImGuiRender()
 {
+
 	m_pointcloud->OnImGuiRender();
 }
 

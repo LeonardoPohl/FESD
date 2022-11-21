@@ -14,54 +14,99 @@
 #include <unordered_map>
 #include <random>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "utilities/Point.h"
 #include "utilities/Plane.h"
+#include "utilities/Cell.h"
+#include "utilities/Utilities.h"
+
+#include "PointCloudHelper.h"
 
 namespace GLObject
 {
 	class PointCloud : public GLObject
 	{
 	public:
-		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr);
-
+		PointCloud(DepthCamera *depthCamera, const Camera *cam = nullptr, Renderer *renderer = nullptr, float metersPerUnit = 0.0f);
+		
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
+
 	private:
-		DepthCamera *m_DepthCamera;
+		void pauseStream()
+		{
+			m_State.setState(PointCloudStreamState::IDLE);
+		}
+
+		void resumeStream()
+		{
+			m_State.setState(PointCloudStreamState::STREAM);
+
+			for (auto key : m_pCellByKey)
+				delete key.second;
+
+			m_pCellByKey.clear();
+			m_ColorBypCell.clear();
+			m_PlanarpCells.clear();
+			m_NonPlanarpCells.clear();
+
+			m_CellsAssigned = false;
+			m_ShowAverageNormals = false;
+			m_NormalsCalculated = false;
+		}
+
+		void streamDepth(int i, const int16_t *depth);
+		void startNormalCalculation();
+		void calculateNormals(int i);
+		void startCellAssignment();
+		void assignCells(int i);
+		void startCellCalculation();
+		void calculateCells(int i);
+		void doPlaneSegmentation();
+
+		PointCloudStreamState m_State{ };
+
+		DepthCamera *mp_DepthCamera;
 
 		Point *m_Points; 
-		Point::Vertex *m_Vertices; 
+		Point::Vertex *m_Vertices;
 
-		std::unique_ptr<VertexArray> m_VAO;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<VertexBuffer> m_VB;
-		std::unique_ptr<VertexBufferLayout> m_VBL;
-
-		float m_RotationFactor{ 0 };
-		glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
-		glm::vec3 m_Translation { 0.f, 0.f, 0.f };
-		glm::vec3 m_ModelTranslation{ 0.0f };
-
-		float m_Scale {1.0f};
-		float m_Depth_Scale {5.0f};
-		float m_MaxDepth {0.0f};
-		float m_DistanceThreshold{1.0f};
-		int m_PointCountThreshold{ 150000 };
-
-		bool doUpdate{ true };
-		bool doFloorDetection{ false };
+		GLUtil m_GLUtil{};
 
 		std::default_random_engine m_Generator;
-		std::unique_ptr<std::uniform_int_distribution<int>> m_Distribution{};
+		std::unique_ptr<std::uniform_int_distribution<int>> m_PointDistribution{};
+		std::unique_ptr<std::uniform_int_distribution<int>> m_ColorDistribution{};
 
-		Point::CMAP cmap{ Point::CMAP::VIRIDIS };
-		int cmap_elem{ 0 };
+		Point::CMAP m_CMAP{ Point::CMAP::VIRIDIS };
+		int m_CMAPElem{ 0 };
 
-		std::vector<std::pair<Plane, int>> pointCountByPlane;
-		int maxPointCount{ 0 };
+		std::vector<std::pair<Plane, int>> m_PointCountByPlane;
+		int m_MaxPointCount{ 0 };
+
+		int m_NumCellDevisions{ 200 };
+		int m_NumElements{ 0 };
+		int m_StreamWidth{ 0 };
+		int m_StreamHeight{ 0 };
+
+		std::unordered_map<Cell*, glm::vec3> m_ColorBypCell;
+		std::unordered_map<std::string, Cell*> m_pCellByKey;
+
+		std::vector<Cell *> m_PlanarpCells;
+		std::vector<Cell *> m_NonPlanarpCells;
+
+		BoundingBox m_BoundingBox{ };
+		glm::vec3 m_CellSize{ };
+
+		float m_PlanarThreshold{ 0.004f };
+
+		bool m_CellsAssigned{ false };
+		bool m_ShowAverageNormals{ false };
+		bool m_NormalsCalculated{ false };
+
+		// Meters per unit
+		float m_MetersPerUnit = 0.0f;
 	};
 };

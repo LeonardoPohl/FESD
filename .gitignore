@@ -35,3 +35,4 @@ vcpkg_installed/
 *.htm
 packages/
 *.oni
+*.tmp

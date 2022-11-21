@@ -4,9 +4,11 @@
 #include <librealsense2/rs.hpp>
 #include <memory>
 
+#include "GLCore/Renderer.h"
+
 class RealSenseCamera : public DepthCamera {
 public:
-	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, int camera_id);
+	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id);
 	~RealSenseCamera() override;
 
 	const void * getDepth() override;
@@ -17,7 +19,7 @@ public:
 	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
-	static std::vector<RealSenseCamera*> initialiseAllDevices(Camera* cam, int *starting_id);
+	static std::vector<RealSenseCamera*> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id);
 
 	inline unsigned int getDepthStreamWidth() const override
 	{

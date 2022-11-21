@@ -6,7 +6,7 @@
 #include <iostream>
 #include <GLCore/GLErrorManager.h>
 
-#include "Consts.h"
+#include "utilities/Consts.h"
 
 GLFWwindow *InitialiseGLFWWindow(STATUS &status)
 {

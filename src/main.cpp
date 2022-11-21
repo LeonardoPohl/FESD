@@ -26,9 +26,9 @@
 
 #include "utilities/Consts.h"
 
-#include "utilities/GLFWHelper.h"
-#include "utilities/ImGuiHelper.h"
-#include "utilities/TestMenuHelper.h"
+#include "utilities/helper/GLFWHelper.h"
+#include "utilities/helper/ImGuiHelper.h"
+#include "utilities/helper/TestMenuHelper.h"
 
 Camera *cam = nullptr;
 
@@ -62,7 +62,7 @@ int main(void)
         
         //# Camera Initialisation
         //#######################
-        CameraHandler cameraHandler{cam};
+        CameraHandler cameraHandler{cam, &r};
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
@@ -86,7 +86,6 @@ int main(void)
 
             tmh.update();
 
-            cameraHandler.OnUpdate();
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
 

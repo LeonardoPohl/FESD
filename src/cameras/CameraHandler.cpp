@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include <parameters/Parameters.h>
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
 
@@ -11,13 +10,10 @@
 #include <obj/PointCloud.h>
 
 
-CameraHandler::CameraHandler(Camera *cam) : cam(cam)
+CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : cam(cam), renderer(renderer)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
-
-    global_params = std::make_unique<Params::GlobalParameters>(&depthCameras);
-    normal_params = std::make_unique<Params::NormalParameters>();
 }
 
 CameraHandler::~CameraHandler()
@@ -39,8 +35,8 @@ void CameraHandler::initAllCameras()
     depthCameras.clear();
 
     int id = 0;
-    auto rs_cameras = RealSenseCamera::initialiseAllDevices(cam, &id);
-    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(cam, &id);
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices(cam, renderer, &id);
+    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(cam, renderer, &id);
 
     std::cout << "[INFO] Queried all devices" << std::endl;
 
@@ -57,26 +53,13 @@ void CameraHandler::showCameras()
     }
 }
 
-void CameraHandler::OnUpdate()
-{
-    // TODO: Implement (#21 Find and not initialise all cameras)
-    //cameraHandler.showCameras();
-
-    for (auto cam : depthCameras)
-    {
-        if (cam->is_enabled)
-        {
-            cam->OnUpdate();
-        }
-    }
-}
-
 void CameraHandler::OnRender()
 {
     for (auto cam : depthCameras)
     {
         if (cam->is_enabled)
         {
+            cam->OnUpdate();
             cam->OnRender();
         }
     }
@@ -84,7 +67,6 @@ void CameraHandler::OnRender()
 
 void CameraHandler::OnImGuiRender()
 {
-
     //# General Camera Window
     //#######################
     ImGui::Begin("Camera Handler");
@@ -100,11 +82,13 @@ void CameraHandler::OnImGuiRender()
 
     for (auto cam : depthCameras)
     {
+        ImGui::Begin(cam->getCameraName().c_str());
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
         if (cam->is_enabled)
         {
             cam->OnImGuiRender();
         }
+        ImGui::End();
     }
 
     ImGui::End();
