@@ -8,24 +8,24 @@
         "type": "tabs",
         "children": [
           {
-            "id": "4bca003282815d9a",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Topics/Camera Calibration.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "b9c683f0839e8746",
+            "id": "9deaead2f9028843",
             "type": "leaf",
             "state": {
               "type": "pdf",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+              }
+            }
+          },
+          {
+            "id": "f453aab838680445",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Meeting Erwin.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -96,7 +96,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "file": "Meeting Erwin.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +113,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+                "file": "Meeting Erwin.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -136,7 +136,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf"
+                "file": "Meeting Erwin.md"
               }
             }
           }
@@ -147,17 +147,17 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "b9c683f0839e8746",
+  "active": "f453aab838680445",
   "lastOpenFiles": [
-    "Topics/Camera Calibration.md",
-    "Papers/Collections/Camera Calibration.md",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
+    "Meeting Erwin.md",
+    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
+    "Papers/Collections/Human Pose Estimation.md",
+    "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf",
+    "Papers/Papers/Multi-view Depth Estimation using Epipolar Spatio-Temporal Networks.pdf",
+    "Papers/Papers/Non-Local Spatial Propagation Network for Depth Completion.pdf",
     "Topics/Camera Linking.md",
-    "Topics/Related Work.md",
-    "Papers/Collections/Related Work/Depth Estimation.md",
-    "Papers/Papers.md",
-    "Papers/Collections/Related Work/Depth Completion.md",
-    "Topics/Camera Hardware.md",
-    "Thesis Research.md",
-    "Papers/Collections/Camera Hardware.md"
+    "Papers/Papers/Method of Using RealSense Camera to Estimate the Depth Map of any Monocular Camera.pdf",
+    "Papers/Papers/Sensor fusion for 3D human body tracking with an Articulated 3D Body Model.pdf"
   ]
 }
