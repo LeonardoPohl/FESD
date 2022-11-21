@@ -309,6 +309,7 @@
     <ClInclude Include="GLCore\Camera.h" />
     <ClInclude Include="GLCore\GLErrorManager.h" />
     <ClInclude Include="GLCore\GLObject.h" />
+    <ClInclude Include="GLCore\GLObjectUtil.h" />
     <ClInclude Include="GLCore\IndexBuffer.h" />
     <ClInclude Include="GLCore\Renderer.h" />
     <ClInclude Include="GLCore\Shader.h" />

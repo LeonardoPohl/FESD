@@ -10,7 +10,7 @@ Camera::Camera(GLFWwindow *window) : window(window)
 
 void Camera::processKeyboardInput(float deltaTime)
 {
-    cameraSpeed = 2.5f * deltaTime;
+    cameraSpeed = 2.5f * deltaTime * (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS ? 1.0f : 5.0f);
     bool update = false;
     update |= glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
     update |= glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;

@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <glm/glm.hpp>
+#include "GLCore/Renderer.h"
 
 class OrbbecCamera : public DepthCamera {
 public:
@@ -18,7 +19,7 @@ public:
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, int *starting_id);
+	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id);
 
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
@@ -31,7 +32,7 @@ public:
 	void OnRender() override;
 	void OnImGuiRender() override;
 
-	void makePointCloud(Camera *cam);
+	void makePointCloud(Camera *cam, Renderer *renderer);
 
 	inline void setNumFrames(int numFrames)
 	{

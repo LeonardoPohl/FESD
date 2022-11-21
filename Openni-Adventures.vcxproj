@@ -168,14 +168,13 @@
     <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
     <ClCompile Include="src\obj\Tests\TestTexture2D.cpp" />
     <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp" />
-    <ClCompile Include="src\parameters\GlobalParameters.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\parameters\NormalParameters.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\utilities\ImGuiHelper.cpp" />
+    <ClCompile Include="src\utilities\Cell.cpp" />
+    <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
+    <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
     <ClCompile Include="src\utilities\Point.cpp" />
-    <ClCompile Include="src\utilities\GLFWHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -197,6 +196,11 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\obj\PointCloudHelper.h" />
+    <ClInclude Include="src\utilities\Cell.h" />
+    <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
+    <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
+    <ClInclude Include="src\utilities\helper\TestMenuHelper.h" />
     <ClInclude Include="src\utilities\Plane.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
     <ClInclude Include="src\obj\PointCloud.h" />
@@ -208,14 +212,10 @@
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
-    <ClInclude Include="src\parameters\Parameters.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\ColorMaps.h" />
-    <ClInclude Include="src\utilities\GLFWHelper.h" />
-    <ClInclude Include="src\utilities\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\Point.h" />
-    <ClInclude Include="src\utilities\TestMenuHelper.h" />
     <ClInclude Include="src\utilities\Utilities.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
