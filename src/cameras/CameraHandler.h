@@ -5,6 +5,8 @@
 #include "GLCore/Renderer.h"
 #include <filesystem>
 
+namespace fs = std::filesystem;
+
 class CameraHandler
 {
 public:
@@ -29,7 +31,10 @@ private:
 	Renderer *mp_Renderer;
 
 	std::vector<DepthCamera *> m_DepthCameras;
+	std::vector<fs::path> m_Recordings;
+	
+	bool m_DoingPlayback{ false };
 
-	std::filesystem::path m_RecordingDirectory{ "F:\\Recordings" };
+	fs::path m_RecordingDirectory{ "F:\\Recordings" };
 };
 

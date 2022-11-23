@@ -17,6 +17,9 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), 
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
+
+    for (const auto &entry : fs::directory_iterator(m_RecordingDirectory))
+        m_Recordings.push_back(entry.path());
 }
 
 CameraHandler::~CameraHandler()
@@ -132,10 +135,28 @@ void CameraHandler::OnImGuiRender()
         
         ImGui::BeginDisabled(m_State != Recording);
 
-
+        // Make it possible to stop recording
+        // Count number of frames and file size maybe
 
         ImGui::EndDisabled();
+    }
+    else {
+        ImGui::Text("Playback");
 
+        if (m_Recordings.empty()) {
+            ImGui::Text("No Recordings Found!");
+        }
+        
+        ImGui::BeginDisabled(m_DoingPlayback);
+
+        for (auto recording : m_Recordings) {
+            if (ImGui::Button(recording.filename().string().c_str())) {
+                m_DoingPlayback = true;
+                // Start Playback
+            }
+        }
+
+        ImGui::EndDisabled();
     }
 
     ImGui::End();
