@@ -92,7 +92,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Rende
 
 OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id) :
     _device_info(device_info) {
-    this->camera_id = camera_id;
+    m_CameraId = camera_id;
     printDeviceInfo();
 
     //# Open initialised_devices

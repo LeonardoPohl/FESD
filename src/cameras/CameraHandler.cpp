@@ -8,9 +8,12 @@
 #include <OpenNI.h>
 #include <iostream>
 #include <obj/PointCloud.h>
+#include <ctime>
+#include <chrono>
+#include <fstream>
+#include <json/json.h>
 
-
-CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : cam(cam), renderer(renderer)
+CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), mp_Renderer(renderer)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
@@ -18,10 +21,9 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : cam(cam), render
 
 CameraHandler::~CameraHandler()
 {
-    for (auto cam : depthCameras)
-    {
+    for (auto cam : m_DepthCameras)
         delete cam;
-    }
+    
     openni::OpenNI::shutdown();
 }
 
@@ -32,30 +34,31 @@ void CameraHandler::findAllCameras()
 
 void CameraHandler::initAllCameras()
 {
-    depthCameras.clear();
+    for (auto cam : m_DepthCameras)
+        delete cam;
+
+    m_DepthCameras.clear();
 
     int id = 0;
-    auto rs_cameras = RealSenseCamera::initialiseAllDevices(cam, renderer, &id);
-    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(cam, renderer, &id);
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id);
+    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id);
 
     std::cout << "[INFO] Queried all devices" << std::endl;
 
-    depthCameras.insert(depthCameras.end(), rs_cameras.begin(), rs_cameras.end());
-    depthCameras.insert(depthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
+    m_DepthCameras.insert(m_DepthCameras.end(), rs_cameras.begin(), rs_cameras.end());
+    m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
 }
 
 void CameraHandler::showCameras()
 {
     // TODO: Implement
-    for (auto cam : depthCameras)
-    {
-        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);        
-    }
+    for (auto cam : m_DepthCameras)
+        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
 }
 
 void CameraHandler::OnRender()
 {
-    for (auto cam : depthCameras)
+    for (auto cam : m_DepthCameras)
     {
         if (cam->is_enabled)
         {
@@ -71,25 +74,79 @@ void CameraHandler::OnImGuiRender()
     //#######################
     ImGui::Begin("Camera Handler");
 
-    if (ImGui::Button("Init Cameras"))
-    {
-        // TODO: Make Async (#21 Async Camera Initialisation)
+    if (ImGui::Button("Init Cameras")) {
         initAllCameras();
     }
 
-    // TODO: Implement (#21 Find and not initialise all cameras)
-    //cameraHandler.showCameras();
-
-    for (auto cam : depthCameras)
-    {
-        ImGui::Begin(cam->getCameraName().c_str());
+    for (auto cam : m_DepthCameras)
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
-        if (cam->is_enabled)
-        {
-            cam->OnImGuiRender();
+    
+    if (!m_DepthCameras.empty()) {
+        ImGui::Text("Recording");
+
+        for (auto cam : m_DepthCameras)
+            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->is_recording);
+
+        ImGui::BeginDisabled(m_State == Recording);
+
+        ImGui::InputText("Session Name", m_SessionName, 60);
+
+        if (ImGui::Button("Start Recording")) {
+            std::string sessionFileName = m_SessionName;
+            sessionFileName += ".json";
+            std::ranges::replace(sessionFileName, ' ', '_');
+
+            std::fstream configJson(m_RecordingDirectory / sessionFileName, std::ios::out | std::ios::app);
+            Json::Value root;
+
+            root["DurationInSec"] = -1;
+
+            Json::Value cameras;
+
+            for (auto cam : m_DepthCameras) {
+                if (cam->is_recording) {
+                    cam->is_enabled = true;
+                    Json::Value camera;
+
+                    camera["Name"] = cam->getCameraName();
+                    camera["Type"] = cam->getName();
+                    camera["FileName"] = cam->getName();
+                    cameras.append(camera);
+
+                    //cam->startRecording(m_SessionName);
+                }
+            }
+
+            root["Cameras"] = cameras;
+
+            Json::StreamWriterBuilder builder;
+
+            configJson << Json::writeString(builder, root);
+            configJson.close();
+
+            
+            m_State = Recording;
         }
-        ImGui::End();
+
+        ImGui::EndDisabled();
+        
+        ImGui::BeginDisabled(m_State != Recording);
+
+
+
+        ImGui::EndDisabled();
+
     }
 
     ImGui::End();
+
+    for (auto cam : m_DepthCameras)
+    {
+        if (cam->is_enabled)
+        {
+            ImGui::Begin(cam->getCameraName().c_str());
+            cam->OnImGuiRender();
+            ImGui::End();
+        }
+    }
 }

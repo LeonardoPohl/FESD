@@ -8,16 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "9deaead2f9028843",
-            "type": "leaf",
-            "state": {
-              "type": "pdf",
-              "state": {
-                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
-              }
-            }
-          },
-          {
             "id": "f453aab838680445",
             "type": "leaf",
             "state": {
@@ -148,8 +138,8 @@
   },
   "active": "f453aab838680445",
   "lastOpenFiles": [
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Meeting Erwin.md",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
     "Papers/Collections/Human Pose Estimation.md",
     "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf",

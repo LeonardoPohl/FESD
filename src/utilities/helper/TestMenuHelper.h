@@ -1,10 +1,10 @@
 #pragma once
 
-#include "obj/tests/TestClearColor.h"
-#include "obj/tests/TestTriangle2D.h"
-#include "obj/tests/TestTexture2D.h"
-#include "obj/tests/TestPyramid3D.h"
-#include "obj/tests/TestPoint.h"
+#include "tests/TestClearColor.h"
+#include "tests/TestTriangle2D.h"
+#include "tests/TestTexture2D.h"
+#include "tests/TestPyramid3D.h"
+#include "tests/TestPoint.h"
 
 #include "GLCore/Camera.h"
 

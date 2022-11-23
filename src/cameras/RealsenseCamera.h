@@ -23,17 +23,12 @@ public:
 
 	inline unsigned int getDepthStreamWidth() const override
 	{
-		return depth_width;
+		return m_DepthWidth;
 	}
 
 	inline unsigned int getDepthStreamHeight() const override
 	{
-		return depth_height;
-	}
-
-	inline uint16_t getDepthStreamMaxDepth() const override
-	{
-		return max_depth;
+		return m_DepthHeight;
 	}
 
 	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
@@ -48,13 +43,13 @@ public:
 		switch (intrin)
 		{
 			case INTRINSICS::FX:
-				return intrinsics.fx;
+				return m_Intrinsics.fx;
 			case INTRINSICS::FY:
-				return intrinsics.fy;
+				return m_Intrinsics.fy;
 			case INTRINSICS::CX:
-				return intrinsics.ppx;
+				return m_Intrinsics.ppx;
 			case INTRINSICS::CY:
-				return intrinsics.ppy;
+				return m_Intrinsics.ppy;
 			default:
 				break;
 		}
@@ -62,30 +57,24 @@ public:
 
 	inline glm::mat3 getIntrinsics() const override
 	{
-		return { intrinsics.fx,		     0.0f, intrinsics.ppx,
-						  0.0f, intrinsics.fy, intrinsics.ppy,
-						  0.0f,		     0.0f,           1.0f };
+		return { m_Intrinsics.fx,		     0.0f, m_Intrinsics.ppx,
+						    0.0f, m_Intrinsics.fy, m_Intrinsics.ppy,
+						    0.0f,		     0.0f,             1.0f };
 	}
 
 private:
-	rs2::pipeline _pipe;
-	rs2::context* _ctx{};
-	rs2::device* _device{};
-	rs2::config _cfg{};
-	rs2_intrinsics intrinsics;
+	rs2::pipeline m_Pipe;
+	rs2::context* mp_Context{};
+	rs2::device* mp_Device{};
+	rs2::config m_Config{};
+	rs2_intrinsics m_Intrinsics;
 
-	size_t pixel_size{ 0 };
+	size_t m_PixelSize{ 0 };
 
 	// Declare depth colorizer for pretty visualization of depth data
-	rs2::colorizer _color_map{};
-	unsigned int max_depth { 32766 };
+	rs2::colorizer m_ColorMap{};
 
-	// TODO fix these
-	const float hfov{ glm::radians(-1.0f) };
-	const float vfov{ glm::radians(-1.0f) };
-	const float dfov{ glm::radians(-1.0f) }; // no Idea what that is
-
-	unsigned int depth_width;
-	unsigned int depth_height;
-	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
+	unsigned int m_DepthWidth;
+	unsigned int m_DepthHeight;
+	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 };

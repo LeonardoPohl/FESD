@@ -25,97 +25,99 @@ std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam,
 
 RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera *cam, Renderer *renderer, int camera_id)
 	:
-	_pipe(rs2::pipeline(*ctx)),
-	_ctx(ctx), 
-	_device(device)
-	 {
-	this->camera_id = camera_id;
+	m_Pipe(rs2::pipeline(*ctx)),
+	mp_Context(ctx),
+	mp_Device(device)
+{
+	m_CameraId = camera_id;
 
-	this->printDeviceInfo();
-	this->_device->query_sensors();
-	this->_cfg.enable_device(this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	printDeviceInfo();
+	mp_Device->query_sensors();
+	m_Config.enable_device(mp_Device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	
-	auto profile = this->_pipe.start(this->_cfg);
+	auto profile = m_Pipe.start(m_Config);
 
-	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	rs2::frameset data = m_Pipe.wait_for_frames(); // Wait for next set of frames from the camera
 	rs2::frame depth = data.get_depth_frame();
 
 	// Get Intrinsics
 	auto depth_profile = depth.get_profile().as<rs2::video_stream_profile>();
-	this->intrinsics   = depth_profile.get_intrinsics();
+	m_Intrinsics = depth_profile.get_intrinsics();
 	
 	// Query frame size (width and height)
-	this->depth_width  = intrinsics.width;
-	this->depth_height = intrinsics.height;
+	m_DepthWidth = m_Intrinsics.width;
+	m_DepthHeight = m_Intrinsics.height;
 
 	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
 
-	m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
+	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
 RealSenseCamera::~RealSenseCamera() {
-	printf("Shutting down [Realsense] %s...\n", this->getCameraName().c_str()); 
+	printf("Shutting down [Realsense] %s...\n", getCameraName().c_str()); 
 
 	try {
-		this->_pipe.stop();
+		m_Pipe.stop();
 	}
 	catch (...) {
-		std::cout << "An exception occured while shutting down [Realsense] Camera " << this->getCameraName();
+		std::cout << "An exception occured while shutting down [Realsense] Camera " << getCameraName();
 	}
 }
 
 const void *RealSenseCamera::getDepth()
 {
-	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
+	rs2::frameset data = m_Pipe.wait_for_frames(); // Wait for next set of frames from the camera
 	rs2::depth_frame depth = data.get_depth_frame();
-	pixel_size = depth.get_data_size();
+	m_PixelSize = depth.get_data_size();
 
 	return depth.get_data();
 }
 
 size_t RealSenseCamera::getDepthSize()
 {
-	if (pixel_size != 0)
+	if (m_PixelSize == 0)
 	{
-		return pixel_size;
+		rs2::frameset data = m_Pipe.wait_for_frames();
+		rs2::depth_frame depth = data.get_depth_frame();
+		m_PixelSize = depth.get_data_size();
 	}
-	rs2::frameset data = this->_pipe.wait_for_frames(); // Wait for next set of frames from the camera
-	rs2::depth_frame depth = data.get_depth_frame();
-	pixel_size = depth.get_data_size();
 
-	return depth.get_data_size();
+	return m_PixelSize;
 }
 
 void RealSenseCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
 {
-
+	m_Pipe.stop();
+	m_Config.enable_record_to_file(sessionName);
+	m_Pipe.start(m_Config);
 }
 
 void RealSenseCamera::stopRecording()
 {
-
+	m_Pipe.stop();
+	m_Config.enable_device(mp_Device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	m_Pipe.start(m_Config);
 }
 
 void RealSenseCamera::OnUpdate()
 {
-	m_pointcloud->OnUpdate();
+	m_PointCloud->OnUpdate();
 }
 
 inline void RealSenseCamera::OnRender()
 {
-	m_pointcloud->OnRender();
+	m_PointCloud->OnRender();
 }
 
 inline void RealSenseCamera::OnImGuiRender()
 {
-
-	m_pointcloud->OnImGuiRender();
+	m_PointCloud->OnImGuiRender();
 }
 
 // Utils
 void RealSenseCamera::printDeviceInfo() const {
-	printf("---\nDevice: %s\n", this->_device->get_info(RS2_CAMERA_INFO_NAME));
-	printf("Produc Line: %s\n", this->_device->get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
-	printf("Serial Number: %s\n", this->_device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-	printf("Physical Port: %s\n\n", this->_device->get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+	printf("---\nDevice: %s\n",		mp_Device->get_info(RS2_CAMERA_INFO_NAME));
+	printf("Produc Line: %s\n",		mp_Device->get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+	printf("Serial Number: %s\n",	mp_Device->get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	printf("Physical Port: %s\n\n", mp_Device->get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
 }

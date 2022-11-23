@@ -23,7 +23,6 @@ public:
 
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
-	inline uint16_t getDepthStreamMaxDepth() const override { return max_depth; }
 
 	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
 	void stopRecording() override;

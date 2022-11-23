@@ -52,14 +52,13 @@ int main(void)
     glfwSetScrollCallback(window, scroll_callback);
 
     {
-    
         ImGuiHelper::initImGui(window);
         cam = new Camera{window};
         
         Renderer r;
 
         TestMenuHelper tmh{ cam };
-        
+        bool showTestMenu = false;
         //# Camera Initialisation
         //#######################
         CameraHandler cameraHandler{cam, &r};
@@ -82,9 +81,8 @@ int main(void)
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            tmh.update();
+            if (showTestMenu)
+                tmh.update();
 
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();

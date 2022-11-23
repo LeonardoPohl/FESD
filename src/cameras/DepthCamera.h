@@ -46,11 +46,6 @@ public:
 	virtual unsigned int getDepthStreamHeight() const = 0;
 
 	/// <summary>
-	/// Get Maximum Depth value
-	/// </summary>
-	virtual uint16_t getDepthStreamMaxDepth() const = 0;
-
-	/// <summary>
 	/// Call update Functions
 	/// </summary>
 	virtual void OnUpdate() = 0;
@@ -87,16 +82,17 @@ public:
 
 	/// <returns>Camera Name</returns>
 	inline std::string getCameraName() const {
-		return this->getName() + " Camera " + std::to_string(this->camera_id);
+		return this->getName() + " Camera " + std::to_string(this->m_CameraId);
 	}
 
 	/// <returns>Window Name</returns>
 	inline unsigned int getCameraId() const
 	{
-		return camera_id;
+		return m_CameraId;
 	}
 
 	bool is_enabled{ false };
+	bool is_recording{ false };
 protected:
-	unsigned int camera_id;
+	unsigned int m_CameraId;
 };
