@@ -11,16 +11,32 @@
 #include <ctime>
 #include <chrono>
 #include <fstream>
-#include <json/json.h>
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), mp_Renderer(renderer)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
 
-    for (const auto &entry : fs::directory_iterator(m_RecordingDirectory))
-        if (entry.is_regular_file() && entry.path().extension() == "json")
-            m_Recordings.push_back(entry.path());
+    for (const auto &entry : fs::directory_iterator(m_RecordingDirectory)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+            std::ifstream configJson(entry.path());
+            Json::Value root;
+
+            Json::CharReaderBuilder builder;
+
+            builder["collectComments"] = true;
+
+            JSONCPP_STRING errs;
+
+            if (!parseFromStream(builder, configJson, &root, &errs)) {
+
+                std::cout << errs << std::endl;
+            }
+            else {
+                m_Recordings.push_back(root);
+            }
+        }
+    }
 }
 
 CameraHandler::~CameraHandler()
@@ -103,6 +119,7 @@ void CameraHandler::OnImGuiRender()
             std::fstream configJson(m_RecordingDirectory / sessionFileName, std::ios::out | std::ios::app);
             Json::Value root;
 
+            root["Name"] = m_SessionName;
             root["DurationInSec"] = -1;
 
             Json::Value cameras;
@@ -151,7 +168,7 @@ void CameraHandler::OnImGuiRender()
         ImGui::BeginDisabled(m_DoingPlayback);
 
         for (auto recording : m_Recordings) {
-            if (ImGui::Button(recording.filename().string().c_str())) {
+            if (ImGui::Button(recording["Name"].asCString())) {
                 m_DoingPlayback = true;
                 // Start Playback
             }

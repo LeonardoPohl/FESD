@@ -3,7 +3,9 @@
 #include "DepthCamera.h"
 #include "GLCore/Camera.h"
 #include "GLCore/Renderer.h"
+
 #include <filesystem>
+#include <json/json.h>
 
 namespace fs = std::filesystem;
 
@@ -31,7 +33,7 @@ private:
 	Renderer *mp_Renderer;
 
 	std::vector<DepthCamera *> m_DepthCameras;
-	std::vector<fs::path> m_Recordings;
+	std::vector<Json::Value> m_Recordings;
 	
 	bool m_DoingPlayback{ false };
 
