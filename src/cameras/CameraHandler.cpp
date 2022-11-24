@@ -19,7 +19,8 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), 
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
 
     for (const auto &entry : fs::directory_iterator(m_RecordingDirectory))
-        m_Recordings.push_back(entry.path());
+        if (entry.is_regular_file() && entry.path().extension() == "json")
+            m_Recordings.push_back(entry.path());
 }
 
 CameraHandler::~CameraHandler()
