@@ -131,10 +131,10 @@ void CameraHandler::OnImGuiRender()
 
                     camera["Name"] = cam->getCameraName();
                     camera["Type"] = cam->getName();
-                    camera["FileName"] = cam->getName();
+                    camera["FileName"] = cam->startRecording(m_SessionName); //cam->getName();
                     cameras.append(camera);
 
-                    //cam->startRecording(m_SessionName);
+                    //
                 }
             }
 
@@ -168,9 +168,21 @@ void CameraHandler::OnImGuiRender()
         ImGui::BeginDisabled(m_DoingPlayback);
 
         for (auto recording : m_Recordings) {
-            if (ImGui::Button(recording["Name"].asCString())) {
-                m_DoingPlayback = true;
-                // Start Playback
+            if (ImGui::TreeNode(recording["Name"].asCString())) {
+                // Display information about recording, length cameras filesize
+
+                ImGui::Text("Cameras:");
+
+                for (auto camera : recording["Cameras"]) {
+                    ImGui::Text(camera["Name"].asCString());
+                    ImGui::Text(camera["Type"].asCString());
+                    ImGui::Text(camera["FileName"].asCString());
+                }
+
+                if(ImGui::Button("Start Recording")){
+                    m_DoingPlayback = true;
+                    // Start Playback
+                }
             }
         }
 

@@ -85,11 +85,14 @@ size_t RealSenseCamera::getDepthSize()
 	return m_PixelSize;
 }
 
-void RealSenseCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
+std::string RealSenseCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
 {
+	std::string filename;
 	m_Pipe.stop();
 	m_Config.enable_record_to_file(sessionName);
 	m_Pipe.start(m_Config);
+
+	return filename;
 }
 
 void RealSenseCamera::stopRecording()
