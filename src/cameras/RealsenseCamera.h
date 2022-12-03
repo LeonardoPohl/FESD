@@ -31,7 +31,7 @@ public:
 		return m_DepthHeight;
 	}
 
-	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
+	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
 	void stopRecording() override;
 
 	void OnUpdate() override;

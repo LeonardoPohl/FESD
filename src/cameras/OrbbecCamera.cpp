@@ -230,11 +230,11 @@ const void *OrbbecCamera::getDepth()
 
 
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
-void OrbbecCamera::startRecording(std::string sessionName, long long startOn, unsigned int numFrames)
+std::string OrbbecCamera::startRecording(std::string sessionName, unsigned int numFrames)
 {    
     std::filesystem::create_directory("Recordings");
 
-    std::string fileName = std::to_string(startOn) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
+    std::string fileName = std::to_string(0) + "_" + sessionName + "_" + this->getCameraName() + ".oni";
 
     setNumFrames(numFrames);
 
@@ -243,11 +243,13 @@ void OrbbecCamera::startRecording(std::string sessionName, long long startOn, un
     if (rc != openni::STATUS_OK)
     {
         std::cout << "[ERROR] Failed to create recorder!" << std::endl;
-        return;
+        return "";
     }
 
-    g_Capture.nStartOn = startOn;
+    g_Capture.nStartOn = 0;
     g_Capture.State = SHOULD_CAPTURE;
+
+    return fileName;
 }
 
 void OrbbecCamera::stopRecording()
@@ -306,12 +308,12 @@ void OrbbecCamera::OnImGuiRender()
 
             ImGui::SliderInt("Delay in ms", &delay, 1, 1000);
 
-            if (ImGui::Button("Start Recording"))
+            /*if (ImGui::Button("Start Recording"))
             {
                 auto epoch = std::chrono::system_clock::now().time_since_epoch();
                 auto startTimestamp = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
-                startRecording("Test Session", startTimestamp.count() + (long long)delay, num_frames);
-            }
+                //startRecording("Test Session", startTimestamp.count() + (long long)delay, num_frames);
+            }*/
         }
         else if (g_Capture.State == SHOULD_CAPTURE)
         {

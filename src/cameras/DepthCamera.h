@@ -65,7 +65,8 @@ public:
 	/// </summary>
 	/// <param name="sessionName">Name of the session used for file naming and multi file synchronisation</param>
 	/// <param name="numFrames">Number of Frames, if 0 recording has to be manually stopped</param>
-	virtual void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) = 0;
+	/// <returns>Path to saved file</returns>
+	virtual std::string startRecording(std::string sessionName, unsigned int numFrames = 0) = 0;
 
 	/// <summary>
 	/// Stop recording
