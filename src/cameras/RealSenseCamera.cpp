@@ -93,33 +93,42 @@ size_t RealSenseCamera::getDepthSize()
 // https://dev.intelrealsense.com/docs/rs-record-playback
 std::string RealSenseCamera::startRecording(std::string sessionName, unsigned int numFrames)
 {
+	auto cameraName = getCameraName();
+	std::ranges::replace(cameraName, ' ', '_');
+
+	std::filesystem::path filepath = m_RecordingDirectory / (sessionName + "_" + cameraName + ".bag");
 	if (!(m_Device).as<rs2::recorder>())
 	{
-		std::filesystem::path filepath = m_RecordingDirectory / (sessionName + "_" + getCameraName() + ".bag");
-
 		mp_Pipe->stop();
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
+		std::cout << "[INFO] Saving " << getCameraName() << "'s stream to " << filepath.string() << std::endl;
 		cfg.enable_record_to_file(filepath.string());
-		mp_Pipe->start(m_Config);
+		mp_Pipe->start(cfg);
 		m_Device = mp_Pipe->get_active_profile().get_device();
-
-		return filepath.filename().string();
+	}
+	else {
+		// if its already recording resume
+		// Not implemented pause function so a bit useless
+		m_Device.as<rs2::recorder>().resume();
 	}
 
 	m_isRecording = true;
 	m_isEnabled = true;
 
+	return filepath.filename().string();
 }
 
 void RealSenseCamera::stopRecording()
 {
 	mp_Pipe->stop();
+	mp_Pipe = std::make_shared<rs2::pipeline>();
+
 	m_Config.enable_device(m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	mp_Pipe->start(m_Config);
+	m_Device = mp_Pipe->get_active_profile().get_device();
 
 	m_isRecording = false;
-
 }
 
 void RealSenseCamera::OnUpdate()

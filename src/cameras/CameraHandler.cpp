@@ -1,6 +1,7 @@
 #include "CameraHandler.h"
 
 #include <imgui.h>
+#include <imgui_stdlib.h>
 
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
@@ -20,7 +21,8 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), 
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
 
-    for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory)) {
+    for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory))
+    {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
             std::ifstream configJson(entry.path());
             Json::Value root;
@@ -40,6 +42,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), 
             }
         }
     }
+    UpdateSessionName();
 }
 
 CameraHandler::~CameraHandler()
@@ -112,14 +115,17 @@ void CameraHandler::OnImGuiRender()
 
         ImGui::BeginDisabled(m_State == Recording);
 
-        ImGui::InputText("Session Name", m_SessionName, 60);
+        if (ImGui::Button("Update Session Name"))
+            UpdateSessionName();
+        ImGui::InputText("Session Name", &m_SessionName, 60);       
 
-        if (ImGui::Button("Start Recording")) {
-            std::string sessionFileName = m_SessionName;
-            sessionFileName += ".json";
-            std::ranges::replace(sessionFileName, ' ', '_');
+        ImGui::EndDisabled();
 
-            std::fstream configJson(m_RecordingDirectory / sessionFileName, std::ios::out | std::ios::app);
+        if (m_State != Recording && ImGui::Button("Start Recording")) {
+            auto configPath = m_RecordingDirectory / getFileSafeSessionName();
+            configPath += ".json";
+
+            std::fstream configJson(configPath, std::ios::out | std::ios::app);
             Json::Value root;
 
             root["Name"] = m_SessionName;
@@ -134,7 +140,7 @@ void CameraHandler::OnImGuiRender()
 
                     camera["Name"] = cam->getCameraName();
                     camera["Type"] = cam->getName();
-                    camera["FileName"] = cam->startRecording(m_SessionName); //cam->getName();
+                    camera["FileName"] = cam->startRecording(getFileSafeSessionName());
                     cameras.append(camera);
                 }
             }
@@ -145,13 +151,18 @@ void CameraHandler::OnImGuiRender()
 
             configJson << Json::writeString(builder, root);
             configJson.close();
-
-            
+                        
             m_State = Recording;
         }
-
-        ImGui::EndDisabled();
-        
+        else if (m_State == Recording && ImGui::Button("Stop Recording")) {
+            m_Recording = true;
+            for (auto cam : m_DepthCameras) {
+                if (cam->m_isRecording) {
+                    cam->stopRecording(); 
+                }
+            }
+        }
+                
         ImGui::BeginDisabled(m_State != Recording);
 
         // Make it possible to stop recording

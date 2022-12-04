@@ -7,7 +7,6 @@ class BoundingBox
 {
 public:
 	// TODO low prio: draw bounding box
-	
 	inline bool updateBox(glm::vec3 p)
 	{
 		bool isUpdated = false;
