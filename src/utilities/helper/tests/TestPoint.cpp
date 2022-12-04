@@ -5,7 +5,6 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include <utilities/Consts.h>
 
 namespace GLObject
 {
@@ -25,11 +24,11 @@ namespace GLObject
         m_Points = new Point[numElements];
         
         m_Points[0].PositionFunction = m_Position;
-        m_Points[0].HalfLengthFun = 1.0f / WINDOW_WIDTH;
+        m_Points[0].HalfLengthFun = 1.0f; // WINDOW_WIDTH;
         m_Points[0].updateVertexArray(m_Depth);
 
         m_Points[1].PositionFunction = { 0.5f, -0.5f };
-        m_Points[1].HalfLengthFun = 2.0f / WINDOW_WIDTH;
+        m_Points[1].HalfLengthFun = 2.0f; // WINDOW_WIDTH;
         m_Points[1].updateVertexArray(m_Depth);
 
 
@@ -53,7 +52,7 @@ namespace GLObject
         m_Shader = std::make_unique<Shader>("resources/shaders/pointcloud.shader");
         m_Shader->Bind();      
 
-        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
+        //m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
         //m_Proj = glm::ortho(0.0f, (float)m_Width, 0.0f, (float)m_Height, 0.0f, (float)m_MaxDepth);
     }
 

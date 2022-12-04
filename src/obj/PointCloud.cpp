@@ -3,8 +3,6 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 
-#include "utilities/Consts.h"
-
 #include <ranges>
 
 #define PixIter for(int i = 0; i < m_NumElements; i++)

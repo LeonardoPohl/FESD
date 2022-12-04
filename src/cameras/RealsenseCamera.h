@@ -12,7 +12,6 @@ public:
 	~RealSenseCamera() override;
 
 	const void * getDepth() override;
-	size_t getDepthSize() override;
 
 	std::string getName() const override { return "Realsense"; }
 
@@ -63,13 +62,16 @@ public:
 	}
 
 private:
-	rs2::pipeline m_Pipe;
+	std::shared_ptr<rs2::pipeline> mp_Pipe;
 	rs2::context* mp_Context{};
-	rs2::device* mp_Device{};
+	rs2::device m_Device{};
 	rs2::config m_Config{};
+	//rs2::recorder m_Recorder{};
+	//rs2::playback m_Playback{};
+
 	rs2_intrinsics m_Intrinsics;
 
-	size_t m_PixelSize{ 0 };
+	//size_t m_PixelSize{ 0 };
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer m_ColorMap{};

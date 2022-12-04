@@ -27,7 +27,7 @@ public:
 	virtual const void *getDepth() = 0;
 
 	/// <returns>Returns size of depth pixel</returns>
-	virtual size_t getDepthSize() = 0;
+	//virtual size_t getDepthSize() = 0;
 
 	/// <summary>
 	/// Gets the Name of the Camera
@@ -92,8 +92,11 @@ public:
 		return m_CameraId;
 	}
 
-	bool is_enabled{ false };
-	bool is_recording{ false };
+	bool m_isEnabled{ false };
+	bool m_isRecording{ false };
 protected:
 	unsigned int m_CameraId;
+
+	// For Later
+	int m_playbackOffset{ 0 };
 };

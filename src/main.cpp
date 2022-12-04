@@ -24,7 +24,7 @@
 #include <OpenNI.h>
 #include "cameras/CameraHandler.h"
 
-#include "utilities/Consts.h"
+#include "utilities/Status.h"
 
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
@@ -32,7 +32,7 @@
 
 Camera *cam = nullptr;
 
-void window_size_callback(GLFWwindow *window, int width, int height);
+// void window_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xpos, double ypos);
 
@@ -47,7 +47,7 @@ int main(void)
         return -1;
     }
 
-    glfwSetWindowSizeCallback(window, window_size_callback);
+    //glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
@@ -99,12 +99,12 @@ int main(void)
     glfwTerminate();
     return 0;
 }
-
+/*
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
     WINDOW_WIDTH = width;
     WINDOW_HEIGHT = height;
-}
+}*/
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {

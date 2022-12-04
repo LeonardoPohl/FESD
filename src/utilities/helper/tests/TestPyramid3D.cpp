@@ -3,8 +3,6 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 
-#include "utilities/Consts.h"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -56,7 +54,7 @@ namespace GLObject
         m_Texture = std::make_unique<Texture>("resources/textures/brick.png");
         m_Texture->Bind();
         m_Shader->SetUniform1i("u_Texture", 0);
-        m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
+        //m_Proj = glm::perspective(glm::radians(45.0f), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, -1.0f, 1.0f);
     }
 
     void TestPyramid3D::OnRender()

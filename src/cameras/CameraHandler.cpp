@@ -11,13 +11,16 @@
 #include <ctime>
 #include <chrono>
 #include <fstream>
+#include <filesystem>
+
+#include <utilities/Consts.h>
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), mp_Renderer(renderer)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK)
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
 
-    for (const auto &entry : fs::directory_iterator(m_RecordingDirectory)) {
+    for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory)) {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
             std::ifstream configJson(entry.path());
             Json::Value root;
@@ -73,14 +76,14 @@ void CameraHandler::showCameras()
 {
     // TODO: Implement
     for (auto cam : m_DepthCameras)
-        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
+        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
 }
 
 void CameraHandler::OnRender()
 {
     for (auto cam : m_DepthCameras)
     {
-        if (cam->is_enabled)
+        if (cam->m_isEnabled)
         {
             cam->OnUpdate();
             cam->OnRender();
@@ -99,13 +102,13 @@ void CameraHandler::OnImGuiRender()
     }
 
     for (auto cam : m_DepthCameras)
-        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->is_enabled);
+        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
     
     if (!m_DepthCameras.empty()) {
         ImGui::Text("Recording");
 
         for (auto cam : m_DepthCameras)
-            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->is_recording);
+            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_isRecording);
 
         ImGui::BeginDisabled(m_State == Recording);
 
@@ -125,16 +128,14 @@ void CameraHandler::OnImGuiRender()
             Json::Value cameras;
 
             for (auto cam : m_DepthCameras) {
-                if (cam->is_recording) {
-                    cam->is_enabled = true;
+                if (cam->m_isRecording) {
+                    cam->m_isEnabled = true;
                     Json::Value camera;
 
                     camera["Name"] = cam->getCameraName();
                     camera["Type"] = cam->getName();
                     camera["FileName"] = cam->startRecording(m_SessionName); //cam->getName();
                     cameras.append(camera);
-
-                    //
                 }
             }
 
@@ -159,7 +160,7 @@ void CameraHandler::OnImGuiRender()
         ImGui::EndDisabled();
     }
     else {
-        ImGui::Text("Playback");
+        ImGui::Text("Recorded Sessions");
 
         if (m_Recordings.empty()) {
             ImGui::Text("No Recordings Found!");
@@ -179,7 +180,7 @@ void CameraHandler::OnImGuiRender()
                     ImGui::Text(camera["FileName"].asCString());
                 }
 
-                if(ImGui::Button("Start Recording")){
+                if(ImGui::Button("Start Playback")){
                     m_DoingPlayback = true;
                     // Start Playback
                 }
@@ -193,7 +194,7 @@ void CameraHandler::OnImGuiRender()
 
     for (auto cam : m_DepthCameras)
     {
-        if (cam->is_enabled)
+        if (cam->m_isEnabled)
         {
             ImGui::Begin(cam->getCameraName().c_str());
             cam->OnImGuiRender();

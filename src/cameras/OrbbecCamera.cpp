@@ -4,9 +4,10 @@
 #include <vector>
 #include <chrono>
 
-#include "obj/PointCloud.h"
 #include <imgui.h>
 #include <filesystem>
+
+#include "obj/PointCloud.h"
 
 constexpr int READ_WAIT_TIMEOUT = 1000;
 
@@ -227,7 +228,6 @@ const void *OrbbecCamera::getDepth()
 
     return (uint16_t*)this->_frame_ref.getData();
 }
-
 
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
 std::string OrbbecCamera::startRecording(std::string sessionName, unsigned int numFrames)

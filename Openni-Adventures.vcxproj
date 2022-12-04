@@ -171,10 +171,10 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\utilities\Cell.cpp" />
+    <ClCompile Include="src\obj\Cell.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
-    <ClCompile Include="src\utilities\Point.cpp" />
+    <ClCompile Include="src\obj\Point.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -197,11 +197,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\obj\PointCloudHelper.h" />
-    <ClInclude Include="src\utilities\Cell.h" />
+    <ClInclude Include="src\obj\Cell.h" />
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\helper\TestMenuHelper.h" />
-    <ClInclude Include="src\utilities\Plane.h" />
+    <ClInclude Include="src\obj\Plane.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
     <ClInclude Include="src\obj\PointCloud.h" />
     <ClInclude Include="src\utilities\helper\tests\TestClearColor.h" />
@@ -215,8 +215,9 @@
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\ColorMaps.h" />
-    <ClInclude Include="src\utilities\Point.h" />
-    <ClInclude Include="src\utilities\Utilities.h" />
+    <ClInclude Include="src\obj\Point.h" />
+    <ClInclude Include="src\utilities\Status.h" />
+    <ClInclude Include="src\obj\BoundingBox.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>

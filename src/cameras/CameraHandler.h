@@ -4,10 +4,7 @@
 #include "GLCore/Camera.h"
 #include "GLCore/Renderer.h"
 
-#include <filesystem>
 #include <json/json.h>
-
-namespace fs = std::filesystem;
 
 class CameraHandler
 {
@@ -37,6 +34,7 @@ private:
 	
 	bool m_DoingPlayback{ false };
 
-	fs::path m_RecordingDirectory{ "F:\\Recordings" };
+	// For playback to seek the position
+	int m_SeekPosition{ 0 };
 };
 

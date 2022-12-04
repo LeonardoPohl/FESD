@@ -1,7 +1,9 @@
 #include "Point.h"
-#include "ColorMaps.h"
-#include "Consts.h"
+#include "Utilities/ColorMaps.h"
+//#include "Utilities/Consts.h"
 #include <functional>
+
+const size_t NUM_COLORS = 100;
 
 void Point::updateVertexArray(float depth, CMAP cmap)
 {
