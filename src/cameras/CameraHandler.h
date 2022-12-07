@@ -34,9 +34,14 @@ public:
 	}
 
 private:
+	void showSessionSettings();
+	void startRecording();
+	void stopRecording();
+
 	enum State {
 		Streaming,
-		Recording
+		Recording,
+		Playback
 	};
 
 	State m_State;
@@ -47,9 +52,19 @@ private:
 
 	std::vector<DepthCamera *> m_DepthCameras;
 	std::vector<Json::Value> m_Recordings;
-	
-	bool m_DoingPlayback{ false };
-	bool m_Recording{ false };
+
+	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
+	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
+	std::chrono::duration<double> m_RecordedSeconds;
+
+	bool m_StreamWhileRecording{ true };
+	bool m_LimitFrames{ false };
+	bool m_LimitTime{ false };
+
+	int m_FrameLimit{ 0 };
+	int m_TimeLimitInS{ 0 };
+
+	int m_RecordedFrames{ 0 };
 
 	// For playback to seek the position
 	int m_SeekPosition{ 0 };

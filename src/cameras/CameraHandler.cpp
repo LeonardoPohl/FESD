@@ -10,11 +10,23 @@
 #include <iostream>
 #include <obj/PointCloud.h>
 #include <ctime>
-#include <chrono>
 #include <fstream>
 #include <filesystem>
 
 #include <utilities/Consts.h>
+
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), mp_Renderer(renderer)
 {
@@ -84,12 +96,26 @@ void CameraHandler::showCameras()
 
 void CameraHandler::OnRender()
 {
+    if (m_State == Recording) {
+        m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
+        if (m_RecordedFrames++ > m_FrameLimit && m_LimitFrames) {
+            stopRecording();
+        }
+
+    }
+    
+    // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
         if (cam->m_isEnabled)
         {
-            cam->OnUpdate();
-            cam->OnRender();
+            if (m_StreamWhileRecording) {
+                cam->OnUpdate();
+                cam->OnRender();
+            }
+            else {
+                cam->saveFrame();
+            }
         }
     }
 }
@@ -107,77 +133,47 @@ void CameraHandler::OnImGuiRender()
     for (auto cam : m_DepthCameras)
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
     
-    if (!m_DepthCameras.empty()) {
-        ImGui::Text("Recording");
+    if (!m_DepthCameras.empty() && ImGui::CollapsingHeader("Recording")) {
+        for (auto cam : m_DepthCameras) {
+            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_selectedForRecording);
+        }
 
-        for (auto cam : m_DepthCameras)
-            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_isRecording);
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Session Settings")) {
+            ImGui::BeginDisabled(m_State == Recording);
+            showSessionSettings();
+            ImGui::EndDisabled();
+            ImGui::TreePop();
+        }
 
-        ImGui::BeginDisabled(m_State == Recording);
-
-        if (ImGui::Button("Update Session Name"))
-            UpdateSessionName();
-        ImGui::InputText("Session Name", &m_SessionName, 60);       
-
-        ImGui::EndDisabled();
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+        if (ImGui::TreeNode("Session Stats")) {
+            ImGui::Text("Elapsed Seconds: %f.2 s", m_RecordedSeconds.count());
+            ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
+            ImGui::Text("Fps: %f.2", (float)m_RecordedFrames / m_RecordedSeconds.count());
+            ImGui::TreePop();
+        }
 
         if (m_State != Recording && ImGui::Button("Start Recording")) {
-            auto configPath = m_RecordingDirectory / getFileSafeSessionName();
-            configPath += ".json";
-
-            std::fstream configJson(configPath, std::ios::out | std::ios::app);
-            Json::Value root;
-
-            root["Name"] = m_SessionName;
-            root["DurationInSec"] = -1;
-
-            Json::Value cameras;
-
-            for (auto cam : m_DepthCameras) {
-                if (cam->m_isRecording) {
-                    cam->m_isEnabled = true;
-                    Json::Value camera;
-
-                    camera["Name"] = cam->getCameraName();
-                    camera["Type"] = cam->getName();
-                    camera["FileName"] = cam->startRecording(getFileSafeSessionName());
-                    cameras.append(camera);
-                }
-            }
-
-            root["Cameras"] = cameras;
-
-            Json::StreamWriterBuilder builder;
-
-            configJson << Json::writeString(builder, root);
-            configJson.close();
-                        
-            m_State = Recording;
+            startRecording();
         }
         else if (m_State == Recording && ImGui::Button("Stop Recording")) {
-            m_Recording = true;
-            for (auto cam : m_DepthCameras) {
-                if (cam->m_isRecording) {
-                    cam->stopRecording(); 
-                }
-            }
+            stopRecording();
         }
                 
         ImGui::BeginDisabled(m_State != Recording);
-
-        // Make it possible to stop recording
+        
         // Count number of frames and file size maybe
 
         ImGui::EndDisabled();
     }
-    else {
-        ImGui::Text("Recorded Sessions");
-
+    
+    if (ImGui::CollapsingHeader("Recorded Sessions")) {
         if (m_Recordings.empty()) {
             ImGui::Text("No Recordings Found!");
         }
         
-        ImGui::BeginDisabled(m_DoingPlayback);
+        ImGui::BeginDisabled(m_State == Playback);
 
         for (auto recording : m_Recordings) {
             if (ImGui::TreeNode(recording["Name"].asCString())) {
@@ -192,7 +188,7 @@ void CameraHandler::OnImGuiRender()
                 }
 
                 if(ImGui::Button("Start Playback")){
-                    m_DoingPlayback = true;
+                    m_State = Playback;
                     // Start Playback
                 }
             }
@@ -210,6 +206,91 @@ void CameraHandler::OnImGuiRender()
             ImGui::Begin(cam->getCameraName().c_str());
             cam->OnImGuiRender();
             ImGui::End();
+        }
+    }
+}
+
+void CameraHandler::showSessionSettings() {
+    if (ImGui::TreeNode("Settings")) {
+        ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
+        ImGui::SameLine(); HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
+
+        ImGui::Checkbox("Limit Frames", &m_LimitFrames);
+        ImGui::BeginDisabled(!m_LimitFrames);
+        ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
+        if (m_FrameLimit < 1) {
+            m_FrameLimit = 0;
+            m_LimitFrames = false;
+        }
+        ImGui::EndDisabled();
+
+        ImGui::Checkbox("Limit Time", &m_LimitTime);
+        ImGui::BeginDisabled(!m_LimitTime);
+        ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
+        if (m_TimeLimitInS < 1) {
+            m_TimeLimitInS = 0;
+            m_LimitTime = false;
+        }
+        ImGui::EndDisabled();
+    }
+
+    if (ImGui::TreeNode("Name")) {
+        if (ImGui::Button("Update Session Name")) {
+            UpdateSessionName();
+        }
+        ImGui::InputText("Session Name", &m_SessionName, 60);
+    }
+}
+
+void CameraHandler::startRecording() {
+    auto configPath = m_RecordingDirectory / getFileSafeSessionName();
+    configPath += ".json";
+
+    std::fstream configJson(configPath, std::ios::out | std::ios::app);
+    Json::Value root;
+
+    root["Name"] = m_SessionName;
+    root["DurationInSec"] = -1;
+
+    Json::Value cameras;
+
+    for (auto cam : m_DepthCameras) {
+        if (cam->m_selectedForRecording) {
+            cam->m_isEnabled = true;
+            Json::Value camera;
+
+            camera["Name"] = cam->getCameraName();
+            camera["Type"] = cam->getName();
+            camera["FileName"] = cam->startRecording(getFileSafeSessionName());
+            cameras.append(camera);
+        }
+    }
+
+    root["Cameras"] = cameras;
+
+    Json::StreamWriterBuilder builder;
+
+    configJson << Json::writeString(builder, root);
+    configJson.close();
+
+    m_State = Recording;
+    m_RecordedFrames = 0;
+    m_RecordedSeconds = std::chrono::duration<double>::zero();
+    m_RecordingStart = std::chrono::system_clock::now();
+}
+
+#pragma warning(disable : 4996)
+void CameraHandler::stopRecording() {
+    m_RecordingEnd = std::chrono::system_clock::now();
+
+    std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);
+    std::cout << "[INFO] Finished recording at " << std::ctime(&end_time)
+        << "elapsed time: " << m_RecordedSeconds.count() << "s\n";
+
+    m_State = Streaming;
+    for (auto cam : m_DepthCameras) {
+        if (cam->m_selectedForRecording) {
+            cam->stopRecording();
         }
     }
 }

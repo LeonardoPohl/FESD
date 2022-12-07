@@ -57,6 +57,10 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 RealSenseCamera::~RealSenseCamera() {
 	printf("Shutting down [Realsense] %s...\n", getCameraName().c_str()); 
 
+	if (m_Device.as<rs2::recorder>()) {
+		stopRecording();
+	}
+
 	try {
 		mp_Pipe->stop();
 	}
@@ -70,6 +74,8 @@ const void *RealSenseCamera::getDepth()
 	if (!m_Device.as<rs2::playback>()) {
 		rs2::frameset data = mp_Pipe->wait_for_frames(); // Wait for next set of frames from the camera
 		rs2::depth_frame depth = data.get_depth_frame();
+		if (m_Device.as<rs2::recorder>())
+			rs2::video_frame color = data.get_color_frame();
 		//m_PixelSize = depth.get_data_size();
 		return depth.get_data();
 	}
@@ -77,18 +83,6 @@ const void *RealSenseCamera::getDepth()
 
 	}
 }
-/*
-size_t RealSenseCamera::getDepthSize()
-{
-	if (m_PixelSize == 0)
-	{
-		rs2::frameset data = mp_Pipe->wait_for_frames();
-		rs2::depth_frame depth = data.get_depth_frame();
-		m_PixelSize = depth.get_data_size();
-	}
-
-	return m_PixelSize;	
-}*/
 
 // https://dev.intelrealsense.com/docs/rs-record-playback
 std::string RealSenseCamera::startRecording(std::string sessionName, unsigned int numFrames)
@@ -113,11 +107,19 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 		m_Device.as<rs2::recorder>().resume();
 	}
 
-	m_isRecording = true;
+	m_selectedForRecording = true;
 	m_isEnabled = true;
 
 	return filepath.filename().string();
 }
+
+void RealSenseCamera::saveFrame() {
+	rs2::frameset data = mp_Pipe->wait_for_frames();
+
+	data.get_depth_frame();
+	data.get_color_frame();
+}
+
 
 void RealSenseCamera::stopRecording()
 {
@@ -128,7 +130,7 @@ void RealSenseCamera::stopRecording()
 	mp_Pipe->start(m_Config);
 	m_Device = mp_Pipe->get_active_profile().get_device();
 
-	m_isRecording = false;
+	m_selectedForRecording = false;
 }
 
 void RealSenseCamera::OnUpdate()

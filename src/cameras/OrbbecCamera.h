@@ -25,6 +25,7 @@ public:
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
 
 	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	void saveFrame() override { };
 	void stopRecording() override;
 
 	void OnUpdate() override;

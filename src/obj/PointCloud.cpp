@@ -90,7 +90,7 @@ namespace GLObject
         {
             startNormalCalculation();
             PixIter 
-            { 
+            {
                 calculateNormals(i);
                 UpdateVertices(i)
             }

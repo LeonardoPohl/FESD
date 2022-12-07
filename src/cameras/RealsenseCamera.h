@@ -11,7 +11,7 @@ public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id);
 	~RealSenseCamera() override;
 
-	const void * getDepth() override;
+	const void *getDepth() override;
 
 	std::string getName() const override { return "Realsense"; }
 
@@ -31,6 +31,7 @@ public:
 	}
 
 	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	void saveFrame() override;
 	void stopRecording() override;
 
 	void OnUpdate() override;
@@ -66,12 +67,8 @@ private:
 	rs2::context* mp_Context{};
 	rs2::device m_Device{};
 	rs2::config m_Config{};
-	//rs2::recorder m_Recorder{};
-	//rs2::playback m_Playback{};
 
 	rs2_intrinsics m_Intrinsics;
-
-	//size_t m_PixelSize{ 0 };
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer m_ColorMap{};

@@ -16,6 +16,7 @@ enum class INTRINSICS
 	CY
 };
 
+
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
@@ -69,6 +70,11 @@ public:
 	virtual std::string startRecording(std::string sessionName, unsigned int numFrames = 0) = 0;
 
 	/// <summary>
+	/// Save a single frame at the current time
+	/// </summary>
+	virtual void saveFrame() = 0;
+
+	/// <summary>
 	/// Stop recording
 	/// </summary>
 	virtual void stopRecording() = 0;
@@ -93,7 +99,7 @@ public:
 	}
 
 	bool m_isEnabled{ false };
-	bool m_isRecording{ false };
+	bool m_selectedForRecording{ true };
 protected:
 	unsigned int m_CameraId;
 
