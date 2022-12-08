@@ -182,6 +182,8 @@ void CameraHandler::OnImGuiRender()
                     m_State = Playback;
                     // Start Playback
                 }
+
+                ImGui::TreePop();
             }
         }
 
@@ -208,7 +210,7 @@ void CameraHandler::showSessionSettings() {
             ImGui::Checkbox("Limit Frames", &m_LimitFrames);
             ImGui::BeginDisabled(!m_LimitFrames);
             ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
-            if (m_FrameLimit < 1) {
+            if (m_FrameLimit < 0) {
                 m_FrameLimit = 0;
                 m_LimitFrames = false;
             }
@@ -217,7 +219,7 @@ void CameraHandler::showSessionSettings() {
             ImGui::Checkbox("Limit Time", &m_LimitTime);
             ImGui::BeginDisabled(!m_LimitTime);
             ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
-            if (m_TimeLimitInS < 1) {
+            if (m_TimeLimitInS < 0) {
                 m_TimeLimitInS = 0;
                 m_LimitTime = false;
             }
