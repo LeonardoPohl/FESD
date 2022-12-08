@@ -196,6 +196,7 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\obj\Logger.h" />
     <ClInclude Include="src\obj\PointCloudHelper.h" />
     <ClInclude Include="src\obj\Cell.h" />
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />

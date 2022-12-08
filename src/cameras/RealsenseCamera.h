@@ -5,10 +5,11 @@
 #include <memory>
 
 #include "GLCore/Renderer.h"
+#include "obj/Logger.h"
 
 class RealSenseCamera : public DepthCamera {
 public:
-	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id);
+	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger);
 	~RealSenseCamera() override;
 
 	const void *getDepth() override;
@@ -18,7 +19,7 @@ public:
 	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
-	static std::vector<RealSenseCamera*> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id);
+	static std::vector<RealSenseCamera*> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
 
 	inline unsigned int getDepthStreamWidth() const override
 	{
@@ -31,6 +32,7 @@ public:
 	}
 
 	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	void showCameraInfo() override;
 	void saveFrame() override;
 	void stopRecording() override;
 
@@ -72,6 +74,8 @@ private:
 
 	// Declare depth colorizer for pretty visualization of depth data
 	rs2::colorizer m_ColorMap{};
+
+	Logger::Logger* mp_Logger;
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;

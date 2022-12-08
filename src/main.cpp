@@ -25,6 +25,7 @@
 #include "cameras/CameraHandler.h"
 
 #include "utilities/Status.h"
+#include "obj/Logger.h"
 
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
@@ -53,6 +54,10 @@ int main(void)
 
     {
         ImGuiHelper::initImGui(window);
+
+        Logger::Logger logger;
+        logger.log(Logger::LogLevel::INFO, "Initialised Log");
+
         cam = new Camera{window};
         
         Renderer r;
@@ -61,7 +66,7 @@ int main(void)
         bool showTestMenu = false;
         //# Camera Initialisation
         //#######################
-        CameraHandler cameraHandler{cam, &r};
+        CameraHandler cameraHandler{cam, &r, &logger};
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
@@ -86,6 +91,8 @@ int main(void)
 
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
+
+            logger.showLog();
 
             ImGuiHelper::endFrame();
 

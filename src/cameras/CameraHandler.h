@@ -7,10 +7,12 @@
 #include <chrono>
 #include <json/json.h>
 
+#include "obj/Logger.h"
+
 class CameraHandler
 {
 public:
-	CameraHandler(Camera *cam, Renderer *r);
+	CameraHandler(Camera *cam, Renderer *r, Logger::Logger *logger);
 	~CameraHandler();
 
 	void findAllCameras();
@@ -35,6 +37,7 @@ public:
 
 private:
 	void showSessionSettings();
+	void showRecordingStats();
 	void startRecording();
 	void stopRecording();
 
@@ -49,6 +52,8 @@ private:
 
 	Camera *mp_Camera;
 	Renderer *mp_Renderer;
+
+	Logger::Logger* mp_Logger;
 
 	std::vector<DepthCamera *> m_DepthCameras;
 	std::vector<Json::Value> m_Recordings;

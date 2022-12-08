@@ -28,10 +28,13 @@ static void HelpMarker(const char* desc)
     }
 }
 
-CameraHandler::CameraHandler(Camera *cam, Renderer *renderer) : mp_Camera(cam), mp_Renderer(renderer)
+CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
-    if (openni::OpenNI::initialize() != openni::STATUS_OK)
+    if (openni::OpenNI::initialize() != openni::STATUS_OK) {
+        auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
+        mp_Logger->log(Logger::LogLevel::ERR, msg);
         printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
+    }        
 
     for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory))
     {
@@ -78,9 +81,10 @@ void CameraHandler::initAllCameras()
     m_DepthCameras.clear();
 
     int id = 0;
-    auto rs_cameras = RealSenseCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id);
-    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id);
+    auto rs_cameras = RealSenseCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
+    auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
 
+    mp_Logger->log(Logger::LogLevel::INFO, "Queried all devices, " + std::to_string(rs_cameras.size() + orbbec_cameras.size()) + " Cameras found");
     std::cout << "[INFO] Queried all devices" << std::endl;
 
     m_DepthCameras.insert(m_DepthCameras.end(), rs_cameras.begin(), rs_cameras.end());
@@ -129,6 +133,12 @@ void CameraHandler::OnImGuiRender()
     if (ImGui::Button("Init Cameras")) {
         initAllCameras();
     }
+    if (!m_DepthCameras.empty()) {
+        ImGui::Text("%d Cameras Found", m_DepthCameras.size());
+        for (auto cam : m_DepthCameras) {
+            cam->showCameraInfo();
+        }
+    }
 
     for (auto cam : m_DepthCameras)
         ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
@@ -138,21 +148,8 @@ void CameraHandler::OnImGuiRender()
             ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_selectedForRecording);
         }
 
-        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-        if (ImGui::TreeNode("Session Settings")) {
-            ImGui::BeginDisabled(m_State == Recording);
-            showSessionSettings();
-            ImGui::EndDisabled();
-            ImGui::TreePop();
-        }
-
-        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-        if (ImGui::TreeNode("Session Stats")) {
-            ImGui::Text("Elapsed Seconds: %f.2 s", m_RecordedSeconds.count());
-            ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
-            ImGui::Text("Fps: %f.2", (float)m_RecordedFrames / m_RecordedSeconds.count());
-            ImGui::TreePop();
-        }
+        showSessionSettings();
+        showRecordingStats();
 
         if (m_State != Recording && ImGui::Button("Start Recording")) {
             startRecording();
@@ -160,12 +157,6 @@ void CameraHandler::OnImGuiRender()
         else if (m_State == Recording && ImGui::Button("Stop Recording")) {
             stopRecording();
         }
-                
-        ImGui::BeginDisabled(m_State != Recording);
-        
-        // Count number of frames and file size maybe
-
-        ImGui::EndDisabled();
     }
     
     if (ImGui::CollapsingHeader("Recorded Sessions")) {
@@ -201,44 +192,59 @@ void CameraHandler::OnImGuiRender()
 
     for (auto cam : m_DepthCameras)
     {
-        if (cam->m_isEnabled)
-        {
-            ImGui::Begin(cam->getCameraName().c_str());
-            cam->OnImGuiRender();
-            ImGui::End();
-        }
+        cam->OnImGuiRender();
+        ImGui::End();
     }
 }
 
 void CameraHandler::showSessionSettings() {
-    if (ImGui::TreeNode("Settings")) {
-        ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-        ImGui::SameLine(); HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Session Settings")) {
+        ImGui::BeginDisabled(m_State == Recording);
+        if (ImGui::TreeNode("Settings")) {
+            ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
+            ImGui::SameLine(); HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
 
-        ImGui::Checkbox("Limit Frames", &m_LimitFrames);
-        ImGui::BeginDisabled(!m_LimitFrames);
-        ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
-        if (m_FrameLimit < 1) {
-            m_FrameLimit = 0;
-            m_LimitFrames = false;
-        }
-        ImGui::EndDisabled();
+            ImGui::Checkbox("Limit Frames", &m_LimitFrames);
+            ImGui::BeginDisabled(!m_LimitFrames);
+            ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
+            if (m_FrameLimit < 1) {
+                m_FrameLimit = 0;
+                m_LimitFrames = false;
+            }
+            ImGui::EndDisabled();
 
-        ImGui::Checkbox("Limit Time", &m_LimitTime);
-        ImGui::BeginDisabled(!m_LimitTime);
-        ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
-        if (m_TimeLimitInS < 1) {
-            m_TimeLimitInS = 0;
-            m_LimitTime = false;
+            ImGui::Checkbox("Limit Time", &m_LimitTime);
+            ImGui::BeginDisabled(!m_LimitTime);
+            ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
+            if (m_TimeLimitInS < 1) {
+                m_TimeLimitInS = 0;
+                m_LimitTime = false;
+            }
+            ImGui::EndDisabled();
+            ImGui::TreePop();
         }
+
+        if (ImGui::TreeNode("Name")) {
+            if (ImGui::Button("Update Session Name")) {
+                UpdateSessionName();
+            }
+            ImGui::InputText("Session Name", &m_SessionName, 60);
+            ImGui::TreePop();
+        }
+
         ImGui::EndDisabled();
+        ImGui::TreePop();
     }
+}
 
-    if (ImGui::TreeNode("Name")) {
-        if (ImGui::Button("Update Session Name")) {
-            UpdateSessionName();
-        }
-        ImGui::InputText("Session Name", &m_SessionName, 60);
+void CameraHandler::showRecordingStats() {
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+    if (ImGui::TreeNode("Session Stats")) {
+        ImGui::Text("Elapsed Seconds: %f.2 s", m_RecordedSeconds.count());
+        ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
+        ImGui::Text("Fps: %f.2", (float)m_RecordedFrames / m_RecordedSeconds.count());
+        ImGui::TreePop();
     }
 }
 
@@ -273,6 +279,7 @@ void CameraHandler::startRecording() {
     configJson << Json::writeString(builder, root);
     configJson.close();
 
+    mp_Logger->log(Logger::LogLevel::INFO, "Starting recording");
     m_State = Recording;
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
@@ -281,6 +288,8 @@ void CameraHandler::startRecording() {
 
 #pragma warning(disable : 4996)
 void CameraHandler::stopRecording() {
+    mp_Logger->log(Logger::LogLevel::INFO, "Stopping recording");
+
     m_RecordingEnd = std::chrono::system_clock::now();
 
     std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);

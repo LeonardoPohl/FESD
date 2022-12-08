@@ -181,6 +181,9 @@
     <ClInclude Include="src\utilities\Status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\obj\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />

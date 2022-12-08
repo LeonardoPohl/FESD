@@ -5,10 +5,11 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "GLCore/Renderer.h"
+#include <obj/Logger.h>
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
+	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id, Logger::Logger* logger);
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
@@ -19,12 +20,13 @@ public:
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id);
+	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
 
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
 
 	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	void showCameraInfo() override;
 	void saveFrame() override { };
 	void stopRecording() override;
 
@@ -39,6 +41,7 @@ public:
 		this->frames_left = numFrames;
 		this->num_frames = numFrames;
 	}
+
 	inline bool decFramesLeft()
 	{
 		return this->frames_left-- <= 0 ;
@@ -83,6 +86,8 @@ private:
 	openni::VideoMode _video_mode;
 	openni::Status rc;
 	unsigned int max_depth;
+
+	Logger::Logger* mp_Logger;
 
 	int frames_left{ 0 };
 	int num_frames{ 0 };

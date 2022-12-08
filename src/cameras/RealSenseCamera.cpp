@@ -3,6 +3,7 @@
 #include <exception>
 #include "obj/PointCloud.h"
 #include <utilities/Consts.h>
+#include <obj/Logger.h>
 
 // TODO: Add depth tuning
 
@@ -10,24 +11,26 @@ rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
 	return ctx.query_devices();
 }
 
-std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id) {
+std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id, Logger::Logger *logger) {
 	rs2::context ctx;
 
 	std::vector<RealSenseCamera*> depthCameras;
 
 	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
 	{
-		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++));
+		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
+		logger->log(Logger::LogLevel::INFO, "Initialised " + depthCameras.back()->getCameraName());
 		std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
 	}
 
 	return depthCameras;
 }
 
-RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera *cam, Renderer *renderer, int camera_id)
+RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger)
 	:
 	mp_Context(ctx),
-	m_Device(*device)
+	m_Device(*device),
+	mp_Logger(logger)
 {
 	mp_Pipe = std::make_shared<rs2::pipeline>(*ctx);
 	m_CameraId = camera_id;
@@ -56,7 +59,7 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 
 RealSenseCamera::~RealSenseCamera() {
 	printf("Shutting down [Realsense] %s...\n", getCameraName().c_str()); 
-
+	mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Realsense] " + getCameraName());
 	if (m_Device.as<rs2::recorder>()) {
 		stopRecording();
 	}
@@ -65,6 +68,8 @@ RealSenseCamera::~RealSenseCamera() {
 		mp_Pipe->stop();
 	}
 	catch (...) {
+		mp_Logger->log(Logger::LogLevel::INFO, "An exception occured while shutting down [Realsense] Camera " + getCameraName());
+
 		std::cout << "An exception occured while shutting down [Realsense] Camera " << getCameraName();
 	}
 }
@@ -97,6 +102,8 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
 		std::cout << "[INFO] Saving " << getCameraName() << "'s stream to " << filepath.string() << std::endl;
+		mp_Logger->log(Logger::LogLevel::INFO, "Saving " + getCameraName() + "'s stream to " + filepath.string());
+
 		cfg.enable_record_to_file(filepath.string());
 		mp_Pipe->start(cfg);
 		m_Device = mp_Pipe->get_active_profile().get_device();
@@ -111,6 +118,16 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 	m_isEnabled = true;
 
 	return filepath.filename().string();
+}
+
+void RealSenseCamera::showCameraInfo() {
+	if (ImGui::TreeNode(getCameraName().c_str())) {
+		ImGui::Text("Name: %s\n", m_Device.get_info(RS2_CAMERA_INFO_NAME));
+		ImGui::Text("Produc Line: %s\n", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+		ImGui::Text("Serial Number: %s\n", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+		ImGui::Text("Physical Port: %s\n\n", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+		ImGui::TreePop();
+	}
 }
 
 void RealSenseCamera::saveFrame() {
@@ -145,7 +162,11 @@ inline void RealSenseCamera::OnRender()
 
 inline void RealSenseCamera::OnImGuiRender()
 {
+	ImGui::Begin(getCameraName().c_str());
+	ImGui::BeginDisabled(!m_isEnabled);
 	m_PointCloud->OnImGuiRender();
+	ImGui::EndDisabled();
+	ImGui::End();
 }
 
 // Utils

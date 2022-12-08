@@ -27,9 +27,6 @@ public:
 	/// <returns>Pointer to first depth pixel</returns>
 	virtual const void *getDepth() = 0;
 
-	/// <returns>Returns size of depth pixel</returns>
-	//virtual size_t getDepthSize() = 0;
-
 	/// <summary>
 	/// Gets the Name of the Camera
 	/// </summary>
@@ -78,6 +75,8 @@ public:
 	/// Stop recording
 	/// </summary>
 	virtual void stopRecording() = 0;
+	
+	virtual void showCameraInfo() = 0;
 
 	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
 	virtual glm::mat3 getIntrinsics() const = 0;
