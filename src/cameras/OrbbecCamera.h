@@ -13,7 +13,6 @@ public:
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
-	//inline size_t getDepthSize() override { return sizeof(int16_t); }
 
 	std::string getName() const override { return "Orbbec"; }
 
@@ -50,9 +49,9 @@ public:
 	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
 	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
-		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
+		auto fx = getDepthStreamWidth()  / (2.f * tan(hfov / 2.f));
 		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
-		auto cx = getDepthStreamWidth() / 2;
+		auto cx = getDepthStreamWidth()  / 2;
 		auto cy = getDepthStreamHeight() / 2;
 
 		switch (intrin)
@@ -96,7 +95,7 @@ private:
 
 	const float hfov{ glm::radians(60.0f) };
 	const float vfov{ glm::radians(49.5f) };
-	const float dfov{ glm::radians(73.0f) }; // no Idea what that is
+	const float dfov{ glm::radians(73.0f) };
 
 	unsigned int depth_width;
 	unsigned int depth_height;

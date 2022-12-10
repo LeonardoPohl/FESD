@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <string>
 #include <GLCore/GLObject.h>
+#include <json/json.h>
 
 namespace GLObject
 {
@@ -97,6 +98,12 @@ public:
 		return m_CameraId;
 	}
 
+	/// <returns>Camera Config</returns>
+	inline Json::Value getCameraConfig() const
+	{
+		return m_CameraInfromation;
+	}
+
 	bool m_isEnabled{ false };
 	bool m_selectedForRecording{ true };
 protected:
@@ -104,4 +111,6 @@ protected:
 
 	// For Later
 	int m_playbackOffset{ 0 };
+
+	Json::Value m_CameraInfromation;
 };

@@ -267,6 +267,11 @@ void OrbbecCamera::showCameraInfo() {
 //https://github.com/OpenNI/OpenNI2/blob/master/Source/Tools/NiViewer/Capture.h
 std::string OrbbecCamera::startRecording(std::string sessionName, unsigned int numFrames)
 {    
+    //m_CameraInfromation["Name"] = getCameraName();
+    //m_CameraInfromation["Type"] = getName();
+    //m_CameraInfromation["FileName"] = startRecording(getFileSafeSessionName());
+    //m_CameraInfromation["NumFrames"] = 0;
+    
     /*
     std::filesystem::create_directory("Recordings");
 

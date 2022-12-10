@@ -94,8 +94,8 @@ void CameraHandler::initAllCameras()
 void CameraHandler::showCameras()
 {
     // TODO: Implement
-    for (auto cam : m_DepthCameras)
-        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
+    //for (auto cam : m_DepthCameras)
+    //    ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
 }
 
 void CameraHandler::OnRender()
@@ -105,7 +105,6 @@ void CameraHandler::OnRender()
         if (m_RecordedFrames++ > m_FrameLimit && m_LimitFrames) {
             stopRecording();
         }
-
     }
     
     // This sould probably be asynchronous/Multi-threaded/Parallel
@@ -113,12 +112,12 @@ void CameraHandler::OnRender()
     {
         if (cam->m_isEnabled)
         {
-            if (m_StreamWhileRecording) {
-                cam->OnUpdate();
-                cam->OnRender();
+            if (m_State == Recording && !m_StreamWhileRecording) {
+                cam->saveFrame();
             }
             else {
-                cam->saveFrame();
+                cam->OnUpdate();
+                cam->OnRender();
             }
         }
     }
@@ -136,12 +135,11 @@ void CameraHandler::OnImGuiRender()
     if (!m_DepthCameras.empty()) {
         ImGui::Text("%d Cameras Found", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
+            ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
             cam->showCameraInfo();
         }
     }
-
-    for (auto cam : m_DepthCameras)
-        ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
+        
     
     if (!m_DepthCameras.empty() && ImGui::CollapsingHeader("Recording")) {
         for (auto cam : m_DepthCameras) {
@@ -251,41 +249,15 @@ void CameraHandler::showRecordingStats() {
 }
 
 void CameraHandler::startRecording() {
-    auto configPath = m_RecordingDirectory / getFileSafeSessionName();
-    configPath += ".json";
-
-    std::fstream configJson(configPath, std::ios::out | std::ios::app);
-    Json::Value root;
-
-    root["Name"] = m_SessionName;
-    root["DurationInSec"] = -1;
-
-    Json::Value cameras;
-
-    for (auto cam : m_DepthCameras) {
-        if (cam->m_selectedForRecording) {
-            cam->m_isEnabled = true;
-            Json::Value camera;
-
-            camera["Name"] = cam->getCameraName();
-            camera["Type"] = cam->getName();
-            camera["FileName"] = cam->startRecording(getFileSafeSessionName());
-            cameras.append(camera);
-        }
-    }
-
-    root["Cameras"] = cameras;
-
-    Json::StreamWriterBuilder builder;
-
-    configJson << Json::writeString(builder, root);
-    configJson.close();
-
     mp_Logger->log(Logger::LogLevel::INFO, "Starting recording");
     m_State = Recording;
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
     m_RecordingStart = std::chrono::system_clock::now();
+    for (auto cam : m_DepthCameras) {
+        cam->m_isEnabled = true;
+        cam->startRecording(getFileSafeSessionName());
+    }
 }
 
 #pragma warning(disable : 4996)
@@ -297,6 +269,32 @@ void CameraHandler::stopRecording() {
     std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);
     std::cout << "[INFO] Finished recording at " << std::ctime(&end_time)
         << "elapsed time: " << m_RecordedSeconds.count() << "s\n";
+
+    auto configPath = m_RecordingDirectory / getFileSafeSessionName();
+    configPath += ".json";
+
+    std::fstream configJson(configPath, std::ios::out | std::ios::app);
+    Json::Value root;
+
+    root["Name"] = m_SessionName;
+    root["DurationInSec"] = m_RecordedSeconds.count();
+    root["Frames"] = m_RecordedFrames;
+
+    Json::Value cameras;
+
+    for (auto cam : m_DepthCameras) {
+        if (cam->m_selectedForRecording) {
+            cameras.append(cam->getCameraConfig());
+        }
+    }
+    std::cout << cameras;
+    root["Cameras"] = cameras;
+
+    Json::StreamWriterBuilder builder;
+
+    configJson << Json::writeString(builder, root);
+    configJson.close();
+
 
     m_State = Streaming;
     for (auto cam : m_DepthCameras) {
