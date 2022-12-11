@@ -106,12 +106,6 @@ int main(void)
     glfwTerminate();
     return 0;
 }
-/*
-void window_size_callback(GLFWwindow *window, int width, int height)
-{
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
-}*/
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {

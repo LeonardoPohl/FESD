@@ -79,15 +79,9 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Rende
             d_cam->makePointCloud(cam, renderer);
             depthCameras.push_back(d_cam);
             logger->log(Logger::LogLevel::INFO, "Initialised " + depthCameras.back()->getCameraName());
-            std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
         }
         catch (const std::system_error& ex) {
             logger->log(Logger::LogLevel::ERR, ex.code().value() + " - " + ex.code().message() + " - " + ex.what());
-
-            std::cout << std::endl << std::endl;
-            std::cout << ex.code() << std::endl;
-            std::cout << ex.code().message() << std::endl;
-            std::cout << ex.what() << std::endl << std::endl;
         }
     }
 
@@ -131,7 +125,6 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
     else {
         mp_Logger->log(Logger::LogLevel::ERR, "Error getting Sensor Info for " + openni::SENSOR_DEPTH);
 
-        printf("Error getting Sensor Info for %d\n", openni::SENSOR_DEPTH);
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
 
@@ -149,8 +142,6 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
     }
     else {
         mp_Logger->log(Logger::LogLevel::INFO, "Depth stream started successfully for " + getCameraName());
-
-        printf("Depth stream started successfully\n");
     }
 
     int changedStreamDummy;
@@ -194,8 +185,7 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    printf("Shutting down [Orbbec] %s...\n", this->getCameraName().c_str());
-    mp_Logger->log(Logger::LogLevel::INFO, "Shutting down[Orbbec] " + this->getCameraName());
+    mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Orbbec] " + this->getCameraName());
 
     this->_depth_stream.stop();
     this->_depth_stream.destroy();

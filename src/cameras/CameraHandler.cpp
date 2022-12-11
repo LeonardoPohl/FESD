@@ -33,7 +33,6 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
         auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
         mp_Logger->log(Logger::LogLevel::ERR, msg);
-        printf("Initialization of OpenNi failed\n%s\n", openni::OpenNI::getExtendedError());
     }        
 
     for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory))
@@ -49,8 +48,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
             JSONCPP_STRING errs;
 
             if (!parseFromStream(builder, configJson, &root, &errs)) {
-
-                std::cout << errs << std::endl;
+                mp_Logger->log(Logger::LogLevel::ERR, errs);
             }
             else {
                 m_Recordings.push_back(root);
@@ -85,7 +83,6 @@ void CameraHandler::initAllCameras()
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
 
     mp_Logger->log(Logger::LogLevel::INFO, "Queried all devices, " + std::to_string(rs_cameras.size() + orbbec_cameras.size()) + " Cameras found");
-    std::cout << "[INFO] Queried all devices" << std::endl;
 
     m_DepthCameras.insert(m_DepthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
@@ -139,7 +136,6 @@ void CameraHandler::OnImGuiRender()
             cam->showCameraInfo();
         }
     }
-        
     
     if (!m_DepthCameras.empty() && ImGui::CollapsingHeader("Recording")) {
         for (auto cam : m_DepthCameras) {
@@ -167,7 +163,6 @@ void CameraHandler::OnImGuiRender()
         for (auto recording : m_Recordings) {
             if (ImGui::TreeNode(recording["Name"].asCString())) {
                 // Display information about recording, length cameras filesize
-
                 ImGui::Text("Cameras:");
 
                 for (auto camera : recording["Cameras"]) {
@@ -267,8 +262,7 @@ void CameraHandler::stopRecording() {
     m_RecordingEnd = std::chrono::system_clock::now();
 
     std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);
-    std::cout << "[INFO] Finished recording at " << std::ctime(&end_time)
-        << "elapsed time: " << m_RecordedSeconds.count() << "s\n";
+    mp_Logger->log(Logger::LogLevel::INFO, "Finished recording at " + (std::string)std::ctime(&end_time) + "elapsed time: " + std::to_string(m_RecordedSeconds.count()) + "s");
 
     auto configPath = m_RecordingDirectory / getFileSafeSessionName();
     configPath += ".json";
@@ -278,7 +272,6 @@ void CameraHandler::stopRecording() {
 
     root["Name"] = m_SessionName;
     root["DurationInSec"] = m_RecordedSeconds.count();
-    root["Frames"] = m_RecordedFrames;
 
     Json::Value cameras;
 

@@ -5,7 +5,7 @@
 #include <utilities/Consts.h>
 #include <obj/Logger.h>
 
-// TODO: Add depth tuning
+// TODO: Add camera parameter tuning
 
 rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
 	return ctx.query_devices();
@@ -20,7 +20,6 @@ std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam,
 	{
 		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
 		logger->log(Logger::LogLevel::INFO, "Initialised " + depthCameras.back()->getCameraName());
-		std::cout << "Initialised " << depthCameras.back()->getCameraName() << std::endl;
 	}
 
 	return depthCameras;
@@ -58,8 +57,8 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 }
 
 RealSenseCamera::~RealSenseCamera() {
-	printf("Shutting down [Realsense] %s...\n", getCameraName().c_str()); 
 	mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Realsense] " + getCameraName());
+
 	if (m_Device.as<rs2::recorder>()) {
 		stopRecording();
 	}
@@ -69,8 +68,6 @@ RealSenseCamera::~RealSenseCamera() {
 	}
 	catch (...) {
 		mp_Logger->log(Logger::LogLevel::INFO, "An exception occured while shutting down [Realsense] Camera " + getCameraName());
-
-		std::cout << "An exception occured while shutting down [Realsense] Camera " << getCameraName();
 	}
 }
 
@@ -81,11 +78,7 @@ const void *RealSenseCamera::getDepth()
 		rs2::depth_frame depth = data.get_depth_frame();
 		if (m_Device.as<rs2::recorder>())
 			rs2::video_frame color = data.get_color_frame();
-		//m_PixelSize = depth.get_data_size();
 		return depth.get_data();
-	}
-	else {
-
 	}
 }
 
@@ -101,23 +94,17 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 		mp_Pipe->stop();
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
-		std::cout << "[INFO] Saving " << getCameraName() << "'s stream to " << filepath.string() << std::endl;
 		mp_Logger->log(Logger::LogLevel::INFO, "Saving " + getCameraName() + "'s stream to " + filepath.string());
 
 		cfg.enable_record_to_file(filepath.string());
 		mp_Pipe->start(cfg);
 		m_Device = mp_Pipe->get_active_profile().get_device();
 	}
-	else {
-		// if its already recording resume
-		// Not implemented pause function so a bit useless
-		m_Device.as<rs2::recorder>().resume();
-	}
 
 	m_CameraInfromation["Name"] = getCameraName();
 	m_CameraInfromation["Type"] = getName();
 	m_CameraInfromation["FileName"] = filepath.filename().string();
-	m_CameraInfromation["NumFrames"] = 0;
+	m_CameraInfromation["Frames"] = 0;
 
 	m_selectedForRecording = true;
 	m_isEnabled = true;
@@ -127,7 +114,6 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 
 void RealSenseCamera::showCameraInfo() {
 	if (ImGui::TreeNode(getCameraName().c_str())) {
-		//ImGui::Checkbox("Activate", &m_isEnabled);
 		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
 		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
 		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));

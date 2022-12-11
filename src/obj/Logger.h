@@ -34,10 +34,12 @@ namespace Logger {
 			entry += msg;
 			entry += "\n";
 
+			std::cout << entry << std::endl;
+
 			m_Log = entry + m_Log;
 
 			if (m_Log.size() > m_MaxLogLength) {
-				m_Log.resize(9000);
+				m_Log.resize(90);
 			}
 		}
 
@@ -48,6 +50,6 @@ namespace Logger {
 		}
 	private:
 		std::string m_Log{ "" };
-		const int m_MaxLogLength{ 10000 };
+		const int m_MaxLogLength{ 100 };
 	};
 }
