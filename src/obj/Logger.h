@@ -2,6 +2,7 @@
 #include <string>
 #include <chrono>
 #include <imgui.h>
+#include <iostream>
 
 namespace Logger {
 	enum class LogLevel
@@ -39,7 +40,7 @@ namespace Logger {
 			m_Log = entry + m_Log;
 
 			if (m_Log.size() > m_MaxLogLength) {
-				m_Log.resize(90);
+				m_Log.resize(9000);
 			}
 		}
 
@@ -50,6 +51,6 @@ namespace Logger {
 		}
 	private:
 		std::string m_Log{ "" };
-		const int m_MaxLogLength{ 100 };
+		const int m_MaxLogLength{ 10000 };
 	};
 }

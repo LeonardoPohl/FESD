@@ -35,9 +35,9 @@ namespace GLObject
 
         auto *indices = new unsigned int[numIndex];
 
-        for (unsigned int w = 0; w < m_StreamWidth; w++)
+        for (int w = 0; w < m_StreamWidth; w++)
         {
-            for (unsigned int h = 0; h < m_StreamHeight; h++)
+            for (int h = 0; h < m_StreamHeight; h++)
             {
                 int i = h * m_StreamWidth + w;
 

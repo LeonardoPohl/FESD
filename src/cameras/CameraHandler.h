@@ -15,9 +15,7 @@ public:
 	CameraHandler(Camera *cam, Renderer *r, Logger::Logger *logger);
 	~CameraHandler();
 
-	void findAllCameras();
 	void initAllCameras();
-	void showCameras();
 	void OnRender();
 	void OnImGuiRender();
 
@@ -38,6 +36,7 @@ public:
 private:
 	void showSessionSettings();
 	void showRecordingStats();
+	void showRecordings();
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
@@ -65,10 +64,10 @@ private:
 
 	bool m_StreamWhileRecording{ true };
 	bool m_LimitFrames{ false };
-	bool m_LimitTime{ false };
+	bool m_LimitTime{ true };
 
-	int m_FrameLimit{ 0 };
-	int m_TimeLimitInS{ 0 };
+	int m_FrameLimit{ 100 };
+	int m_TimeLimitInS{ 100 };
 
 	int m_RecordedFrames{ 0 };
 

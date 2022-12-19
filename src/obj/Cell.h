@@ -61,9 +61,9 @@ public:
 	{
 		auto coords = (point - boundingBox.getMinPoint()) / cellSize;
 
-		int x = std::round(coords.x);
-		int y = std::round(coords.y);
-		int z = std::round(coords.z);
+		int x = (int)std::round(coords.x);
+		int y = (int)std::round(coords.y);
+		int z = (int)std::round(coords.z);
 
 		return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
 	}

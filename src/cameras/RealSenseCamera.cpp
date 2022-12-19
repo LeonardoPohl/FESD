@@ -56,6 +56,17 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
+RealSenseCamera::RealSenseCamera(std::filesystem::path recording)
+{
+	rs2::playback playback = m_Device.as<rs2::playback>();
+	mp_Pipe->stop(); // Stop streaming with default configuration
+	mp_Pipe = std::make_shared<rs2::pipeline>();
+	rs2::config cfg;
+	cfg.enable_device_from_file(recording.string());
+	mp_Pipe->start(cfg); //File will be opened in read mode at this point
+	m_Device = mp_Pipe->get_active_profile().get_device();
+}
+
 RealSenseCamera::~RealSenseCamera() {
 	mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Realsense] " + getCameraName());
 
@@ -80,6 +91,7 @@ const void *RealSenseCamera::getDepth()
 			rs2::video_frame color = data.get_color_frame();
 		return depth.get_data();
 	}
+	return nullptr;
 }
 
 // https://dev.intelrealsense.com/docs/rs-record-playback

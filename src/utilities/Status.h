@@ -1,6 +1,6 @@
 #pragma once
 
-static enum STATUS
+enum STATUS
 {
 	OK,
 	ERR

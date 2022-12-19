@@ -1,15 +1,18 @@
 #pragma once
 
-#include "DepthCamera.h"
 #include <librealsense2/rs.hpp>
+#include <filesystem>
 #include <memory>
 
 #include "GLCore/Renderer.h"
 #include "obj/Logger.h"
+#include "DepthCamera.h"
 
 class RealSenseCamera : public DepthCamera {
 public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger);
+	RealSenseCamera(std::filesystem::path recording);
+
 	~RealSenseCamera() override;
 
 	const void *getDepth() override;

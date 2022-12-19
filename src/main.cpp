@@ -75,11 +75,11 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
-            float currentFrame = glfwGetTime();
+            float currentFrame = (float)glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
 
-            fps = (fps * fpsSmoothing) + (deltaTime * (1.0 - fpsSmoothing));
+            fps = (float)((fps * fpsSmoothing) + (deltaTime * (1.0 - fpsSmoothing)));
 
             r.Clear();
             

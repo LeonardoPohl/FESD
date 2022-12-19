@@ -14,19 +14,7 @@
 #include <filesystem>
 
 #include <utilities/Consts.h>
-
-static void HelpMarker(const char* desc)
-{
-    ImGui::TextDisabled("(?)");
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::BeginTooltip();
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextUnformatted(desc);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
-}
+#include <utilities/helper/ImGuiHelper.h>
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
@@ -47,11 +35,6 @@ CameraHandler::~CameraHandler()
     openni::OpenNI::shutdown();
 }
 
-void CameraHandler::findAllCameras()
-{
-    // TODO: Implement find all cameras
-}
-
 void CameraHandler::initAllCameras()
 {
     for (auto cam : m_DepthCameras)
@@ -69,13 +52,6 @@ void CameraHandler::initAllCameras()
     m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
 }
 
-void CameraHandler::showCameras()
-{
-    // TODO: Implement
-    //for (auto cam : m_DepthCameras)
-    //    ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
-}
-
 void CameraHandler::OnRender()
 {
     if (m_State == Recording) {
@@ -88,7 +64,7 @@ void CameraHandler::OnRender()
     // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
-        if (cam->m_isEnabled)
+        if (cam->m_isEnabled || m_State == Playback)
         {
             if (m_State == Recording && !m_StreamWhileRecording) {
                 cam->saveFrame();
@@ -135,6 +111,16 @@ void CameraHandler::OnImGuiRender()
     }
     
     if (ImGui::CollapsingHeader("Recorded Sessions")) {
+        if (m_State == Playback && ImGui::Button("Stop Playback")) {
+            mp_Logger->log(Logger::LogLevel::INFO, "Stopping Playback");
+            m_State = Streaming;
+            for (auto cam : m_DepthCameras)
+                delete cam;
+            m_DepthCameras.clear();
+        }
+
+        ImGui::BeginDisabled(m_State == Playback);
+
         if (ImGui::Button("Refresh Recordings")) {
             findRecordings();
         }
@@ -142,29 +128,8 @@ void CameraHandler::OnImGuiRender()
         if (m_Recordings.empty()) {
             ImGui::Text("No Recordings Found!");
         }
-        
-        ImGui::BeginDisabled(m_State == Playback);
 
-        for (auto recording : m_Recordings) {
-            if (ImGui::TreeNode(recording["Name"].asCString())) {
-                // Display information about recording, length cameras filesize
-                ImGui::Text("Cameras:");
-
-                for (auto camera : recording["Cameras"]) {
-                    ImGui::Text(camera["Name"].asCString());
-                    ImGui::Text(camera["Type"].asCString());
-                    ImGui::Text(camera["FileName"].asCString());
-                }
-
-                if(ImGui::Button("Start Playback")){
-                    m_State = Playback;
-                    // Start Playback
-                }
-
-                ImGui::TreePop();
-            }
-        }
-
+        showRecordings();
         ImGui::EndDisabled();
     }
 
@@ -183,7 +148,7 @@ void CameraHandler::showSessionSettings() {
         ImGui::BeginDisabled(m_State == Recording);
         if (ImGui::TreeNode("Settings")) {
             ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-            ImGui::SameLine(); HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
+            ImGui::SameLine(); ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
 
             ImGui::Checkbox("Limit Frames", &m_LimitFrames);
 
@@ -224,7 +189,7 @@ void CameraHandler::showRecordingStats() {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Session Stats")) {
         ImGui::BeginDisabled(m_State == Recording);
-        ImGui::Text("Elapsed Seconds: %f.2 s", m_RecordedSeconds.count());
+        ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
         ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
 
         if (m_LimitFrames && m_FrameLimit > 0) {
@@ -239,6 +204,40 @@ void CameraHandler::showRecordingStats() {
         ImGui::EndDisabled();
 
         ImGui::TreePop();
+    }
+}
+
+void CameraHandler::showRecordings() {
+    for (auto recording : m_Recordings) {
+        if (ImGui::TreeNode(recording["Name"].asCString())) {
+            ImGui::Text("Duration (s): %.2f", recording["DurationInSec"]);
+
+            if (ImGui::TreeNode("Cameras")) {
+                for (auto camera : recording["Cameras"]) {
+                    ImGui::Text(" Name: %s", camera["Name"].asString());
+                    ImGui::Text("   Type: %s", camera["Type"].asCString());
+                    ImGui::Text("   FileName: %s", camera["FileName"].asCString());
+                }
+                ImGui::TreePop();
+            }
+
+            if (ImGui::Button("Start Playback")) {
+                mp_Logger->log(Logger::LogLevel::INFO, "Started Playback of Recording \"" + recording["Name"].asString() + "\"");
+                m_State = Playback;
+
+                for (auto cam : m_DepthCameras)
+                    delete cam;
+                m_DepthCameras.clear();
+
+                for (auto camera : recording["Cameras"]) {
+                    if (camera["Name"].asString() == "Realsense") {
+                        m_DepthCameras.push_back(new RealSenseCamera(m_RecordingDirectory / camera["FileName"].asCString()));
+                    }
+                }
+            }
+
+            ImGui::TreePop();
+        }
     }
 }
 
