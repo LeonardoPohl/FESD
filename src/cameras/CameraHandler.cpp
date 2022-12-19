@@ -35,26 +35,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
         mp_Logger->log(Logger::LogLevel::ERR, msg);
     }        
 
-    for (const auto &entry : std::filesystem::directory_iterator(m_RecordingDirectory))
-    {
-        if (entry.is_regular_file() && entry.path().extension() == ".json") {
-            std::ifstream configJson(entry.path());
-            Json::Value root;
-
-            Json::CharReaderBuilder builder;
-
-            builder["collectComments"] = true;
-
-            JSONCPP_STRING errs;
-
-            if (!parseFromStream(builder, configJson, &root, &errs)) {
-                mp_Logger->log(Logger::LogLevel::ERR, errs);
-            }
-            else {
-                m_Recordings.push_back(root);
-            }
-        }
-    }
+    findRecordings();
     UpdateSessionName();
 }
 
@@ -154,6 +135,8 @@ void CameraHandler::OnImGuiRender()
     }
     
     if (ImGui::CollapsingHeader("Recorded Sessions")) {
+        if (ImGui::Button("Find Recordings")) {}
+
         if (m_Recordings.empty()) {
             ImGui::Text("No Recordings Found!");
         }
@@ -201,6 +184,7 @@ void CameraHandler::showSessionSettings() {
             ImGui::SameLine(); HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
 
             ImGui::Checkbox("Limit Frames", &m_LimitFrames);
+
             ImGui::BeginDisabled(!m_LimitFrames);
             ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
             if (m_FrameLimit < 0) {
@@ -210,6 +194,7 @@ void CameraHandler::showSessionSettings() {
             ImGui::EndDisabled();
 
             ImGui::Checkbox("Limit Time", &m_LimitTime);
+
             ImGui::BeginDisabled(!m_LimitTime);
             ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
             if (m_TimeLimitInS < 0) {
@@ -236,9 +221,21 @@ void CameraHandler::showSessionSettings() {
 void CameraHandler::showRecordingStats() {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Session Stats")) {
+        ImGui::BeginDisabled(m_State == Recording);
         ImGui::Text("Elapsed Seconds: %f.2 s", m_RecordedSeconds.count());
         ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
-        ImGui::Text("Fps: %f.2", (float)m_RecordedFrames / m_RecordedSeconds.count());
+
+        if (m_LimitFrames && m_FrameLimit > 0) {
+            ImGui::Text("Frame Limit:");
+            ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
+        }
+        
+        if (m_LimitTime && m_TimeLimitInS > 0) {
+            ImGui::Text("Time Limit:");
+            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
+        }
+        ImGui::EndDisabled();
+
         ImGui::TreePop();
     }
 }
@@ -288,11 +285,36 @@ void CameraHandler::stopRecording() {
     configJson << Json::writeString(builder, root);
     configJson.close();
 
+    UpdateSessionName();
+    findRecordings();
 
     m_State = Streaming;
     for (auto cam : m_DepthCameras) {
         if (cam->m_selectedForRecording) {
             cam->stopRecording();
+        }
+    } 
+}
+
+void CameraHandler::findRecordings() {
+    for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+            std::ifstream configJson(entry.path());
+            Json::Value root;
+
+            Json::CharReaderBuilder builder;
+
+            builder["collectComments"] = true;
+
+            JSONCPP_STRING errs;
+
+            if (!parseFromStream(builder, configJson, &root, &errs)) {
+                mp_Logger->log(Logger::LogLevel::ERR, errs);
+            }
+            else {
+                m_Recordings.push_back(root);
+            }
         }
     }
 }

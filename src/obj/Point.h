@@ -17,7 +17,7 @@ public:
 			: Position(position), Color(color) {}
 	};
 		
-	static enum class CMAP
+	enum class CMAP
 	{
 		VIRIDIS,
 		MAGMA,

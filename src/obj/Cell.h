@@ -44,7 +44,7 @@ public:
 		return m_Index.x == other_index.x && m_Index.y == other_index.y && m_Index.z == other_index.z;
 	}
 
-	static enum class NDT_TYPE
+	enum class NDT_TYPE
 	{
 		Linear,
 		Planar,

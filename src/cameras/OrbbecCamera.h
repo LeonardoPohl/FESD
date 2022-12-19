@@ -62,13 +62,13 @@ public:
 			case FY:
 				return fy;
 			case CX:
-				return cx;
+				return (float)cx;
 			case CY:
-				return cy;
+				return (float)cy;
 			default:
 				break;
 		}
-		return INFINITE;
+		return (float)INFINITE;
 	}
 
 	inline glm::mat3 getIntrinsics() const override

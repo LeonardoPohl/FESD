@@ -70,12 +70,16 @@ int main(void)
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
+        float fps = 0.0f;
+        float fpsSmoothing = 0.9f;
 
         while (!glfwWindowShouldClose(window))
         {
             float currentFrame = glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
+
+            fps = (fps * fpsSmoothing) + (deltaTime * (1.0 - fpsSmoothing));
 
             r.Clear();
             
@@ -85,6 +89,12 @@ int main(void)
             //#############
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
+
+            ImGui::Begin("Information");
+
+            ImGui::Text("FPS: %.2f", 1.0f/fps);
+
+            ImGui::End();
 
             if (showTestMenu)
                 tmh.update();

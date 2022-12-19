@@ -40,6 +40,7 @@ private:
 	void showRecordingStats();
 	void startRecording();
 	void stopRecording();
+	void findRecordings();
 
 	enum State {
 		Streaming,
