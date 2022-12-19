@@ -135,7 +135,9 @@ void CameraHandler::OnImGuiRender()
     }
     
     if (ImGui::CollapsingHeader("Recorded Sessions")) {
-        if (ImGui::Button("Find Recordings")) {}
+        if (ImGui::Button("Refresh Recordings")) {
+            findRecordings();
+        }
 
         if (m_Recordings.empty()) {
             ImGui::Text("No Recordings Found!");
