@@ -29,3 +29,16 @@
 	- How can I create ground truth fast? 
 		- Is there a better way other than manual?
 	- If I have to manually create the ground truth this will take another couple months, could we somehow reformulate the problem so it only takes another 2 months?
+ 
+## 19-12-2022
+
+- What to work on:
+	1.  Playback RS
+	2. Recording Orbbec
+	3. Playback Orbbec
+	4. Skeleton Detection in recording stream
+- Research Focus
+	- When does HPE go wrong?
+	- Detect Scenarios where it goes wrong.
+	- Dataset contains of depth and rgb stream and skeleton ground truth
+	- 
