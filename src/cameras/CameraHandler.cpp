@@ -52,7 +52,6 @@ void CameraHandler::OnRender()
 {
     if (m_State == Recording) {
         m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
-        m_RecordedFrames += 1;
 
         if (m_RecordedFrames > m_FrameLimit && m_LimitFrames) {
             stopRecording();
@@ -63,6 +62,8 @@ void CameraHandler::OnRender()
             stopRecording();
             return;
         }
+
+        m_RecordedFrames += 1;
     }
     
     // This sould probably be asynchronous/Multi-threaded/Parallel
@@ -301,6 +302,8 @@ void CameraHandler::stopRecording() {
 
 void CameraHandler::findRecordings() {
     m_Recordings.clear();
+
+    mp_Logger->log("Finding Recordings in '" + m_RecordingDirectory.generic_string() + "'");
 
     for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
     {

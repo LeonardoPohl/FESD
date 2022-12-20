@@ -62,9 +62,8 @@ public:
 	/// Start recording to file
 	/// </summary>
 	/// <param name="sessionName">Name of the session used for file naming and multi file synchronisation</param>
-	/// <param name="numFrames">Number of Frames, if 0 recording has to be manually stopped</param>
 	/// <returns>Path to saved file</returns>
-	virtual std::string startRecording(std::string sessionName, unsigned int numFrames = 0) = 0;
+	virtual std::string startRecording(std::string sessionName) = 0;
 
 	/// <summary>
 	/// Save a single frame at the current time
@@ -82,14 +81,10 @@ public:
 	virtual glm::mat3 getIntrinsics() const = 0;
 
 	/// <returns>Window Name (Display: *Camera Name*)</returns>
-	inline std::string getWindowName() const {
-		return "Display: " + this->getCameraName();
-	}
+	virtual std::string getWindowName() const = 0;
 
 	/// <returns>Camera Name</returns>
-	inline std::string getCameraName() const {
-		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
-	}
+	virtual std::string getCameraName() const = 0;
 
 	/// <returns>Window Name</returns>
 	inline unsigned int getCameraId() const

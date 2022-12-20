@@ -16,6 +16,14 @@ public:
 
 	static std::string getType() { return "Orbbec"; }
 
+	inline std::string getWindowName() const override {
+		return "Display: " + this->getCameraName();
+	}
+
+	inline std::string getCameraName() const override {
+		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
+	}
+
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
@@ -24,7 +32,7 @@ public:
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
 
-	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	std::string startRecording(std::string sessionName) override;
 	void showCameraInfo() override;
 	void saveFrame() override { };
 	void stopRecording() override;
