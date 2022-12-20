@@ -35,7 +35,7 @@ namespace Logger {
 			entry += msg;
 			entry += "\n";
 
-			std::cout << entry << std::endl;
+			std::cout << entry;
 
 			m_Log = entry + m_Log;
 

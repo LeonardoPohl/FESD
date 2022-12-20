@@ -97,7 +97,9 @@ void CameraHandler::OnImGuiRender()
         }
     }
     
-    if (!m_DepthCameras.empty() && ImGui::CollapsingHeader("Recording")) {
+    if (!m_DepthCameras.empty()) {
+        ImGui::Begin("Recorder");
+
         for (auto cam : m_DepthCameras) {
             ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_selectedForRecording);
         }
@@ -111,31 +113,33 @@ void CameraHandler::OnImGuiRender()
         else if (m_State == Recording && ImGui::Button("Stop Recording")) {
             stopRecording();
         }
+        ImGui::End();
     }
     
-    if (ImGui::CollapsingHeader("Recorded Sessions")) {
-        if (m_State == Playback && ImGui::Button("Stop Playback")) {
-            mp_Logger->log("Stopping Playback");
-            m_State = Streaming;
-            for (auto cam : m_DepthCameras)
-                delete cam;
-            m_DepthCameras.clear();
-        }
+    ImGui::Begin("Recorded Sessions");
 
-        ImGui::BeginDisabled(m_State == Playback);
-
-        if (ImGui::Button("Refresh Recordings")) {
-            findRecordings();
-        }
-
-        if (m_Recordings.empty()) {
-            ImGui::Text("No Recordings Found!");
-        }
-
-        showRecordings();
-        ImGui::EndDisabled();
+    if (m_State == Playback && ImGui::Button("Stop Playback")) {
+        mp_Logger->log("Stopping Playback");
+        m_State = Streaming;
+        for (auto cam : m_DepthCameras)
+            delete cam;
+        m_DepthCameras.clear();
     }
 
+    ImGui::BeginDisabled(m_State == Playback);
+
+    if (ImGui::Button("Refresh Recordings")) {
+        findRecordings();
+    }
+
+    if (m_Recordings.empty()) {
+        ImGui::Text("No Recordings Found!");
+    }
+
+    showRecordings();
+    ImGui::EndDisabled();
+    
+    ImGui::End();
     ImGui::End();
 
     for (auto cam : m_DepthCameras)

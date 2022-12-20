@@ -196,7 +196,7 @@ inline void RealSenseCamera::OnRender()
 inline void RealSenseCamera::OnImGuiRender()
 {
 	ImGui::Begin(getCameraName().c_str());
-	ImGui::BeginDisabled(!m_isEnabled);
+	ImGui::BeginDisabled(!m_isEnabled || m_Device.as<rs2::recorder>());
 	m_PointCloud->OnImGuiRender();
 	ImGui::EndDisabled();
 	ImGui::End();
