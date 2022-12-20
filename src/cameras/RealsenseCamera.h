@@ -19,6 +19,14 @@ public:
 
 	static std::string getType() { return "Realsense"; }
 
+	inline std::string getWindowName() const override {
+		return "Display: " + this->getCameraName();
+	}
+
+	inline std::string getCameraName() const override {
+		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
+	}
+
 	void printDeviceInfo() const;
 
 	static rs2::device_list getAvailableDevices(rs2::context ctx);
@@ -34,7 +42,7 @@ public:
 		return m_DepthHeight;
 	}
 
-	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	std::string startRecording(std::string sessionName) override;
 	void showCameraInfo() override;
 	void saveFrame() override;
 	void stopRecording() override;

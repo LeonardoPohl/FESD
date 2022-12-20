@@ -84,9 +84,8 @@ int main(void)
             r.Clear();
             
             ImGuiHelper::beginFrame();
+            ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
-            //# Test window
-            //#############
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
 

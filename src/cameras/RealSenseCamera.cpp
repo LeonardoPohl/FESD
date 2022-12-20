@@ -126,7 +126,7 @@ const void *RealSenseCamera::getDepth()
 }
 
 // https://dev.intelrealsense.com/docs/rs-record-playback
-std::string RealSenseCamera::startRecording(std::string sessionName, unsigned int numFrames)
+std::string RealSenseCamera::startRecording(std::string sessionName)
 {
 	auto cameraName = getCameraName();
 	std::ranges::replace(cameraName, ' ', '_');
@@ -147,7 +147,6 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 	m_CameraInfromation["Name"] = getCameraName();
 	m_CameraInfromation["Type"] = getType();
 	m_CameraInfromation["FileName"] = filepath.filename().string();
-	m_CameraInfromation["Frames"] = 0;
 
 	m_selectedForRecording = true;
 	m_isEnabled = true;
@@ -167,7 +166,6 @@ void RealSenseCamera::showCameraInfo() {
 
 void RealSenseCamera::saveFrame() {
 	rs2::frameset data = mp_Pipe->wait_for_frames();
-	m_CameraInfromation["NumFrames"] = m_CameraInfromation["NumFrames"].asInt() + 1;
 	data.get_depth_frame();
 	data.get_color_frame();
 }
