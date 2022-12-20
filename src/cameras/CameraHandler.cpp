@@ -303,8 +303,6 @@ void CameraHandler::stopRecording() {
 void CameraHandler::findRecordings() {
     m_Recordings.clear();
 
-    mp_Logger->log("Finding Recordings in '" + m_RecordingDirectory.generic_string() + "'");
-
     for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
@@ -325,4 +323,6 @@ void CameraHandler::findRecordings() {
             }
         }
     }
+
+    mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
 }
