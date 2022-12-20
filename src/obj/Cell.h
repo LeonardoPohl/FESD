@@ -1,6 +1,6 @@
 #pragma once
 #include "Point.h"
-#include "Utilities.h"
+#include "BoundingBox.h"
 
 #include <vector>
 #include <string>
@@ -44,7 +44,7 @@ public:
 		return m_Index.x == other_index.x && m_Index.y == other_index.y && m_Index.z == other_index.z;
 	}
 
-	static enum class NDT_TYPE
+	enum class NDT_TYPE
 	{
 		Linear,
 		Planar,
@@ -59,18 +59,18 @@ public:
 
 	static inline std::string getKey(BoundingBox boundingBox, glm::vec3 cellSize, glm::vec3 point)
 	{
-		auto coords = (point - boundingBox.minBoundingPoint) / cellSize;
+		auto coords = (point - boundingBox.getMinPoint()) / cellSize;
 
-		int x = std::round(coords.x);
-		int y = std::round(coords.y);
-		int z = std::round(coords.z);
+		int x = (int)std::round(coords.x);
+		int y = (int)std::round(coords.y);
+		int z = (int)std::round(coords.z);
 
 		return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
 	}
 
 	static inline glm::vec3 getCellSize(BoundingBox boundingBox, int devisions)
 	{
-		return (boundingBox.maxBoundingPoint - boundingBox.minBoundingPoint) / (float)devisions;
+		return (boundingBox.getMaxPoint() - boundingBox.getMinPoint()) / (float)devisions;
 	}
 private:
 	float *m_PlanarThreshold;

@@ -9,4 +9,6 @@ public:
 	static void beginFrame();
 	static void endFrame();
 	static void terminateImGui();
+
+	static void HelpMarker(const char* desc);
 };

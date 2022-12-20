@@ -6,7 +6,7 @@
 #include <iostream>
 #include <GLCore/GLErrorManager.h>
 
-#include "utilities/Consts.h"
+#include "utilities/Status.h"
 
 GLFWwindow *InitialiseGLFWWindow(STATUS &status)
 {
@@ -31,7 +31,7 @@ GLFWwindow *InitialiseGLFWWindow(STATUS &status)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(mode->width, mode->height, WindowName.c_str(), nullptr, nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, "WiP: Master Thesis", nullptr, nullptr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     if (!window)

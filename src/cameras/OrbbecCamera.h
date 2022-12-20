@@ -5,27 +5,28 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "GLCore/Renderer.h"
+#include <obj/Logger.h>
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id);
+	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id, Logger::Logger* logger);
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
-	inline size_t getDepthSize() override { return sizeof(int16_t); }
 
-	std::string getName() const override { return "Orbbec"; }
+	static std::string getType() { return "Orbbec"; }
 
 	void printDeviceInfo() const;
 
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id);
+	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
 
 	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
 	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
-	inline uint16_t getDepthStreamMaxDepth() const override { return max_depth; }
 
-	void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) override;
+	std::string startRecording(std::string sessionName, unsigned int numFrames = 0) override;
+	void showCameraInfo() override;
+	void saveFrame() override { };
 	void stopRecording() override;
 
 	void OnUpdate() override;
@@ -39,6 +40,7 @@ public:
 		this->frames_left = numFrames;
 		this->num_frames = numFrames;
 	}
+
 	inline bool decFramesLeft()
 	{
 		return this->frames_left-- <= 0 ;
@@ -47,9 +49,9 @@ public:
 	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
 	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
-		auto fx = getDepthStreamWidth() / (2.f * tan(hfov / 2.f));
+		auto fx = getDepthStreamWidth()  / (2.f * tan(hfov / 2.f));
 		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
-		auto cx = getDepthStreamWidth() / 2;
+		auto cx = getDepthStreamWidth()  / 2;
 		auto cy = getDepthStreamHeight() / 2;
 
 		switch (intrin)
@@ -60,13 +62,13 @@ public:
 			case FY:
 				return fy;
 			case CX:
-				return cx;
+				return (float)cx;
 			case CY:
-				return cy;
+				return (float)cy;
 			default:
 				break;
 		}
-		return INFINITE;
+		return (float)INFINITE;
 	}
 
 	inline glm::mat3 getIntrinsics() const override
@@ -84,6 +86,8 @@ private:
 	openni::Status rc;
 	unsigned int max_depth;
 
+	Logger::Logger* mp_Logger;
+
 	int frames_left{ 0 };
 	int num_frames{ 0 };
 	int delay{ 0 };
@@ -91,7 +95,7 @@ private:
 
 	const float hfov{ glm::radians(60.0f) };
 	const float vfov{ glm::radians(49.5f) };
-	const float dfov{ glm::radians(73.0f) }; // no Idea what that is
+	const float dfov{ glm::radians(73.0f) };
 
 	unsigned int depth_width;
 	unsigned int depth_height;

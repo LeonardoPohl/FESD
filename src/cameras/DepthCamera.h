@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <string>
 #include <GLCore/GLObject.h>
+#include <json/json.h>
 
 namespace GLObject
 {
@@ -16,6 +17,7 @@ enum class INTRINSICS
 	CY
 };
 
+
 class DepthCamera {
 public:
 	virtual ~DepthCamera() = default;
@@ -26,14 +28,10 @@ public:
 	/// <returns>Pointer to first depth pixel</returns>
 	virtual const void *getDepth() = 0;
 
-	/// <returns>Returns size of depth pixel</returns>
-	virtual size_t getDepthSize() = 0;
-
 	/// <summary>
-	/// Gets the Name of the Camera
+	/// Gets the Type of the Camera
 	/// </summary>
-	/// <returns>Name of Camera</returns>
-	virtual std::string getName() const = 0; 
+	static std::string getType() { return "Base"; };
 
 	/// <summary>
 	/// Get Width in Pixel
@@ -44,11 +42,6 @@ public:
 	/// Get Height in Pixel
 	/// </summary>
 	virtual unsigned int getDepthStreamHeight() const = 0;
-
-	/// <summary>
-	/// Get Maximum Depth value
-	/// </summary>
-	virtual uint16_t getDepthStreamMaxDepth() const = 0;
 
 	/// <summary>
 	/// Call update Functions
@@ -70,12 +63,20 @@ public:
 	/// </summary>
 	/// <param name="sessionName">Name of the session used for file naming and multi file synchronisation</param>
 	/// <param name="numFrames">Number of Frames, if 0 recording has to be manually stopped</param>
-	virtual void startRecording(std::string sessionName, long long startOn, unsigned int numFrames = 0) = 0;
+	/// <returns>Path to saved file</returns>
+	virtual std::string startRecording(std::string sessionName, unsigned int numFrames = 0) = 0;
+
+	/// <summary>
+	/// Save a single frame at the current time
+	/// </summary>
+	virtual void saveFrame() = 0;
 
 	/// <summary>
 	/// Stop recording
 	/// </summary>
 	virtual void stopRecording() = 0;
+	
+	virtual void showCameraInfo() = 0;
 
 	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
 	virtual glm::mat3 getIntrinsics() const = 0;
@@ -87,16 +88,28 @@ public:
 
 	/// <returns>Camera Name</returns>
 	inline std::string getCameraName() const {
-		return this->getName() + " Camera " + std::to_string(this->camera_id);
+		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
 	}
 
 	/// <returns>Window Name</returns>
 	inline unsigned int getCameraId() const
 	{
-		return camera_id;
+		return m_CameraId;
 	}
 
-	bool is_enabled{ false };
+	/// <returns>Camera Config</returns>
+	inline Json::Value getCameraConfig() const
+	{
+		return m_CameraInfromation;
+	}
+
+	bool m_isEnabled{ false };
+	bool m_selectedForRecording{ true };
 protected:
-	unsigned int camera_id;
+	unsigned int m_CameraId;
+
+	// For Later
+	int m_playbackOffset{ 0 };
+
+	Json::Value m_CameraInfromation;
 };

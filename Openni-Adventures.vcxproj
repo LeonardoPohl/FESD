@@ -163,18 +163,18 @@
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
-    <ClCompile Include="src\obj\Tests\TestClearColor.cpp" />
-    <ClCompile Include="src\obj\tests\TestPoint.cpp" />
-    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp" />
-    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp" />
-    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp" />
+    <ClCompile Include="src\utilities\helper\tests\TestClearColor.cpp" />
+    <ClCompile Include="src\utilities\helper\tests\TestPoint.cpp" />
+    <ClCompile Include="src\utilities\helper\tests\TestPyramid3D.cpp" />
+    <ClCompile Include="src\utilities\helper\tests\TestTexture2D.cpp" />
+    <ClCompile Include="src\utilities\helper\tests\TestTriangle2D.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\utilities\Cell.cpp" />
+    <ClCompile Include="src\obj\Cell.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
-    <ClCompile Include="src\utilities\Point.cpp" />
+    <ClCompile Include="src\obj\Point.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -196,27 +196,29 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\obj\Logger.h" />
     <ClInclude Include="src\obj\PointCloudHelper.h" />
-    <ClInclude Include="src\utilities\Cell.h" />
+    <ClInclude Include="src\obj\Cell.h" />
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\helper\TestMenuHelper.h" />
-    <ClInclude Include="src\utilities\Plane.h" />
+    <ClInclude Include="src\obj\Plane.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
     <ClInclude Include="src\obj\PointCloud.h" />
-    <ClInclude Include="src\obj\Tests\TestClearColor.h" />
-    <ClInclude Include="src\obj\tests\TestPoint.h" />
-    <ClInclude Include="src\obj\Tests\TestPyramid3D.h" />
-    <ClInclude Include="src\obj\Tests\TestTexture2D.h" />
-    <ClInclude Include="src\obj\Tests\TestTriangle2D.h" />
+    <ClInclude Include="src\utilities\helper\tests\TestClearColor.h" />
+    <ClInclude Include="src\utilities\helper\tests\TestPoint.h" />
+    <ClInclude Include="src\utilities\helper\tests\TestPyramid3D.h" />
+    <ClInclude Include="src\utilities\helper\tests\TestTexture2D.h" />
+    <ClInclude Include="src\utilities\helper\tests\TestTriangle2D.h" />
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\Consts.h" />
     <ClInclude Include="src\utilities\ColorMaps.h" />
-    <ClInclude Include="src\utilities\Point.h" />
-    <ClInclude Include="src\utilities\Utilities.h" />
+    <ClInclude Include="src\obj\Point.h" />
+    <ClInclude Include="src\utilities\Status.h" />
+    <ClInclude Include="src\obj\BoundingBox.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>

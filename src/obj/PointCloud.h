@@ -17,10 +17,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "utilities/Point.h"
-#include "utilities/Plane.h"
-#include "utilities/Cell.h"
-#include "utilities/Utilities.h"
+#include "Point.h"
+#include "Plane.h"
+#include "Cell.h"
+#include "BoundingBox.h"
 
 #include "PointCloudHelper.h"
 

@@ -3,8 +3,6 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 
-#include "utilities/Consts.h"
-
 #include <ranges>
 
 #define PixIter for(int i = 0; i < m_NumElements; i++)
@@ -37,9 +35,9 @@ namespace GLObject
 
         auto *indices = new unsigned int[numIndex];
 
-        for (unsigned int w = 0; w < m_StreamWidth; w++)
+        for (int w = 0; w < m_StreamWidth; w++)
         {
-            for (unsigned int h = 0; h < m_StreamHeight; h++)
+            for (int h = 0; h < m_StreamHeight; h++)
             {
                 int i = h * m_StreamWidth + w;
 
@@ -82,17 +80,18 @@ namespace GLObject
         if (m_State.m_State == m_State.STREAM)
         {
             depth = static_cast<const int16_t *>(mp_DepthCamera->getDepth());
-            PixIter 
-            { 
-                streamDepth(i, depth);
-                UpdateVertices(i)
+            if (depth != nullptr) {
+                PixIter { 
+                    streamDepth(i, depth);
+                    UpdateVertices(i)
+                }
             }
+            
         }
         else if (m_State.m_State == m_State.NORMALS)
         {
             startNormalCalculation();
-            PixIter 
-            { 
+            PixIter {
                 calculateNormals(i);
                 UpdateVertices(i)
             }

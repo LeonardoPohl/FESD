@@ -12,7 +12,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "utilities/Point.h"
+#include "obj/Point.h"
 
 namespace GLObject
 {

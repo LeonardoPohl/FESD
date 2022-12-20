@@ -24,7 +24,8 @@
 #include <OpenNI.h>
 #include "cameras/CameraHandler.h"
 
-#include "utilities/Consts.h"
+#include "utilities/Status.h"
+#include "obj/Logger.h"
 
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
@@ -32,7 +33,7 @@
 
 Camera *cam = nullptr;
 
-void window_size_callback(GLFWwindow *window, int width, int height);
+// void window_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xpos, double ypos);
 
@@ -47,31 +48,38 @@ int main(void)
         return -1;
     }
 
-    glfwSetWindowSizeCallback(window, window_size_callback);
+    //glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     {
-    
         ImGuiHelper::initImGui(window);
+
+        Logger::Logger logger;
+        logger.log("Initialised Log");
+
         cam = new Camera{window};
         
         Renderer r;
 
         TestMenuHelper tmh{ cam };
-        
+        bool showTestMenu = false;
         //# Camera Initialisation
         //#######################
-        CameraHandler cameraHandler{cam, &r};
+        CameraHandler cameraHandler{cam, &r, &logger};
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
+        float fps = 0.0f;
+        float fpsSmoothing = 0.9f;
 
         while (!glfwWindowShouldClose(window))
         {
-            float currentFrame = glfwGetTime();
+            float currentFrame = (float)glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
+
+            fps = (float)((fps * fpsSmoothing) + (deltaTime * (1.0 - fpsSmoothing)));
 
             r.Clear();
             
@@ -82,12 +90,19 @@ int main(void)
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            ImGui::Begin("Information");
 
-            tmh.update();
+            ImGui::Text("FPS: %.2f", 1.0f/fps);
+
+            ImGui::End();
+
+            if (showTestMenu)
+                tmh.update();
 
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();
+
+            logger.showLog();
 
             ImGuiHelper::endFrame();
 
@@ -100,12 +115,6 @@ int main(void)
 
     glfwTerminate();
     return 0;
-}
-
-void window_size_callback(GLFWwindow *window, int width, int height)
-{
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
 }
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
