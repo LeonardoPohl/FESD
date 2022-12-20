@@ -80,17 +80,18 @@ namespace GLObject
         if (m_State.m_State == m_State.STREAM)
         {
             depth = static_cast<const int16_t *>(mp_DepthCamera->getDepth());
-            PixIter 
-            { 
-                streamDepth(i, depth);
-                UpdateVertices(i)
+            if (depth != nullptr) {
+                PixIter { 
+                    streamDepth(i, depth);
+                    UpdateVertices(i)
+                }
             }
+            
         }
         else if (m_State.m_State == m_State.NORMALS)
         {
             startNormalCalculation();
-            PixIter 
-            {
+            PixIter {
                 calculateNormals(i);
                 UpdateVertices(i)
             }

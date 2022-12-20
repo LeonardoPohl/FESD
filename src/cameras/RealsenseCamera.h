@@ -11,7 +11,7 @@
 class RealSenseCamera : public DepthCamera {
 public:
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger);
-	RealSenseCamera(std::filesystem::path recording);
+	RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
 
 	~RealSenseCamera() override;
 

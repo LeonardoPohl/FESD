@@ -231,11 +231,8 @@ void CameraHandler::showRecordings() {
                 clearCameras();
 
                 for (auto camera : recording["Cameras"]) {
-                    mp_Logger->log(camera["Type"].asString());
-                    mp_Logger->log(RealSenseCamera::getType());
-                    mp_Logger->log((camera["Type"].asString() == RealSenseCamera::getType()) ? "true" : "false");
                     if (camera["Type"].asString() == RealSenseCamera::getType()) {
-                        m_DepthCameras.push_back(new RealSenseCamera(m_RecordingDirectory / camera["FileName"].asCString()));
+                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
                     }
                 }
             }

@@ -56,8 +56,14 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
-RealSenseCamera::RealSenseCamera(std::filesystem::path recording)
+RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
+	mp_Logger(logger)
 {
+	rs2::context ctx;
+	mp_Pipe = std::make_shared<rs2::pipeline>();
+	mp_Pipe->start();
+	m_Device = mp_Pipe->get_active_profile().get_device();
+
 	rs2::playback playback = m_Device.as<rs2::playback>();
 	mp_Pipe->stop(); // Stop streaming with default configuration
 	mp_Pipe = std::make_shared<rs2::pipeline>();
@@ -65,6 +71,21 @@ RealSenseCamera::RealSenseCamera(std::filesystem::path recording)
 	cfg.enable_device_from_file(recording.string());
 	mp_Pipe->start(cfg); //File will be opened in read mode at this point
 	m_Device = mp_Pipe->get_active_profile().get_device();
+
+	// Wait for first frame
+	rs2::frameset data = mp_Pipe->wait_for_frames(); 
+	rs2::frame depth = data.get_depth_frame();
+
+	// Get Intrinsics
+	auto depth_profile = depth.get_profile().as<rs2::video_stream_profile>();
+	m_Intrinsics = depth_profile.get_intrinsics();
+
+	// Query frame size (width and height)
+	m_DepthWidth = m_Intrinsics.width;
+	m_DepthHeight = m_Intrinsics.height;
+
+	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
+	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -91,7 +112,17 @@ const void *RealSenseCamera::getDepth()
 			rs2::video_frame color = data.get_color_frame();
 		return depth.get_data();
 	}
-	return nullptr;
+	else {
+		rs2::frameset frames;
+		if (mp_Pipe->poll_for_frames(&frames)) // Check if new frames are ready
+		{
+			rs2::depth_frame depth = frames.get_depth_frame();
+			rs2::video_frame color = frames.get_color_frame();
+			return depth.get_data();
+		}
+
+		return nullptr;
+	}
 }
 
 // https://dev.intelrealsense.com/docs/rs-record-playback
