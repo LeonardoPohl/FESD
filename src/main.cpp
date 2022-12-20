@@ -56,7 +56,7 @@ int main(void)
         ImGuiHelper::initImGui(window);
 
         Logger::Logger logger;
-        logger.log(Logger::LogLevel::INFO, "Initialised Log");
+        logger.log("Initialised Log");
 
         cam = new Camera{window};
         

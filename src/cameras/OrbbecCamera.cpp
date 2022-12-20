@@ -78,10 +78,10 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Rende
             OrbbecCamera *d_cam = new OrbbecCamera(&orbbec_devices[i], (*starting_id)++, logger);
             d_cam->makePointCloud(cam, renderer);
             depthCameras.push_back(d_cam);
-            logger->log(Logger::LogLevel::INFO, "Initialised " + depthCameras.back()->getCameraName());
+            logger->log("Initialised " + depthCameras.back()->getCameraName());
         }
         catch (const std::system_error& ex) {
-            logger->log(Logger::LogLevel::ERR, ex.code().value() + " - " + ex.code().message() + " - " + ex.what());
+            logger->log(ex.code().value() + " - " + ex.code().message() + " - " + ex.what(), Logger::LogLevel::ERR);
         }
     }
 
@@ -101,7 +101,7 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
     {
         std::string error_string = "Couldn't open device\n";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -117,13 +117,13 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
         {
             std::string error_string = "Couldn't create depth stream\n";
             error_string += openni::OpenNI::getExtendedError();
-            mp_Logger->log(Logger::LogLevel::ERR, error_string);
+            mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
             throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
         }
     }
     else {
-        mp_Logger->log(Logger::LogLevel::ERR, "Error getting Sensor Info for " + openni::SENSOR_DEPTH);
+        mp_Logger->log("Error getting Sensor Info for " + openni::SENSOR_DEPTH, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
@@ -136,12 +136,12 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
         std::string error_string = "Couldn't start depth stream\n";
         error_string += openni::OpenNI::getExtendedError();
 
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
     else {
-        mp_Logger->log(Logger::LogLevel::INFO, "Depth stream started successfully for " + getCameraName());
+        mp_Logger->log("Depth stream started successfully for " + getCameraName());
     }
 
     int changedStreamDummy;
@@ -156,7 +156,7 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
         error_string += std::to_string(READ_WAIT_TIMEOUT);
         error_string += " ms)\n";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -168,7 +168,7 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
     {
         std::string error_string = "Read failed!\n";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -185,7 +185,7 @@ OrbbecCamera::OrbbecCamera(const openni::DeviceInfo *device_info, int camera_id,
 /// Closes all video streams an stops all devices
 /// </summary>
 OrbbecCamera::~OrbbecCamera() {
-    mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Orbbec] " + this->getCameraName());
+    mp_Logger->log("Shutting down [Orbbec] " + this->getCameraName());
 
     this->_depth_stream.stop();
     this->_depth_stream.destroy();
@@ -215,7 +215,7 @@ const void *OrbbecCamera::getDepth()
         error_string += std::to_string(READ_WAIT_TIMEOUT);
         error_string += " ms)\n";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -226,7 +226,7 @@ const void *OrbbecCamera::getDepth()
     {
         std::string error_string = "Read failed!\n";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -236,7 +236,7 @@ const void *OrbbecCamera::getDepth()
     if (this->_video_mode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_MM && this->_video_mode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_100_UM)
     {
         std::string error_string = "Unexpected frame format!";
-        mp_Logger->log(Logger::LogLevel::ERR, error_string);
+        mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
@@ -258,7 +258,7 @@ void OrbbecCamera::showCameraInfo() {
 std::string OrbbecCamera::startRecording(std::string sessionName, unsigned int numFrames)
 {    
     //m_CameraInfromation["Name"] = getCameraName();
-    //m_CameraInfromation["Type"] = getName();
+    //m_CameraInfromation["Type"] = getType();
     //m_CameraInfromation["FileName"] = startRecording(getFileSafeSessionName());
     //m_CameraInfromation["NumFrames"] = 0;
     

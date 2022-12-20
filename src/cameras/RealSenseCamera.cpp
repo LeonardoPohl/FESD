@@ -19,7 +19,7 @@ std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam,
 	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
 	{
 		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
-		logger->log(Logger::LogLevel::INFO, "Initialised " + depthCameras.back()->getCameraName());
+		logger->log("Initialised " + depthCameras.back()->getCameraName());
 	}
 
 	return depthCameras;
@@ -68,7 +68,7 @@ RealSenseCamera::RealSenseCamera(std::filesystem::path recording)
 }
 
 RealSenseCamera::~RealSenseCamera() {
-	mp_Logger->log(Logger::LogLevel::INFO, "Shutting down [Realsense] " + getCameraName());
+	mp_Logger->log("Shutting down [Realsense] " + getCameraName());
 
 	if (m_Device.as<rs2::recorder>()) {
 		stopRecording();
@@ -78,7 +78,7 @@ RealSenseCamera::~RealSenseCamera() {
 		mp_Pipe->stop();
 	}
 	catch (...) {
-		mp_Logger->log(Logger::LogLevel::INFO, "An exception occured while shutting down [Realsense] Camera " + getCameraName());
+		mp_Logger->log("An exception occured while shutting down [Realsense] Camera " + getCameraName());
 	}
 }
 
@@ -106,7 +106,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 		mp_Pipe->stop();
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
-		mp_Logger->log(Logger::LogLevel::INFO, "Saving " + getCameraName() + "'s stream to " + filepath.string());
+		mp_Logger->log("Saving " + getCameraName() + "'s stream to " + filepath.string());
 
 		cfg.enable_record_to_file(filepath.string());
 		mp_Pipe->start(cfg);
@@ -114,7 +114,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName, unsigned in
 	}
 
 	m_CameraInfromation["Name"] = getCameraName();
-	m_CameraInfromation["Type"] = getName();
+	m_CameraInfromation["Type"] = getType();
 	m_CameraInfromation["FileName"] = filepath.filename().string();
 	m_CameraInfromation["Frames"] = 0;
 

@@ -14,7 +14,7 @@ public:
 
 	const void * getDepth() override;
 
-	std::string getName() const override { return "Orbbec"; }
+	static std::string getType() { return "Orbbec"; }
 
 	void printDeviceInfo() const;
 

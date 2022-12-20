@@ -20,7 +20,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
         auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
-        mp_Logger->log(Logger::LogLevel::ERR, msg);
+        mp_Logger->log(msg, Logger::LogLevel::ERR);
     }        
 
     findRecordings();
@@ -42,7 +42,7 @@ void CameraHandler::initAllCameras()
     auto rs_cameras = RealSenseCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
     auto orbbec_cameras = OrbbecCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
 
-    mp_Logger->log(Logger::LogLevel::INFO, "Queried all devices, " + std::to_string(rs_cameras.size() + orbbec_cameras.size()) + " Cameras found");
+    mp_Logger->log("Queried all devices, " + std::to_string(rs_cameras.size() + orbbec_cameras.size()) + " Cameras found");
 
     m_DepthCameras.insert(m_DepthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
@@ -52,10 +52,13 @@ void CameraHandler::OnRender()
 {
     if (m_State == Recording) {
         m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
-        if (m_RecordedFrames++ > m_FrameLimit && m_LimitFrames) {
+        m_RecordedFrames += 1;
+
+        if (m_RecordedFrames > m_FrameLimit && m_LimitFrames) {
             stopRecording();
             return;
         }
+
         if (m_RecordedSeconds.count() > m_TimeLimit && m_LimitTime) {
             stopRecording();
             return;
@@ -111,7 +114,7 @@ void CameraHandler::OnImGuiRender()
     
     if (ImGui::CollapsingHeader("Recorded Sessions")) {
         if (m_State == Playback && ImGui::Button("Stop Playback")) {
-            mp_Logger->log(Logger::LogLevel::INFO, "Stopping Playback");
+            mp_Logger->log("Stopping Playback");
             m_State = Streaming;
             for (auto cam : m_DepthCameras)
                 delete cam;
@@ -210,6 +213,7 @@ void CameraHandler::showRecordings() {
     for (auto recording : m_Recordings) {
         if (ImGui::TreeNode(recording["Name"].asCString())) {
             ImGui::Text("Duration (s): %.2f", recording["DurationInSec"].asFloat());
+            ImGui::Text("Recorded Frames: %d", recording["RecordedFrames"].asInt());
 
             ImGui::Text("Cameras:");
             for (auto camera : recording["Cameras"]) {
@@ -221,13 +225,16 @@ void CameraHandler::showRecordings() {
             }
 
             if (ImGui::Button("Start Playback")) {
-                mp_Logger->log(Logger::LogLevel::INFO, "Started Playback of Recording \"" + recording["Name"].asString() + "\"");
+                mp_Logger->log("Started Playback of Recording \"" + recording["Name"].asString() + "\"");
                 m_State = Playback;
 
                 clearCameras();
 
                 for (auto camera : recording["Cameras"]) {
-                    if (camera["Name"].asString() == "Realsense") {
+                    mp_Logger->log(camera["Type"].asString());
+                    mp_Logger->log(RealSenseCamera::getType());
+                    mp_Logger->log((camera["Type"].asString() == RealSenseCamera::getType()) ? "true" : "false");
+                    if (camera["Type"].asString() == RealSenseCamera::getType()) {
                         m_DepthCameras.push_back(new RealSenseCamera(m_RecordingDirectory / camera["FileName"].asCString()));
                     }
                 }
@@ -239,7 +246,7 @@ void CameraHandler::showRecordings() {
 }
 
 void CameraHandler::startRecording() {
-    mp_Logger->log(Logger::LogLevel::INFO, "Starting recording");
+    mp_Logger->log("Starting recording");
     m_State = Recording;
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
@@ -252,12 +259,12 @@ void CameraHandler::startRecording() {
 
 #pragma warning(disable : 4996)
 void CameraHandler::stopRecording() {
-    mp_Logger->log(Logger::LogLevel::INFO, "Stopping recording");
+    mp_Logger->log("Stopping recording");
 
     m_RecordingEnd = std::chrono::system_clock::now();
 
     std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);
-    mp_Logger->log(Logger::LogLevel::INFO, "Finished recording at " + (std::string)std::ctime(&end_time) + "elapsed time: " + std::to_string(m_RecordedSeconds.count()) + "s");
+    mp_Logger->log("Finished recording at " + (std::string)std::ctime(&end_time) + "elapsed time: " + std::to_string(m_RecordedSeconds.count()) + "s");
 
     auto configPath = m_RecordingDirectory / getFileSafeSessionName();
     configPath += ".json";
@@ -267,6 +274,7 @@ void CameraHandler::stopRecording() {
 
     root["Name"] = m_SessionName;
     root["DurationInSec"] = m_RecordedSeconds.count();
+    root["RecordedFrames"] = m_RecordedFrames;
 
     Json::Value cameras;
 
@@ -310,7 +318,7 @@ void CameraHandler::findRecordings() {
             JSONCPP_STRING errs;
 
             if (!parseFromStream(builder, configJson, &root, &errs)) {
-                mp_Logger->log(Logger::LogLevel::ERR, errs);
+                mp_Logger->log(errs, Logger::LogLevel::ERR);
             }
             else {
                 m_Recordings.push_back(root);

@@ -15,7 +15,7 @@ namespace Logger {
 	class Logger {
 	public:
 		#pragma warning(disable : 4996)
-		void log(LogLevel level, std::string msg) {
+		void log(std::string msg, LogLevel level = LogLevel::INFO) {
 			std::string entry = "";
 			auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			entry += ctime(&now);

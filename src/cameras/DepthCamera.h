@@ -29,10 +29,9 @@ public:
 	virtual const void *getDepth() = 0;
 
 	/// <summary>
-	/// Gets the Name of the Camera
+	/// Gets the Type of the Camera
 	/// </summary>
-	/// <returns>Name of Camera</returns>
-	virtual std::string getName() const = 0; 
+	static std::string getType() { return "Base"; };
 
 	/// <summary>
 	/// Get Width in Pixel
@@ -89,7 +88,7 @@ public:
 
 	/// <returns>Camera Name</returns>
 	inline std::string getCameraName() const {
-		return this->getName() + " Camera " + std::to_string(this->m_CameraId);
+		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
 	}
 
 	/// <returns>Window Name</returns>

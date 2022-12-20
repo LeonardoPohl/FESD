@@ -17,7 +17,7 @@ public:
 
 	const void *getDepth() override;
 
-	std::string getName() const override { return "Realsense"; }
+	static std::string getType() { return "Realsense"; }
 
 	void printDeviceInfo() const;
 
