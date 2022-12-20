@@ -1,12 +1,11 @@
 #pragma once
 #include <vector>
-#include "DepthCamera.h"
-#include "GLCore/Camera.h"
-#include "GLCore/Renderer.h"
-
 #include <chrono>
 #include <json/json.h>
 
+#include "DepthCamera.h"
+#include "GLCore/Camera.h"
+#include "GLCore/Renderer.h"
 #include "obj/Logger.h"
 
 class CameraHandler
@@ -18,21 +17,6 @@ public:
 	void initAllCameras();
 	void OnRender();
 	void OnImGuiRender();
-
-	void UpdateSessionName() {
-		auto tp = std::chrono::system_clock::now();
-		static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
-		m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{CET, floor<std::chrono::seconds>(tp)});
-	}
-
-	std::string getFileSafeSessionName(){
-		std::string sessionFileName = m_SessionName;
-		std::ranges::replace(sessionFileName, ' ', '_');
-		std::ranges::replace(sessionFileName, ':', '.');
-
-		return sessionFileName;
-	}
-
 private:
 	void showSessionSettings();
 	void showRecordingStats();
@@ -40,6 +24,26 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
+
+	void clearCameras() {
+		for (auto cam : m_DepthCameras)
+			delete cam;
+		m_DepthCameras.clear();
+	}
+
+	void updateSessionName() {
+		auto tp = std::chrono::system_clock::now();
+		static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
+		m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
+	}
+
+	std::string getFileSafeSessionName() {
+		std::string sessionFileName = m_SessionName;
+		std::ranges::replace(sessionFileName, ' ', '_');
+		std::ranges::replace(sessionFileName, ':', '.');
+
+		return sessionFileName;
+	}
 
 	enum State {
 		Streaming,
@@ -67,11 +71,12 @@ private:
 	bool m_LimitTime{ true };
 
 	int m_FrameLimit{ 100 };
-	int m_TimeLimitInS{ 100 };
+
+	/// <summary>
+	/// Time Limit in Seconds
+	/// </summary>
+	int m_TimeLimit{ 100 };
 
 	int m_RecordedFrames{ 0 };
-
-	// For playback to seek the position
-	int m_SeekPosition{ 0 };
 };
 

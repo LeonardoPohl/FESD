@@ -24,23 +24,19 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
     }        
 
     findRecordings();
-    UpdateSessionName();
+    updateSessionName();
 }
 
 CameraHandler::~CameraHandler()
 {
-    for (auto cam : m_DepthCameras)
-        delete cam;
+    clearCameras();
     
     openni::OpenNI::shutdown();
 }
 
 void CameraHandler::initAllCameras()
 {
-    for (auto cam : m_DepthCameras)
-        delete cam;
-
-    m_DepthCameras.clear();
+    clearCameras();
 
     int id = 0;
     auto rs_cameras = RealSenseCamera::initialiseAllDevices(mp_Camera, mp_Renderer, &id, mp_Logger);
@@ -58,6 +54,11 @@ void CameraHandler::OnRender()
         m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
         if (m_RecordedFrames++ > m_FrameLimit && m_LimitFrames) {
             stopRecording();
+            return;
+        }
+        if (m_RecordedSeconds.count() > m_TimeLimit && m_LimitTime) {
+            stopRecording();
+            return;
         }
     }
     
@@ -79,8 +80,6 @@ void CameraHandler::OnRender()
 
 void CameraHandler::OnImGuiRender()
 {
-    //# General Camera Window
-    //#######################
     ImGui::Begin("Camera Handler");
 
     if (ImGui::Button("Init Cameras")) {
@@ -163,9 +162,9 @@ void CameraHandler::showSessionSettings() {
             ImGui::Checkbox("Limit Time", &m_LimitTime);
 
             ImGui::BeginDisabled(!m_LimitTime);
-            ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
-            if (m_TimeLimitInS < 0) {
-                m_TimeLimitInS = 0;
+            ImGui::InputInt("Number of Seconds", &m_TimeLimit, 1, 100);
+            if (m_TimeLimit < 0) {
+                m_TimeLimit = 0;
                 m_LimitTime = false;
             }
             ImGui::EndDisabled();
@@ -174,7 +173,7 @@ void CameraHandler::showSessionSettings() {
 
         if (ImGui::TreeNode("Name")) {
             if (ImGui::Button("Update Session Name")) {
-                UpdateSessionName();
+                updateSessionName();
             }
             ImGui::InputText("Session Name", &m_SessionName, 60);
             ImGui::TreePop();
@@ -197,9 +196,9 @@ void CameraHandler::showRecordingStats() {
             ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
         }
         
-        if (m_LimitTime && m_TimeLimitInS > 0) {
+        if (m_LimitTime && m_TimeLimit > 0) {
             ImGui::Text("Time Limit:");
-            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
+            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimit);
         }
         ImGui::EndDisabled();
 
@@ -210,24 +209,22 @@ void CameraHandler::showRecordingStats() {
 void CameraHandler::showRecordings() {
     for (auto recording : m_Recordings) {
         if (ImGui::TreeNode(recording["Name"].asCString())) {
-            ImGui::Text("Duration (s): %.2f", recording["DurationInSec"]);
+            ImGui::Text("Duration (s): %.2f", recording["DurationInSec"].asFloat());
 
-            if (ImGui::TreeNode("Cameras")) {
-                for (auto camera : recording["Cameras"]) {
-                    ImGui::Text(" Name: %s", camera["Name"].asString());
-                    ImGui::Text("   Type: %s", camera["Type"].asCString());
-                    ImGui::Text("   FileName: %s", camera["FileName"].asCString());
+            ImGui::Text("Cameras:");
+            for (auto camera : recording["Cameras"]) {
+                if (ImGui::TreeNode(camera["Name"].asCString())) {
+                    ImGui::Text("Type: %s", camera["Type"].asCString());
+                    ImGui::Text("FileName: %s", camera["FileName"].asCString());
+                    ImGui::TreePop();
                 }
-                ImGui::TreePop();
             }
 
             if (ImGui::Button("Start Playback")) {
                 mp_Logger->log(Logger::LogLevel::INFO, "Started Playback of Recording \"" + recording["Name"].asString() + "\"");
                 m_State = Playback;
 
-                for (auto cam : m_DepthCameras)
-                    delete cam;
-                m_DepthCameras.clear();
+                clearCameras();
 
                 for (auto camera : recording["Cameras"]) {
                     if (camera["Name"].asString() == "Realsense") {
@@ -286,7 +283,7 @@ void CameraHandler::stopRecording() {
     configJson << Json::writeString(builder, root);
     configJson.close();
 
-    UpdateSessionName();
+    updateSessionName();
     findRecordings();
 
     m_State = Streaming;
@@ -298,6 +295,8 @@ void CameraHandler::stopRecording() {
 }
 
 void CameraHandler::findRecordings() {
+    m_Recordings.clear();
+
     for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json") {
