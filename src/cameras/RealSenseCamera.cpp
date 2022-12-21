@@ -179,8 +179,6 @@ void RealSenseCamera::stopRecording()
 	m_Config.enable_device(m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	mp_Pipe->start(m_Config);
 	m_Device = mp_Pipe->get_active_profile().get_device();
-
-	m_selectedForRecording = false;
 }
 
 void RealSenseCamera::OnUpdate()
