@@ -252,11 +252,13 @@ void CameraHandler::startRecording() {
     m_State = Recording;
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
-    m_RecordingStart = std::chrono::system_clock::now();
+
     for (auto cam : m_DepthCameras) {
         cam->m_isEnabled = true;
         cam->startRecording(getFileSafeSessionName());
     }
+
+    m_RecordingStart = std::chrono::system_clock::now();
 }
 
 #pragma warning(disable : 4996)
