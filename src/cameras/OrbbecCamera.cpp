@@ -96,6 +96,18 @@ OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logg
     errorHandling("Couldn't start depth stream!");
 
     mp_PlaybackController = m_Device.getPlaybackControl();
+
+    mp_PlaybackController->seek(m_DepthStream, 0);
+
+    m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
+    errorHandling("Depth Stream read failed!");
+
+    m_VideoMode = m_DepthFrameRef.getVideoMode();
+    m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
+
+    m_DepthWidth = m_DepthFrameRef.getWidth();
+    m_DepthHeight = m_DepthFrameRef.getHeight();
+
     m_IsPlayback = true;
     m_IsEnabled = true;
 
