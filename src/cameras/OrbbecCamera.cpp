@@ -24,9 +24,7 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Rende
 
     for (int i = 0; i < orbbec_devices.getSize(); i++) {
         try {
-            OrbbecCamera *d_cam = new OrbbecCamera(orbbec_devices[i], (*starting_id)++, logger);
-            d_cam->makePointCloud(cam, renderer);
-            depthCameras.push_back(d_cam);
+            depthCameras.push_back(new OrbbecCamera(orbbec_devices[i], cam, renderer, (*starting_id)++, logger));
             logger->log("Initialised " + depthCameras.back()->getCameraName());
         }
         catch (const std::system_error& ex) {
@@ -37,8 +35,8 @@ std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Rende
     return depthCameras;
 }
 
-OrbbecCamera::OrbbecCamera(openni::DeviceInfo device_info, int camera_id, Logger::Logger* logger) :
-    m_DeviceInfo(device_info), mp_Logger(logger) {
+OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger) :
+    m_DeviceInfo(deviceInfo), mp_Logger(logger) {
     m_CameraId = camera_id;
     printDeviceInfo();
 
@@ -79,6 +77,17 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo device_info, int camera_id, Logger
 
     this->m_DepthWidth = this->m_DepthFrameRef.getWidth();
     this->m_DepthHeight = this->m_DepthFrameRef.getHeight();
+
+    // -> 1 unit = 1 mm
+    // -> 1 m = 1000 units 
+    // -> meters per unit = 1/1000
+    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
+}
+
+OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
+    mp_Logger(logger) {
+    
+    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
 
 OrbbecCamera::~OrbbecCamera() {
@@ -92,10 +101,7 @@ OrbbecCamera::~OrbbecCamera() {
 
 void OrbbecCamera::makePointCloud(Camera *cam, Renderer *renderer)
 {
-    // -> 1 unit = 1 mm
-    // -> 1 m = 1000 units 
-    // -> meters per unit = 1/1000
-    m_pointcloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f/1000.f);
+    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f/1000.f);
 }
 
 const void *OrbbecCamera::getDepth()
@@ -185,19 +191,19 @@ void OrbbecCamera::stopRecording()
 
 void OrbbecCamera::OnUpdate()
 {
-   m_pointcloud->OnUpdate();
+   m_PointCloud->OnUpdate();
 }
 
 void OrbbecCamera::OnRender()
 {
-    m_pointcloud->OnRender();
+    m_PointCloud->OnRender();
 }
 
 void OrbbecCamera::OnImGuiRender()
 {
     ImGui::Begin(getCameraName().c_str());
     ImGui::BeginDisabled(!m_isEnabled);
-    m_pointcloud->OnImGuiRender();
+    m_PointCloud->OnImGuiRender();
     ImGui::EndDisabled();
     ImGui::End();
 }

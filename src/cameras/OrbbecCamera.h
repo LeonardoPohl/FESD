@@ -1,15 +1,18 @@
 #pragma once
-#include "DepthCamera.h"
 #include <OpenNI.h>
 #include <vector>
+#include <filesystem>
 #include <memory>
 #include <glm/glm.hpp>
+
+#include "DepthCamera.h"
 #include "GLCore/Renderer.h"
-#include <obj/Logger.h>
+#include "obj/Logger.h"
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(openni::DeviceInfo deviceInfo, int camera_id, Logger::Logger* logger);
+	OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger);
+	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
@@ -93,5 +96,5 @@ private:
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
-	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
+	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 };
