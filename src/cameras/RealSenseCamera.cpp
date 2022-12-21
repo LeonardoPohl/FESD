@@ -148,20 +148,10 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 	m_CameraInfromation["Type"] = getType();
 	m_CameraInfromation["FileName"] = filepath.filename().string();
 
-	m_selectedForRecording = true;
-	m_isEnabled = true;
+	m_IsSelectedForRecording = true;
+	m_IsEnabled = true;
 
 	return filepath.filename().string();
-}
-
-void RealSenseCamera::showCameraInfo() {
-	if (ImGui::TreeNode(getCameraName().c_str())) {
-		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
-		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
-		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-		ImGui::TreePop();
-	}
 }
 
 void RealSenseCamera::saveFrame() {
@@ -179,8 +169,6 @@ void RealSenseCamera::stopRecording()
 	m_Config.enable_device(m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
 	mp_Pipe->start(m_Config);
 	m_Device = mp_Pipe->get_active_profile().get_device();
-
-	m_selectedForRecording = false;
 }
 
 void RealSenseCamera::OnUpdate()
@@ -196,13 +184,22 @@ inline void RealSenseCamera::OnRender()
 inline void RealSenseCamera::OnImGuiRender()
 {
 	ImGui::Begin(getCameraName().c_str());
-	ImGui::BeginDisabled(!m_isEnabled);
+	ImGui::BeginDisabled(!m_IsEnabled || m_Device.as<rs2::recorder>());
 	m_PointCloud->OnImGuiRender();
 	ImGui::EndDisabled();
 	ImGui::End();
 }
 
-// Utils
+void RealSenseCamera::showCameraInfo() {
+	if (ImGui::TreeNode(getCameraName().c_str())) {
+		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
+		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+		ImGui::TreePop();
+	}
+}
+
 void RealSenseCamera::printDeviceInfo() const {
 	printf("---\nDevice: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_NAME));
 	printf("Produc Line: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));

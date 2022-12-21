@@ -1,15 +1,18 @@
 #pragma once
-#include "DepthCamera.h"
 #include <OpenNI.h>
 #include <vector>
+#include <filesystem>
 #include <memory>
 #include <glm/glm.hpp>
+
+#include "DepthCamera.h"
 #include "GLCore/Renderer.h"
-#include <obj/Logger.h>
+#include "obj/Logger.h"
 
 class OrbbecCamera : public DepthCamera {
 public:
-	OrbbecCamera(const openni::DeviceInfo* deviceInfo, int camera_id, Logger::Logger* logger);
+	OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger);
+	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
@@ -29,36 +32,23 @@ public:
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
 	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
 
-	inline unsigned int getDepthStreamWidth() const override { return depth_width; }
-	inline unsigned int getDepthStreamHeight() const override { return depth_height; }
+	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
+	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
 
 	std::string startRecording(std::string sessionName) override;
 	void showCameraInfo() override;
-	void saveFrame() override { };
+	void saveFrame() override;
 	void stopRecording() override;
 
 	void OnUpdate() override;
 	void OnRender() override;
 	void OnImGuiRender() override;
 
-	void makePointCloud(Camera *cam, Renderer *renderer);
-
-	inline void setNumFrames(int numFrames)
-	{
-		this->frames_left = numFrames;
-		this->num_frames = numFrames;
-	}
-
-	inline bool decFramesLeft()
-	{
-		return this->frames_left-- <= 0 ;
-	}
-
 	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
 	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
-		auto fx = getDepthStreamWidth()  / (2.f * tan(hfov / 2.f));
-		auto fy = getDepthStreamHeight() / (2.f * tan(vfov / 2.f));
+		auto fx = getDepthStreamWidth()  / (2.f * tan(m_hfov / 2.f));
+		auto fy = getDepthStreamHeight() / (2.f * tan(m_vfov / 2.f));
 		auto cx = getDepthStreamWidth()  / 2;
 		auto cy = getDepthStreamHeight() / 2;
 
@@ -86,26 +76,27 @@ public:
 										  0.0f,							 0.0f,							1.0f };
 	}
 private:
-	const openni::DeviceInfo* _device_info;
-	openni::Device _device;
-	openni::VideoStream _depth_stream;
-	openni::VideoFrameRef _frame_ref;
-	openni::VideoMode _video_mode;
-	openni::Status rc;
-	unsigned int max_depth;
+	void errorHandling(std::string error_string = "");
+
+	openni::DeviceInfo m_DeviceInfo;
+	openni::Device m_Device;
+	openni::VideoStream m_DepthStream;
+	openni::VideoFrameRef m_DepthFrameRef;
+	openni::VideoMode m_VideoMode;
+	openni::Status m_RC;
+
+	openni::Recorder m_Recorder;
+	openni::PlaybackControl *mp_PlaybackController;
+	int m_CurrentPlaybackFrame{ 0 };
+	bool m_IsPlayback{ false };
 
 	Logger::Logger* mp_Logger;
 
-	int frames_left{ 0 };
-	int num_frames{ 0 };
-	int delay{ 0 };
-	bool limit_frames = true;
+	const float m_hfov{ glm::radians(60.0f) };
+	const float m_vfov{ glm::radians(49.5f) };
+	const float m_dfov{ glm::radians(73.0f) };
 
-	const float hfov{ glm::radians(60.0f) };
-	const float vfov{ glm::radians(49.5f) };
-	const float dfov{ glm::radians(73.0f) };
-
-	unsigned int depth_width;
-	unsigned int depth_height;
-	std::unique_ptr<GLObject::PointCloud> m_pointcloud;
+	unsigned int m_DepthWidth;
+	unsigned int m_DepthHeight;
+	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 };

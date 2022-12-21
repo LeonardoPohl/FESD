@@ -98,13 +98,9 @@ public:
 		return m_CameraInfromation;
 	}
 
-	bool m_isEnabled{ false };
-	bool m_selectedForRecording{ true };
+	bool m_IsEnabled{ true };
+	bool m_IsSelectedForRecording{ true };
 protected:
 	unsigned int m_CameraId;
-
-	// For Later
-	int m_playbackOffset{ 0 };
-
 	Json::Value m_CameraInfromation;
 };

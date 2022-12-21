@@ -69,6 +69,7 @@ private:
 	bool m_StreamWhileRecording{ true };
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
+	bool m_PlaybackPaused{ false };
 
 	int m_FrameLimit{ 100 };
 
