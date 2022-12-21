@@ -44,8 +44,6 @@ public:
 	void OnRender() override;
 	void OnImGuiRender() override;
 
-	void makePointCloud(Camera *cam, Renderer *renderer);
-
 	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
 	inline float getIntrinsics(INTRINSICS intrin) const override
 	{
@@ -88,6 +86,10 @@ private:
 	openni::Status m_RC;
 
 	openni::Recorder m_Recorder;
+	openni::PlaybackControl *mp_PlaybackController;
+	int m_CurrentPlaybackFrame{ 0 };
+	bool m_IsPlayback{ false };
+
 	Logger::Logger* mp_Logger;
 
 	const float m_hfov{ glm::radians(60.0f) };

@@ -41,12 +41,12 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     printDeviceInfo();
 
     // Open initialised devices
-    this->m_RC = this->m_Device.open(m_DeviceInfo.getUri());
+    m_RC = m_Device.open(m_DeviceInfo.getUri());
     errorHandling("Couldn't open device");
 
     // Create depth stream
-    if (this->m_Device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr) {
-        this->m_RC = this->m_DepthStream.create(this->m_Device, openni::SENSOR_DEPTH);
+    if (m_Device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr) {
+        m_RC = m_DepthStream.create(m_Device, openni::SENSOR_DEPTH);
         errorHandling("Couldn't create depth stream");
     }
     else {
@@ -55,28 +55,28 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     }
 
     // Start depth stream
-    this->m_RC = this->m_DepthStream.start();
+    m_RC = m_DepthStream.start();
     errorHandling("Couldn't start depth stream");
-    if (this->m_RC == openni::STATUS_OK) {
+    if (m_RC == openni::STATUS_OK) {
         mp_Logger->log("Depth stream started successfully for " + getCameraName());
     }
 
     int changedStreamDummy;
-    openni::VideoStream *pStream = &this->m_DepthStream;
+    openni::VideoStream *pStream = &m_DepthStream;
 
     // Wait for a new (first) frame
     m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     errorHandling("Wait failed for Depth! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
 
     // Get depth frame
-    m_RC = this->m_DepthStream.readFrame(&this->m_DepthFrameRef);
+    m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
 
-    this->m_VideoMode = this->m_DepthFrameRef.getVideoMode();
-    this->m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
+    m_VideoMode = m_DepthFrameRef.getVideoMode();
+    m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 
-    this->m_DepthWidth = this->m_DepthFrameRef.getWidth();
-    this->m_DepthHeight = this->m_DepthFrameRef.getHeight();
+    m_DepthWidth = m_DepthFrameRef.getWidth();
+    m_DepthHeight = m_DepthFrameRef.getHeight();
 
     // -> 1 unit = 1 mm
     // -> 1 m = 1000 units 
@@ -86,56 +86,79 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
 
 OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
     mp_Logger(logger) {
-    
+    m_RC = m_Device.open(recording.string().c_str());
+    errorHandling("Couldn't open Recording!");
+
+    m_RC = m_DepthStream.create(m_Device, openni::SENSOR_DEPTH);
+    errorHandling("Couldn't create depth stream!");
+
+    m_RC = m_DepthStream.start();
+    errorHandling("Couldn't start depth stream!");
+
+    mp_PlaybackController = m_Device.getPlaybackControl();
+    m_IsPlayback = true;
+    m_IsEnabled = true;
+
     m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
 
 OrbbecCamera::~OrbbecCamera() {
-    mp_Logger->log("Shutting down [Orbbec] " + this->getCameraName());
+    mp_Logger->log("Shutting down [Orbbec] " + getCameraName());
 
-    this->m_DepthStream.stop();
-    this->m_DepthStream.destroy();
+    m_DepthStream.stop();
+    m_DepthStream.destroy();
 
-    this->m_Device.close();
-}
-
-void OrbbecCamera::makePointCloud(Camera *cam, Renderer *renderer)
-{
-    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f/1000.f);
+    m_Device.close();
 }
 
 const void *OrbbecCamera::getDepth()
 {
-    int changedStreamDummy;
-    openni::VideoStream *pStream = &this->m_DepthStream;
+    if (m_IsPlayback) {
+        mp_PlaybackController->seek(m_DepthStream, m_CurrentPlaybackFrame);
+        m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
+    }
+    else {
+        int changedStreamDummy;
+        openni::VideoStream* pStream = &m_DepthStream;
 
-    // Wait a new frame
-    auto m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
-    errorHandling("Wait failed! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
+        // Wait a new frame
+        auto m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+        errorHandling("Wait failed! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
+    }    
 
     // Get depth frame
-    m_RC = this->m_DepthStream.readFrame(&this->m_DepthFrameRef);
+    m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
 
     // Check if the frame format is depth frame format
-    if (this->m_VideoMode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_MM && this->m_VideoMode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_100_UM)
+    if (!m_IsPlayback && m_VideoMode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_MM && m_VideoMode.getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_100_UM)
     {
+        std::cout << m_VideoMode.getPixelFormat() << std::endl;
         std::string error_string = "Unexpected frame format!";
         mp_Logger->log(error_string, Logger::LogLevel::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
     
-    return (uint16_t*)this->m_DepthFrameRef.getData();
+    return (uint16_t*)m_DepthFrameRef.getData();
 }
 
 void OrbbecCamera::showCameraInfo() {
     if (ImGui::TreeNode(getCameraName().c_str())) {
-        ImGui::Text("Device: %s\n", this->m_DeviceInfo.getName());
-        ImGui::Text("URI: %s\n", this->m_DeviceInfo.getUri());
-        ImGui::Text("USB Product Id: %d\n", this->m_DeviceInfo.getUsbProductId());
-        ImGui::Text("Vendor: %s\n", this->m_DeviceInfo.getVendor());
-        ImGui::TreePop();
+        if (m_IsPlayback) {
+            ImGui::Text("Recording");
+            float progress_saturated = (float)m_CurrentPlaybackFrame / (float)mp_PlaybackController->getNumberOfFrames(m_DepthStream);
+            char buf[32];
+            sprintf(buf, "frame %d/%d", (int)(progress_saturated * mp_PlaybackController->getNumberOfFrames(m_DepthStream)), mp_PlaybackController->getNumberOfFrames(m_DepthStream));
+            ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)mp_PlaybackController->getNumberOfFrames(m_DepthStream), ImVec2(0.f, 0.f), buf);
+        }
+        else {
+            ImGui::Text("Device: %s\n", m_DeviceInfo.getName());
+            ImGui::Text("URI: %s\n", m_DeviceInfo.getUri());
+            ImGui::Text("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
+            ImGui::Text("Vendor: %s\n", m_DeviceInfo.getVendor());
+            ImGui::TreePop();
+        }
     }
 }
 
@@ -165,21 +188,21 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Orbbec Recorder is invalid", Logger::LogLevel::ERR);
     }
 
-    m_isEnabled = true;
+    m_IsEnabled = true;
 
     return filepath.filename().string();
 }
 
 void OrbbecCamera::saveFrame() {
     int changedStreamDummy;
-    openni::VideoStream* pStream = &this->m_DepthStream;
+    openni::VideoStream* pStream = &m_DepthStream;
 
     // Wait for a new frame
     m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     errorHandling("Wait failed for Depth! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
 
     // Get depth frame
-    m_RC = this->m_DepthStream.readFrame(&this->m_DepthFrameRef);
+    m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
 }
 
@@ -202,17 +225,17 @@ void OrbbecCamera::OnRender()
 void OrbbecCamera::OnImGuiRender()
 {
     ImGui::Begin(getCameraName().c_str());
-    ImGui::BeginDisabled(!m_isEnabled);
+    ImGui::BeginDisabled(!m_IsEnabled);
     m_PointCloud->OnImGuiRender();
     ImGui::EndDisabled();
     ImGui::End();
 }
 
 void OrbbecCamera::printDeviceInfo() const  {
-    printf("---\nDevice: %s\n", this->m_DeviceInfo.getName());
-    printf("URI: %s\n", this->m_DeviceInfo.getUri());
-    printf("USB Product Id: %d\n", this->m_DeviceInfo.getUsbProductId());
-    printf("Vendor: %s\n", this->m_DeviceInfo.getVendor());
+    printf("---\nDevice: %s\n", m_DeviceInfo.getName());
+    printf("URI: %s\n", m_DeviceInfo.getUri());
+    printf("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
+    printf("Vendor: %s\n", m_DeviceInfo.getVendor());
 }
 
 void OrbbecCamera::errorHandling(std::string error_string) {

@@ -29,6 +29,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
 CameraHandler::~CameraHandler()
 {
+    stopRecording();
     clearCameras();
     
     openni::OpenNI::shutdown();
@@ -69,7 +70,7 @@ void CameraHandler::OnRender()
     // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
-        if (cam->m_isEnabled || m_State == Playback)
+        if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
         {
             if (m_State == Recording && !m_StreamWhileRecording) {
                 cam->saveFrame();
@@ -86,22 +87,25 @@ void CameraHandler::OnImGuiRender()
 {
     ImGui::Begin("Camera Handler");
 
-    if (ImGui::Button("Init Cameras")) {
+    if (ImGui::Button("Init Cameras") && m_State != Playback) {
         initAllCameras();
     }
     if (!m_DepthCameras.empty()) {
-        ImGui::Text("%d Cameras Found", m_DepthCameras.size());
+        ImGui::Text("%d Cameras Initialised", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
-            ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_isEnabled);
+            if (m_State != Playback) {
+                ImGui::Checkbox(cam->getCameraName().c_str(), &cam->m_IsEnabled);
+            }
             cam->showCameraInfo();
         }
     }
+    ImGui::End();
     
-    if (!m_DepthCameras.empty()) {
+    if (!m_DepthCameras.empty() && m_State != Playback) {
         ImGui::Begin("Recorder");
 
         for (auto cam : m_DepthCameras) {
-            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_selectedForRecording);
+            ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_IsSelectedForRecording);
         }
 
         showSessionSettings();
@@ -117,6 +121,10 @@ void CameraHandler::OnImGuiRender()
     }
     
     ImGui::Begin("Recorded Sessions");
+
+    if (m_State == Playback) {
+        ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
+    }
 
     if (m_State == Playback && ImGui::Button("Stop Playback")) {
         mp_Logger->log("Stopping Playback");
@@ -139,13 +147,12 @@ void CameraHandler::OnImGuiRender()
     showRecordings();
     ImGui::EndDisabled();
     
-    ImGui::End();
+
     ImGui::End();
 
     for (auto cam : m_DepthCameras)
     {
         cam->OnImGuiRender();
-        ImGui::End();
     }
 }
 
@@ -216,7 +223,28 @@ void CameraHandler::showRecordingStats() {
 
 void CameraHandler::showRecordings() {
     for (auto recording : m_Recordings) {
-        if (ImGui::TreeNode(recording["Name"].asCString())) {
+        bool isValid = false;
+        std::string tabName = "(";
+        for (auto camera : recording["Cameras"]) {
+            if (camera["Type"].asString() == RealSenseCamera::getType()) {
+                tabName += "RS";
+                isValid = true;
+            }
+            else if (camera["Type"].asString() == OrbbecCamera::getType()) {
+                tabName += "OB";
+                isValid = true;
+            }
+            else {
+                isValid = false;
+                tabName += "??";
+            }
+        }
+
+        tabName += ") - ";
+        tabName += recording["Name"].asString();
+
+        ImGui::BeginDisabled(!isValid);
+        if (ImGui::TreeNode(tabName.c_str())) {
             ImGui::Text("Duration (s): %.2f", recording["DurationInSec"].asFloat());
             ImGui::Text("Recorded Frames: %d", recording["RecordedFrames"].asInt());
 
@@ -239,11 +267,18 @@ void CameraHandler::showRecordings() {
                     if (camera["Type"].asString() == RealSenseCamera::getType()) {
                         m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
                     }
+                    else if (camera["Type"].asString() == OrbbecCamera::getType()) {
+                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
+                    }
+                    else {
+                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::LogLevel::WARNING);
+                    }
                 }
             }
 
             ImGui::TreePop();
         }
+        ImGui::EndDisabled();
     }
 }
 
@@ -254,7 +289,7 @@ void CameraHandler::startRecording() {
     m_RecordedSeconds = std::chrono::duration<double>::zero();
 
     for (auto cam : m_DepthCameras) {
-        cam->m_isEnabled = true;
+        cam->m_IsEnabled = true;
         cam->startRecording(getFileSafeSessionName());
     }
 
@@ -283,7 +318,7 @@ void CameraHandler::stopRecording() {
     Json::Value cameras;
 
     for (auto cam : m_DepthCameras) {
-        if (cam->m_selectedForRecording) {
+        if (cam->m_IsSelectedForRecording) {
             cameras.append(cam->getCameraConfig());
         }
     }
@@ -291,16 +326,17 @@ void CameraHandler::stopRecording() {
     root["Cameras"] = cameras;
 
     Json::StreamWriterBuilder builder;
-
-    configJson << Json::writeString(builder, root);
-    configJson.close();
+    if (!m_DepthCameras.empty()) {
+        configJson << Json::writeString(builder, root);
+        configJson.close();
+    }
 
     updateSessionName();
     findRecordings();
 
     m_State = Streaming;
     for (auto cam : m_DepthCameras) {
-        if (cam->m_selectedForRecording) {
+        if (cam->m_IsSelectedForRecording) {
             cam->stopRecording();
         }
     } 

@@ -148,8 +148,8 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 	m_CameraInfromation["Type"] = getType();
 	m_CameraInfromation["FileName"] = filepath.filename().string();
 
-	m_selectedForRecording = true;
-	m_isEnabled = true;
+	m_IsSelectedForRecording = true;
+	m_IsEnabled = true;
 
 	return filepath.filename().string();
 }
@@ -184,7 +184,7 @@ inline void RealSenseCamera::OnRender()
 inline void RealSenseCamera::OnImGuiRender()
 {
 	ImGui::Begin(getCameraName().c_str());
-	ImGui::BeginDisabled(!m_isEnabled || m_Device.as<rs2::recorder>());
+	ImGui::BeginDisabled(!m_IsEnabled || m_Device.as<rs2::recorder>());
 	m_PointCloud->OnImGuiRender();
 	ImGui::EndDisabled();
 	ImGui::End();

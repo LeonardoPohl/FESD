@@ -71,7 +71,7 @@ int main(void)
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
         float fps = 0.0f;
-        float fpsSmoothing = 0.9f;
+        float fpsSmoothing = 0.99f;
 
         static float continuousFps[90] = {};
         static int values_offset = 0;
