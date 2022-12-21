@@ -154,16 +154,6 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 	return filepath.filename().string();
 }
 
-void RealSenseCamera::showCameraInfo() {
-	if (ImGui::TreeNode(getCameraName().c_str())) {
-		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
-		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
-		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-		ImGui::TreePop();
-	}
-}
-
 void RealSenseCamera::saveFrame() {
 	rs2::frameset data = mp_Pipe->wait_for_frames();
 	data.get_depth_frame();
@@ -200,7 +190,16 @@ inline void RealSenseCamera::OnImGuiRender()
 	ImGui::End();
 }
 
-// Utils
+void RealSenseCamera::showCameraInfo() {
+	if (ImGui::TreeNode(getCameraName().c_str())) {
+		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
+		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+		ImGui::TreePop();
+	}
+}
+
 void RealSenseCamera::printDeviceInfo() const {
 	printf("---\nDevice: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_NAME));
 	printf("Produc Line: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));

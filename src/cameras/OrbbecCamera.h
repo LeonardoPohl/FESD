@@ -34,7 +34,7 @@ public:
 
 	std::string startRecording(std::string sessionName) override;
 	void showCameraInfo() override;
-	void saveFrame() override { };
+	void saveFrame() override;
 	void stopRecording() override;
 
 	void OnUpdate() override;
@@ -80,15 +80,11 @@ private:
 	openni::DeviceInfo m_DeviceInfo;
 	openni::Device m_Device;
 	openni::VideoStream m_DepthStream;
-	openni::VideoStream m_ColorStream;
 	openni::VideoFrameRef m_DepthFrameRef;
-	openni::VideoFrameRef m_ColorFrameRef;
 	openni::VideoMode m_VideoMode;
 	openni::Status m_RC;
-	//unsigned int m_MaxDepth;
 
 	openni::Recorder m_Recorder;
-
 	Logger::Logger* mp_Logger;
 
 	const float m_hfov{ glm::radians(60.0f) };
