@@ -33,7 +33,6 @@
 
 Camera *cam = nullptr;
 
-// void window_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xpos, double ypos);
 
@@ -48,7 +47,6 @@ int main(void)
         return -1;
     }
 
-    //glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
@@ -64,8 +62,7 @@ int main(void)
 
         TestMenuHelper tmh{ cam };
         bool showTestMenu = false;
-        //# Camera Initialisation
-        //#######################
+
         CameraHandler cameraHandler{cam, &r, &logger};
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
