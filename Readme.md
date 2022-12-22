@@ -1,29 +1,35 @@
-# Laughing Eureka
+# FESD - Fault estimation for skeleton detection
 
-This repository hopefully contains the last, but successful attempt at implementing my thesis. In this iteration I am using the OpenNi framework to simultaneously stream different cameras. So far it has shown to be quite promising at least for the astra cameras. Even if the Realsense camera does not work with the OpenNi framework I am still hopefull that this might be my last attempt, since the Realsense library is easier to work with than the Astra library.
+FESD is a fault detector that was developed in the scope of a master thesis at the University of Leiden. Its goal is to detect faults in skeleton detection using multi modal RGBD Cameras. The cameras that are currently used are the Orbbec Astra Pro and the Realsense L515 but it should not be hard to extend the code to handle different cameras. Openni2 is used as an interface to stream, record and replay the Depth stream of the Astra Camera. The excellent Realsense API is used to do the same for the realsense camera.
+
+The project consists of two or three parts. The first is data aquisition. I implemented methods to display the depth data as a pointcloud and supply several settings for the recording process. This part of the project also supplies a playback functionallity to review the previously recorded sessions. It will also have a functionality to align multiple camera streams using NDT cells.
+
+Skeleton detection is then performed and also stored along the the data stream. We assume that the detected skeleton is the ground truth. Before using the data for training the data is examined for any major faults. To emulate faulty data we randomly move the most likely joints to be faulty to a random position, which is a common fault which might be detectable. Using this method we try to make the training dataset artificially larger.
+
+The fault estimation is then done using a Neural Network which is trained in python.
 
 ## Installation
 
 To use the code in this repository some things have to be installed, this might not be a complete list.
 
-- Astra Driver
-- Realsense Driver
+- Orbbec Camera Driver - [Orbbec Download Page](https://orbbec3d.com/index/download.html)
+- Orbbec OpenNI SDK - [Orbbec Download Page](https://orbbec3d.com/index/download.html)
 
-## Refocus of the thesis
+## Near Future Work (TODOs)
 
-Original plan:
-- Build a structure that allows us to find the relative position of multiple cameras
-- Align the point clouds
-- Find errors in Skeleton detection using multiple angles
-- Use these errors to improve the skeleton detection
+- Multiple pointclouds visible at same time
+- Camera stream alignment using NDT cells
+- **Skeleton detection and recording**
+- Oni and Bag reader in python
+- Train Neural networks
+- Validate/Test neural networks
+- Write report
 
-Proposed plan:
-- Build a structure that allows us to find the relative position of multiple cameras
-- Find the exact relative position and rotation of each camera
-- Calculate the error of the positioning
-- Given a preconfigured set-up show what needs to change to be set up correctly
-- If using multiple cameras:
-	- Overlay the point clouds
-	- Calculate the error of the point clouds
+## Future Work
 
-I believe that this will still be challenging and very exciting. Such a tool would be very useful
+- More Error Handling
+- More Camera Support
+- More data aquisition
+- Better Data Augmentation
+- Different approaches for Fault estimation
+- Integrate neural network in C++ program
