@@ -20,6 +20,9 @@ To use the code in this repository some things have to be installed, this might 
 - Multiple pointclouds visible at same time
 - Camera stream alignment using NDT cells
 - **Skeleton detection and recording**
+- Oni and Bag reader in python
+- Train Neural networks
+- Validate/Test neural networks
 - Write report
 
 ## Future Work
@@ -29,3 +32,4 @@ To use the code in this repository some things have to be installed, this might 
 - More data aquisition
 - Better Data Augmentation
 - Different approaches for Fault estimation
+- Integrate neural network in C++ program
