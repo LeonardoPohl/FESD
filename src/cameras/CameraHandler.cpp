@@ -29,7 +29,9 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
 CameraHandler::~CameraHandler()
 {
-    stopRecording();
+    if (m_State == Recording) {
+        stopRecording();
+    }
     clearCameras();
     
     openni::OpenNI::shutdown();
@@ -367,4 +369,24 @@ void CameraHandler::findRecordings() {
     }
 
     mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
+}
+
+void CameraHandler::clearCameras() {
+    for (auto cam : m_DepthCameras)
+        delete cam;
+    m_DepthCameras.clear();
+}
+
+void CameraHandler::updateSessionName() {
+    auto tp = std::chrono::system_clock::now();
+    static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
+    m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
+}
+
+std::string CameraHandler::getFileSafeSessionName() {
+    std::string sessionFileName = m_SessionName;
+    std::ranges::replace(sessionFileName, ' ', '_');
+    std::ranges::replace(sessionFileName, ':', '.');
+
+    return sessionFileName;
 }

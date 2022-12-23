@@ -25,25 +25,9 @@ private:
 	void stopRecording();
 	void findRecordings();
 
-	void clearCameras() {
-		for (auto cam : m_DepthCameras)
-			delete cam;
-		m_DepthCameras.clear();
-	}
-
-	void updateSessionName() {
-		auto tp = std::chrono::system_clock::now();
-		static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
-		m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
-	}
-
-	std::string getFileSafeSessionName() {
-		std::string sessionFileName = m_SessionName;
-		std::ranges::replace(sessionFileName, ' ', '_');
-		std::ranges::replace(sessionFileName, ':', '.');
-
-		return sessionFileName;
-	}
+	void clearCameras();
+	void updateSessionName();
+	std::string getFileSafeSessionName();
 
 	enum State {
 		Streaming,
