@@ -42,10 +42,43 @@
     <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
+    <ClCompile Include="src\parameters\NormalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parameters\GlobalParameters.cpp">
+      <Filter>Source Files\Parameters</Filter>
+    </ClCompile>
     <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\tests\TestPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\PointCloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Cell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\utilities\helper\tests\TestClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utilities\helper\tests\TestPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\helper\tests\TestPyramid3D.cpp">
@@ -57,22 +90,10 @@
     <ClCompile Include="src\utilities\helper\tests\TestTriangle2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestPoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\PointCloud.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Point.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -121,7 +142,7 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\BoundingBox.h">
+    <ClInclude Include="src\parameters\Parameters.h">
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="src\cameras\DepthCamera.h">
@@ -130,22 +151,19 @@
     <ClInclude Include="src\cameras\CameraHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestClearColor.h">
+    <ClInclude Include="src\obj\Tests\TestClearColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestPyramid3D.h">
+    <ClInclude Include="src\obj\Tests\TestPyramid3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestTexture2D.h">
+    <ClInclude Include="src\obj\Tests\TestTexture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestTriangle2D.h">
+    <ClInclude Include="src\obj\Tests\TestTriangle2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\Point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestPoint.h">
+    <ClInclude Include="src\obj\tests\TestPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\Consts.h">
@@ -160,7 +178,37 @@
     <ClInclude Include="src\utilities\Callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\obj\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Cell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\obj\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\PointCloudHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\helper\tests\TestClearColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\helper\tests\TestPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\helper\tests\TestPyramid3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\helper\tests\TestTexture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\helper\tests\TestTriangle2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\helper\GLFWHelper.h">
@@ -172,16 +220,7 @@
     <ClInclude Include="src\utilities\helper\TestMenuHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\Cell.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\PointCloudHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Status.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
