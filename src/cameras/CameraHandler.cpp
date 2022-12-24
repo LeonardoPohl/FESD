@@ -29,9 +29,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
 CameraHandler::~CameraHandler()
 {
-    if (m_State == Recording) {
-        stopRecording();
-    }
+    stopRecording();
     clearCameras();
     
     openni::OpenNI::shutdown();
@@ -300,6 +298,9 @@ void CameraHandler::startRecording() {
 
 #pragma warning(disable : 4996)
 void CameraHandler::stopRecording() {
+    if (m_State != Recording)
+        return;
+
     mp_Logger->log("Stopping recording");
 
     m_RecordingEnd = std::chrono::system_clock::now();

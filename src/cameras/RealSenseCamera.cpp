@@ -91,10 +91,6 @@ RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger
 RealSenseCamera::~RealSenseCamera() {
 	mp_Logger->log("Shutting down [Realsense] " + getCameraName());
 
-	if (m_Device.as<rs2::recorder>()) {
-		stopRecording();
-	}
-
 	try {
 		mp_Pipe->stop();
 	}
