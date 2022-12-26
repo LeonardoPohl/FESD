@@ -59,13 +59,6 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
 	mp_Logger(logger)
 {
-	rs2::context ctx;
-	mp_Pipe = std::make_shared<rs2::pipeline>();
-	mp_Pipe->start();
-	m_Device = mp_Pipe->get_active_profile().get_device();
-
-	rs2::playback playback = m_Device.as<rs2::playback>();
-	mp_Pipe->stop(); // Stop streaming with default configuration
 	mp_Pipe = std::make_shared<rs2::pipeline>();
 	rs2::config cfg;
 	cfg.enable_device_from_file(recording.string());

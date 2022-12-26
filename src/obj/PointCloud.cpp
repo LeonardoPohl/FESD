@@ -116,7 +116,6 @@ namespace GLObject
         }
         
         m_GLUtil.m_IndexBuffer->Bind();
-
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Point::Vertex) * m_NumElements * Point::VertexCount, m_Vertices));
     }
 
