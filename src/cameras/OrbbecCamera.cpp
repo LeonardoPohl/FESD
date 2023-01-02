@@ -155,6 +155,14 @@ const void *OrbbecCamera::getDepth()
     return (uint16_t*)m_DepthFrameRef.getData();
 }
 
+cv::Mat OrbbecCamera::getColorFrame()
+{
+
+
+    return {};
+}
+
+
 void OrbbecCamera::showCameraInfo() {
     if (ImGui::TreeNode(getCameraName().c_str())) {
         if (m_IsPlayback) {

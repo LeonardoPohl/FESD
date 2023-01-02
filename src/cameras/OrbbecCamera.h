@@ -16,12 +16,9 @@ public:
 	~OrbbecCamera() override;
 
 	const void * getDepth() override;
+	cv::Mat getColorFrame() override;
 
 	static std::string getType() { return "Orbbec"; }
-
-	inline std::string getWindowName() const override {
-		return "Display: " + this->getCameraName();
-	}
 
 	inline std::string getCameraName() const override {
 		return this->getType() + " Camera " + std::to_string(this->m_CameraId);

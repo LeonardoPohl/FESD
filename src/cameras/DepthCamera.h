@@ -3,6 +3,7 @@
 #include <string>
 #include <GLCore/GLObject.h>
 #include <json/json.h>
+#include <opencv2/opencv.hpp>
 
 namespace GLObject
 {
@@ -27,6 +28,11 @@ public:
 	/// </summary>
 	/// <returns>Pointer to first depth pixel</returns>
 	virtual const void *getDepth() = 0;
+
+	/// <summary>
+	/// Gets current color frame for skeleton detection
+	/// </summary>
+	virtual cv::Mat getColorFrame() = 0;
 
 	/// <summary>
 	/// Gets the Type of the Camera
@@ -80,9 +86,6 @@ public:
 	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
 	virtual glm::mat3 getIntrinsics() const = 0;
 
-	/// <returns>Window Name (Display: *Camera Name*)</returns>
-	virtual std::string getWindowName() const = 0;
-
 	/// <returns>Camera Name</returns>
 	virtual std::string getCameraName() const = 0;
 
@@ -101,6 +104,6 @@ public:
 	bool m_IsEnabled{ true };
 	bool m_IsSelectedForRecording{ true };
 protected:
-	unsigned int m_CameraId;
+	unsigned int m_CameraId{ 0 };
 	Json::Value m_CameraInfromation;
 };

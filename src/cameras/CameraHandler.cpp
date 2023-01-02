@@ -146,7 +146,6 @@ void CameraHandler::OnImGuiRender()
 
     showRecordings();
     ImGui::EndDisabled();
-    
 
     ImGui::End();
 
@@ -343,6 +342,10 @@ void CameraHandler::stopRecording() {
             cam->stopRecording();
         }
     } 
+}
+
+void CameraHandler::calculateSkeleton() {
+    
 }
 
 void CameraHandler::findRecordings() {

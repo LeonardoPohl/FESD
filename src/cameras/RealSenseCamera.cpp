@@ -114,6 +114,11 @@ const void *RealSenseCamera::getDepth()
 	}
 }
 
+cv::Mat RealSenseCamera::getColorFrame()
+{
+	return cv::Mat();
+}
+
 // https://dev.intelrealsense.com/docs/rs-record-playback
 std::string RealSenseCamera::startRecording(std::string sessionName)
 {

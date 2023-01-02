@@ -16,12 +16,9 @@ public:
 	~RealSenseCamera() override;
 
 	const void *getDepth() override;
+	cv::Mat getColorFrame() override;
 
 	static std::string getType() { return "Realsense"; }
-
-	inline std::string getWindowName() const override {
-		return "Display: " + this->getCameraName();
-	}
 
 	inline std::string getCameraName() const override {
 		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
@@ -82,9 +79,6 @@ private:
 	rs2::config m_Config{};
 
 	rs2_intrinsics m_Intrinsics;
-
-	// Declare depth colorizer for pretty visualization of depth data
-	rs2::colorizer m_ColorMap{};
 
 	Logger::Logger* mp_Logger;
 

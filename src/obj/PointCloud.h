@@ -22,7 +22,8 @@
 #include "Cell.h"
 #include "BoundingBox.h"
 
-#include "PointCloudHelper.h"
+#include "PointCloudStreamState.h"
+#include "utilities/GLUtil.h"
 
 namespace GLObject
 {

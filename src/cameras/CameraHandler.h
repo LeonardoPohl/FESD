@@ -24,6 +24,7 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
+	void calculateSkeleton();
 
 	void clearCameras();
 	void updateSessionName();
@@ -32,7 +33,8 @@ private:
 	enum State {
 		Streaming,
 		Recording,
-		Playback
+		Playback,
+		HPE
 	};
 
 	State m_State;

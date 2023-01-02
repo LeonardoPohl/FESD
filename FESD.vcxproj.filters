@@ -42,28 +42,7 @@
     <ClCompile Include="src\cameras\RealSenseCamera.cpp">
       <Filter>Source Files\CameraController</Filter>
     </ClCompile>
-    <ClCompile Include="src\parameters\NormalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\parameters\GlobalParameters.cpp">
-      <Filter>Source Files\Parameters</Filter>
-    </ClCompile>
     <ClCompile Include="src\cameras\CameraHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Tests\TestClearColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Tests\TestPyramid3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Tests\TestTexture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Tests\TestTriangle2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\tests\TestPoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\obj\PointCloud.cpp">
@@ -131,6 +110,7 @@
     <None Include="resources\shaders\pointcloud.shader" />
     <None Include="resources\shaders\basic.shader" />
     <None Include="resources\shaders\basic3d.shader" />
+    <None Include="src\fesd.ipynb" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
@@ -142,28 +122,10 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\parameters\Parameters.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\cameras\DepthCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="src\cameras\CameraHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Tests\TestClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Tests\TestPyramid3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Tests\TestTexture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Tests\TestTriangle2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\tests\TestPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\Consts.h">
@@ -193,7 +155,7 @@
     <ClInclude Include="src\obj\Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\PointCloudHelper.h">
+    <ClInclude Include="src\obj\PointCloudStreamState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\helper\tests\TestClearColor.h">
@@ -223,6 +185,9 @@
     <ClInclude Include="src\utilities\Status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\utilities\GLUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />
@@ -234,5 +199,8 @@
     <Image Include="resources\textures\brick.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\requirements.txt" />
   </ItemGroup>
 </Project>
