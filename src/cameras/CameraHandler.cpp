@@ -74,6 +74,8 @@ void CameraHandler::OnRender()
         calculateSkeleton();
     }
 
+    
+
     // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
@@ -85,6 +87,9 @@ void CameraHandler::OnRender()
             else {
                 cam->OnUpdate();
                 cam->OnRender();
+            }
+            if (m_ShowColorFrames) {
+                cv::imshow(cam->getCameraName(), cam->getColorFrame());
             }
         }
     }
@@ -107,6 +112,7 @@ void CameraHandler::OnImGuiRender()
         }
     }
     ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+    ImGui::Checkbox("ShowColorFrames", &m_ShowColorFrames);
 
     ImGui::End();
     
