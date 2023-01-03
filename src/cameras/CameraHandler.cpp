@@ -21,7 +21,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
         auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
         mp_Logger->log(msg, Logger::LogLevel::ERR);
-    }        
+    }
 
     findRecordings();
     updateSessionName();
@@ -33,6 +33,9 @@ CameraHandler::~CameraHandler()
     clearCameras();
     
     openni::OpenNI::shutdown();
+
+    if (m_OpenPoseStarted)
+        m_OPWrapper.stop();
 }
 
 void CameraHandler::initAllCameras()
@@ -67,6 +70,10 @@ void CameraHandler::OnRender()
         m_RecordedFrames += 1;
     }
     
+    if (m_DoSkeletonDetection) {
+        calculateSkeleton();
+    }
+
     // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
@@ -99,6 +106,8 @@ void CameraHandler::OnImGuiRender()
             cam->showCameraInfo();
         }
     }
+    ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+
     ImGui::End();
     
     if (!m_DepthCameras.empty() && m_State != Playback) {
@@ -344,8 +353,34 @@ void CameraHandler::stopRecording() {
     } 
 }
 
+void CameraHandler::startOpenpose()
+{
+    if (m_OpenPoseStarted)
+        return;
+
+    mp_Logger->log("Configuring OpenPose");
+
+    // Starting OpenPose
+    mp_Logger->log("Starting openpose thread(s)");
+    m_OPWrapper.start();
+    m_OpenPoseStarted = true;
+}
+
 void CameraHandler::calculateSkeleton() {
-    
+    startOpenpose();
+
+    for (auto cam : m_DepthCameras) {
+        cv::Mat im = cam->getColorFrame();
+        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(im);
+        auto datumProcessed = m_OPWrapper.emplaceAndPop(imageToProcess);
+        if (datumProcessed != nullptr) {
+            auto keyPoints = datumProcessed->at(0)->poseKeypoints;
+            mp_Logger->log(keyPoints.toString());
+        }
+        else {
+            mp_Logger->log("Frame could not be processed.", Logger::LogLevel::ERR);
+        }
+    }
 }
 
 void CameraHandler::findRecordings() {
@@ -374,6 +409,7 @@ void CameraHandler::findRecordings() {
 
     mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
 }
+
 
 void CameraHandler::clearCameras() {
     for (auto cam : m_DepthCameras)

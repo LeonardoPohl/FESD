@@ -116,7 +116,14 @@ const void *RealSenseCamera::getDepth()
 
 cv::Mat RealSenseCamera::getColorFrame()
 {
-	return cv::Mat();
+	rs2::frameset data = mp_Pipe->wait_for_frames();
+	// Make sure the frameset is spatialy aligned 
+	// (each pixel in depth image corresponds to the same pixel in the color image)
+	rs2::frameset aligned_set = m_AlignToDepth.process(data);
+
+	auto color_frame = aligned_set.get_color_frame();
+
+	return {cv::Size(color_frame.get_width(), color_frame.get_height()), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP};
 }
 
 // https://dev.intelrealsense.com/docs/rs-record-playback

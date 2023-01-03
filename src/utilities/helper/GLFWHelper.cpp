@@ -31,7 +31,7 @@ GLFWwindow *InitialiseGLFWWindow(STATUS &status)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(mode->width, mode->height, "WiP: Master Thesis", nullptr, nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, "FESD: Fault Estimation for Skeleton Detection", nullptr, nullptr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     if (!window)

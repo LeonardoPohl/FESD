@@ -29,31 +29,19 @@ struct PointCloudStreamState
 
 	void setState(State state)
 	{
+		m_State = state;
+
 		if (state == STREAM)
-		{
-			m_State = PointCloudStreamState::STREAM;
 			m_StateElem = 0;
-		}
 		else if (state == IDLE)
-		{
-			m_State = PointCloudStreamState::IDLE;
 			m_StateElem = 1;
-		}
 		else if (state == NORMALS)
-		{
-			m_State = NORMALS;
 			m_StateElem = 2;
-		}
 		else if (state == CELLS)
-		{
-			m_State = CELLS;
 			m_StateElem = 3;
-		}
 		else if (state == CALC_CELLS)
-		{
-			m_State = CALC_CELLS;
 			m_StateElem = 4;
-		}
+		
 	}
 
 	void showState()

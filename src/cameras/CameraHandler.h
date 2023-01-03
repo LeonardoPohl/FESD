@@ -8,6 +8,11 @@
 #include "GLCore/Renderer.h"
 #include "obj/Logger.h"
 
+#include <opencv2/opencv.hpp>
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+#include <openpose/headers.hpp>
+
 class CameraHandler
 {
 public:
@@ -24,6 +29,7 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
+	void startOpenpose();
 	void calculateSkeleton();
 
 	void clearCameras();
@@ -48,6 +54,8 @@ private:
 	std::vector<DepthCamera *> m_DepthCameras;
 	std::vector<Json::Value> m_Recordings;
 
+	op::Wrapper m_OPWrapper{ op::ThreadManagerMode::Asynchronous };
+
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
 	std::chrono::duration<double> m_RecordedSeconds;
@@ -56,6 +64,8 @@ private:
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
 	bool m_PlaybackPaused{ false };
+	bool m_OpenPoseStarted{ false };
+	bool m_DoSkeletonDetection{ false };
 
 	int m_FrameLimit{ 100 };
 

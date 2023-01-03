@@ -35,10 +35,8 @@ namespace GLObject
 
         auto *indices = new unsigned int[numIndex];
 
-        for (int w = 0; w < m_StreamWidth; w++)
-        {
-            for (int h = 0; h < m_StreamHeight; h++)
-            {
+        for (int w = 0; w < m_StreamWidth; w++) {
+            for (int h = 0; h < m_StreamHeight; h++) {
                 int i = h * m_StreamWidth + w;
 
                 m_Points[i].PositionFunction = { ((float)w - cx) / fx,
@@ -77,8 +75,7 @@ namespace GLObject
     {
         const int16_t *depth;
 
-        if (m_State.m_State == m_State.STREAM)
-        {
+        if (m_State.m_State == m_State.STREAM) {
             depth = static_cast<const int16_t *>(mp_DepthCamera->getDepth());
             if (depth != nullptr) {
                 PixIter { 
@@ -86,18 +83,15 @@ namespace GLObject
                     UpdateVertices(i)
                 }
             }
-            
         }
-        else if (m_State.m_State == m_State.NORMALS)
-        {
+        else if (m_State.m_State == m_State.NORMALS) {
             startNormalCalculation();
             PixIter {
                 calculateNormals(i);
                 UpdateVertices(i)
             }
         }
-        else if (m_State.m_State == m_State.CELLS)
-        {
+        else if (m_State.m_State == m_State.CELLS) {
             startCellAssignment();
             PixIter 
             { 
@@ -105,8 +99,7 @@ namespace GLObject
                 UpdateVertices(i)
             }
         }
-        else if (m_State.m_State == m_State.CALC_CELLS)
-        {
+        else if (m_State.m_State == m_State.CALC_CELLS) {
             startCellCalculation();
             PixIter
             { 
@@ -153,8 +146,7 @@ namespace GLObject
         if (m_State != m_State.CALC_CELLS && ImGui::Button("Calculate Cells"))
             startCellCalculation();
 
-        if (m_State == m_State.CELLS || m_State == m_State.CALC_CELLS)
-        {
+        if (m_State == m_State.CELLS || m_State == m_State.CALC_CELLS) {
             ImGui::Checkbox("Show Average Normals", &m_ShowAverageNormals);
             if (ImGui::SliderInt("Cell devisions", &m_NumCellDevisions, 0, 400))
             {
@@ -168,12 +160,10 @@ namespace GLObject
         }
 
         if (m_State == m_State.CALC_CELLS) {
-            if (ImGui::SliderFloat("Planar Threshold", &m_PlanarThreshold, 0.0001f, 1.0f))
-            {
+            if (ImGui::SliderFloat("Planar Threshold", &m_PlanarThreshold, 0.0001f, 1.0f)) {
                 m_PlanarpCells.clear();
                 m_NonPlanarpCells.clear();
-                for (auto const &[_, cell] : m_pCellByKey)
-                {
+                for (auto const &[_, cell] : m_pCellByKey) {
                     cell->updateNDTType();
 
                     if (cell->getType() == Cell::NDT_TYPE::Planar)
@@ -191,8 +181,7 @@ namespace GLObject
     {
         int depth_i = m_StreamWidth * (m_StreamHeight + 1) - i;
 
-        if (m_BoundingBox.updateBox(m_Points[i].getPoint()))
-        {
+        if (m_BoundingBox.updateBox(m_Points[i].getPoint())) {
             m_CellSize = Cell::getCellSize(m_BoundingBox, m_NumCellDevisions);
         }
 
@@ -243,16 +232,13 @@ namespace GLObject
 
         m_State.setState(PointCloudStreamState::CELLS);
 
-        if (!m_CellsAssigned)
-        {
-            PixIter
-            {
+        if (!m_CellsAssigned) {
+            PixIter {
                 auto p = m_Points[i].getPoint();
 
                 std::string key = Cell::getKey(m_BoundingBox, m_CellSize, p);
 
-                if (!m_pCellByKey.contains(key))
-                {
+                if (!m_pCellByKey.contains(key)) {
                     glm::vec3 color{ m_ColorDistribution->operator()(m_Generator), 
                                      m_ColorDistribution->operator()(m_Generator), 
                                      m_ColorDistribution->operator()(m_Generator) };
@@ -274,13 +260,11 @@ namespace GLObject
 
         glm::vec3 col;
 
-        if (m_ShowAverageNormals)
-        {
+        if (m_ShowAverageNormals) {
             auto normal = m_pCellByKey[key]->getNormalisedNormal();
             col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
         }
-        else
-        {
+        else {
             col = m_ColorBypCell[m_pCellByKey[key]];
         }
 
@@ -293,18 +277,15 @@ namespace GLObject
 
     void PointCloud::startCellCalculation()
     {
-        if (!m_CellsAssigned)
-        {
+        if (!m_CellsAssigned) {
             startCellAssignment();
-            //PixIter assignCells(i);
+            // PixIter assignCells(i);
         }
 
         m_State.setState(PointCloudStreamState::CALC_CELLS);
 
-        if (m_PlanarpCells.empty())
-        {
-            for (auto const &[_, cell] : m_pCellByKey)
-            {
+        if (m_PlanarpCells.empty()) {
+            for (auto const &[_, cell] : m_pCellByKey) {
                 cell->calculateNDT();
 
                 if (cell->getType() == Cell::NDT_TYPE::Planar)
@@ -322,18 +303,16 @@ namespace GLObject
 
         std::string key = Cell::getKey(m_BoundingBox, m_CellSize, p);
 
-        glm::vec3 col;
+        glm::vec3 col{};
 
         auto cell = m_pCellByKey[key];
         auto type = cell->getType();
 
-        if (m_ShowAverageNormals)
-        {
+        if (m_ShowAverageNormals) {
             auto normal = cell->getNormalisedNormal();
             col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
         }
-        else
-        {
+        else {
             if (type == Cell::NDT_TYPE::Planar)
                 col = glm::vec3{ 0.0f, 0.0f, 1.0f };
             else if (type == Cell::NDT_TYPE::Linear)

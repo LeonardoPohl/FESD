@@ -78,6 +78,8 @@ private:
 	rs2::device m_Device{};
 	rs2::config m_Config{};
 
+	rs2::align m_AlignToDepth{ RS2_STREAM_DEPTH };
+
 	rs2_intrinsics m_Intrinsics;
 
 	Logger::Logger* mp_Logger;
