@@ -1,0 +1,11 @@
+diff a/src/cameras/OrbbecCamera.cpp b/src/cameras/OrbbecCamera.cpp	(rejected hunks)
+@@ -78,6 +78,9 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
+     m_DepthWidth = m_DepthFrameRef.getWidth();
+     m_DepthHeight = m_DepthFrameRef.getHeight();
+ 
++    m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, 640);
++    m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
++
+     // -> 1 unit = 1 mm
+     // -> 1 m = 1000 units 
+     // -> meters per unit = 1/1000

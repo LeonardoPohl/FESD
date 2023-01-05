@@ -121,9 +121,10 @@ cv::Mat RealSenseCamera::getColorFrame()
 	// (each pixel in depth image corresponds to the same pixel in the color image)
 	rs2::frameset aligned_set = m_AlignToDepth.process(data);
 
-	auto color_frame = aligned_set.get_color_frame();
-
-	return {cv::Size(color_frame.get_width(), color_frame.get_height()), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP};
+	rs2::video_frame color_frame = aligned_set.get_color_frame();
+	cv::Mat color_mat = { cv::Size(color_frame.get_width(), color_frame.get_height()), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP };
+	cv::cvtColor(color_mat, color_mat, cv::COLOR_BGR2RGB);
+	return color_mat;
 }
 
 // https://dev.intelrealsense.com/docs/rs-record-playback

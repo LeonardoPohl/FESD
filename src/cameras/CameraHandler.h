@@ -8,9 +8,9 @@
 #include "GLCore/Renderer.h"
 #include "obj/Logger.h"
 
+#include <OpenNI.h>
+
 #include <opencv2/opencv.hpp>
-//#define OPENPOSE_FLAGS_DISABLE_POSE
-//#include <openpose/flags.hpp>
 #include <openpose/headers.hpp>
 
 class CameraHandler
@@ -39,8 +39,7 @@ private:
 	enum State {
 		Streaming,
 		Recording,
-		Playback,
-		HPE
+		Playback
 	};
 
 	State m_State;

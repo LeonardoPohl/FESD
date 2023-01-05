@@ -8,20 +8,11 @@
 #include <string>
 #include <sstream>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 #include "GLCore/Renderer.h"
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 #include "GLCore/GLObject.h"
 #include "GLCore/GLErrorManager.h"
 #include "GLCore/Camera.h"
 
-#include <OpenNI.h>
 #include "cameras/CameraHandler.h"
 
 #include "utilities/Status.h"
@@ -29,7 +20,6 @@
 
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
-#include "utilities/helper/TestMenuHelper.h"
 
 Camera *cam = nullptr;
 
@@ -59,9 +49,6 @@ int main(void)
         cam = new Camera{window};
         
         Renderer r;
-
-        TestMenuHelper tmh{ cam };
-        bool showTestMenu = false;
 
         CameraHandler cameraHandler{cam, &r, &logger};
 
@@ -114,9 +101,6 @@ int main(void)
                 ImGui::PlotLines("", continuousFps, IM_ARRAYSIZE(continuousFps), values_offset, overlay, 0.0f, 60.0f, ImVec2(0, 80.0f));
             }
             ImGui::End();
-
-            if (showTestMenu)
-                tmh.update();
 
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();

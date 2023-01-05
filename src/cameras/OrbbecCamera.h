@@ -85,8 +85,8 @@ private:
 	openni::Recorder m_Recorder;
 	openni::PlaybackControl *mp_PlaybackController;
 
-	cv::VideoCapture m_ColorStream{ 0, cv::CAP_V4L2 };
-	cv::Mat m_LastFrame{ };
+	cv::VideoCapture m_ColorStream;
+	cv::Mat m_LastColorFrame{ };
 
 	int m_CurrentPlaybackFrame{ 0 };
 	bool m_IsPlayback{ false };

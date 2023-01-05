@@ -1,0 +1,5 @@
+diff a/.gitmodules b/.gitmodules	(rejected hunks)
+@@ -1,3 +0,0 @@
+-[submodule "openpose"]
+-	path = openpose
+-	url = H:\\FESD\\third-party\\openpose

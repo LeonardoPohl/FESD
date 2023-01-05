@@ -78,11 +78,13 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
 
-    m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    m_ColorStream = cv::VideoCapture{ 0, cv::CAP_MSMF };
+
+    m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
+    m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
 
     // -> 1 unit = 1 mm
-    // -> 1 m = 1000 units 
+    // -> 1 m = 1000 units
     // -> meters per unit = 1/1000
     m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
@@ -160,9 +162,9 @@ const void *OrbbecCamera::getDepth()
 
 cv::Mat OrbbecCamera::getColorFrame()
 {
-
-
-    return {};
+    if (m_ColorStream.read(m_LastColorFrame))
+        m_ColorStream.retrieve(m_LastColorFrame);
+    return m_LastColorFrame;
 }
 
 

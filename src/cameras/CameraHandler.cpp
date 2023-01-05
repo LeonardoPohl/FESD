@@ -16,6 +16,9 @@
 #include <utilities/Consts.h>
 #include <utilities/helper/ImGuiHelper.h>
 
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
@@ -89,7 +92,9 @@ void CameraHandler::OnRender()
                 cam->OnRender();
             }
             if (m_ShowColorFrames) {
-                cv::imshow(cam->getCameraName(), cam->getColorFrame());
+                auto frame = cam->getColorFrame();
+                if (!frame.empty())
+                    cv::imshow(cam->getCameraName(), frame);
             }
         }
     }
@@ -103,6 +108,9 @@ void CameraHandler::OnImGuiRender()
         initAllCameras();
     }
     if (!m_DepthCameras.empty()) {
+        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+        ImGui::Checkbox("Show Color Frames", &m_ShowColorFrames);
+
         ImGui::Text("%d Cameras Initialised", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
             if (m_State != Playback) {
@@ -111,8 +119,6 @@ void CameraHandler::OnImGuiRender()
             cam->showCameraInfo();
         }
     }
-    ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
-    ImGui::Checkbox("ShowColorFrames", &m_ShowColorFrames);
 
     ImGui::End();
     
