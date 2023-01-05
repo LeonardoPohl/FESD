@@ -78,8 +78,8 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
     
-    m_ColorStream = cv::VideoCapture{ 0, cv::CAP_MSMF };
-    
+    m_ColorStream = cv::VideoCapture{ 0, cv::CAP_DSHOW };
+
     m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
     m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
 
@@ -162,8 +162,23 @@ const void *OrbbecCamera::getDepth()
 
 cv::Mat OrbbecCamera::getColorFrame()
 {
-    if (m_ColorStream.read(m_LastColorFrame))
+    while (!m_ColorStream.grab() && m_CVCameraId < m_CVCameraSearchDepth) {
+        m_CVCameraId += 1;
+        m_ColorStream = cv::VideoCapture{ m_CVCameraId, cv::CAP_DSHOW };
+
+        m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
+        m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
+    }
+
+    if (m_CVCameraId < m_CVCameraSearchDepth) {
+        m_CVCameraFound = true;
         m_ColorStream.retrieve(m_LastColorFrame);
+    }
+    else if (m_CVCameraId == m_CVCameraSearchDepth) {
+        m_CVCameraId += 1;
+        mp_Logger->log("No suitable OpenCV Camera has been found.", Logger::LogLevel::WARNING);
+    }
+
     return m_LastColorFrame;
 }
 
@@ -251,6 +266,19 @@ void OrbbecCamera::OnImGuiRender()
 {
     ImGui::Begin(getCameraName().c_str());
     ImGui::BeginDisabled(!m_IsEnabled);
+    
+    ImGui::BeginDisabled();
+    ImGui::Checkbox("RGB Camera found", &m_CVCameraFound);
+    ImGui::EndDisabled();
+
+    if (ImGui::Button("Continue Search")) {
+        m_CVCameraFound = false;
+    }
+    if (ImGui::Button("Restart Search")) {
+        m_CVCameraFound = false;
+        m_CVCameraId = 0;
+    }
+
     m_PointCloud->OnImGuiRender();
     ImGui::EndDisabled();
     ImGui::End();

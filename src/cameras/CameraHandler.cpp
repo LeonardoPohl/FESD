@@ -77,8 +77,6 @@ void CameraHandler::OnRender()
         calculateSkeleton();
     }
 
-    
-
     // This sould probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {

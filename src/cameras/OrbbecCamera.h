@@ -8,6 +8,7 @@
 #include "DepthCamera.h"
 #include "GLCore/Renderer.h"
 #include "obj/Logger.h"
+#include "utilities/helper/ImGuiHelper.h"
 
 class OrbbecCamera : public DepthCamera {
 public:
@@ -100,4 +101,8 @@ private:
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
 	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
+
+	int m_CVCameraId{ 0 };
+	int m_CVCameraSearchDepth{ 10 };
+	bool m_CVCameraFound{ false };
 };
