@@ -77,9 +77,9 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
 
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
-
+    
     m_ColorStream = cv::VideoCapture{ 0, cv::CAP_MSMF };
-
+    
     m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
     m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
 
