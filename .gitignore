@@ -35,3 +35,5 @@ vcpkg_installed/
 *.oni
 *.tmp
 bin/
+*.caffemodel
+*.prototxt
