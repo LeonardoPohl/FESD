@@ -93,11 +93,20 @@ OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logg
     m_VideoMode = m_DepthFrameRef.getVideoMode();
     m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 
+    try {
+        m_ColorStream = cv::VideoCapture{ recording.replace_extension("avi").string() };
+    }
+    catch (...) {
+        m_PlaybackHasRGBStream = false;
+        mp_Logger->log("RGB Recording '" + recording.replace_extension("avi").string() + "' not found for " + getCameraName(), Logger::LogLevel::WARNING);
+    }
+    
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
 
     m_IsPlayback = true;
     m_IsEnabled = true;
+    m_CVCameraFound = true;
 
     m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
@@ -216,7 +225,7 @@ const void *OrbbecCamera::getDepth()
         // Wait a new frame
         auto m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
         errorHandling("Wait failed! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
-    }    
+    }
 
     // Get depth frame
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
@@ -231,30 +240,40 @@ const void *OrbbecCamera::getDepth()
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }
+
+    if (m_IsRecording) {
+        m_ColorStreamRecorder.write(getColorFrame());
+    }
     
     return (uint16_t*)m_DepthFrameRef.getData();
 }
 
 cv::Mat OrbbecCamera::getColorFrame()
 {
-    while (!m_ColorStream.grab() && m_CVCameraId < m_CVCameraSearchDepth) {
-        m_CVCameraId += 1;
-        m_ColorStream = cv::VideoCapture{ m_CVCameraId, cv::CAP_DSHOW };
+    if (!m_CVCameraFound) {
+        while (!m_ColorStream.grab() && m_CVCameraId < m_CVCameraSearchDepth) {
+            m_CVCameraId += 1;
+            m_ColorStream = cv::VideoCapture{ m_CVCameraId, cv::CAP_DSHOW };
 
-        m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
-        m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
+            m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
+            m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
+        }
+
+        if (!m_CVCameraFound && m_CVCameraId < m_CVCameraSearchDepth) {
+            m_CVCameraFound = true;
+        }
+        else if (m_CVCameraId == m_CVCameraSearchDepth) {
+            m_CVCameraId += 1;
+            mp_Logger->log("No suitable OpenCV Camera has been found.", Logger::LogLevel::WARNING);
+        }
     }
 
-    if (m_CVCameraId < m_CVCameraSearchDepth) {
-        m_CVCameraFound = true;
-        m_ColorStream.retrieve(m_LastColorFrame);
+    if (m_CVCameraFound) {
+        m_ColorStream.retrieve(m_ColorFrame);
     }
-    else if (m_CVCameraId == m_CVCameraSearchDepth) {
-        m_CVCameraId += 1;
-        mp_Logger->log("No suitable OpenCV Camera has been found.", Logger::LogLevel::WARNING);
-    }
+    
 
-    return m_LastColorFrame;
+    return m_ColorFrame;
 }
 
 
@@ -324,6 +343,8 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Orbbec Recorder is invalid", Logger::LogLevel::ERR);
     }
 
+    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 30, cv::Size(m_DepthWidth, m_DepthHeight)};
+
     m_IsEnabled = true;
     m_IsRecording = true;
 
@@ -341,6 +362,8 @@ void OrbbecCamera::saveFrame() {
     // Get depth frame
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
+
+    m_ColorStreamRecorder.write(getColorFrame());
 }
 
 void OrbbecCamera::stopRecording()
@@ -348,7 +371,9 @@ void OrbbecCamera::stopRecording()
     m_IsRecording = false;
     m_Recorder.stop();
     m_Recorder.destroy();
+    m_ColorStreamRecorder.release();
 }
+
 
 /// 
 /// Utils

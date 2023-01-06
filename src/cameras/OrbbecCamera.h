@@ -58,11 +58,13 @@ private:
 	openni::PlaybackControl *mp_PlaybackController;
 
 	cv::VideoCapture m_ColorStream;
-	cv::Mat m_LastColorFrame{ };
-
-	bool m_IsRecording{ false };
+	cv::Mat m_ColorFrame{ };
+	cv::VideoWriter m_ColorStreamRecorder;
+	
 	int m_CurrentPlaybackFrame{ 0 };
+	bool m_IsRecording{ false };
 	bool m_IsPlayback{ false };
+	bool m_PlaybackHasRGBStream{ true };
 
 	Logger::Logger* mp_Logger;
 
