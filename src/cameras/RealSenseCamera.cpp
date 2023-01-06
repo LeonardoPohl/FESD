@@ -51,6 +51,7 @@ RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger
 	cfg.enable_device_from_file(recording.string());
 	mp_Pipe->start(cfg); //File will be opened in read mode at this point
 	m_Device = mp_Pipe->get_active_profile().get_device();
+	m_Device.as<rs2::playback>().set_real_time(false);
 
 	// Wait for first frame
 	rs2::frameset data = mp_Pipe->wait_for_frames();
@@ -70,7 +71,7 @@ RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger
 
 RealSenseCamera::~RealSenseCamera() {
 	mp_Logger->log("Shutting down [Realsense] " + getCameraName());
-
+	
 	try {
 		mp_Pipe->stop();
 	}
@@ -173,7 +174,9 @@ const void* RealSenseCamera::getDepth()
 		return depth.get_data();
 	}
 	else {
+		auto playback = m_Device.as<rs2::playback>();
 		rs2::frameset frames;
+		
 		if (mp_Pipe->poll_for_frames(&frames)) // Check if new frames are ready
 		{
 			rs2::depth_frame depth = frames.get_depth_frame();
