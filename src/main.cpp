@@ -73,7 +73,7 @@ int main(void)
 
             wi.ShowInformation();
 
-            cameraHandler.OnRender();
+            cameraHandler.OnUpdate();
             cameraHandler.OnImGuiRender();
 
             logger.showLog();

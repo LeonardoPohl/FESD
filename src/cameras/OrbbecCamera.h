@@ -12,67 +12,38 @@
 
 class OrbbecCamera : public DepthCamera {
 public:
+	/// Constructors & Destructors
 	OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger);
 	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
 	~OrbbecCamera() override;
 
+	/// Initialise all devices
+	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
+	static std::vector<OrbbecCamera*> initialiseAllDevices(Camera* cam, Renderer* renderer, int* starting_id, Logger::Logger* logger);
+
+	/// Camera Details
+	static std::string getType();
+	inline std::string getCameraName() const;
+	void showCameraInfo() override;
+	void printDeviceInfo() const;
+	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
+	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
+	inline float getIntrinsics(INTRINSICS intrin) const override;
+	inline glm::mat3 getIntrinsics() const override;
+
+	/// Frame retreival
 	const void * getDepth() override;
 	cv::Mat getColorFrame() override;
 
-	static std::string getType() { return "Orbbec"; }
-
-	inline std::string getCameraName() const override {
-		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
-	}
-
-	void printDeviceInfo() const;
-
-	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
-
-	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
-	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
-
-	std::string startRecording(std::string sessionName) override;
-	void showCameraInfo() override;
-	void saveFrame() override;
-	void stopRecording() override;
-
+	/// Frame update
 	void OnUpdate() override;
 	void OnRender() override;
 	void OnImGuiRender() override;
 
-	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
-	inline float getIntrinsics(INTRINSICS intrin) const override
-	{
-		auto fx = getDepthStreamWidth()  / (2.f * tan(m_hfov / 2.f));
-		auto fy = getDepthStreamHeight() / (2.f * tan(m_vfov / 2.f));
-		auto cx = getDepthStreamWidth()  / 2;
-		auto cy = getDepthStreamHeight() / 2;
-
-		switch (intrin)
-		{
-			using enum INTRINSICS;
-			case FX:
-				return fx;
-			case FY:
-				return fy;
-			case CX:
-				return (float)cx;
-			case CY:
-				return (float)cy;
-			default:
-				break;
-		}
-		return (float)INFINITE;
-	}
-
-	inline glm::mat3 getIntrinsics() const override
-	{
-		return { getIntrinsics(INTRINSICS::FX),							 0.0f, getIntrinsics(INTRINSICS::CX), 
-										  0.0f,	getIntrinsics(INTRINSICS::FY), getIntrinsics(INTRINSICS::CY), 
-										  0.0f,							 0.0f,							1.0f };
-	}
+	/// Recording
+	std::string startRecording(std::string sessionName) override;
+	void saveFrame() override;
+	void stopRecording() override;
 private:
 	void errorHandling(std::string error_string = "");
 
@@ -89,6 +60,7 @@ private:
 	cv::VideoCapture m_ColorStream;
 	cv::Mat m_LastColorFrame{ };
 
+	bool m_IsRecording{ false };
 	int m_CurrentPlaybackFrame{ 0 };
 	bool m_IsPlayback{ false };
 

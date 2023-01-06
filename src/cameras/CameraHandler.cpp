@@ -55,7 +55,7 @@ void CameraHandler::initAllCameras()
     m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
 }
 
-void CameraHandler::OnRender()
+void CameraHandler::OnUpdate()
 {
     if (m_State == Recording) {
         m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
@@ -77,7 +77,7 @@ void CameraHandler::OnRender()
         calculateSkeleton();
     }
 
-    // This sould probably be asynchronous/Multi-threaded/Parallel
+    // This should probably be asynchronous/Multi-threaded/Parallel
     for (auto cam : m_DepthCameras)
     {
         if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))

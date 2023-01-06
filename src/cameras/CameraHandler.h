@@ -20,7 +20,7 @@ public:
 	~CameraHandler();
 
 	void initAllCameras();
-	void OnRender();
+	void OnUpdate();
 	void OnImGuiRender();
 private:
 	void showSessionSettings();

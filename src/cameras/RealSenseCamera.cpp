@@ -7,25 +7,12 @@
 
 // TODO: Add camera parameter tuning
 
-rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
-	return ctx.query_devices();
-}
 
-std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id, Logger::Logger *logger) {
-	rs2::context ctx;
+/// 
+/// Constructors & Destructors
+/// 
 
-	std::vector<RealSenseCamera*> depthCameras;
-
-	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
-	{
-		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
-		logger->log("Initialised " + depthCameras.back()->getCameraName());
-	}
-
-	return depthCameras;
-}
-
-RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger)
+RealSenseCamera::RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger)
 	:
 	mp_Context(ctx),
 	m_Device(*device),
@@ -37,7 +24,7 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 	printDeviceInfo();
 	m_Device.query_sensors();
 	m_Config.enable_device(m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-	
+
 	auto profile = mp_Pipe->start(m_Config);
 
 	rs2::frameset data = mp_Pipe->wait_for_frames(); // Wait for next set of frames from the camera
@@ -46,7 +33,7 @@ RealSenseCamera::RealSenseCamera(rs2::context *ctx, rs2::device *device, Camera 
 	// Get Intrinsics
 	auto depth_profile = depth.get_profile().as<rs2::video_stream_profile>();
 	m_Intrinsics = depth_profile.get_intrinsics();
-	
+
 	// Query frame size (width and height)
 	m_DepthWidth = m_Intrinsics.width;
 	m_DepthHeight = m_Intrinsics.height;
@@ -66,7 +53,7 @@ RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger
 	m_Device = mp_Pipe->get_active_profile().get_device();
 
 	// Wait for first frame
-	rs2::frameset data = mp_Pipe->wait_for_frames(); 
+	rs2::frameset data = mp_Pipe->wait_for_frames();
 	rs2::frame depth = data.get_depth_frame();
 
 	// Get Intrinsics
@@ -92,7 +79,91 @@ RealSenseCamera::~RealSenseCamera() {
 	}
 }
 
-const void *RealSenseCamera::getDepth()
+
+/// 
+/// Initialise all devices
+/// 
+
+rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
+	return ctx.query_devices();
+}
+
+std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer* renderer, int* starting_id, Logger::Logger* logger) {
+	rs2::context ctx;
+
+	std::vector<RealSenseCamera*> depthCameras;
+
+	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
+	{
+		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
+		logger->log("Initialised " + depthCameras.back()->getCameraName());
+	}
+
+	return depthCameras;
+}
+
+/// 
+/// Camera Details
+/// 
+
+
+std::string RealSenseCamera::getType() 
+{ 
+	return "Realsense"; 
+}
+
+inline std::string RealSenseCamera::getCameraName() const
+{
+	return this->getType() + " Camera " + std::to_string(this->m_CameraId);
+}
+
+void RealSenseCamera::showCameraInfo() {
+	if (ImGui::TreeNode(getCameraName().c_str())) {
+		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
+		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+		ImGui::TreePop();
+	}
+}
+
+void RealSenseCamera::printDeviceInfo() const {
+	printf("---\nDevice: %s\n", m_Device.get_info(RS2_CAMERA_INFO_NAME));
+	printf("Produc Line: %s\n", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
+	printf("Serial Number: %s\n", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
+	printf("Physical Port: %s\n\n", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
+}
+
+inline float RealSenseCamera::getIntrinsics(INTRINSICS intrin) const
+{
+	switch (intrin)
+	{
+	case INTRINSICS::FX:
+		return m_Intrinsics.fx;
+	case INTRINSICS::FY:
+		return m_Intrinsics.fy;
+	case INTRINSICS::CX:
+		return m_Intrinsics.ppx;
+	case INTRINSICS::CY:
+		return m_Intrinsics.ppy;
+	default:
+		break;
+	}
+}
+
+inline glm::mat3 RealSenseCamera::getIntrinsics() const
+{
+	return { m_Intrinsics.fx,		     0.0f, m_Intrinsics.ppx,
+						0.0f, m_Intrinsics.fy, m_Intrinsics.ppy,
+						0.0f,		     0.0f,             1.0f };
+}
+
+
+/// 
+/// Frame retreival
+/// 
+
+const void* RealSenseCamera::getDepth()
 {
 	if (!m_Device.as<rs2::playback>()) {
 		rs2::frameset data = mp_Pipe->wait_for_frames(); // Wait for next set of frames from the camera
@@ -127,9 +198,38 @@ cv::Mat RealSenseCamera::getColorFrame()
 	return color_mat;
 }
 
-// https://dev.intelrealsense.com/docs/rs-record-playback
+
+/// 
+/// Frame update
+/// 
+
+void RealSenseCamera::OnUpdate()
+{
+	m_PointCloud->OnUpdate();
+}
+
+inline void RealSenseCamera::OnRender()
+{
+	m_PointCloud->OnRender();
+}
+
+inline void RealSenseCamera::OnImGuiRender()
+{
+	ImGui::Begin(getCameraName().c_str());
+	ImGui::BeginDisabled(!m_IsEnabled || m_Device.as<rs2::recorder>());
+	m_PointCloud->OnImGuiRender();
+	ImGui::EndDisabled();
+	ImGui::End();
+}
+
+
+/// 
+/// Recording
+/// 
+
 std::string RealSenseCamera::startRecording(std::string sessionName)
 {
+	// https://dev.intelrealsense.com/docs/rs-record-playback
 	auto cameraName = getCameraName();
 	std::ranges::replace(cameraName, ' ', '_');
 
@@ -162,7 +262,6 @@ void RealSenseCamera::saveFrame() {
 	data.get_color_frame();
 }
 
-
 void RealSenseCamera::stopRecording()
 {
 	mp_Pipe->stop();
@@ -173,38 +272,5 @@ void RealSenseCamera::stopRecording()
 	m_Device = mp_Pipe->get_active_profile().get_device();
 }
 
-void RealSenseCamera::OnUpdate()
-{
-	m_PointCloud->OnUpdate();
-}
 
-inline void RealSenseCamera::OnRender()
-{
-	m_PointCloud->OnRender();
-}
 
-inline void RealSenseCamera::OnImGuiRender()
-{
-	ImGui::Begin(getCameraName().c_str());
-	ImGui::BeginDisabled(!m_IsEnabled || m_Device.as<rs2::recorder>());
-	m_PointCloud->OnImGuiRender();
-	ImGui::EndDisabled();
-	ImGui::End();
-}
-
-void RealSenseCamera::showCameraInfo() {
-	if (ImGui::TreeNode(getCameraName().c_str())) {
-		ImGui::Text("Name: %s", m_Device.get_info(RS2_CAMERA_INFO_NAME));
-		ImGui::Text("Produc Line: %s", m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
-		ImGui::Text("Serial Number: %s", m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-		ImGui::Text("Physical Port: %s", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-		ImGui::TreePop();
-	}
-}
-
-void RealSenseCamera::printDeviceInfo() const {
-	printf("---\nDevice: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_NAME));
-	printf("Produc Line: %s\n",		m_Device.get_info(RS2_CAMERA_INFO_PRODUCT_LINE));
-	printf("Serial Number: %s\n",	m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-	printf("Physical Port: %s\n\n", m_Device.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT));
-}
