@@ -20,6 +20,7 @@
 
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
+#include "utilities/WindowInfo.h"
 
 Camera *cam = nullptr;
 
@@ -49,26 +50,19 @@ int main(void)
         cam = new Camera{window};
         
         Renderer r;
-
+        WindowInformation wi{};
         CameraHandler cameraHandler{cam, &r, &logger};
 
         float deltaTime = 0.0f;	// Time between current frame and last frame
         float lastFrame = 0.0f; // Time of last frame
-        float fps = 0.0f;
-        float fpsSmoothing = 0.99f;
-
-        static float continuousFps[90] = {};
-        static int values_offset = 0;
-        static double refresh_time = 0.0;
-
+        
         while (!glfwWindowShouldClose(window))
         {
             float currentFrame = (float)glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
 
-            fps = (float)((fps * fpsSmoothing) + (deltaTime * (1.0 - fpsSmoothing)));
-
+            wi.UpdateFps(deltaTime);
             r.Clear();
             
             ImGuiHelper::beginFrame();
@@ -77,30 +71,7 @@ int main(void)
             cam->processKeyboardInput(deltaTime);
             cam->updateImGui();
 
-            ImGui::Begin("Information");
-
-            if (refresh_time == 0.0)
-                refresh_time = ImGui::GetTime();
-
-            while (refresh_time < ImGui::GetTime())
-            {
-                static float phase = 0.0f;
-                continuousFps[values_offset] = 1.0f / fps;
-                values_offset = (values_offset + 1) % IM_ARRAYSIZE(continuousFps);
-                phase += 0.10f * values_offset;
-                refresh_time += 1.0f / 60.0f;
-            }
-
-            {
-                float average = 0.0f;
-                for (int n = 0; n < IM_ARRAYSIZE(continuousFps); n++)
-                    average += continuousFps[n];
-                average /= (float)IM_ARRAYSIZE(continuousFps);
-                char overlay[32];
-                sprintf(overlay, "avg %.2f, curr %.2f", average, 1.0f / fps);
-                ImGui::PlotLines("", continuousFps, IM_ARRAYSIZE(continuousFps), values_offset, overlay, 0.0f, 60.0f, ImVec2(0, 80.0f));
-            }
-            ImGui::End();
+            wi.ShowInformation();
 
             cameraHandler.OnRender();
             cameraHandler.OnImGuiRender();

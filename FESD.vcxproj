@@ -211,6 +211,7 @@
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\Status.h" />
+    <ClInclude Include="src\utilities\WindowInfo.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>
