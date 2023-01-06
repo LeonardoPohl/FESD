@@ -102,10 +102,10 @@ std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam,
 	return depthCameras;
 }
 
+
 /// 
 /// Camera Details
 /// 
-
 
 std::string RealSenseCamera::getType() 
 { 
@@ -271,6 +271,3 @@ void RealSenseCamera::stopRecording()
 	mp_Pipe->start(m_Config);
 	m_Device = mp_Pipe->get_active_profile().get_device();
 }
-
-
-

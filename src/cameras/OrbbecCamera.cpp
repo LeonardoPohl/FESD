@@ -223,7 +223,7 @@ const void *OrbbecCamera::getDepth()
         openni::VideoStream* pStream = &m_DepthStream;
 
         // Wait a new frame
-        auto m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+        m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
         errorHandling("Wait failed! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
     }
 
@@ -269,6 +269,9 @@ cv::Mat OrbbecCamera::getColorFrame()
     }
 
     if (m_CVCameraFound) {
+        if (m_IsPlayback)
+            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, m_CurrentPlaybackFrame);
+
         m_ColorStream.retrieve(m_ColorFrame);
     }
     
