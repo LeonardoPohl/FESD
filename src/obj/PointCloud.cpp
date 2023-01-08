@@ -16,12 +16,8 @@ namespace GLObject
     PointCloud::PointCloud(DepthCamera *depthCamera, const Camera *cam, Renderer *renderer, float metersPerUnit) : mp_DepthCamera(depthCamera), m_MetersPerUnit(metersPerUnit)
     {
         this->camera = cam;
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glEnable(GL_CULL_FACE));
-        GLCall(glEnable(GL_DEPTH_TEST));
-        GLCall(glDepthFunc(GL_LESS));
-        GLCall(glDepthMask(GL_FALSE));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+        GLUtil::setFlags();
 
         m_StreamWidth = mp_DepthCamera->getDepthStreamWidth();
         m_StreamHeight = mp_DepthCamera->getDepthStreamHeight();
