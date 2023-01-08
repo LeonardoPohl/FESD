@@ -1,10 +1,8 @@
 #pragma once
-#ifndef CMAP
-#define CMAP
 #include <vector>
 
 namespace CMap {
-std::vector<std::array<float, 3>> VIRIDS{
+static const std::vector<std::array<float, 3>> VIRIDS{
     {0.267004f, 0.004874f, 0.329415f},
     {0.268510f, 0.009605f, 0.335427f},
     {0.269944f, 0.014625f, 0.341379f},
@@ -267,5 +265,3 @@ inline std::array<float, 3> getViridis(float percent) {
     return VIRIDS[(int)((float)VIRIDS.size() * percent)];
 }
 }
-
-#endif // !CMAP
