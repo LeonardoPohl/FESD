@@ -1,9 +1,14 @@
 #pragma once
-#include <stdexcept>
 #include <string>
+#include <filesystem>
+
+#include <glm/glm.hpp>
+#include <opencv2/core.hpp>
 #include <GLCore/GLObject.h>
 #include <json/json.h>
-#include <opencv2/opencv.hpp>
+#include <GLCore/Renderer.h>
+
+#include "obj/Logger.h"
 
 namespace GLObject
 {

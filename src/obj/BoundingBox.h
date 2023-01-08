@@ -1,12 +1,10 @@
 #pragma once
 #include <random>
-#include <iostream>
 #include <glm/glm.hpp>
 
 class BoundingBox
 {
 public:
-	// TODO low prio: draw bounding box
 	inline bool updateBox(glm::vec3 p)
 	{
 		bool isUpdated = false;
@@ -16,7 +14,7 @@ public:
 			isUpdated = true;
 		}
 		if (p.y > m_MaxBoundingPoint.y){ 
-			m_MaxBoundingPoint.y = p.y; 
+			m_MaxBoundingPoint.y = p.y;
 			isUpdated = true;
 		}
 		if (p.z > m_MaxBoundingPoint.z){ 

@@ -5,9 +5,7 @@
 
 Thanks Tom
 */
-
-#ifndef CPPCOLORMAP_H
-#define CPPCOLORMAP_H
+#pragma once
 
 /**
 \cond
@@ -5561,5 +5559,3 @@ inline array_type::tensor<size_t, 1> match(
 }
 
 } // namespace cppcolormap
-
-#endif

@@ -1,14 +1,11 @@
 #pragma once
-#include <OpenNI.h>
-#include <vector>
-#include <filesystem>
 #include <memory>
-#include <glm/glm.hpp>
+
+#include <OpenNI.h>
+#include <opencv2/videoio.hpp>
 
 #include "DepthCamera.h"
-#include "GLCore/Renderer.h"
-#include "obj/Logger.h"
-#include "utilities/helper/ImGuiHelper.h"
+
 
 class OrbbecCamera : public DepthCamera {
 public:

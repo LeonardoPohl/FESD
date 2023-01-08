@@ -1,9 +1,12 @@
 #include "PointCloud.h"
 
+#include <ranges>
+#include <random>
+
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <ranges>
 
 #define PixIter for(int i = 0; i < m_NumElements; i++)
 #define UpdateVertices(i) memcpy(m_Vertices + i * Point::VertexCount, &m_Points[i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
@@ -43,7 +46,7 @@ namespace GLObject
                                                  ((float)h - cy) / fy };
 
                 m_Points[i].HalfLengthFun = 0.5f / fy;
-                m_Points[i].updateVertexArray(1.f, m_CMAP);
+                m_Points[i].updateVertexArray(1.f);
 
                 memcpy(indices + i * Point::IndexCount, Point::getIndices(i), Point::IndexCount * sizeof(unsigned int));
             }
@@ -186,7 +189,7 @@ namespace GLObject
         }
 
         // Read depth data
-        m_Points[i].updateVertexArray((float)depth[depth_i] * m_MetersPerUnit, m_CMAP);
+        m_Points[i].updateVertexArray((float)depth[depth_i] * m_MetersPerUnit);
     }
 
     void PointCloud::startNormalCalculation()
@@ -215,7 +218,7 @@ namespace GLObject
         auto p1 = m_Points[i_y].getPoint();
         auto p2 = m_Points[i_x].getPoint();
 
-        auto normal = m_Points[i].calculateNormal(p1, p2);
+        auto normal = m_Points[i].getNormal(p1, p2);
 
         for (int v : std::views::iota(0, Point::VertexCount))
             m_Points[i].Vertices[v].Color = { (normal.x + 1) / 2.0f,

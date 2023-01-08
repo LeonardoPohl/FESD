@@ -1,27 +1,19 @@
 #pragma once
-
-#include <GLCore/GLObject.h>
-
-#include <GLCore/Renderer.h>
-#include <GLCore/Texture.h>
-#include <GLCore/VertexBuffer.h>
-#include <GLCore/VertexBufferLayout.h>
-
 #include <array>
 #include <memory>
-#include <cameras/DepthCamera.h>
-
 #include <unordered_map>
-#include <random>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <GLCore/GLObject.h>
+#include <GLCore/Renderer.h>
 
-#include "Point.h"
+#include "cameras/DepthCamera.h"
 #include "Plane.h"
 #include "Cell.h"
+#ifndef POINT
+#include "Point.h"
+#endif
 #include "BoundingBox.h"
-
 #include "PointCloudStreamState.h"
 #include "utilities/GLUtil.h"
 
@@ -81,12 +73,6 @@ namespace GLObject
 		std::unique_ptr<std::uniform_int_distribution<int>> m_PointDistribution{};
 		std::unique_ptr<std::uniform_int_distribution<int>> m_ColorDistribution{};
 
-		Point::CMAP m_CMAP{ Point::CMAP::VIRIDIS };
-		int m_CMAPElem{ 0 };
-
-		std::vector<std::pair<Plane, int>> m_PointCountByPlane;
-		int m_MaxPointCount{ 0 };
-
 		int m_NumCellDevisions{ 200 };
 		int m_NumElements{ 0 };
 		int m_StreamWidth{ 0 };
@@ -107,7 +93,6 @@ namespace GLObject
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
 
-		// Meters per unit
-		float m_MetersPerUnit = 0.0f;
+		float m_MetersPerUnit{ 0.0f };
 	};
 };

@@ -1,17 +1,14 @@
 #pragma once
 #include <vector>
 #include <chrono>
-#include <json/json.h>
+#include <string>
+
+#include <openpose/headers.hpp>
+#include <GLCore/Camera.h>
+#include <GLCore/Renderer.h>
 
 #include "DepthCamera.h"
-#include "GLCore/Camera.h"
-#include "GLCore/Renderer.h"
 #include "obj/Logger.h"
-
-#include <OpenNI.h>
-
-#include <opencv2/opencv.hpp>
-#include <openpose/headers.hpp>
 
 class CameraHandler
 {

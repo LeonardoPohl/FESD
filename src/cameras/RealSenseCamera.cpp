@@ -1,12 +1,11 @@
 #include "RealsenseCamera.h"
-#include <iostream>
+
 #include <exception>
+#include <iostream>
+#include <opencv2/imgproc.hpp>
+
 #include "obj/PointCloud.h"
-#include <utilities/Consts.h>
-#include <obj/Logger.h>
-
-// TODO: Add camera parameter tuning
-
+#include "utilities/Consts.h"
 
 /// 
 /// Constructors & Destructors
@@ -174,7 +173,6 @@ const void* RealSenseCamera::getDepth()
 		return depth.get_data();
 	}
 	else {
-		auto playback = m_Device.as<rs2::playback>();
 		rs2::frameset frames;
 		
 		if (mp_Pipe->poll_for_frames(&frames)) // Check if new frames are ready

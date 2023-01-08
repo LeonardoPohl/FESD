@@ -164,7 +164,6 @@
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
     <ClCompile Include="src\obj\Cell.cpp" />
-    <ClCompile Include="src\obj\Point.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
@@ -205,8 +204,8 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
+    <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />
-    <ClInclude Include="src\utilities\ColorMaps.h" />
     <ClInclude Include="src\utilities\GLUtil.h" />
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />

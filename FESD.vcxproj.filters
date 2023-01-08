@@ -51,9 +51,6 @@
     <ClCompile Include="src\obj\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\Point.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -119,9 +116,6 @@
     <ClInclude Include="src\obj\PointCloud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\ColorMaps.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -156,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\WindowInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\CMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,29 +1,31 @@
 #include "CameraHandler.h"
 
-#include <imgui.h>
-#include <imgui_stdlib.h>
-
-#include "RealsenseCamera.h"
-#include "OrbbecCamera.h"
-
-#include <OpenNI.h>
 #include <iostream>
-#include <obj/PointCloud.h>
 #include <ctime>
 #include <fstream>
 #include <filesystem>
 
-#include <utilities/Consts.h>
-#include <utilities/helper/ImGuiHelper.h>
-
+#include <json/json.h>
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <OpenNI.h>
+#include <opencv2/opencv.hpp>
 #define OPENPOSE_FLAGS_DISABLE_POSE
 #include <openpose/flags.hpp>
+
+#include "RealsenseCamera.h"
+#include "OrbbecCamera.h"
+
+#include "obj/PointCloud.h"
+
+#include "utilities/Consts.h"
+#include "utilities/helper/ImGuiHelper.h"
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
         auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
-        mp_Logger->log(msg, Logger::LogLevel::ERR);
+        mp_Logger->log(msg, Logger::Priority::ERR);
     }
 
     findRecordings();
@@ -289,7 +291,7 @@ void CameraHandler::showRecordings() {
                         m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
                     }
                     else {
-                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::LogLevel::WARNING);
+                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
                     }
                 }
             }
@@ -388,7 +390,7 @@ void CameraHandler::calculateSkeleton() {
             mp_Logger->log(keyPoints.toString());
         }
         else {
-            mp_Logger->log("Frame could not be processed.", Logger::LogLevel::ERR);
+            mp_Logger->log("Frame could not be processed.", Logger::Priority::ERR);
         }
     }
 }
@@ -409,7 +411,7 @@ void CameraHandler::findRecordings() {
             JSONCPP_STRING errs;
 
             if (!parseFromStream(builder, configJson, &root, &errs)) {
-                mp_Logger->log(errs, Logger::LogLevel::ERR);
+                mp_Logger->log(errs, Logger::Priority::ERR);
             }
             else {
                 m_Recordings.push_back(root);

@@ -1,11 +1,8 @@
 #pragma once
-
-#include <librealsense2/rs.hpp>
-#include <filesystem>
 #include <memory>
 
-#include "GLCore/Renderer.h"
-#include "obj/Logger.h"
+#include <librealsense2/rs.hpp>
+
 #include "DepthCamera.h"
 
 class RealSenseCamera : public DepthCamera {
