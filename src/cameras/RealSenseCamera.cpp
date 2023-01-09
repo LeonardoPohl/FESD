@@ -38,6 +38,7 @@ RealSenseCamera::RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera*
 	m_DepthHeight = m_Intrinsics.height;
 
 	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
+	m_MetersPerUnit = depth_frame.get_units();
 }
 
 RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :

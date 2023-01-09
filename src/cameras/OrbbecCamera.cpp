@@ -50,6 +50,8 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
 
+    m_DepthStream.setMirroringEnabled(false);
+
     m_VideoMode = m_DepthFrameRef.getVideoMode();
     m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 

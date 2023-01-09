@@ -68,7 +68,7 @@ private:
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
-	float m_MetersPerUnit{ 1/1000 };
+	float m_MetersPerUnit{ 1.f/1000.f };
 
 	int m_CVCameraId{ 0 };
 	int m_CVCameraSearchDepth{ 10 };

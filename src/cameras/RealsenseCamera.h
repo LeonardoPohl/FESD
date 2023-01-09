@@ -52,5 +52,5 @@ private:
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
-	float m_MetersPerUnit;
+	float m_MetersPerUnit{};
 };

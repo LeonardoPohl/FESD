@@ -17,7 +17,14 @@ namespace GLObject
     {
         this->camera = cam;
 
-        GLUtil::setFlags();
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glEnable(GL_CULL_FACE));
+        GLCall(glEnable(GL_DEPTH_TEST));
+        GLCall(glDepthFunc(GL_LESS));
+        GLCall(glDepthMask(GL_FALSE));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+        //GLUtil::setFlags();
         m_NumElementsTotal = 0;
 
         for (auto cam : m_DepthCameras) {
@@ -30,8 +37,8 @@ namespace GLObject
             m_NumElements.push_back(m_StreamWidths.back() * m_StreamHeights.back());
             m_ElementOffset.push_back(m_NumElementsTotal);
 
-            m_Points.push_back(new Point[m_NumElements.back()]);
-            m_Vertices.push_back(new Point::Vertex[m_NumElements.back() * Point::VertexCount]);
+            m_Points.push_back(new Point[m_NumElements.back()]{});
+            m_Vertices.push_back(new Point::Vertex[m_NumElements.back() * Point::VertexCount]{});
 
             m_ColorBypCell.push_back({ });
             m_pCellByKey.push_back({ });
@@ -60,7 +67,7 @@ namespace GLObject
             for (int w = 0; w < m_StreamWidths[cam_index]; w++) {
                 for (int h = 0; h < m_StreamHeights[cam_index]; h++) {
                     int i = h * m_StreamWidths[cam_index] + w;
-
+                    
                     m_Points[cam_index][i].PositionFunction = { ((float)w - cx) / fx,
                                                                 ((float)h - cy) / fy };
 
@@ -91,7 +98,6 @@ namespace GLObject
         m_GLUtil.m_Shader = std::make_unique<Shader>("resources/shaders/PointCloud");
         m_GLUtil.m_Shader->Bind();
 
-
         m_PointDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, m_NumElementsTotal - 1);
         m_ColorDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, 255);
     }
@@ -112,7 +118,8 @@ namespace GLObject
                     PixIter(cam_index) 
                     {
                         streamDepth(i, cam_index, depth);
-                        UpdateVertices(cam_index, i)
+                        memcpy(m_Vertices[cam_index] + i * Point::VertexCount, &m_Points[cam_index][i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+                        //UpdateVertices(cam_index, i)
                     }
                 }
             }
@@ -148,8 +155,6 @@ namespace GLObject
     void PointCloud::OnRender()
     {
         m_GLUtil.m_Shader->Bind();
-        m_GLUtil.m_Shader->SetUniform1f("u_Scale", m_Scale);
-
         for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
             glm::mat4 model{ 1.0f };
             if (m_Rotation[cam_index].x != 0 || m_Rotation[cam_index].y != 0 || m_Rotation[cam_index].z != 0)
@@ -402,7 +407,6 @@ namespace GLObject
         std::vector<int> plane_points{};
 
         plane_points.push_back(m_PointDistribution->operator()(m_Generator));
-        
     }
 
     void PointCloud::manipulateTranslation()
@@ -410,8 +414,8 @@ namespace GLObject
         for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
             if (ImGui::CollapsingHeader(("Translation " + m_DepthCameras[cam_index]->getCameraName()).c_str()))
             {
-                ImGui::SliderFloat3("Rotation", &m_Rotation[cam_index].x, -1.0f, 1.0f);
-                ImGui::SliderFloat3("Translation", &m_Translation[cam_index].x, -2.0f, 2.0f);
+                ImGui::SliderFloat3(("Rotation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Rotation[cam_index].x, -1.0f, 1.0f);
+                ImGui::SliderFloat3(("Translation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Translation[cam_index].x, -2.0f, 2.0f);
             }
         }
 

@@ -94,7 +94,7 @@ public:
 		return m_CameraInfromation;
 	}
 
-	bool m_IsEnabled{ false };
+	bool m_IsEnabled{ true };
 	bool m_IsSelectedForRecording{ true };
 protected:
 	unsigned int m_CameraId{ 0 };
