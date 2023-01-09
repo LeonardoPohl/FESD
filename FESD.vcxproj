@@ -184,10 +184,8 @@
     </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
-    <None Include="resources\shaders\basic.shader" />
-    <None Include="resources\shaders\basic3d.shader" />
-    <None Include="resources\shaders\texture.shader" />
-    <None Include="resources\shaders\pointcloud.shader" />
+    <None Include="resources\shaders\PointCloud\PointCloud.frag" />
+    <None Include="resources\shaders\PointCloud\PointCloud.vert" />
     <None Include="src\fesd.ipynb" />
     <None Include="vcpkg.json" />
   </ItemGroup>

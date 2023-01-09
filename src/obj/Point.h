@@ -14,13 +14,13 @@ class Point
 public:
 	struct Vertex
 	{
+		int CameraIndex{ 0 };
 		std::array<float, 3> Position;
-		std::array<float, 4> Color;
-
-		Vertex() : Position{ 0.0f, 0.0f, 0.0f }, Color{ 0.0f, 0.0f, 0.0f, 1.0f } {}
-		Vertex(std::array<float, 3> position,
-			   std::array<float, 4> color)
-			: Position(position), Color(color) {}
+		std::array<float, 3> Color;
+		
+		Vertex() : Position{ 0.0f, 0.0f, 0.0f }, Color{ 0.0f, 0.0f, 0.0f }, CameraIndex(0) {}
+		Vertex(std::array<float, 3> position, std::array<float, 3> color, int CameraIndex)
+			: Position(position), Color(color), CameraIndex(CameraIndex) {}
 
 		inline void reassign(float x, float y, float z, const float r, const float g, const float b) {
 			Position[0] = x;
@@ -73,7 +73,7 @@ public:
 		return CMap::getViridis(z);
 	}
 
-	inline void updateVertexArray(float depth) 
+	inline void updateVertexArray(float depth, int cam_index = -1)
 	{
 		Depth = depth;
 		std::array<float, 3> Color = getColorFromDepth(depth);
@@ -91,10 +91,15 @@ public:
 		Vertices[1].reassign(x + a, y - a, z - a, r, g, b);
 		Vertices[2].reassign(x + a, y - a, z + a, r, g, b);
 		Vertices[3].reassign(x - a, y - a, z + a, r, g, b);
+		
 		Vertices[4].reassign(x - a, y + a, z - a, r, g, b);
 		Vertices[5].reassign(x + a, y + a, z - a, r, g, b);
 		Vertices[6].reassign(x + a, y + a, z + a, r, g, b);
 		Vertices[7].reassign(x - a, y + a, z + a, r, g, b);
+
+		if (cam_index != -1)
+			for (auto vert : Vertices)
+				vert.CameraIndex = cam_index;
 	}
 
 	inline glm::vec3 getPoint() const

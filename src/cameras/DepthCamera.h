@@ -55,21 +55,6 @@ public:
 	virtual unsigned int getDepthStreamHeight() const = 0;
 
 	/// <summary>
-	/// Call update Functions
-	/// </summary>
-	virtual void OnUpdate() = 0;
-
-	/// <summary>
-	/// Execute Render
-	/// </summary>
-	virtual void OnRender() = 0;
-
-	/// <summary>
-	/// Execute ImGui Render
-	/// </summary>
-	virtual void OnImGuiRender() = 0;
-
-	/// <summary>
 	/// Start recording to file
 	/// </summary>
 	/// <param name="sessionName">Name of the session used for file naming and multi file synchronisation</param>
@@ -90,6 +75,9 @@ public:
 
 	virtual float getIntrinsics(INTRINSICS intrin) const = 0;
 	virtual glm::mat3 getIntrinsics() const = 0;
+	virtual float getMetersPerUnit() const = 0;
+
+	virtual void CameraSettings() =0;
 
 	/// <returns>Camera Name</returns>
 	virtual std::string getCameraName() const = 0;
@@ -106,7 +94,7 @@ public:
 		return m_CameraInfromation;
 	}
 
-	bool m_IsEnabled{ true };
+	bool m_IsEnabled{ false };
 	bool m_IsSelectedForRecording{ true };
 protected:
 	unsigned int m_CameraId{ 0 };

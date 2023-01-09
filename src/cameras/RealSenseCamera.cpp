@@ -38,8 +38,6 @@ RealSenseCamera::RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera*
 	m_DepthHeight = m_Intrinsics.height;
 
 	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
-
-	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
 }
 
 RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
@@ -65,7 +63,7 @@ RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger
 	m_DepthHeight = m_Intrinsics.height;
 
 	rs2::depth_frame depth_frame = depth.as<rs2::depth_frame>();
-	m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, depth_frame.get_units());
+	m_MetersPerUnit = depth_frame.get_units();
 }
 
 RealSenseCamera::~RealSenseCamera() {
@@ -158,6 +156,11 @@ inline glm::mat3 RealSenseCamera::getIntrinsics() const
 						0.0f,		     0.0f,             1.0f };
 }
 
+inline float RealSenseCamera::getMetersPerUnit() const
+{
+	return m_MetersPerUnit;
+}
+
 
 /// 
 /// Frame retreival
@@ -197,30 +200,6 @@ cv::Mat RealSenseCamera::getColorFrame()
 	cv::Mat color_mat = { cv::Size(color_frame.get_width(), color_frame.get_height()), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP };
 	cv::cvtColor(color_mat, color_mat, cv::COLOR_BGR2RGB);
 	return color_mat;
-}
-
-
-/// 
-/// Frame update
-/// 
-
-void RealSenseCamera::OnUpdate()
-{
-	m_PointCloud->OnUpdate();
-}
-
-inline void RealSenseCamera::OnRender()
-{
-	m_PointCloud->OnRender();
-}
-
-inline void RealSenseCamera::OnImGuiRender()
-{
-	ImGui::Begin(getCameraName().c_str());
-	ImGui::BeginDisabled(!m_IsEnabled || m_Device.as<rs2::recorder>());
-	m_PointCloud->OnImGuiRender();
-	ImGui::EndDisabled();
-	ImGui::End();
 }
 
 

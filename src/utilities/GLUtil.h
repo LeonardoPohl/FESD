@@ -21,13 +21,6 @@ struct GLUtil
 	std::unique_ptr<VertexBuffer> m_VB;
 	std::unique_ptr<VertexBufferLayout> m_VBL;
 
-	float m_RotationFactor{ 0 };
-	glm::vec3 m_Rotation{ 0.0f, 1.0f, 0.0f };
-	glm::vec3 m_Translation{ 0.f, 0.f, 0.f };
-	glm::vec3 m_ModelTranslation{ 0.0f };
-
-	float m_Scale{ 1.0f };
-
 	static void setFlags() {
 		GLCall(glEnable(GL_BLEND));
 		GLCall(glEnable(GL_CULL_FACE));
@@ -35,21 +28,5 @@ struct GLUtil
 		GLCall(glDepthFunc(GL_LESS));
 		GLCall(glDepthMask(GL_FALSE));
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-	}
-
-	void manipulateTranslation()
-	{
-		if (ImGui::CollapsingHeader("Translation"))
-		{
-			ImGui::SliderAngle("Rotation Factor", &m_RotationFactor);
-			ImGui::SliderFloat3("Rotation", &m_Rotation.x, -1.0f, 1.0f);
-
-			ImGui::SliderFloat3("Translation", &m_Translation.x, -2.0f, 2.0f);
-		}
-
-		if (ImGui::CollapsingHeader("Scale"))
-		{
-			ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
-		}
 	}
 };

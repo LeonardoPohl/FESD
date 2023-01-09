@@ -18,7 +18,7 @@ private:
 	mutable std::unordered_map<std::string, int> m_UniformLocationCache;
 public:
 	Shader() =default;
-	Shader(const std::string &filepath);
+	Shader(const std::string& filepath);
 	~Shader();
 
 	void Bind() const;
@@ -33,7 +33,7 @@ public:
 	void SetUniformMat4f(const std::string &name, const glm::mat4 &matrix);
 private:
 	unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader);
-	ShaderProgramSource ParseShader(const std::string &filepath);
+	ShaderProgramSource ParseShaderCombined(const std::string &filepath);
 	unsigned int CompileShader(unsigned int type, const std::string &source);
 
 	int GetUniformLocation(const std::string &name) const;

@@ -62,11 +62,6 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
 
     getColorFrame();
-
-    // -> 1 unit = 1 mm
-    // -> 1 m = 1000 units
-    // -> meters per unit = 1/1000
-    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
 
 OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
@@ -104,8 +99,6 @@ OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logg
     m_IsPlayback = true;
     m_IsEnabled = true;
     m_CVCameraFound = true;
-
-    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
 }
 
 OrbbecCamera::~OrbbecCamera() {
@@ -205,6 +198,11 @@ inline glm::mat3 OrbbecCamera::getIntrinsics() const
                                       0.0f,							 0.0f,							1.0f };
 }
 
+inline float OrbbecCamera::getMetersPerUnit() const
+{
+    return m_MetersPerUnit;
+}
+
 /// 
 /// Frame retreival
 /// 
@@ -278,20 +276,10 @@ cv::Mat OrbbecCamera::getColorFrame()
 
 
 /// 
-/// Frame update
+/// Camera Settings
 /// 
 
-void OrbbecCamera::OnUpdate()
-{
-   m_PointCloud->OnUpdate();
-}
-
-void OrbbecCamera::OnRender()
-{
-    m_PointCloud->OnRender();
-}
-
-void OrbbecCamera::OnImGuiRender()
+void OrbbecCamera::CameraSettings()
 {
     ImGui::Begin(getCameraName().c_str());
     ImGui::BeginDisabled(!m_IsEnabled);
@@ -308,7 +296,6 @@ void OrbbecCamera::OnImGuiRender()
         m_CVCameraId = 0;
     }
 
-    m_PointCloud->OnImGuiRender();
     ImGui::EndDisabled();
     ImGui::End();
 }

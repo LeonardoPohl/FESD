@@ -2,6 +2,7 @@
 #include <vector>
 #include <chrono>
 #include <string>
+#include <memory>
 
 #include <openpose/headers.hpp>
 #include <GLCore/Camera.h>
@@ -47,6 +48,7 @@ private:
 
 	Logger::Logger* mp_Logger;
 
+	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 	std::vector<DepthCamera *> m_DepthCameras;
 	std::vector<Json::Value> m_Recordings;
 
@@ -63,6 +65,7 @@ private:
 	bool m_OpenPoseStarted{ false };
 	bool m_DoSkeletonDetection{ false };
 	bool m_ShowColorFrames{ false };
+	bool m_CamerasExist{ false };
 
 	int m_FrameLimit{ 100 };
 

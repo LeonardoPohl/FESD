@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-
 #include <OpenNI.h>
 #include <opencv2/videoio.hpp>
 
@@ -27,15 +25,14 @@ public:
 	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
 	inline float getIntrinsics(INTRINSICS intrin) const override;
 	inline glm::mat3 getIntrinsics() const override;
+	inline float getMetersPerUnit() const override;
 
 	/// Frame retreival
 	const void * getDepth() override;
 	cv::Mat getColorFrame() override;
 
-	/// Frame update
-	void OnUpdate() override;
-	void OnRender() override;
-	void OnImGuiRender() override;
+	/// Camera Settings
+	void CameraSettings() override;
 
 	/// Recording
 	std::string startRecording(std::string sessionName) override;
@@ -71,7 +68,7 @@ private:
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
-	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
+	float m_MetersPerUnit{ 1/1000 };
 
 	int m_CVCameraId{ 0 };
 	int m_CVCameraSearchDepth{ 10 };
