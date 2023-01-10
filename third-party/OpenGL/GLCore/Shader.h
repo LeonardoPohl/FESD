@@ -33,8 +33,7 @@ public:
 	void SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3);
 	void SetUniformMat3f(const std::string &name, const glm::mat3 &matrix);
 	void SetUniformMat4f(const std::string &name, const glm::mat4 &matrix);
-	template<size_t N>
-	void SetUniformMat4fv(const std::string& name, const std::array<glm::mat4&, N> mats);
+	void SetUniformMat4fv(const std::string& name, const std::vector<glm::mat4> &matrices, size_t elemCount);
 private:
 	unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader);
 	ShaderProgramSource ParseShaderCombined(const std::string &filepath);

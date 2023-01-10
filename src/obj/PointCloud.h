@@ -45,6 +45,8 @@ namespace GLObject
 		PointCloudStreamState m_State{ };
 
 		std::vector<DepthCamera*> m_DepthCameras;
+		std::vector<glm::mat4> m_MVPS{};
+		const int m_CameraCount{ };
 
 		std::vector<Point *> m_Points; 
 		std::vector<Point::Vertex *> m_Vertices;

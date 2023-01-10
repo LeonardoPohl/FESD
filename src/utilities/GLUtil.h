@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 
 #include <GLCore/Renderer.h>
-#include <GLCore/Texture.h>
 #include <GLCore/VertexBuffer.h>
 #include <GLCore/VertexBufferLayout.h>
 

@@ -3,7 +3,15 @@
 #include "GLErrorManager.h"
 #include <GL/glew.h>
 
-void Renderer::Draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const
+void Renderer::Draw(const VertexArray& va, const Shader& shader) const
+{
+    shader.Bind();
+    va.Bind();
+
+    GLCall(glDrawElements(GL_POINTS, va.GetCount(), GL_UNSIGNED_INT, nullptr));
+}
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
     shader.Bind();
     va.Bind();

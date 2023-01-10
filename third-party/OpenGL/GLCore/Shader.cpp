@@ -157,15 +157,9 @@ void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
     GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
 }
 
-void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+void Shader::SetUniformMat4fv(const std::string& name, const std::vector<glm::mat4>& matrices, size_t elemCount)
 {
-    GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
-}
-
-template <size_t N>
-void Shader::SetUniformMat4fv(const std::string& name, const std::array<glm::mat4&, N> matrix)
-{
-    GLCall(glUniformMatrix4fv(GetUniformLocation(name), N, GL_FALSE, &matrix[0][0][0]));
+    GLCall(glUniformMatrix4fv(GetUniformLocation(name), elemCount, GL_FALSE, &matrices[0][0][0]));
 }
 
 int Shader::GetUniformLocation(const std::string &name) const

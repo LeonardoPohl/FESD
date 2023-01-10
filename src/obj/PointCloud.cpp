@@ -13,16 +13,16 @@
 
 namespace GLObject
 {
-    PointCloud::PointCloud(std::vector<DepthCamera *> depthCameras, const Camera *cam, Renderer *renderer) : m_DepthCameras(depthCameras)
+    PointCloud::PointCloud(std::vector<DepthCamera *> depthCameras, const Camera *cam, Renderer *renderer) : m_DepthCameras(depthCameras), m_CameraCount(depthCameras.size())
     {
         this->camera = cam;
 
-        GLCall(glEnable(GL_BLEND));
-        GLCall(glEnable(GL_CULL_FACE));
+        GLCall(glPointSize(1.5f));
+
         GLCall(glEnable(GL_DEPTH_TEST));
-        GLCall(glDepthFunc(GL_LESS));
-        GLCall(glDepthMask(GL_FALSE));
-        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LEQUAL);
+        glDepthRange(0.0f, 1.0f);
 
         //GLUtil::setFlags();
         m_NumElementsTotal = 0;
@@ -36,6 +36,8 @@ namespace GLObject
 
             m_NumElements.push_back(m_StreamWidths.back() * m_StreamHeights.back());
             m_ElementOffset.push_back(m_NumElementsTotal);
+            
+            m_MVPS.push_back({ });
 
             m_Points.push_back(new Point[m_NumElements.back()]{});
             m_Vertices.push_back(new Point::Vertex[m_NumElements.back() * Point::VertexCount]{});
@@ -55,10 +57,7 @@ namespace GLObject
         // Add the last element + 1 so termination criteria is simpler
         m_ElementOffset.push_back(m_NumElementsTotal + 1);
 
-        const unsigned int numIndex = m_NumElementsTotal * Point::IndexCount;
-        auto* indices = new unsigned int[numIndex];
-
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             float fx = m_DepthCameras[cam_index]->getIntrinsics(INTRINSICS::FX);
             float fy = m_DepthCameras[cam_index]->getIntrinsics(INTRINSICS::FY);
             float cx = m_DepthCameras[cam_index]->getIntrinsics(INTRINSICS::CX);
@@ -73,27 +72,21 @@ namespace GLObject
 
                     m_Points[cam_index][i].HalfLengthFun = 0.5f / fy;
                     m_Points[cam_index][i].updateVertexArray(1.f, cam_index);
-
-                    memcpy(indices + i * Point::IndexCount + m_ElementOffset[cam_index] * Point::IndexCount,
-                           Point::getIndices(i + m_ElementOffset[cam_index]),
-                           Point::IndexCount * sizeof(unsigned int));
                 }
             }
         }
 
         m_GLUtil.mp_Renderer = renderer;
-        m_GLUtil.m_VAO = std::make_unique<VertexArray>();
+        m_GLUtil.m_VAO = std::make_unique<VertexArray>(m_NumElementsTotal);
 
         m_GLUtil.m_VB = std::make_unique<VertexBuffer>(m_NumElementsTotal * Point::VertexCount * sizeof(Point::Vertex));
         m_GLUtil.m_VBL = std::make_unique<VertexBufferLayout>();
 
+        m_GLUtil.m_VBL->Push<GLfloat>(3);
+        m_GLUtil.m_VBL->Push<GLfloat>(3);
         m_GLUtil.m_VBL->Push<GLuint>(1);
-        m_GLUtil.m_VBL->Push<GLfloat>(3);
-        m_GLUtil.m_VBL->Push<GLfloat>(3);
 
         m_GLUtil.m_VAO->AddBuffer(*m_GLUtil.m_VB, *m_GLUtil.m_VBL);
-
-        m_GLUtil.m_IndexBuffer = std::make_unique<IndexBuffer>(indices, numIndex);
 
         m_GLUtil.m_Shader = std::make_unique<Shader>("resources/shaders/PointCloud");
         m_GLUtil.m_Shader->Bind();
@@ -105,9 +98,8 @@ namespace GLObject
     void PointCloud::OnUpdate()
     {
         const int16_t *depth;
-        m_GLUtil.m_IndexBuffer->Bind();
 
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             auto cam = m_DepthCameras[cam_index];
             if (!cam->m_IsEnabled)
                 continue;
@@ -154,18 +146,21 @@ namespace GLObject
 
     void PointCloud::OnRender()
     {
-        m_GLUtil.m_Shader->Bind();
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             glm::mat4 model{ 1.0f };
+
             if (m_Rotation[cam_index].x != 0 || m_Rotation[cam_index].y != 0 || m_Rotation[cam_index].z != 0)
                 model = glm::rotate(model, 1.0f, m_Rotation[cam_index]);
             
             model = glm::translate(model, m_Translation[cam_index]);
-            
-            m_GLUtil.m_Shader->SetUniformMat4f("u_MVP" + std::to_string(cam_index), camera->getViewProjection() * model);
+
+            m_GLUtil.m_Shader->SetUniformMat4f(("u_Models[" + std::to_string(cam_index) + "]"), model);
         }
 
-        m_GLUtil.mp_Renderer->Draw(*m_GLUtil.m_VAO, *m_GLUtil.m_IndexBuffer, *m_GLUtil.m_Shader);
+        m_GLUtil.m_Shader->SetUniformMat4f("u_VP", camera->getViewProjection());
+        
+        m_GLUtil.m_Shader->Bind();
+        m_GLUtil.mp_Renderer->Draw(*m_GLUtil.m_VAO, *m_GLUtil.m_Shader);
     }
 
     void PointCloud::OnImGuiRender()
@@ -191,7 +186,7 @@ namespace GLObject
             ImGui::Checkbox("Show Average Normals", &m_ShowAverageNormals);
             if (ImGui::SliderInt("Cell devisions", &m_NumCellDevisions, 0, 400))
             {
-                for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+                for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
                     m_CellSizes[cam_index] = Cell::getCellSize(m_BoundingBoxes[cam_index], m_NumCellDevisions);
                     m_ColorBypCell[cam_index].clear();
                     m_pCellByKey[cam_index].clear();
@@ -204,7 +199,7 @@ namespace GLObject
 
         if (m_State == m_State.CALC_CELLS) {
             if (ImGui::SliderFloat("Planar Threshold", &m_PlanarThreshold, 0.0001f, 1.0f)) {
-                for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+                for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
                     m_PlanarpCells[cam_index].clear();
                     m_NonPlanarpCells[cam_index].clear();
 
@@ -231,7 +226,7 @@ namespace GLObject
     void PointCloud::resumeStream()
     {
         m_State.setState(PointCloudStreamState::STREAM);
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             for (auto key : m_pCellByKey[cam_index])
                 delete key.second;
 
@@ -255,7 +250,7 @@ namespace GLObject
         }
 
         // Read depth data
-        m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit());
+        m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit(), cam_index);
     }
 
     void PointCloud::startNormalCalculation()
@@ -294,7 +289,7 @@ namespace GLObject
 
     void PointCloud::startCellAssignment()
     {
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             if (!m_NormalsCalculated) {
                 PixIter(cam_index)
                 {
@@ -356,7 +351,7 @@ namespace GLObject
         }
         m_State.setState(PointCloudStreamState::CALC_CELLS);
 
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             if (m_PlanarpCells.empty()) {
                 for (auto const& [_, cell] : m_pCellByKey[cam_index]) {
                     cell->calculateNDT();
@@ -411,7 +406,7 @@ namespace GLObject
 
     void PointCloud::manipulateTranslation()
     {
-        for (int cam_index = 0; cam_index < m_DepthCameras.size(); cam_index++) {
+        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             if (ImGui::CollapsingHeader(("Translation " + m_DepthCameras[cam_index]->getCameraName()).c_str()))
             {
                 ImGui::SliderFloat3(("Rotation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Rotation[cam_index].x, -1.0f, 1.0f);

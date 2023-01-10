@@ -39,9 +39,6 @@
     <ClCompile Include="GLCore\vendor\imgui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GLCore\vendor\stb_image\std_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GLCore\GLErrorManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -55,9 +52,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GLCore\Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GLCore\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GLCore\VertexArray.cpp">
@@ -1355,9 +1349,6 @@
     <ClInclude Include="GLCore\vendor\imgui\imstb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GLCore\vendor\stb_image\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GLCore\GLErrorManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1371,9 +1362,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GLCore\Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GLCore\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GLCore\VertexArray.h">
