@@ -21,7 +21,9 @@ void main()
 	if (aCamIndex == 0){
 		gl_Position = u_VP * u_Models[0] * vec4(aPos, 1.0);
 	}else if (aCamIndex == 1){
-		gl_Position = u_VP * mat4(1.0) * vec4(aPos, 1.0);
+		gl_Position = u_VP * u_Models[1] * vec4(aPos, 1.0);
+	}else{
+		gl_Position = u_VP * vec4(aPos, 1.0);
 	}
 	
 	// Assigns the colors from the Vertex Data to "color"

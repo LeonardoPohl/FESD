@@ -59,7 +59,7 @@ private:
 	float cameraSpeed{ SPEED };
 	float sensitivity{ SENSITIVITY };
 
-	float fov{ 45.0f };
+	float fov{ 60.0f };
 
 	float lastX{ -1.0f };
 	float lastY{ -1.0f };
