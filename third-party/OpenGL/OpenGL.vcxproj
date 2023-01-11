@@ -130,6 +130,7 @@
       <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)GLCore;$(ProjectDir)GLCore\vendor;$(ProjectDir)Dependencies\GLFW\include;$(ProjectDir)Dependencies\GLEW\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,7 +148,6 @@
     <ClCompile Include="GLCore\IndexBuffer.cpp" />
     <ClCompile Include="GLCore\Renderer.cpp" />
     <ClCompile Include="GLCore\Shader.cpp" />
-    <ClCompile Include="GLCore\Texture.cpp" />
     <ClCompile Include="GLCore\vendor\glm\detail\glm.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui_demo.cpp" />
@@ -156,7 +156,6 @@
     <ClCompile Include="GLCore\vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="GLCore\vendor\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="GLCore\vendor\stb_image\std_image.cpp" />
     <ClCompile Include="GLCore\VertexArray.cpp" />
     <ClCompile Include="GLCore\VertexBuffer.cpp" />
   </ItemGroup>
@@ -313,7 +312,6 @@
     <ClInclude Include="GLCore\IndexBuffer.h" />
     <ClInclude Include="GLCore\Renderer.h" />
     <ClInclude Include="GLCore\Shader.h" />
-    <ClInclude Include="GLCore\Texture.h" />
     <ClInclude Include="GLCore\vendor\glm\common.hpp" />
     <ClInclude Include="GLCore\vendor\glm\detail\compute_common.hpp" />
     <ClInclude Include="GLCore\vendor\glm\detail\compute_vector_relational.hpp" />
@@ -605,7 +603,6 @@
     <ClInclude Include="GLCore\vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="GLCore\vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="GLCore\vendor\imgui\imstb_truetype.h" />
-    <ClInclude Include="GLCore\vendor\stb_image\stb_image.h" />
     <ClInclude Include="GLCore\VertexArray.h" />
     <ClInclude Include="GLCore\VertexBuffer.h" />
     <ClInclude Include="GLCore\VertexBufferLayout.h" />

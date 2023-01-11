@@ -30,9 +30,10 @@
 *.app
 
 .vs/
-x64/
 vcpkg_installed/
 *.htm
-packages/
 *.oni
 *.tmp
+bin/
+*.caffemodel
+*.prototxt

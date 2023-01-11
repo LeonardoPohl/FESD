@@ -1,39 +1,17 @@
 #include "OrbbecCamera.h"
 
 #include <iostream>
-#include <vector>
-#include <chrono>
+#include <stdexcept>
 
 #include <imgui.h>
-#include <filesystem>
-#include <utilities/Consts.h>
 
 #include "obj/PointCloud.h"
+#include "utilities/Consts.h"
+#include "utilities/helper/ImGuiHelper.h"
 
-constexpr int READ_WAIT_TIMEOUT = 1000;
-
-void OrbbecCamera::getAvailableDevices(openni::Array<openni::DeviceInfo> *available_devices) {
-    openni::OpenNI::enumerateDevices(available_devices);
-}
-
-std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id, Logger::Logger* logger) {
-    openni::Array<openni::DeviceInfo> orbbec_devices;
-    OrbbecCamera::getAvailableDevices(&orbbec_devices);
-
-    std::vector<OrbbecCamera*> depthCameras;
-
-    for (int i = 0; i < orbbec_devices.getSize(); i++) {
-        try {
-            depthCameras.push_back(new OrbbecCamera(orbbec_devices[i], cam, renderer, (*starting_id)++, logger));
-            logger->log("Initialised " + depthCameras.back()->getCameraName());
-        }
-        catch (const std::system_error& ex) {
-            logger->log(ex.code().value() + " - " + ex.code().message() + " - " + ex.what(), Logger::LogLevel::ERR);
-        }
-    }
-
-    return depthCameras;
-}
+/// 
+/// Constructors & Destructors
+/// 
 
 OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger) :
     m_DeviceInfo(deviceInfo), mp_Logger(logger) {
@@ -50,7 +28,7 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
         errorHandling("Couldn't create depth stream");
     }
     else {
-        mp_Logger->log("Error getting Sensor Info for the Depth Sensor", Logger::LogLevel::ERR);
+        mp_Logger->log("Error getting Sensor Info for the Depth Sensor", Logger::Priority::ERR);
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
 
@@ -62,7 +40,7 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     }
 
     int changedStreamDummy;
-    openni::VideoStream *pStream = &m_DepthStream;
+    openni::VideoStream* pStream = &m_DepthStream;
 
     // Wait for a new (first) frame
     m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
@@ -72,16 +50,20 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
 
+    m_DepthStream.setMirroringEnabled(false);
+
     m_VideoMode = m_DepthFrameRef.getVideoMode();
     m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
 
-    // -> 1 unit = 1 mm
-    // -> 1 m = 1000 units 
-    // -> meters per unit = 1/1000
-    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
+    m_ColorStream = cv::VideoCapture{ 0, cv::CAP_DSHOW };
+
+    m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
+    m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
+
+    getColorFrame();
 }
 
 OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
@@ -105,13 +87,20 @@ OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logg
     m_VideoMode = m_DepthFrameRef.getVideoMode();
     m_VideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_1_MM);
 
+    try {
+        m_ColorStream = cv::VideoCapture{ recording.replace_extension("avi").string() };
+    }
+    catch (...) {
+        m_PlaybackHasRGBStream = false;
+        mp_Logger->log("RGB Recording '" + recording.replace_extension("avi").string() + "' not found for " + getCameraName(), Logger::Priority::WARN);
+    }
+    
     m_DepthWidth = m_DepthFrameRef.getWidth();
     m_DepthHeight = m_DepthFrameRef.getHeight();
 
     m_IsPlayback = true;
     m_IsEnabled = true;
-
-    m_PointCloud = std::make_unique<GLObject::PointCloud>(this, cam, renderer, 1.f / 1000.f);
+    m_CVCameraFound = true;
 }
 
 OrbbecCamera::~OrbbecCamera() {
@@ -122,6 +111,103 @@ OrbbecCamera::~OrbbecCamera() {
 
     m_Device.close();
 }
+
+/// 
+/// Initialise all devices
+/// 
+
+void OrbbecCamera::getAvailableDevices(openni::Array<openni::DeviceInfo> *available_devices) {
+    openni::OpenNI::enumerateDevices(available_devices);
+}
+
+std::vector<OrbbecCamera*> OrbbecCamera::initialiseAllDevices(Camera* cam, Renderer *renderer, int *starting_id, Logger::Logger* logger) {
+    openni::Array<openni::DeviceInfo> orbbec_devices;
+    OrbbecCamera::getAvailableDevices(&orbbec_devices);
+
+    std::vector<OrbbecCamera*> depthCameras;
+
+    for (int i = 0; i < orbbec_devices.getSize(); i++) {
+        try {
+            depthCameras.push_back(new OrbbecCamera(orbbec_devices[i], cam, renderer, (*starting_id)++, logger));
+            logger->log("Initialised " + depthCameras.back()->getCameraName());
+        }
+        catch (const std::system_error& ex) {
+            logger->log(ex.code().value() + " - " + ex.code().message() + " - " + ex.what(), Logger::Priority::ERR);
+        }
+    }
+
+    return depthCameras;
+}
+
+/// 
+/// Camera Details
+/// 
+
+std::string OrbbecCamera::getType() 
+{
+    return "Orbbec"; 
+}
+
+inline std::string OrbbecCamera::getCameraName() const 
+{
+    return this->getType() + " Camera " + std::to_string(this->m_CameraId);
+}
+
+void OrbbecCamera::showCameraInfo() {
+    if (ImGui::TreeNode(getCameraName().c_str())) {
+        ImGui::Text("Device: %s\n", m_DeviceInfo.getName());
+        ImGui::Text("URI: %s\n", m_DeviceInfo.getUri());
+        ImGui::Text("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
+        ImGui::Text("Vendor: %s\n", m_DeviceInfo.getVendor());
+        ImGui::TreePop();
+    }
+}
+
+void OrbbecCamera::printDeviceInfo() const {
+    printf("---\nDevice: %s\n", m_DeviceInfo.getName());
+    printf("URI: %s\n", m_DeviceInfo.getUri());
+    printf("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
+    printf("Vendor: %s\n", m_DeviceInfo.getVendor());
+}
+
+
+inline float OrbbecCamera::getIntrinsics(INTRINSICS intrin) const
+{
+    //https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
+    auto fx = getDepthStreamWidth() / (2.f * tan(m_hfov / 2.f));
+    auto fy = getDepthStreamHeight() / (2.f * tan(m_vfov / 2.f));
+    auto cx = getDepthStreamWidth() / 2;
+    auto cy = getDepthStreamHeight() / 2;
+
+    switch (intrin)
+    {
+        using enum INTRINSICS;
+    case FX:
+        return fx;
+    case FY:
+        return fy;
+    case CX:
+        return (float)cx;
+    case CY:
+        return (float)cy;
+    }
+}
+
+inline glm::mat3 OrbbecCamera::getIntrinsics() const
+{
+    return { getIntrinsics(INTRINSICS::FX),							 0.0f, getIntrinsics(INTRINSICS::CX),
+                                      0.0f,	getIntrinsics(INTRINSICS::FY), getIntrinsics(INTRINSICS::CY),
+                                      0.0f,							 0.0f,							1.0f };
+}
+
+inline float OrbbecCamera::getMetersPerUnit() const
+{
+    return m_MetersPerUnit;
+}
+
+/// 
+/// Frame retreival
+/// 
 
 const void *OrbbecCamera::getDepth()
 {
@@ -134,9 +220,9 @@ const void *OrbbecCamera::getDepth()
         openni::VideoStream* pStream = &m_DepthStream;
 
         // Wait a new frame
-        auto m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
+        m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
         errorHandling("Wait failed! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
-    }    
+    }
 
     // Get depth frame
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
@@ -147,32 +233,78 @@ const void *OrbbecCamera::getDepth()
     {
         std::cout << m_VideoMode.getPixelFormat() << std::endl;
         std::string error_string = "Unexpected frame format!";
-        mp_Logger->log(error_string, Logger::LogLevel::ERR);
+        mp_Logger->log(error_string, Logger::Priority::ERR);
 
         throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
+    }
+
+    if (m_IsRecording) {
+        m_ColorStreamRecorder.write(getColorFrame());
     }
     
     return (uint16_t*)m_DepthFrameRef.getData();
 }
 
-void OrbbecCamera::showCameraInfo() {
-    if (ImGui::TreeNode(getCameraName().c_str())) {
-        if (m_IsPlayback) {
-            ImGui::Text("Recording");
-            float progress_saturated = (float)m_CurrentPlaybackFrame / (float)mp_PlaybackController->getNumberOfFrames(m_DepthStream);
-            char buf[32];
-            sprintf(buf, "frame %d/%d", (int)(progress_saturated * mp_PlaybackController->getNumberOfFrames(m_DepthStream)), mp_PlaybackController->getNumberOfFrames(m_DepthStream));
-            ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)mp_PlaybackController->getNumberOfFrames(m_DepthStream), ImVec2(0.f, 0.f), buf);
+cv::Mat OrbbecCamera::getColorFrame()
+{
+    if (!m_CVCameraFound) {
+        while (!m_ColorStream.grab() && m_CVCameraId < m_CVCameraSearchDepth) {
+            m_CVCameraId += 1;
+            m_ColorStream = cv::VideoCapture{ m_CVCameraId, cv::CAP_DSHOW };
+
+            m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
+            m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
         }
-        else {
-            ImGui::Text("Device: %s\n", m_DeviceInfo.getName());
-            ImGui::Text("URI: %s\n", m_DeviceInfo.getUri());
-            ImGui::Text("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
-            ImGui::Text("Vendor: %s\n", m_DeviceInfo.getVendor());
-            ImGui::TreePop();
+
+        if (!m_CVCameraFound && m_CVCameraId < m_CVCameraSearchDepth) {
+            m_CVCameraFound = true;
+        }
+        else if (m_CVCameraId == m_CVCameraSearchDepth) {
+            m_CVCameraId += 1;
+            mp_Logger->log("No suitable OpenCV Camera has been found.", Logger::Priority::WARN);
         }
     }
+
+    if (m_CVCameraFound) {
+        if (m_IsPlayback)
+            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, m_CurrentPlaybackFrame);
+
+        m_ColorStream.retrieve(m_ColorFrame);
+    }
+    
+
+    return m_ColorFrame;
 }
+
+
+/// 
+/// Camera Settings
+/// 
+
+void OrbbecCamera::CameraSettings()
+{
+    ImGui::Begin(getCameraName().c_str());
+    ImGui::BeginDisabled(!m_IsEnabled);
+    
+    ImGui::BeginDisabled();
+    ImGui::Checkbox("RGB Camera found", &m_CVCameraFound);
+    ImGui::EndDisabled();
+
+    if (ImGui::Button("Continue Search")) {
+        m_CVCameraFound = false;
+    }
+    if (ImGui::Button("Restart Search")) {
+        m_CVCameraFound = false;
+        m_CVCameraId = 0;
+    }
+
+    ImGui::EndDisabled();
+    ImGui::End();
+}
+
+/// 
+/// Recording
+/// 
 
 std::string OrbbecCamera::startRecording(std::string sessionName)
 {
@@ -197,10 +329,13 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Created Orbbec Recorder");
     }
     else {
-        mp_Logger->log("Orbbec Recorder is invalid", Logger::LogLevel::ERR);
+        mp_Logger->log("Orbbec Recorder is invalid", Logger::Priority::ERR);
     }
 
+    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 30, cv::Size(m_DepthWidth, m_DepthHeight)};
+
     m_IsEnabled = true;
+    m_IsRecording = true;
 
     return filepath.filename().string();
 }
@@ -216,46 +351,29 @@ void OrbbecCamera::saveFrame() {
     // Get depth frame
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
+
+    m_ColorStreamRecorder.write(getColorFrame());
 }
 
 void OrbbecCamera::stopRecording()
 {
+    m_IsRecording = false;
     m_Recorder.stop();
     m_Recorder.destroy();
+    m_ColorStreamRecorder.release();
 }
 
-void OrbbecCamera::OnUpdate()
-{
-   m_PointCloud->OnUpdate();
-}
 
-void OrbbecCamera::OnRender()
-{
-    m_PointCloud->OnRender();
-}
-
-void OrbbecCamera::OnImGuiRender()
-{
-    ImGui::Begin(getCameraName().c_str());
-    ImGui::BeginDisabled(!m_IsEnabled);
-    m_PointCloud->OnImGuiRender();
-    ImGui::EndDisabled();
-    ImGui::End();
-}
-
-void OrbbecCamera::printDeviceInfo() const  {
-    printf("---\nDevice: %s\n", m_DeviceInfo.getName());
-    printf("URI: %s\n", m_DeviceInfo.getUri());
-    printf("USB Product Id: %d\n", m_DeviceInfo.getUsbProductId());
-    printf("Vendor: %s\n", m_DeviceInfo.getVendor());
-}
+/// 
+/// Utils
+/// 
 
 void OrbbecCamera::errorHandling(std::string error_string) {
     if (m_RC != openni::STATUS_OK)
     {
         error_string += " - ";
         error_string += openni::OpenNI::getExtendedError();
-        mp_Logger->log(error_string, Logger::LogLevel::ERR);
+        mp_Logger->log(error_string, Logger::Priority::ERR);
 
         //throw std::system_error(ECONNABORTED, std::generic_category(), error_string);
     }

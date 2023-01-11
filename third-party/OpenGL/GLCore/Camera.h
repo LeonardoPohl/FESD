@@ -10,8 +10,8 @@ const glm::vec3 UP{ 0.0f, 1.0f, 0.0f };
 struct GLFWwindow;
 
 // Default camera values
-const float YAW = 90.0f;
-const float PITCH = 0.0f;
+const float YAW = 117.0f;
+const float PITCH = -4.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
 
@@ -46,7 +46,7 @@ private:
 
 	GLFWwindow *window;
 
-	glm::vec3 Position	{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 Position	{ 2.14f, 0.184f, -0.266f };
 	glm::vec3 Front {0.0f, 0.0f, -1.0f};
 	glm::vec3 Right;
 	glm::vec3 Up;
@@ -59,7 +59,7 @@ private:
 	float cameraSpeed{ SPEED };
 	float sensitivity{ SENSITIVITY };
 
-	float fov{ 45.0f };
+	float fov{ 60.0f };
 
 	float lastX{ -1.0f };
 	float lastY{ -1.0f };

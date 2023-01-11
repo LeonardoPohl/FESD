@@ -1,80 +1,43 @@
 #pragma once
 #include <OpenNI.h>
-#include <vector>
-#include <filesystem>
-#include <memory>
-#include <glm/glm.hpp>
+#include <opencv2/videoio.hpp>
 
 #include "DepthCamera.h"
-#include "GLCore/Renderer.h"
-#include "obj/Logger.h"
+
 
 class OrbbecCamera : public DepthCamera {
 public:
+	/// Constructors & Destructors
 	OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger);
 	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
 	~OrbbecCamera() override;
 
-	const void * getDepth() override;
-
-	static std::string getType() { return "Orbbec"; }
-
-	inline std::string getWindowName() const override {
-		return "Display: " + this->getCameraName();
-	}
-
-	inline std::string getCameraName() const override {
-		return this->getType() + " Camera " + std::to_string(this->m_CameraId);
-	}
-
-	void printDeviceInfo() const;
-
+	/// Initialise all devices
 	static void getAvailableDevices(openni::Array<openni::DeviceInfo>* available_devices);
-	static std::vector<OrbbecCamera *> initialiseAllDevices(Camera *cam, Renderer *renderer, int *starting_id, Logger::Logger* logger);
+	static std::vector<OrbbecCamera*> initialiseAllDevices(Camera* cam, Renderer* renderer, int* starting_id, Logger::Logger* logger);
 
+	/// Camera Details
+	static std::string getType();
+	inline std::string getCameraName() const;
+	void showCameraInfo() override;
+	void printDeviceInfo() const;
 	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
 	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
+	inline float getIntrinsics(INTRINSICS intrin) const override;
+	inline glm::mat3 getIntrinsics() const override;
+	inline float getMetersPerUnit() const override;
 
+	/// Frame retreival
+	const void * getDepth() override;
+	cv::Mat getColorFrame() override;
+
+	/// Camera Settings
+	void CameraSettings() override;
+
+	/// Recording
 	std::string startRecording(std::string sessionName) override;
-	void showCameraInfo() override;
 	void saveFrame() override;
 	void stopRecording() override;
-
-	void OnUpdate() override;
-	void OnRender() override;
-	void OnImGuiRender() override;
-
-	//https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
-	inline float getIntrinsics(INTRINSICS intrin) const override
-	{
-		auto fx = getDepthStreamWidth()  / (2.f * tan(m_hfov / 2.f));
-		auto fy = getDepthStreamHeight() / (2.f * tan(m_vfov / 2.f));
-		auto cx = getDepthStreamWidth()  / 2;
-		auto cy = getDepthStreamHeight() / 2;
-
-		switch (intrin)
-		{
-			using enum INTRINSICS;
-			case FX:
-				return fx;
-			case FY:
-				return fy;
-			case CX:
-				return (float)cx;
-			case CY:
-				return (float)cy;
-			default:
-				break;
-		}
-		return (float)INFINITE;
-	}
-
-	inline glm::mat3 getIntrinsics() const override
-	{
-		return { getIntrinsics(INTRINSICS::FX),							 0.0f, getIntrinsics(INTRINSICS::CX), 
-										  0.0f,	getIntrinsics(INTRINSICS::FY), getIntrinsics(INTRINSICS::CY), 
-										  0.0f,							 0.0f,							1.0f };
-	}
 private:
 	void errorHandling(std::string error_string = "");
 
@@ -87,8 +50,15 @@ private:
 
 	openni::Recorder m_Recorder;
 	openni::PlaybackControl *mp_PlaybackController;
+
+	cv::VideoCapture m_ColorStream;
+	cv::Mat m_ColorFrame{ };
+	cv::VideoWriter m_ColorStreamRecorder;
+	
 	int m_CurrentPlaybackFrame{ 0 };
+	bool m_IsRecording{ false };
 	bool m_IsPlayback{ false };
+	bool m_PlaybackHasRGBStream{ true };
 
 	Logger::Logger* mp_Logger;
 
@@ -98,5 +68,9 @@ private:
 
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
-	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
+	float m_MetersPerUnit{ 1.f/1000.f };
+
+	int m_CVCameraId{ 0 };
+	int m_CVCameraSearchDepth{ 10 };
+	bool m_CVCameraFound{ false };
 };

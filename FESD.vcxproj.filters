@@ -45,34 +45,16 @@
     <ClCompile Include="src\cameras\CameraHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestClearColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestPyramid3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestTexture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestTriangle2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utilities\helper\tests\TestPoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\obj\PointCloud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\Point.cpp">
+    <ClCompile Include="src\obj\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\obj\Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -106,10 +88,9 @@
     </None>
     <None Include="packages.config" />
     <None Include="imgui.ini" />
-    <None Include="resources\shaders\texture.shader" />
-    <None Include="resources\shaders\pointcloud.shader" />
-    <None Include="resources\shaders\basic.shader" />
-    <None Include="resources\shaders\basic3d.shader" />
+    <None Include="resources\shaders\PointCloud\PointCloud.vert" />
+    <None Include="src\fesd.ipynb" />
+    <None Include="resources\shaders\PointCloud\PointCloud.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h">
@@ -121,31 +102,10 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\BoundingBox.h">
-      <Filter>Header Files\Utilities</Filter>
-    </ClInclude>
     <ClInclude Include="src\cameras\DepthCamera.h">
       <Filter>Header Files\Cameras</Filter>
     </ClInclude>
     <ClInclude Include="src\cameras\CameraHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestPyramid3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestTexture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestTriangle2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utilities\helper\tests\TestPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\Consts.h">
@@ -154,13 +114,25 @@
     <ClInclude Include="src\obj\PointCloud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\ColorMaps.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\obj\Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Cell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\obj\Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\PointCloudStreamState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\helper\GLFWHelper.h">
@@ -169,19 +141,16 @@
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utilities\helper\TestMenuHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\Cell.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\obj\PointCloudHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utilities\Status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\Logger.h">
+    <ClInclude Include="src\utilities\GLUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\WindowInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utilities\CMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,5 +164,8 @@
     <Image Include="resources\textures\brick.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\requirements.txt" />
   </ItemGroup>
 </Project>

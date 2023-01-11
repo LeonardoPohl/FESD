@@ -4,15 +4,39 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 #include <GL/glew.h>
 
 #include "GLErrorManager.h"
 
-Shader::Shader(const std::string &filepath) 
-	: m_FilePath(filepath), m_RendererID(0)
+Shader::Shader(const std::string &filepath)
+	: m_RendererID(0)
 {
-    ShaderProgramSource source = ParseShader(filepath);
+    std::filesystem::path fp{filepath};
+    ShaderProgramSource source;
+    if (fp.has_extension() && fp.extension() == ".shader") {
+        source = ParseShaderCombined(filepath);
+    }
+    else {
+        for (const auto& entry : std::filesystem::directory_iterator(fp))
+        {
+            if (entry.is_regular_file()) {
+                std::ifstream file(entry.path(), std::ios::in | std::ios::binary);
+                if (!file.is_open())
+                    continue;
+
+                if (entry.path().extension() == ".vert") {
+                    source.VertexSource = { std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+                }
+                else if (entry.path().extension() == ".frag") {
+                    source.FragmentSource = { std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+                }
+
+                file.close();
+            }
+        }
+    }
     m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
 }
 
@@ -21,8 +45,7 @@ Shader::~Shader()
     GLCall(glDeleteProgram(m_RendererID));
 }
 
-
-ShaderProgramSource Shader::ParseShader(const std::string &filepath)
+ShaderProgramSource Shader::ParseShaderCombined(const std::string& filepath)
 {
     std::ifstream stream(filepath);
 
@@ -34,15 +57,15 @@ ShaderProgramSource Shader::ParseShader(const std::string &filepath)
     std::string line;
     std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
-    while ( getline(stream, line) )
+    while (getline(stream, line))
     {
-        if ( line.find("#shader") != std::string::npos )
+        if (line.find("#shader") != std::string::npos)
         {
-            if ( line.find("vertex") != std::string::npos )
+            if (line.find("vertex") != std::string::npos)
             {
                 type = ShaderType::VERTEX;
             }
-            else if ( line.find("fragment") != std::string::npos )
+            else if (line.find("fragment") != std::string::npos)
             {
                 type = ShaderType::FRAGMENT;
             }
@@ -54,7 +77,6 @@ ShaderProgramSource Shader::ParseShader(const std::string &filepath)
     }
     return{ ss[0].str(), ss[1].str() };
 }
-
 
 unsigned int Shader::CompileShader(unsigned int type, const std::string &source)
 {
@@ -130,9 +152,14 @@ void Shader::SetUniformMat3f(const std::string &name, const glm::mat3 &matrix)
     GLCall(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
 }
 
-void Shader::SetUniformMat4f(const std::string &name, const glm::mat4 &matrix)
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
 {
     GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
+}
+
+void Shader::SetUniformMat4fv(const std::string& name, const std::vector<glm::mat4>& matrices, size_t elemCount)
+{
+    GLCall(glUniformMatrix4fv(GetUniformLocation(name), elemCount, GL_FALSE, &matrices[0][0][0]));
 }
 
 int Shader::GetUniformLocation(const std::string &name) const

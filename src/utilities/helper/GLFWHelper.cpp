@@ -31,7 +31,7 @@ GLFWwindow *InitialiseGLFWWindow(STATUS &status)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(mode->width, mode->height, "WiP: Master Thesis", nullptr, nullptr);
+    window = glfwCreateWindow(mode->width, mode->height, "FESD: Fault Estimation for Skeleton Detection", nullptr, nullptr);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     if (!window)
@@ -50,9 +50,10 @@ GLFWwindow *InitialiseGLFWWindow(STATUS &status)
     }
 
     std::cout << glGetString(GL_VERSION) << std::endl;
-    GLCall(glEnable(GL_BLEND));
-    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    //GLCall(glEnable(GL_BLEND));
+    //GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     GLCall(glClearColor(.45f, .45f, .45f, 1.f));
-    
+    GLCall(glClearDepth(1.0f));
+
     return window;
 }

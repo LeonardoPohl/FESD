@@ -1,11 +1,14 @@
 #pragma once
 #include <vector>
 #include <chrono>
-#include <json/json.h>
+#include <string>
+#include <memory>
+
+#include <openpose/headers.hpp>
+#include <GLCore/Camera.h>
+#include <GLCore/Renderer.h>
 
 #include "DepthCamera.h"
-#include "GLCore/Camera.h"
-#include "GLCore/Renderer.h"
 #include "obj/Logger.h"
 
 class CameraHandler
@@ -15,7 +18,7 @@ public:
 	~CameraHandler();
 
 	void initAllCameras();
-	void OnRender();
+	void OnUpdate();
 	void OnImGuiRender();
 private:
 	void showSessionSettings();
@@ -24,26 +27,12 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
+	void startOpenpose();
+	void calculateSkeleton();
 
-	void clearCameras() {
-		for (auto cam : m_DepthCameras)
-			delete cam;
-		m_DepthCameras.clear();
-	}
-
-	void updateSessionName() {
-		auto tp = std::chrono::system_clock::now();
-		static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
-		m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
-	}
-
-	std::string getFileSafeSessionName() {
-		std::string sessionFileName = m_SessionName;
-		std::ranges::replace(sessionFileName, ' ', '_');
-		std::ranges::replace(sessionFileName, ':', '.');
-
-		return sessionFileName;
-	}
+	void clearCameras();
+	void updateSessionName();
+	std::string getFileSafeSessionName();
 
 	enum State {
 		Streaming,
@@ -59,8 +48,11 @@ private:
 
 	Logger::Logger* mp_Logger;
 
+	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 	std::vector<DepthCamera *> m_DepthCameras;
 	std::vector<Json::Value> m_Recordings;
+
+	op::Wrapper m_OPWrapper{ op::ThreadManagerMode::Asynchronous };
 
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
@@ -70,6 +62,10 @@ private:
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
 	bool m_PlaybackPaused{ false };
+	bool m_OpenPoseStarted{ false };
+	bool m_DoSkeletonDetection{ false };
+	bool m_ShowColorFrames{ false };
+	bool m_CamerasExist{ false };
 
 	int m_FrameLimit{ 100 };
 

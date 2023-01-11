@@ -3,13 +3,22 @@
 #include "GLErrorManager.h"
 #include <GL/glew.h>
 
-void Renderer::Draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const
+void Renderer::DrawTriangles(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
     shader.Bind();
     va.Bind();
     ib.Bind();
 
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+}
+
+void Renderer::DrawPoints(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+    shader.Bind();
+    va.Bind();
+    ib.Bind();
+
+    GLCall(glDrawElements(GL_POINTS, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }
 
 void Renderer::Clear() const

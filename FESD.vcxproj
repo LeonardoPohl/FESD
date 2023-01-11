@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\RosbagStorage/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third-party\openpose\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\include;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -157,25 +157,19 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\openpose\build\src\openpose\Release;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\x64\vc15\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;freeglut.lib;glog.lib;gflags.lib;caffe.lib;caffeproto.lib;opencv_world450.lib;openpose.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
+    <ClCompile Include="src\obj\Cell.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
-    <ClCompile Include="src\utilities\helper\tests\TestClearColor.cpp" />
-    <ClCompile Include="src\utilities\helper\tests\TestPoint.cpp" />
-    <ClCompile Include="src\utilities\helper\tests\TestPyramid3D.cpp" />
-    <ClCompile Include="src\utilities\helper\tests\TestTexture2D.cpp" />
-    <ClCompile Include="src\utilities\helper\tests\TestTriangle2D.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\obj\Cell.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
-    <ClCompile Include="src\obj\Point.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -190,36 +184,31 @@
     </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
-    <None Include="resources\shaders\basic.shader" />
-    <None Include="resources\shaders\basic3d.shader" />
-    <None Include="resources\shaders\texture.shader" />
-    <None Include="resources\shaders\pointcloud.shader" />
+    <None Include="resources\shaders\PointCloud\PointCloud.frag" />
+    <None Include="resources\shaders\PointCloud\PointCloud.vert" />
+    <None Include="src\fesd.ipynb" />
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\obj\Logger.h" />
-    <ClInclude Include="src\obj\PointCloudHelper.h" />
+    <ClInclude Include="src\obj\BoundingBox.h" />
     <ClInclude Include="src\obj\Cell.h" />
-    <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
-    <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
-    <ClInclude Include="src\utilities\helper\TestMenuHelper.h" />
+    <ClInclude Include="src\obj\Logger.h" />
     <ClInclude Include="src\obj\Plane.h" />
+    <ClInclude Include="src\obj\Point.h" />
+    <ClInclude Include="src\obj\PointCloudStreamState.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
     <ClInclude Include="src\obj\PointCloud.h" />
-    <ClInclude Include="src\utilities\helper\tests\TestClearColor.h" />
-    <ClInclude Include="src\utilities\helper\tests\TestPoint.h" />
-    <ClInclude Include="src\utilities\helper\tests\TestPyramid3D.h" />
-    <ClInclude Include="src\utilities\helper\tests\TestTexture2D.h" />
-    <ClInclude Include="src\utilities\helper\tests\TestTriangle2D.h" />
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
+    <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />
-    <ClInclude Include="src\utilities\ColorMaps.h" />
-    <ClInclude Include="src\obj\Point.h" />
+    <ClInclude Include="src\utilities\GLUtil.h" />
+    <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
+    <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />
     <ClInclude Include="src\utilities\Status.h" />
-    <ClInclude Include="src\obj\BoundingBox.h" />
+    <ClInclude Include="src\utilities\WindowInfo.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>
@@ -228,6 +217,9 @@
   <ItemGroup>
     <Image Include="resources\textures\brick.png" />
     <Image Include="resources\textures\ml.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\requirements.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,27 +1,32 @@
 #include "CameraHandler.h"
 
-#include <imgui.h>
-#include <imgui_stdlib.h>
-
-#include "RealsenseCamera.h"
-#include "OrbbecCamera.h"
-
-#include <OpenNI.h>
 #include <iostream>
-#include <obj/PointCloud.h>
 #include <ctime>
 #include <fstream>
 #include <filesystem>
 
-#include <utilities/Consts.h>
-#include <utilities/helper/ImGuiHelper.h>
+#include <json/json.h>
+#include <imgui.h>
+#include <imgui_stdlib.h>
+#include <OpenNI.h>
+#include <opencv2/opencv.hpp>
+#define OPENPOSE_FLAGS_DISABLE_POSE
+#include <openpose/flags.hpp>
+
+#include "RealsenseCamera.h"
+#include "OrbbecCamera.h"
+
+#include "obj/PointCloud.h"
+
+#include "utilities/Consts.h"
+#include "utilities/helper/ImGuiHelper.h"
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
     if (openni::OpenNI::initialize() != openni::STATUS_OK) {
         auto msg = (std::string)"Initialization of OpenNi failed: " + openni::OpenNI::getExtendedError();
-        mp_Logger->log(msg, Logger::LogLevel::ERR);
-    }        
+        mp_Logger->log(msg, Logger::Priority::ERR);
+    }
 
     findRecordings();
     updateSessionName();
@@ -33,6 +38,9 @@ CameraHandler::~CameraHandler()
     clearCameras();
     
     openni::OpenNI::shutdown();
+
+    if (m_OpenPoseStarted)
+        m_OPWrapper.stop();
 }
 
 void CameraHandler::initAllCameras()
@@ -47,10 +55,17 @@ void CameraHandler::initAllCameras()
 
     m_DepthCameras.insert(m_DepthCameras.end(), rs_cameras.begin(), rs_cameras.end());
     m_DepthCameras.insert(m_DepthCameras.end(), orbbec_cameras.begin(), orbbec_cameras.end());
+
+    m_CamerasExist = !m_DepthCameras.empty();
+    if (m_CamerasExist)
+        m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
 }
 
-void CameraHandler::OnRender()
+void CameraHandler::OnUpdate()
 {
+    if (!m_CamerasExist)
+        return;
+
     if (m_State == Recording) {
         m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
 
@@ -67,7 +82,17 @@ void CameraHandler::OnRender()
         m_RecordedFrames += 1;
     }
     
-    // This sould probably be asynchronous/Multi-threaded/Parallel
+    if (m_DoSkeletonDetection) {
+        calculateSkeleton();
+    }
+
+    if (m_State == Streaming || 
+       (m_State == Recording && m_StreamWhileRecording) || 
+       (m_State == Playback  && !m_PlaybackPaused)) {
+        m_PointCloud->OnUpdate();
+        m_PointCloud->OnRender();
+    }
+
     for (auto cam : m_DepthCameras)
     {
         if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
@@ -75,9 +100,11 @@ void CameraHandler::OnRender()
             if (m_State == Recording && !m_StreamWhileRecording) {
                 cam->saveFrame();
             }
-            else {
-                cam->OnUpdate();
-                cam->OnRender();
+
+            if (m_ShowColorFrames) {
+                auto frame = cam->getColorFrame();
+                if (!frame.empty())
+                    cv::imshow(cam->getCameraName(), frame);
             }
         }
     }
@@ -90,7 +117,10 @@ void CameraHandler::OnImGuiRender()
     if (ImGui::Button("Init Cameras") && m_State != Playback) {
         initAllCameras();
     }
-    if (!m_DepthCameras.empty()) {
+    if (m_CamerasExist) {
+        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+        ImGui::Checkbox("Show Color Frames", &m_ShowColorFrames);
+
         ImGui::Text("%d Cameras Initialised", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
             if (m_State != Playback) {
@@ -99,9 +129,10 @@ void CameraHandler::OnImGuiRender()
             cam->showCameraInfo();
         }
     }
+
     ImGui::End();
     
-    if (!m_DepthCameras.empty() && m_State != Playback) {
+    if (m_CamerasExist && m_State != Playback) {
         ImGui::Begin("Recorder");
 
         for (auto cam : m_DepthCameras) {
@@ -129,9 +160,7 @@ void CameraHandler::OnImGuiRender()
     if (m_State == Playback && ImGui::Button("Stop Playback")) {
         mp_Logger->log("Stopping Playback");
         m_State = Streaming;
-        for (auto cam : m_DepthCameras)
-            delete cam;
-        m_DepthCameras.clear();
+        clearCameras();
     }
 
     ImGui::BeginDisabled(m_State == Playback);
@@ -146,13 +175,16 @@ void CameraHandler::OnImGuiRender()
 
     showRecordings();
     ImGui::EndDisabled();
-    
 
     ImGui::End();
+    if (m_CamerasExist) {
+        ImGui::Begin("PointCloud");
+        m_PointCloud->OnImGuiRender();
+        ImGui::End();
 
-    for (auto cam : m_DepthCameras)
-    {
-        cam->OnImGuiRender();
+        for (auto cam : m_DepthCameras) {
+            cam->CameraSettings();
+        }
     }
 }
 
@@ -271,9 +303,13 @@ void CameraHandler::showRecordings() {
                         m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
                     }
                     else {
-                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::LogLevel::WARNING);
+                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
                     }
                 }
+
+                m_CamerasExist = !m_DepthCameras.empty();
+                if(m_CamerasExist)
+                    m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
             }
 
             ImGui::TreePop();
@@ -298,6 +334,9 @@ void CameraHandler::startRecording() {
 
 #pragma warning(disable : 4996)
 void CameraHandler::stopRecording() {
+    if (m_State != Recording)
+        return;
+
     mp_Logger->log("Stopping recording");
 
     m_RecordingEnd = std::chrono::system_clock::now();
@@ -326,7 +365,7 @@ void CameraHandler::stopRecording() {
     root["Cameras"] = cameras;
 
     Json::StreamWriterBuilder builder;
-    if (!m_DepthCameras.empty()) {
+    if (m_CamerasExist) {
         configJson << Json::writeString(builder, root);
         configJson.close();
     }
@@ -340,6 +379,36 @@ void CameraHandler::stopRecording() {
             cam->stopRecording();
         }
     } 
+}
+
+void CameraHandler::startOpenpose()
+{
+    if (m_OpenPoseStarted)
+        return;
+
+    mp_Logger->log("Configuring OpenPose");
+
+    // Starting OpenPose
+    mp_Logger->log("Starting openpose thread(s)");
+    m_OPWrapper.start();
+    m_OpenPoseStarted = true;
+}
+
+void CameraHandler::calculateSkeleton() {
+    startOpenpose();
+
+    for (auto cam : m_DepthCameras) {
+        cv::Mat im = cam->getColorFrame();
+        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(im);
+        auto datumProcessed = m_OPWrapper.emplaceAndPop(imageToProcess);
+        if (datumProcessed != nullptr) {
+            auto keyPoints = datumProcessed->at(0)->poseKeypoints;
+            mp_Logger->log(keyPoints.toString());
+        }
+        else {
+            mp_Logger->log("Frame could not be processed.", Logger::Priority::ERR);
+        }
+    }
 }
 
 void CameraHandler::findRecordings() {
@@ -358,7 +427,7 @@ void CameraHandler::findRecordings() {
             JSONCPP_STRING errs;
 
             if (!parseFromStream(builder, configJson, &root, &errs)) {
-                mp_Logger->log(errs, Logger::LogLevel::ERR);
+                mp_Logger->log(errs, Logger::Priority::ERR);
             }
             else {
                 m_Recordings.push_back(root);
@@ -367,4 +436,28 @@ void CameraHandler::findRecordings() {
     }
 
     mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
+}
+
+
+void CameraHandler::clearCameras() {
+    for (auto cam : m_DepthCameras)
+        delete cam;
+
+    m_DepthCameras.clear();
+    m_PointCloud.release();
+    m_CamerasExist = false;
+}
+
+void CameraHandler::updateSessionName() {
+    auto tp = std::chrono::system_clock::now();
+    static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
+    m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
+}
+
+std::string CameraHandler::getFileSafeSessionName() {
+    std::string sessionFileName = m_SessionName;
+    std::ranges::replace(sessionFileName, ' ', '_');
+    std::ranges::replace(sessionFileName, ':', '.');
+
+    return sessionFileName;
 }

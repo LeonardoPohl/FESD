@@ -1,6 +1,8 @@
 #pragma once
+#include <array>
 #include <string>
 #include <unordered_map>
+
 #include "glm/glm.hpp"
 
 struct ShaderProgramSource
@@ -18,7 +20,7 @@ private:
 	mutable std::unordered_map<std::string, int> m_UniformLocationCache;
 public:
 	Shader() =default;
-	Shader(const std::string &filepath);
+	Shader(const std::string& filepath);
 	~Shader();
 
 	void Bind() const;
@@ -31,9 +33,10 @@ public:
 	void SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3);
 	void SetUniformMat3f(const std::string &name, const glm::mat3 &matrix);
 	void SetUniformMat4f(const std::string &name, const glm::mat4 &matrix);
+	void SetUniformMat4fv(const std::string& name, const std::vector<glm::mat4> &matrices, size_t elemCount);
 private:
 	unsigned int CreateShader(const std::string &vertexShader, const std::string &fragmentShader);
-	ShaderProgramSource ParseShader(const std::string &filepath);
+	ShaderProgramSource ParseShaderCombined(const std::string &filepath);
 	unsigned int CompileShader(unsigned int type, const std::string &source);
 
 	int GetUniformLocation(const std::string &name) const;

@@ -5,8 +5,12 @@
 
 #include <GL/glew.h>
 
-VertexArray::VertexArray()
-{    
+VertexArray::VertexArray() : m_Count(0)
+{
+    GLCall(glGenVertexArrays(1, &m_RendererID));
+}
+VertexArray::VertexArray(unsigned int count) : m_Count(count)
+{
     GLCall(glGenVertexArrays(1, &m_RendererID));
 }
 
