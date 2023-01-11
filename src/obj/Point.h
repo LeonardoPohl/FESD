@@ -1,6 +1,4 @@
 #pragma once
-#ifndef POINT
-#define POINT
 
 #include <array>
 #include <algorithm>
@@ -35,41 +33,6 @@ public:
 		}
 	};
 
-	static unsigned int* getIndices(int i) {
-		/*
-			7      6
-		   .+------+
-		4.' |  5 .'|
-		+---+--+'  |
-		|   | p|   |
-		|  .+--+---+2
-		|.' 3  | .'a
-		+------+'
-		0	   1
-		*/
-
-		std::array<unsigned int, IndexCount> indices
-		{
-			0, 1, 2,
-			0, 2, 3,
-			0, 3, 7,
-			0, 7, 4,
-			1, 0, 5,
-			5, 0, 4,
-			2, 1, 6,
-			6, 1, 5,
-			3, 2, 7,
-			7, 2, 6,
-			5, 4, 6,
-			6, 4, 7
-		};
-
-		for (int k = 0; k < IndexCount; k++)
-			indices[k] += i * VertexCount;
-
-		return &indices[0];
-	}
-
 	inline std::array<float, 3> getColorFromDepth(float depth) const {
 		float z = std::clamp(depth / 6.0f, 0.0f, 1.0f);
 		return CMap::getViridis(z);
@@ -89,21 +52,7 @@ public:
 		auto g = Color[1];
 		auto b = Color[2];
 
-		Vertices[0].reassign(x, y, z, r, g, b, cam_index);
-
-		/*Vertices[0].reassign(x - a, y - a, z - a, r, g, b);
-		Vertices[1].reassign(x + a, y - a, z - a, r, g, b);
-		Vertices[2].reassign(x + a, y - a, z + a, r, g, b);
-		Vertices[3].reassign(x - a, y - a, z + a, r, g, b);
-		
-		Vertices[4].reassign(x - a, y + a, z - a, r, g, b);
-		Vertices[5].reassign(x + a, y + a, z - a, r, g, b);
-		Vertices[6].reassign(x + a, y + a, z + a, r, g, b);
-		Vertices[7].reassign(x - a, y + a, z + a, r, g, b);*/
-
-		if (cam_index != -1)
-			for (auto vert : Vertices)
-				vert.CameraIndex = cam_index;
+		Vert.reassign(x, y, z, r, g, b, cam_index);
 	}
 
 	inline glm::vec3 getPoint() const
@@ -123,15 +72,11 @@ public:
 		return normal;
 	}
 
-	static const int VertexCount = 1;
-	static const int IndexCount = 3 * 12;
 
 	float Depth{ 0 };
-	std::array<Vertex, VertexCount> Vertices;
+	Vertex Vert;
 	std::array<float, 2> PositionFunction{ 0.0f, 0.0f };
 	float HalfLengthFun;
 
 	glm::vec3 normal{ 0.f };
 };
-
-#endif

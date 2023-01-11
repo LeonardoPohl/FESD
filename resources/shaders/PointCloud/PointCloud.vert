@@ -1,11 +1,11 @@
 #version 330 core
 
 // Positions/Coordinates
-layout(location = 0) in int aCamIndex;
-// Positions/Coordinates
-layout(location = 1) in vec3 aPos;
+layout(location = 0) in vec3 aPos;
 // Colors
-layout(location = 2) in vec3 aColor;
+layout(location = 1) in vec3 aColor;
+// Positions/Coordinates
+layout(location = 2) in int aCamIndex;
 
 // Outputs the color for the Fragment Shader
 out vec3 v_Color;
@@ -16,7 +16,8 @@ uniform mat4 u_VP;
 
 void main()
 {
-	// Outputs the positions/coordinates of all vertices
+	// Outputs the positions/coordinates of all vertices 
+
 	if (aCamIndex == 0){
 		gl_Position = u_VP * u_Models[0] * vec4(aPos, 1.0);
 	}else if (aCamIndex == 1){

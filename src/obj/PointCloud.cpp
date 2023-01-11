@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #define PixIter(cam_index) for(int i = 0; i < m_NumElements[cam_index]; i++)
-#define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i * Point::VertexCount, &m_Points[cam_index][i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
+#define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i, &m_Points[cam_index][i].Vert, sizeof(Point::Vertex));
 
 namespace GLObject
 {
@@ -40,7 +40,7 @@ namespace GLObject
             m_MVPS.push_back({ });
 
             m_Points.push_back(new Point[m_NumElements.back()]{});
-            m_Vertices.push_back(new Point::Vertex[m_NumElements.back() * Point::VertexCount]{});
+            m_Vertices.push_back(new Point::Vertex[m_NumElements.back()]{});
 
             m_ColorBypCell.push_back({ });
             m_pCellByKey.push_back({ });
@@ -56,6 +56,7 @@ namespace GLObject
         
         // Add the last element + 1 so termination criteria is simpler
         m_ElementOffset.push_back(m_NumElementsTotal + 1);
+        auto* indices = new unsigned int[m_NumElementsTotal];
 
         for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             float fx = m_DepthCameras[cam_index]->getIntrinsics(INTRINSICS::FX);
@@ -72,6 +73,7 @@ namespace GLObject
 
                     m_Points[cam_index][i].HalfLengthFun = 0.5f / fy;
                     m_Points[cam_index][i].updateVertexArray(1.f, cam_index);
+                    indices[i + m_ElementOffset[cam_index]] = i + m_ElementOffset[cam_index];
                 }
             }
         }
@@ -79,14 +81,16 @@ namespace GLObject
         m_GLUtil.mp_Renderer = renderer;
         m_GLUtil.m_VAO = std::make_unique<VertexArray>(m_NumElementsTotal);
 
-        m_GLUtil.m_VB = std::make_unique<VertexBuffer>(m_NumElementsTotal * Point::VertexCount * sizeof(Point::Vertex));
+        m_GLUtil.m_VB = std::make_unique<VertexBuffer>(m_NumElementsTotal * sizeof(Point::Vertex));
         m_GLUtil.m_VBL = std::make_unique<VertexBufferLayout>();
 
         m_GLUtil.m_VBL->Push<GLfloat>(3);
         m_GLUtil.m_VBL->Push<GLfloat>(3);
-        m_GLUtil.m_VBL->Push<GLuint>(1);
-
+        m_GLUtil.m_VBL->Push<GLint>(1);
+        
         m_GLUtil.m_VAO->AddBuffer(*m_GLUtil.m_VB, *m_GLUtil.m_VBL);
+
+        m_GLUtil.m_IndexBuffer = std::make_unique<IndexBuffer>(indices, m_NumElementsTotal);
 
         m_GLUtil.m_Shader = std::make_unique<Shader>("resources/shaders/PointCloud");
         m_GLUtil.m_Shader->Bind();
@@ -110,8 +114,7 @@ namespace GLObject
                     PixIter(cam_index) 
                     {
                         streamDepth(i, cam_index, depth);
-                        memcpy(m_Vertices[cam_index] + i * Point::VertexCount, &m_Points[cam_index][i].Vertices[0], Point::VertexCount * sizeof(Point::Vertex));
-                        //UpdateVertices(cam_index, i)
+                        UpdateVertices(cam_index, i)
                     }
                 }
             }
@@ -140,12 +143,14 @@ namespace GLObject
                 }
             }
 
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point::Vertex) * Point::VertexCount * m_ElementOffset[cam_index], sizeof(Point::Vertex) * m_NumElements[cam_index] * Point::VertexCount, m_Vertices[cam_index]));
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point::Vertex) * m_ElementOffset[cam_index], sizeof(Point::Vertex) * m_NumElements[cam_index], m_Vertices[cam_index]));
         }
     }
 
     void PointCloud::OnRender()
     {
+        m_GLUtil.m_Shader->Bind();
+
         for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             glm::mat4 model{ 1.0f };
 
@@ -158,9 +163,7 @@ namespace GLObject
         }
 
         m_GLUtil.m_Shader->SetUniformMat4f("u_VP", camera->getViewProjection());
-        
-        m_GLUtil.m_Shader->Bind();
-        m_GLUtil.mp_Renderer->Draw(*m_GLUtil.m_VAO, *m_GLUtil.m_Shader);
+        m_GLUtil.mp_Renderer->DrawPoints(*m_GLUtil.m_VAO, *m_GLUtil.m_IndexBuffer, *m_GLUtil.m_Shader);
     }
 
     void PointCloud::OnImGuiRender()
@@ -281,8 +284,7 @@ namespace GLObject
 
         auto normal = m_Points[cam_index][i].getNormal(p1, p2);
 
-        for (int v : std::views::iota(0, Point::VertexCount))
-            m_Points[cam_index][i].Vertices[v].Color = { (normal.x + 1) / 2.0f,
+        m_Points[cam_index][i].Vert.Color = { (normal.x + 1) / 2.0f,
                                               (normal.y + 1) / 2.0f,
                                               (normal.z + 1) / 2.0f};
     }
@@ -336,9 +338,7 @@ namespace GLObject
         else {
             col = m_ColorBypCell[cam_index][m_pCellByKey[cam_index][key]];
         }
-
-        for (int v : std::views::iota(0, Point::VertexCount))
-            m_Points[cam_index][i].Vertices[v].Color = { col.x,
+        m_Points[cam_index][i].Vert.Color = { col.x,
                                               col.y,
                                               col.z,};
     }
@@ -390,8 +390,7 @@ namespace GLObject
                 col = glm::vec3{ 0.0f, 1.0f, 0.0f };
         }
 
-        for (int v : std::views::iota(0, Point::VertexCount))
-            m_Points[cam_index][i].Vertices[v].Color = { col.x,
+        m_Points[cam_index][i].Vert.Color = { col.x,
                                               col.y,
                                               col.z};
 
