@@ -59,7 +59,7 @@ void SkeletonDetector::startRecording(std::string sessionName)
 {
 }
 
-void SkeletonDetector::saveFrame()
+void SkeletonDetector::saveFrame(cv::Mat frame_to_process)
 {
 }
 

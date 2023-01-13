@@ -66,8 +66,9 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     getColorFrame();
 }
 
-OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
-    mp_Logger(logger) {
+OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int* currentPlaybackFrame) :
+    mp_Logger(logger), mp_CurrentPlaybackFrame(currentPlaybackFrame)
+{
     m_RC = m_Device.open(recording.string().c_str());
     errorHandling("Couldn't open Recording!");
 
@@ -212,8 +213,8 @@ inline float OrbbecCamera::getMetersPerUnit() const
 const void *OrbbecCamera::getDepth()
 {
     if (m_IsPlayback) {
-        mp_PlaybackController->seek(m_DepthStream, m_CurrentPlaybackFrame);
-        m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
+        mp_PlaybackController->seek(m_DepthStream, *mp_CurrentPlaybackFrame);
+        //m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
     }
     else {
         int changedStreamDummy;
@@ -267,7 +268,7 @@ cv::Mat OrbbecCamera::getColorFrame()
 
     if (m_CVCameraFound) {
         if (m_IsPlayback)
-            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, m_CurrentPlaybackFrame);
+            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, *mp_CurrentPlaybackFrame);
 
         m_ColorStream.retrieve(m_ColorFrame);
     }

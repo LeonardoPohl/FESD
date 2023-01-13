@@ -9,7 +9,7 @@ class RealSenseCamera : public DepthCamera {
 public:
 	/// Constructors & Destructors
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger);
-	RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
+	RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int *currentPlaybackFrame);
 	~RealSenseCamera() override;
 
 	/// Initialise all devices
@@ -53,4 +53,6 @@ private:
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
 	float m_MetersPerUnit{};
+
+	int* mp_CurrentPlaybackFrame;
 };

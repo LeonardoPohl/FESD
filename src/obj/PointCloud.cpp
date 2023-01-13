@@ -17,14 +17,9 @@ namespace GLObject
     {
         this->camera = cam;
 
-        GLCall(glPointSize(1.5f));
 
-        GLCall(glEnable(GL_DEPTH_TEST));
-        glDepthMask(GL_TRUE);
-        glDepthFunc(GL_LEQUAL);
-        glDepthRange(0.0f, 1.0f);
+        GLUtil::setFlags();
 
-        //GLUtil::setFlags();
         m_NumElementsTotal = 0;
 
         for (auto cam : m_DepthCameras) {
@@ -99,7 +94,7 @@ namespace GLObject
         m_ColorDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, 255);
     }
 
-    void PointCloud::OnUpdate()
+    void PointCloud::OnUpdate(int currentPlaybackFrame)
     {
         const int16_t *depth;
 

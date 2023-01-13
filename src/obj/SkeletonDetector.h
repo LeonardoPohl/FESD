@@ -17,7 +17,7 @@ public:
 	void drawSkeleton(cv::Mat &frame_to_process, float score_threshold = 0.0f, bool show_uncertainty = false);
 
 	void startRecording(std::string sessionName);
-	void saveFrame();
+	void saveFrame(cv::Mat frame_to_process);
 	void stopRecording();
 private:
 	Logger::Logger *mp_Logger;

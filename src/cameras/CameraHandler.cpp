@@ -175,6 +175,17 @@ void CameraHandler::OnImGuiRender()
         ImGui::Text("No Recordings Found!");
     }
 
+    if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
+        mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
+        int i = 0;
+        for (auto rec : m_Recordings) {
+            std::cout << i++ << "/" << m_Recordings.size() << "\r";
+            calculateSkeletons(rec);
+        }
+
+        mp_Logger->log("Skeleton detection done for all recordings");
+    }
+
     showRecordings();
     ImGui::EndDisabled();
 
@@ -299,10 +310,10 @@ void CameraHandler::showRecordings() {
 
                 for (auto camera : recording["Cameras"]) {
                     if (camera["Type"].asString() == RealSenseCamera::getType()) {
-                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
+                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
                     }
                     else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
+                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
                     }
                     else {
                         mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
@@ -418,6 +429,43 @@ void CameraHandler::clearCameras() {
     m_DepthCameras.clear();
     m_PointCloud.release();
     m_CamerasExist = false;
+}
+
+void CameraHandler::calculateSkeletons(Json::Value recording) {
+    mp_Logger->log("Started Skeleton recording of \"" + recording["Name"].asString() + "\"");
+    m_State = Playback;
+
+    clearCameras();
+
+    for (auto camera : recording["Cameras"]) {
+        if (camera["Type"].asString() == RealSenseCamera::getType()) {
+            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else if (camera["Type"].asString() == OrbbecCamera::getType()) {
+            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else {
+            mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
+        }
+    }
+
+    m_CamerasExist = !m_DepthCameras.empty();
+
+    if (!m_CamerasExist) {
+        mp_Logger->log("No cameras could be initialised for recording \"" + recording["Name"].asString() + "\"", Logger::Priority::ERR);
+        return;
+    }
+
+    m_SkeletonDetector->startRecording(recording["Name"].asString());
+
+    for (m_CurrentPlaybackFrame = 0; m_CurrentPlaybackFrame < recording["RecordedFrames"].asInt(); m_CurrentPlaybackFrame++) {
+        for (auto cam : m_DepthCameras) {
+            auto frame_to_process = cam->getColorFrame();
+            m_SkeletonDetector->saveFrame(frame_to_process);
+        }
+    }
+
+    m_SkeletonDetector->stopRecording();
 }
 
 void CameraHandler::updateSessionName() {

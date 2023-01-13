@@ -27,6 +27,7 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
+	void calculateSkeletons(Json::Value recording);
 
 	void clearCameras();
 	void updateSessionName();
@@ -66,6 +67,8 @@ private:
 	// Playback
 	std::vector<Json::Value> m_Recordings;
 	bool m_PlaybackPaused{ false };
+	int m_TotalPlaybackFrames{ 0 };
+	int m_CurrentPlaybackFrame{ 0 };
 
 	// Skeleton Detection
 	bool m_DoSkeletonDetection{ false };

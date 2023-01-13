@@ -9,7 +9,7 @@ class OrbbecCamera : public DepthCamera {
 public:
 	/// Constructors & Destructors
 	OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger);
-	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
+	OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int* currentPlaybackFrame);
 	~OrbbecCamera() override;
 
 	/// Initialise all devices
@@ -55,7 +55,7 @@ private:
 	cv::Mat m_ColorFrame{ };
 	cv::VideoWriter m_ColorStreamRecorder;
 	
-	int m_CurrentPlaybackFrame{ 0 };
+	int *mp_CurrentPlaybackFrame;
 	bool m_IsRecording{ false };
 	bool m_IsPlayback{ false };
 	bool m_PlaybackHasRGBStream{ true };
