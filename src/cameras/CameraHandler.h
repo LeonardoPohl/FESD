@@ -4,12 +4,12 @@
 #include <string>
 #include <memory>
 
-#include <openpose/headers.hpp>
 #include <GLCore/Camera.h>
 #include <GLCore/Renderer.h>
 
 #include "DepthCamera.h"
 #include "obj/Logger.h"
+#include "obj/SkeletonDetector.h"
 
 class CameraHandler
 {
@@ -27,8 +27,6 @@ private:
 	void startRecording();
 	void stopRecording();
 	void findRecordings();
-	void startOpenpose();
-	void calculateSkeleton();
 
 	void clearCameras();
 	void updateSessionName();
@@ -41,39 +39,38 @@ private:
 	};
 
 	State m_State;
-	std::string m_SessionName{ "Session" };
 
 	Camera *mp_Camera;
 	Renderer *mp_Renderer;
 
 	Logger::Logger* mp_Logger;
 
+	// Streaming
+	bool m_CamerasExist{ false };
+	bool m_ShowColorFrames{ false };
 	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
 	std::vector<DepthCamera *> m_DepthCameras;
-	std::vector<Json::Value> m_Recordings;
 
-	op::Wrapper m_OPWrapper{ op::ThreadManagerMode::Asynchronous };
-
-	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
-	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
-	std::chrono::duration<double> m_RecordedSeconds;
-
+	// Recording
+	std::string m_SessionName{ };
 	bool m_StreamWhileRecording{ true };
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
-	bool m_PlaybackPaused{ false };
-	bool m_OpenPoseStarted{ false };
-	bool m_DoSkeletonDetection{ false };
-	bool m_ShowColorFrames{ false };
-	bool m_CamerasExist{ false };
-
 	int m_FrameLimit{ 100 };
-
-	/// <summary>
-	/// Time Limit in Seconds
-	/// </summary>
-	int m_TimeLimit{ 100 };
-
+	int m_TimeLimitInS{ 100 };
+	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
+	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
+	std::chrono::duration<double> m_RecordedSeconds;
 	int m_RecordedFrames{ 0 };
+
+	// Playback
+	std::vector<Json::Value> m_Recordings;
+	bool m_PlaybackPaused{ false };
+
+	// Skeleton Detection
+	bool m_DoSkeletonDetection{ false };
+	float m_ScoreThreshold{ 0.0f };
+	bool m_ShowUncertainty{ false };
+	std::unique_ptr<SkeletonDetector> m_SkeletonDetector;
 };
 

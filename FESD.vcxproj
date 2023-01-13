@@ -168,6 +168,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
+    <ClCompile Include="src\obj\SkeletonDetector.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
   </ItemGroup>
@@ -201,6 +202,7 @@
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
+    <ClInclude Include="src\obj\SkeletonDetector.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />

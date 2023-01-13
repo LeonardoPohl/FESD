@@ -10,8 +10,6 @@
 #include <imgui_stdlib.h>
 #include <OpenNI.h>
 #include <opencv2/opencv.hpp>
-#define OPENPOSE_FLAGS_DISABLE_POSE
-#include <openpose/flags.hpp>
 
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
@@ -30,6 +28,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
+    m_SkeletonDetector = std::make_unique<SkeletonDetector>(logger);
 }
 
 CameraHandler::~CameraHandler()
@@ -38,9 +37,6 @@ CameraHandler::~CameraHandler()
     clearCameras();
     
     openni::OpenNI::shutdown();
-
-    if (m_OpenPoseStarted)
-        m_OPWrapper.stop();
 }
 
 void CameraHandler::initAllCameras()
@@ -74,16 +70,12 @@ void CameraHandler::OnUpdate()
             return;
         }
 
-        if (m_RecordedSeconds.count() > m_TimeLimit && m_LimitTime) {
+        if (m_RecordedSeconds.count() > m_TimeLimitInS && m_LimitTime) {
             stopRecording();
             return;
         }
 
         m_RecordedFrames += 1;
-    }
-    
-    if (m_DoSkeletonDetection) {
-        calculateSkeleton();
     }
 
     if (m_State == Streaming || 
@@ -101,10 +93,14 @@ void CameraHandler::OnUpdate()
                 cam->saveFrame();
             }
 
-            if (m_ShowColorFrames) {
+            if (m_ShowColorFrames || m_DoSkeletonDetection) {
                 auto frame = cam->getColorFrame();
-                if (!frame.empty())
+                if (!frame.empty()) {
+                    if (m_DoSkeletonDetection) {
+                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                    }
                     cv::imshow(cam->getCameraName(), frame);
+                }
             }
         }
     }
@@ -118,8 +114,14 @@ void CameraHandler::OnImGuiRender()
         initAllCameras();
     }
     if (m_CamerasExist) {
-        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
         ImGui::Checkbox("Show Color Frames", &m_ShowColorFrames);
+
+        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+        if (m_DoSkeletonDetection) {
+            ImGui::InputFloat("Score Threshold", &m_ScoreThreshold, 0.0f, 0.999f, "%.3f");
+            ImGui::Checkbox("Show Uncertainty", &m_ShowUncertainty);
+            ImGuiHelper::HelpMarker("Joints which are lower than the Score Thresholt will be shown in grey and the ones above will be shown ");
+        }
 
         ImGui::Text("%d Cameras Initialised", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
@@ -152,7 +154,7 @@ void CameraHandler::OnImGuiRender()
     }
     
     ImGui::Begin("Recorded Sessions");
-
+    
     if (m_State == Playback) {
         ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
     }
@@ -209,9 +211,9 @@ void CameraHandler::showSessionSettings() {
             ImGui::Checkbox("Limit Time", &m_LimitTime);
 
             ImGui::BeginDisabled(!m_LimitTime);
-            ImGui::InputInt("Number of Seconds", &m_TimeLimit, 1, 100);
-            if (m_TimeLimit < 0) {
-                m_TimeLimit = 0;
+            ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
+            if (m_TimeLimitInS < 0) {
+                m_TimeLimitInS = 0;
                 m_LimitTime = false;
             }
             ImGui::EndDisabled();
@@ -243,9 +245,9 @@ void CameraHandler::showRecordingStats() {
             ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
         }
         
-        if (m_LimitTime && m_TimeLimit > 0) {
+        if (m_LimitTime && m_TimeLimitInS > 0) {
             ImGui::Text("Time Limit:");
-            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimit);
+            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
         }
         ImGui::EndDisabled();
 
@@ -379,36 +381,6 @@ void CameraHandler::stopRecording() {
             cam->stopRecording();
         }
     } 
-}
-
-void CameraHandler::startOpenpose()
-{
-    if (m_OpenPoseStarted)
-        return;
-
-    mp_Logger->log("Configuring OpenPose");
-
-    // Starting OpenPose
-    mp_Logger->log("Starting openpose thread(s)");
-    m_OPWrapper.start();
-    m_OpenPoseStarted = true;
-}
-
-void CameraHandler::calculateSkeleton() {
-    startOpenpose();
-
-    for (auto cam : m_DepthCameras) {
-        cv::Mat im = cam->getColorFrame();
-        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(im);
-        auto datumProcessed = m_OPWrapper.emplaceAndPop(imageToProcess);
-        if (datumProcessed != nullptr) {
-            auto keyPoints = datumProcessed->at(0)->poseKeypoints;
-            mp_Logger->log(keyPoints.toString());
-        }
-        else {
-            mp_Logger->log("Frame could not be processed.", Logger::Priority::ERR);
-        }
-    }
 }
 
 void CameraHandler::findRecordings() {

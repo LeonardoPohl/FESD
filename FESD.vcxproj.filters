@@ -57,6 +57,9 @@
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\obj\SkeletonDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore">
@@ -151,6 +154,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\CMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\SkeletonDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
