@@ -70,6 +70,13 @@ void Camera::processMousePosUpdate(double xpos, double ypos)
 
 void Camera::processScroll(double, double yoffset)
 {
+    bool mouseControl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
+        glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS ||
+        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS;
+
+    if (!mouseControl)
+        return;
+
     fov -= (float)yoffset;
     if (fov < 1.0f)
         fov = 1.0f;
@@ -83,7 +90,7 @@ void Camera::updateProjection()
     int width;
     int height;
     glfwGetWindowSize(window, &width, &height);
-    proj = glm::perspective(glm::radians(fov), (float)width / (float)height, -1.f, 1.f);
+    proj = glm::perspective(glm::radians(fov), (float)width / (float)height, 0.1f, 10.f);
 }
 
 void Camera::updateView()
@@ -102,7 +109,7 @@ void Camera::updateImGui()
         update = true;
         pitch = PITCH;
         yaw = YAW;
-        Position = glm::vec3{ 0.0f };
+        Position = POS;
     }
 
     ImGui::Text("Angles");

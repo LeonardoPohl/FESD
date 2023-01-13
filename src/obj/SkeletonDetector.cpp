@@ -49,7 +49,7 @@ void SkeletonDetector::drawSkeleton(cv::Mat& frame_to_process, float score_thres
                 else {
                     color = { (0.7 * (score - score_threshold) / (1.0 - score_threshold)) + 0.3, 0.3, 0.3 };
                 }
-                cv::circle(frame_to_process, { (int)x, (int)y }, 5, color, cv::FILLED);
+                cv::circle(frame_to_process, { (int)x, (int)y }, 5, color * 255.0f, cv::FILLED);
             }
         }
     }
