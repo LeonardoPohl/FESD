@@ -59,8 +59,9 @@ void SkeletonDetector::startRecording(std::string sessionName)
 {
 }
 
-void SkeletonDetector::saveFrame(cv::Mat frame_to_process)
+void SkeletonDetector::saveFrame(cv::Mat frame_to_process, std::string cameraName)
 {
+    
 }
 
 void SkeletonDetector::stopRecording()

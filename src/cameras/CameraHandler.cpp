@@ -104,6 +104,10 @@ void CameraHandler::OnUpdate()
             }
         }
     }
+
+    if (m_State == Playback) {
+        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+    }
 }
 
 void CameraHandler::OnImGuiRender()
@@ -207,7 +211,7 @@ void CameraHandler::showSessionSettings() {
         ImGui::BeginDisabled(m_State == Recording);
         if (ImGui::TreeNode("Settings")) {
             ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-            ImGui::SameLine(); ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
+            ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
 
             ImGui::Checkbox("Limit Frames", &m_LimitFrames);
 
@@ -319,7 +323,7 @@ void CameraHandler::showRecordings() {
                         mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
                     }
                 }
-
+                m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
                 m_CamerasExist = !m_DepthCameras.empty();
                 if(m_CamerasExist)
                     m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
@@ -456,12 +460,14 @@ void CameraHandler::calculateSkeletons(Json::Value recording) {
         return;
     }
 
+    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
+
     m_SkeletonDetector->startRecording(recording["Name"].asString());
 
     for (m_CurrentPlaybackFrame = 0; m_CurrentPlaybackFrame < recording["RecordedFrames"].asInt(); m_CurrentPlaybackFrame++) {
         for (auto cam : m_DepthCameras) {
             auto frame_to_process = cam->getColorFrame();
-            m_SkeletonDetector->saveFrame(frame_to_process);
+            m_SkeletonDetector->saveFrame(frame_to_process, cam->getCameraName());
         }
     }
 

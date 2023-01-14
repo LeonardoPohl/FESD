@@ -94,7 +94,7 @@ namespace GLObject
         m_ColorDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, 255);
     }
 
-    void PointCloud::OnUpdate(int currentPlaybackFrame)
+    void PointCloud::OnUpdate()
     {
         const int16_t *depth;
 
