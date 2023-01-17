@@ -2,6 +2,7 @@
 #include <array>
 #include <memory>
 #include <unordered_map>
+#include <type_traits>
 
 #include <glm/glm.hpp>
 #include <GLCore/GLObject.h>
@@ -9,12 +10,11 @@
 #include <nanoflann.hpp>
 
 #include "cameras/DepthCamera.h"
-#include "Plane.h"
-#include "Cell.h"
 #include "Point.h"
 #include "BoundingBox.h"
 #include "PointCloudStreamState.h"
 #include "utilities/GLUtil.h"
+#include "KDTree.h"
 
 namespace GLObject
 {
@@ -36,11 +36,6 @@ namespace GLObject
 		void streamDepth(int i, int cam_index, const int16_t* depth);
 		void startNormalCalculation();
 		void calculateNormals(int i, int cam_index);
-		void startCellAssignment();
-		void assignCells(int i, int cam_index);
-		void startCellCalculation();
-		void calculateCells(int i, int cam_index);
-		void doPlaneSegmentation();
 		void manipulateTranslation();
 
 		PointCloudStreamState m_State{ };
@@ -70,14 +65,11 @@ namespace GLObject
 		std::vector<int> m_StreamWidths;
 		std::vector<int> m_StreamHeights;
 
-		std::vector<std::unordered_map<Cell*, glm::vec3>> m_ColorBypCell;
-		std::vector<std::unordered_map<std::string, Cell*>> m_pCellByKey;
-
-		std::vector<std::vector<Cell *>> m_PlanarpCells;
-		std::vector<std::vector<Cell *>> m_NonPlanarpCells;
-
 		std::vector<BoundingBox> m_BoundingBoxes{ };
 		std::vector<glm::vec3> m_CellSizes{ };
+		
+		// For now only works if there are exactly 2 cameras and no more
+		KDTree::Tree *m_KDTree;
 
 		float m_PlanarThreshold{ 0.004f };
 

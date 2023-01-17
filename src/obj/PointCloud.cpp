@@ -37,12 +37,6 @@ namespace GLObject
             m_Points.push_back(new Point[m_NumElements.back()]{});
             m_Vertices.push_back(new Point::Vertex[m_NumElements.back()]{});
 
-            m_ColorBypCell.push_back({ });
-            m_pCellByKey.push_back({ });
-
-            m_PlanarpCells.push_back({ });
-            m_NonPlanarpCells.push_back({ });
-
             m_BoundingBoxes.push_back({ });
             m_CellSizes.push_back({ });
 
@@ -121,22 +115,6 @@ namespace GLObject
                     UpdateVertices(cam_index, i)
                 }
             }
-            else if (m_State.m_State == m_State.CELLS) {
-                startCellAssignment();
-                PixIter(cam_index)
-                {
-                    assignCells(i, cam_index);
-                    UpdateVertices(cam_index, i)
-                }
-            }
-            else if (m_State.m_State == m_State.CALC_CELLS) {
-                startCellCalculation();
-                PixIter(cam_index)
-                {
-                    calculateCells(i, cam_index);
-                    UpdateVertices(cam_index, i)
-                }
-            }
 
             GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point::Vertex) * m_ElementOffset[cam_index], sizeof(Point::Vertex) * m_NumElements[cam_index], m_Vertices[cam_index]));
         }
@@ -172,47 +150,8 @@ namespace GLObject
         if (m_State == m_State.STREAM && ImGui::Button("Pause Stream"))
             pauseStream();
 
-        if (m_State != m_State.CELLS && ImGui::Button("Show Cells"))
-            startCellAssignment();
-
         if (m_State != m_State.NORMALS && ImGui::Button("Show Normals"))
             startNormalCalculation();
-
-        if (m_State != m_State.CALC_CELLS && ImGui::Button("Calculate Cells"))
-            startCellCalculation();
-
-        if (m_State == m_State.CELLS || m_State == m_State.CALC_CELLS) {
-            ImGui::Checkbox("Show Average Normals", &m_ShowAverageNormals);
-            if (ImGui::SliderInt("Cell devisions", &m_NumCellDevisions, 0, 400))
-            {
-                for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-                    m_CellSizes[cam_index] = Cell::getCellSize(m_BoundingBoxes[cam_index], m_NumCellDevisions);
-                    m_ColorBypCell[cam_index].clear();
-                    m_pCellByKey[cam_index].clear();
-                    m_PlanarpCells[cam_index].clear();
-                    m_NonPlanarpCells[cam_index].clear();
-                }
-                m_CellsAssigned = false;
-            }
-        }
-
-        if (m_State == m_State.CALC_CELLS) {
-            if (ImGui::SliderFloat("Planar Threshold", &m_PlanarThreshold, 0.0001f, 1.0f)) {
-                for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-                    m_PlanarpCells[cam_index].clear();
-                    m_NonPlanarpCells[cam_index].clear();
-
-                    for (auto const& [_, cell] : m_pCellByKey[cam_index]) {
-                        cell->updateNDTType();
-
-                        if (cell->getType() == Cell::NDT_TYPE::Planar)
-                            m_PlanarpCells[cam_index].push_back(cell);
-                        else
-                            m_NonPlanarpCells[cam_index].push_back(cell);
-                    }
-                }
-            }
-        }
 
         ImGui::Checkbox("Alignment Mode", &m_AlignmentMode);
 
@@ -237,17 +176,7 @@ namespace GLObject
     void PointCloud::resumeStream()
     {
         m_State.setState(PointCloudStreamState::STREAM);
-        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            for (auto key : m_pCellByKey[cam_index])
-                delete key.second;
 
-            m_pCellByKey[cam_index].clear();
-            m_ColorBypCell[cam_index].clear();
-            m_PlanarpCells[cam_index].clear();
-            m_NonPlanarpCells[cam_index].clear();
-        }
-
-        m_CellsAssigned = false;
         m_ShowAverageNormals = false;
         m_NormalsCalculated = false;
     }
@@ -255,12 +184,7 @@ namespace GLObject
     void PointCloud::streamDepth(int i, int cam_index, const int16_t *depth)
     {
         int depth_i = m_StreamWidths[cam_index] * (m_StreamHeights[cam_index] + 1) - i;
-
-        if (m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint())) {
-            m_CellSizes[cam_index] = Cell::getCellSize(m_BoundingBoxes[cam_index], m_NumCellDevisions);
-        }
-
-        // Read depth data
+        m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint());
         m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit(), cam_index);
     }
 
@@ -295,123 +219,6 @@ namespace GLObject
         m_Points[cam_index][i].Vert.Color = { (normal.x + 1) / 2.0f,
                                               (normal.y + 1) / 2.0f,
                                               (normal.z + 1) / 2.0f};
-    }
-
-    void PointCloud::startCellAssignment()
-    {
-        if (!m_NormalsCalculated) {
-            for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-                PixIter(cam_index)
-                {
-                    calculateNormals(i, cam_index);
-                }
-            }
-        }
-        m_State.setState(PointCloudStreamState::CELLS);
-
-        if (!m_CellsAssigned) {
-            for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-                PixIter(cam_index)
-                {
-                    auto p = m_Points[cam_index][i].getPoint();
-
-                    std::string key = Cell::getKey(m_BoundingBoxes[cam_index], m_CellSizes[cam_index], p);
-
-                    if (!m_pCellByKey[cam_index].contains(key)) {
-                        glm::vec3 color{ (*m_ColorDistribution)(m_Generator),
-                                         (*m_ColorDistribution)(m_Generator),
-                                         (*m_ColorDistribution)(m_Generator) };
-                        m_pCellByKey[cam_index].insert(std::make_pair(key, new Cell(key, &m_PlanarThreshold)));
-                        m_ColorBypCell[cam_index].insert(std::make_pair(m_pCellByKey[cam_index][key], color));
-                    }
-                    m_pCellByKey[cam_index][key]->addPoint(&m_Points[cam_index][i]);
-                }
-            }
-
-            m_CellsAssigned = true;
-        }
-    }
-
-    void PointCloud::assignCells(int i, int cam_index)
-    {
-        auto p = m_Points[cam_index][i].getPoint();
-
-        std::string key = Cell::getKey(m_BoundingBoxes[cam_index], m_CellSizes[cam_index], p);
-
-        glm::vec3 col;
-        auto cell = m_pCellByKey[cam_index][key];
-        if (m_ShowAverageNormals) {
-            auto normal = cell->getNormalisedNormal();
-            col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
-        }
-        else {
-            col = m_ColorBypCell[cam_index][cell];
-        }
-        m_Points[cam_index][i].Vert.Color = { col.x,
-                                              col.y,
-                                              col.z,};
-    }
-
-    void PointCloud::startCellCalculation()
-    {
-        if (!m_CellsAssigned) {
-            startCellAssignment();
-            // PixIter assignCells(i);
-        }
-        m_State.setState(PointCloudStreamState::CALC_CELLS);
-
-        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            if (m_PlanarpCells[cam_index].empty()) {
-                for (auto const& [_, cell] : m_pCellByKey[cam_index]) {
-                    cell->calculateNDT();
-
-                    if (cell->getType() == Cell::NDT_TYPE::Planar)
-                        m_PlanarpCells[cam_index].push_back(cell);
-                    else
-                        m_NonPlanarpCells[cam_index].push_back(cell);
-                }
-                m_PointDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, m_PlanarpCells.size());
-            }
-        }
-    }
-
-    void PointCloud::calculateCells(int i, int cam_index)
-    {
-        auto p = m_Points[cam_index][i].getPoint();
-
-        std::string key = Cell::getKey(m_BoundingBoxes[cam_index], m_CellSizes[cam_index], p);
-
-        glm::vec3 col{};
-
-        auto cell = m_pCellByKey[cam_index][key];
-        auto type = cell->getType();
-
-        if (m_ShowAverageNormals) {
-            auto normal = cell->getNormalisedNormal();
-            col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
-        }
-        else {
-            if (type == Cell::NDT_TYPE::Planar)
-                col = glm::vec3{ 0.0f, 0.0f, 1.0f };
-            else if (type == Cell::NDT_TYPE::Linear)
-                col = glm::vec3{ 1.0f, 0.0f, 0.0f };
-            else if (type == Cell::NDT_TYPE::Spherical)
-                col = glm::vec3{ 0.0f, 1.0f, 0.0f };
-            else
-                col = glm::vec3{ 0.5f, 0.75f, 0.25f };
-        }
-
-        m_Points[cam_index][i].Vert.Color = { col.x,
-                                              col.y,
-                                              col.z};
-
-    }
-
-    void PointCloud::doPlaneSegmentation()
-    {
-        std::vector<int> plane_points{};
-
-        plane_points.push_back(m_PointDistribution->operator()(m_Generator));
     }
 
     void PointCloud::manipulateTranslation()

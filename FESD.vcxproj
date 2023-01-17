@@ -163,7 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
-    <ClCompile Include="src\obj\Cell.cpp" />
+    <ClCompile Include="src\obj\KDTree.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
@@ -192,9 +192,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\obj\BoundingBox.h" />
-    <ClInclude Include="src\obj\Cell.h" />
+    <ClInclude Include="src\obj\KDTree.h" />
     <ClInclude Include="src\obj\Logger.h" />
-    <ClInclude Include="src\obj\Plane.h" />
     <ClInclude Include="src\obj\Point.h" />
     <ClInclude Include="src\obj\PointCloudStreamState.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <algorithm>
+#include <functional>
 
 #include <glm/glm.hpp>
 
@@ -36,6 +37,34 @@ public:
 	inline std::array<float, 3> getColorFromDepth(float depth) const {
 		float z = std::clamp(depth / 6.0f, 0.0f, 1.0f);
 		return CMap::getViridis(z);
+	}
+
+	static std::function<bool(Point p1, Point p2)> getComparator(int axis) {
+		if (axis == 0) {
+			return compareX;
+		}
+		else if (axis == 1) {
+			return compareY;
+		}
+		else if (axis == 2) {
+			return compareZ;
+		}
+		return nullptr;
+	}
+
+	static bool compareX(Point p1, Point p2)
+	{
+		return (p1.getPoint().x < p2.getPoint().x);
+	}
+
+	static bool compareY(Point p1, Point p2)
+	{
+		return (p1.getPoint().y < p2.getPoint().y);
+	}
+
+	static bool compareZ(Point p1, Point p2)
+	{
+		return (p1.getPoint().z < p2.getPoint().z);
 	}
 
 	inline void updateVertexArray(float depth, int cam_index)
