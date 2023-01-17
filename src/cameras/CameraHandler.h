@@ -49,7 +49,7 @@ private:
 	// Streaming
 	bool m_CamerasExist{ false };
 	bool m_ShowColorFrames{ false };
-	std::unique_ptr<GLObject::PointCloud> m_PointCloud;
+	std::unique_ptr<GLObject::PointCloud> mp_PointCloud;
 	std::vector<DepthCamera *> m_DepthCameras;
 
 	// Recording

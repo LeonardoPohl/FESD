@@ -89,11 +89,11 @@ bool Cell::calculateNDT()
 	else
 	{
 		auto q = trace / 3;
-		auto p2 = glm::pow(covariance[0][0] - q, 2) + glm::pow(covariance[1][1], 2) + glm::pow(covariance[2][2], 2) + 2 * p1;
+		auto p2 = glm::pow(covariance[0][0] - q, 2) + glm::pow(covariance[1][1], 2) + glm::pow(covariance[2][2], 2) + 2.0 * p1;
 		auto p = glm::sqrt(p2 / 6);
 		auto B = (float)(1.0f / p) * (covariance - q * identity);
 
-		auto r = calcSymmetricalDeterminant(B) / 2;
+		auto r = calcSymmetricalDeterminant(B) / 2.0;
 
 		// In exact arithmetic for a symmetric matrix - 1 <= r <= 1
 		// but computation error can leave it slightly outside this range.
@@ -118,15 +118,9 @@ bool Cell::calculateNDT()
 }
 
 void Cell::updateNDTType() {
-
-	if (m_EigenVector.z == 0 || m_EigenVector.y == 0) {
-		m_Type = NDT_TYPE::None;
-		return;
-	}
-
-	if (m_EigenVector.y / m_EigenVector.z <= *m_PlanarThreshold)
+	if (m_EigenVector.z != 0 && m_EigenVector.y / m_EigenVector.z <= *m_PlanarThreshold)
 		m_Type = NDT_TYPE::Linear;
-	else if (m_EigenVector.x / m_EigenVector.y <= *m_PlanarThreshold)
+	else if (m_EigenVector.y != 0 && m_EigenVector.x / m_EigenVector.y <= *m_PlanarThreshold)
 		m_Type = NDT_TYPE::Planar;
 	else
 		m_Type = NDT_TYPE::Spherical;

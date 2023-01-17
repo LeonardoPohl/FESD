@@ -54,7 +54,7 @@ void CameraHandler::initAllCameras()
 
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
-        m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+        mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
 }
 
 void CameraHandler::OnUpdate()
@@ -81,8 +81,8 @@ void CameraHandler::OnUpdate()
     if (m_State == Streaming || 
        (m_State == Recording && m_StreamWhileRecording) || 
        (m_State == Playback  && !m_PlaybackPaused)) {
-        m_PointCloud->OnUpdate();
-        m_PointCloud->OnRender();
+        mp_PointCloud->OnUpdate();
+        mp_PointCloud->OnRender();
     }
 
     for (auto cam : m_DepthCameras)
@@ -195,13 +195,13 @@ void CameraHandler::OnImGuiRender()
 
     ImGui::End();
     if (m_CamerasExist) {
-        ImGui::Begin("PointCloud");
-        m_PointCloud->OnImGuiRender();
-        ImGui::End();
-
         for (auto cam : m_DepthCameras) {
             cam->CameraSettings();
         }
+
+        ImGui::Begin("PointCloud");
+        mp_PointCloud->OnImGuiRender();
+        ImGui::End();
     }
 }
 
@@ -326,7 +326,7 @@ void CameraHandler::showRecordings() {
                 m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
                 m_CamerasExist = !m_DepthCameras.empty();
                 if(m_CamerasExist)
-                    m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+                    mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
             }
 
             ImGui::TreePop();
@@ -373,12 +373,24 @@ void CameraHandler::stopRecording() {
 
     Json::Value cameras;
 
-    for (auto cam : m_DepthCameras) {
+    for (int cam_id = 0; cam_id < m_DepthCameras.size(); cam_id++) {
+        auto cam = m_DepthCameras[cam_id];
         if (cam->m_IsSelectedForRecording) {
-            cameras.append(cam->getCameraConfig());
+            auto cam_json = cam->getCameraConfig();
+
+            auto r = mp_PointCloud->getRotation(cam_id);
+            auto t = mp_PointCloud->getTranslation(cam_id);
+            float rotation[3] = { r.x, r.y, r.z };
+            float translation[3] = { t.x, t.y, t.z };
+
+            cam_json["Rotation"] = rotation;
+            cam_json["Translation"] = translation;
+            
+            cameras.append(cam_json);
+            cam->stopRecording();
         }
     }
-    std::cout << cameras;
+
     root["Cameras"] = cameras;
 
     Json::StreamWriterBuilder builder;
@@ -391,11 +403,6 @@ void CameraHandler::stopRecording() {
     findRecordings();
 
     m_State = Streaming;
-    for (auto cam : m_DepthCameras) {
-        if (cam->m_IsSelectedForRecording) {
-            cam->stopRecording();
-        }
-    } 
 }
 
 void CameraHandler::findRecordings() {
@@ -431,7 +438,7 @@ void CameraHandler::clearCameras() {
         delete cam;
 
     m_DepthCameras.clear();
-    m_PointCloud.release();
+    mp_PointCloud.release();
     m_CamerasExist = false;
 }
 

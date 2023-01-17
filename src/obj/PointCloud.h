@@ -6,13 +6,12 @@
 #include <glm/glm.hpp>
 #include <GLCore/GLObject.h>
 #include <GLCore/Renderer.h>
+#include <nanoflann.hpp>
 
 #include "cameras/DepthCamera.h"
 #include "Plane.h"
 #include "Cell.h"
-#ifndef POINT
 #include "Point.h"
-#endif
 #include "BoundingBox.h"
 #include "PointCloudStreamState.h"
 #include "utilities/GLUtil.h"
@@ -28,6 +27,8 @@ namespace GLObject
 		void OnRender() override;
 		void OnImGuiRender() override;
 
+		glm::vec3 getRotation(int cameraId);
+		glm::vec3 getTranslation(int cameraId);
 	private:
 		void pauseStream();
 		void resumeStream();
@@ -54,6 +55,7 @@ namespace GLObject
 		GLUtil m_GLUtil{ };
 
 		std::vector<glm::vec3> m_Rotation;
+		std::vector<float> m_RotationFactor;
 		std::vector<glm::vec3> m_Translation;
 		float m_Scale{ 1.0f };
 
@@ -82,5 +84,6 @@ namespace GLObject
 		bool m_CellsAssigned{ false };
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
+		bool m_AlignmentMode{ false };
 	};
 };

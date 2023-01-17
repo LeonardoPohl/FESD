@@ -17,13 +17,13 @@ namespace GLObject
     {
         this->camera = cam;
 
-
         GLUtil::setFlags();
 
         m_NumElementsTotal = 0;
 
         for (auto cam : m_DepthCameras) {
             m_Rotation.push_back({ });
+            m_RotationFactor.push_back({ });
             m_Translation.push_back({ });
 
             m_StreamWidths.push_back(cam->getDepthStreamWidth());
@@ -149,7 +149,7 @@ namespace GLObject
         for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
             glm::mat4 model{ 1.0f };
 
-            if (m_Rotation[cam_index].x != 0 || m_Rotation[cam_index].y != 0 || m_Rotation[cam_index].z != 0)
+            if (m_Rotation[cam_index].x != 0.0f || m_Rotation[cam_index].y != 0.0f || m_Rotation[cam_index].z != 0.0f)
                 model = glm::rotate(model, 1.0f, m_Rotation[cam_index]);
             
             model = glm::translate(model, m_Translation[cam_index]);
@@ -158,6 +158,7 @@ namespace GLObject
         }
 
         m_GLUtil.m_Shader->SetUniformMat4f("u_VP", camera->getViewProjection());
+        m_GLUtil.m_Shader->SetUniformBool("u_AlignmentMode", m_AlignmentMode);
         m_GLUtil.mp_Renderer->DrawPoints(*m_GLUtil.m_VAO, *m_GLUtil.m_IndexBuffer, *m_GLUtil.m_Shader);
     }
 
@@ -213,7 +214,19 @@ namespace GLObject
             }
         }
 
+        ImGui::Checkbox("Alignment Mode", &m_AlignmentMode);
+
         manipulateTranslation();
+    }
+
+    glm::vec3 PointCloud::getRotation(int cameraId)
+    {
+        return m_Rotation[cameraId];
+    }
+
+    glm::vec3 PointCloud::getTranslation(int cameraId)
+    {
+        return m_Translation[cameraId];
     }
 
     void PointCloud::pauseStream()
@@ -286,17 +299,18 @@ namespace GLObject
 
     void PointCloud::startCellAssignment()
     {
-        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            if (!m_NormalsCalculated) {
+        if (!m_NormalsCalculated) {
+            for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
                 PixIter(cam_index)
                 {
                     calculateNormals(i, cam_index);
                 }
             }
+        }
+        m_State.setState(PointCloudStreamState::CELLS);
 
-            m_State.setState(PointCloudStreamState::CELLS);
-
-            if (!m_CellsAssigned) {
+        if (!m_CellsAssigned) {
+            for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
                 PixIter(cam_index)
                 {
                     auto p = m_Points[cam_index][i].getPoint();
@@ -304,17 +318,17 @@ namespace GLObject
                     std::string key = Cell::getKey(m_BoundingBoxes[cam_index], m_CellSizes[cam_index], p);
 
                     if (!m_pCellByKey[cam_index].contains(key)) {
-                        glm::vec3 color{ m_ColorDistribution->operator()(m_Generator),
-                                         m_ColorDistribution->operator()(m_Generator),
-                                         m_ColorDistribution->operator()(m_Generator) };
+                        glm::vec3 color{ (*m_ColorDistribution)(m_Generator),
+                                         (*m_ColorDistribution)(m_Generator),
+                                         (*m_ColorDistribution)(m_Generator) };
                         m_pCellByKey[cam_index].insert(std::make_pair(key, new Cell(key, &m_PlanarThreshold)));
                         m_ColorBypCell[cam_index].insert(std::make_pair(m_pCellByKey[cam_index][key], color));
                     }
                     m_pCellByKey[cam_index][key]->addPoint(&m_Points[cam_index][i]);
                 }
-
-                m_CellsAssigned = true;
             }
+
+            m_CellsAssigned = true;
         }
     }
 
@@ -325,13 +339,13 @@ namespace GLObject
         std::string key = Cell::getKey(m_BoundingBoxes[cam_index], m_CellSizes[cam_index], p);
 
         glm::vec3 col;
-
+        auto cell = m_pCellByKey[cam_index][key];
         if (m_ShowAverageNormals) {
-            auto normal = m_pCellByKey[cam_index][key]->getNormalisedNormal();
+            auto normal = cell->getNormalisedNormal();
             col = (normal + glm::vec3(1.0f)) / glm::vec3(2.0f);
         }
         else {
-            col = m_ColorBypCell[cam_index][m_pCellByKey[cam_index][key]];
+            col = m_ColorBypCell[cam_index][cell];
         }
         m_Points[cam_index][i].Vert.Color = { col.x,
                                               col.y,
@@ -347,7 +361,7 @@ namespace GLObject
         m_State.setState(PointCloudStreamState::CALC_CELLS);
 
         for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            if (m_PlanarpCells.empty()) {
+            if (m_PlanarpCells[cam_index].empty()) {
                 for (auto const& [_, cell] : m_pCellByKey[cam_index]) {
                     cell->calculateNDT();
 
@@ -383,6 +397,8 @@ namespace GLObject
                 col = glm::vec3{ 1.0f, 0.0f, 0.0f };
             else if (type == Cell::NDT_TYPE::Spherical)
                 col = glm::vec3{ 0.0f, 1.0f, 0.0f };
+            else
+                col = glm::vec3{ 0.5f, 0.75f, 0.25f };
         }
 
         m_Points[cam_index][i].Vert.Color = { col.x,
@@ -401,10 +417,18 @@ namespace GLObject
     void PointCloud::manipulateTranslation()
     {
         for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            if (ImGui::CollapsingHeader(("Translation " + m_DepthCameras[cam_index]->getCameraName()).c_str()))
+            auto camName = m_DepthCameras[cam_index]->getCameraName();
+            if (ImGui::CollapsingHeader(("Translation " + camName).c_str()))
             {
                 ImGui::SliderFloat3(("Rotation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Rotation[cam_index].x, -1.0f, 1.0f);
-                ImGui::SliderFloat3(("Translation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Translation[cam_index].x, -2.0f, 2.0f);
+                //ImGui::InputFloat(("Rotation x" + camName).c_str(), &m_Rotation[cam_index].x, 0.00001, 0.0001, "%f");
+                //ImGui::InputFloat(("Rotation y" + camName).c_str(), &m_Rotation[cam_index].y, 0.00001, 0.0001, "%f");
+                //ImGui::InputFloat(("Rotation z" + camName).c_str(), &m_Rotation[cam_index].z, 0.00001, 0.0001, "%f");
+                //ImGui::InputFloat(("Rotation Factor" + camName).c_str(), &m_RotationFactor[cam_index], 0.01, 0.1, "%f");
+
+                ImGui::InputFloat(("Translation x" + camName).c_str(), &m_Translation[cam_index].x, 0.001, 0.01, "%.3f"); 
+                ImGui::InputFloat(("Translation y" + camName).c_str(), &m_Translation[cam_index].y, 0.001, 0.01, "%.3f"); 
+                ImGui::InputFloat(("Translation z" + camName).c_str(), &m_Translation[cam_index].z, 0.001, 0.01, "%.3f");
             }
         }
 

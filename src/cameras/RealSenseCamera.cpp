@@ -239,6 +239,13 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 
 	m_CameraInfromation["Name"] = getCameraName();
 	m_CameraInfromation["Type"] = getType();
+
+	m_CameraInfromation["Fx"] = getIntrinsics(INTRINSICS::FX);
+	m_CameraInfromation["Fy"] = getIntrinsics(INTRINSICS::FY);
+	m_CameraInfromation["Cx"] = getIntrinsics(INTRINSICS::CX);
+	m_CameraInfromation["Cy"] = getIntrinsics(INTRINSICS::CY);
+	m_CameraInfromation["MeterPerUnit"] =  getMetersPerUnit();
+
 	m_CameraInfromation["FileName"] = filepath.filename().string();
 
 	m_IsSelectedForRecording = true;

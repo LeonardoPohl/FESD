@@ -15,6 +15,7 @@
     "opengl",
     "xtensor",
     "jsoncpp",
-    "opencv4"
+    "opencv4",
+    "nanoflann"
   ]
 }
