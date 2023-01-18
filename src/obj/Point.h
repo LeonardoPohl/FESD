@@ -39,7 +39,7 @@ public:
 		return CMap::getViridis(z);
 	}
 
-	static std::function<bool(Point p1, Point p2)> getComparator(int axis) {
+	static std::function<bool(Point *p1, Point *p2)> getComparator(int axis) {
 		if (axis == 0) {
 			return compareX;
 		}
@@ -49,22 +49,24 @@ public:
 		else if (axis == 2) {
 			return compareZ;
 		}
-		return nullptr;
+		return compareX;
 	}
 
-	static bool compareX(Point p1, Point p2)
+
+	static bool compareX(Point* p1, Point* p2)
 	{
-		return (p1.getPoint().x < p2.getPoint().x);
+		return (p1->getPoint().x < p2->getPoint().x);
 	}
 
-	static bool compareY(Point p1, Point p2)
+
+	static bool compareY(Point* p1, Point* p2)
 	{
-		return (p1.getPoint().y < p2.getPoint().y);
+		return (p1->getPoint().y < p2->getPoint().y);
 	}
 
-	static bool compareZ(Point p1, Point p2)
+	static bool compareZ(Point* p1, Point* p2)
 	{
-		return (p1.getPoint().z < p2.getPoint().z);
+		return (p1->getPoint().z < p2->getPoint().z);
 	}
 
 	inline void updateVertexArray(float depth, int cam_index)

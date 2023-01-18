@@ -33,8 +33,13 @@ public:
                 average += m_ContinuousFps[n];
             average /= (float)IM_ARRAYSIZE(m_ContinuousFps);
             char overlay[32];
-            sprintf(overlay, "avg %.2f, curr %.2f", average, 1.0f / m_Fps);
-            ImGui::PlotLines("", m_ContinuousFps, IM_ARRAYSIZE(m_ContinuousFps), m_ValuesOffset, overlay, 0.0f, 60.0f, ImVec2(0, 80.0f));
+            ImGui::Text("avg %.2f, curr %.2f", average, 1.0f / m_Fps);
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::PlotLines("", m_ContinuousFps, IM_ARRAYSIZE(m_ContinuousFps), m_ValuesOffset, overlay, 0.0f, 60.0f, ImVec2(0, 80.0f));
+                ImGui::EndTooltip();
+            }
         }
 
         ImGui::End();

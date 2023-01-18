@@ -11,18 +11,15 @@ layout(location = 2) in int aCamIndex;
 out vec3 v_Color;
 
 // Inputs the matrices needed for 3D viewing with perspective for up to 4 cameras
-uniform mat4 u_Models[2];
+uniform mat4 u_Model;
 uniform mat4 u_VP;
 uniform bool u_AlignmentMode;
 
 void main()
 {
 	// Outputs the positions/coordinates of all vertices 
-
 	if (aCamIndex == 0){
-		gl_Position = u_VP * u_Models[0] * vec4(aPos, 1.0);
-	}else if (aCamIndex == 1){
-		gl_Position = u_VP * u_Models[1] * vec4(aPos, 1.0);
+		gl_Position = u_VP * u_Model * vec4(aPos, 1.0);
 	}else{
 		gl_Position = u_VP * vec4(aPos, 1.0);
 	}

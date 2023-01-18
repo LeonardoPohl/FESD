@@ -7,12 +7,16 @@
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #define PixIter(cam_index) for(int i = 0; i < m_NumElements[cam_index]; i++)
 #define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i, &m_Points[cam_index][i].Vert, sizeof(Point::Vertex));
 
 namespace GLObject
 {
+    //
+    // Constructor
+    //
     PointCloud::PointCloud(std::vector<DepthCamera *> depthCameras, const Camera *cam, Renderer *renderer) : m_DepthCameras(depthCameras), m_CameraCount(depthCameras.size())
     {
         this->camera = cam;
@@ -22,10 +26,6 @@ namespace GLObject
         m_NumElementsTotal = 0;
 
         for (auto cam : m_DepthCameras) {
-            m_Rotation.push_back({ });
-            m_RotationFactor.push_back({ });
-            m_Translation.push_back({ });
-
             m_StreamWidths.push_back(cam->getDepthStreamWidth());
             m_StreamHeights.push_back(cam->getDepthStreamHeight());
 
@@ -88,6 +88,9 @@ namespace GLObject
         m_ColorDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, 255);
     }
 
+    // 
+    // Updates
+    // 
     void PointCloud::OnUpdate()
     {
         const int16_t *depth;
@@ -97,7 +100,7 @@ namespace GLObject
             if (!cam->m_IsEnabled)
                 continue;
 
-            if (m_State.m_State == m_State.STREAM) {
+            if (m_State == m_State.STREAM) {
                 depth = static_cast<const int16_t*>(cam->getDepth());
                 if (depth != nullptr) {
                     PixIter(cam_index) 
@@ -107,13 +110,16 @@ namespace GLObject
                     }
                 }
             }
-            else if (m_State.m_State == m_State.NORMALS) {
+            else if (m_State == m_State.NORMALS) {
                 startNormalCalculation();
-                PixIter(cam_index) 
+                PixIter(cam_index)
                 {
                     calculateNormals(i, cam_index);
                     UpdateVertices(cam_index, i)
                 }
+            }
+            else if (m_State == m_State.ICP) {
+                alignPointclouds();
             }
 
             GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point::Vertex) * m_ElementOffset[cam_index], sizeof(Point::Vertex) * m_NumElements[cam_index], m_Vertices[cam_index]));
@@ -124,16 +130,13 @@ namespace GLObject
     {
         m_GLUtil.m_Shader->Bind();
 
-        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            glm::mat4 model{ 1.0f };
+        glm::mat4 model{ 1.0f };
 
-            if (m_Rotation[cam_index].x != 0.0f || m_Rotation[cam_index].y != 0.0f || m_Rotation[cam_index].z != 0.0f)
-                model = glm::rotate(model, 1.0f, m_Rotation[cam_index]);
-            
-            model = glm::translate(model, m_Translation[cam_index]);
+        model = glm::eulerAngleYXZ(m_Rotation.y, m_Rotation.x, m_Rotation.z); 
+        model = glm::translate(model, m_Translation);
 
-            m_GLUtil.m_Shader->SetUniformMat4f(("u_Models[" + std::to_string(cam_index) + "]"), model);
-        }
+        m_GLUtil.m_Shader->SetUniformMat4f(("u_Model"), model);
+        
 
         m_GLUtil.m_Shader->SetUniformMat4f("u_VP", camera->getViewProjection());
         m_GLUtil.m_Shader->SetUniformBool("u_AlignmentMode", m_AlignmentMode);
@@ -142,8 +145,6 @@ namespace GLObject
 
     void PointCloud::OnImGuiRender()
     {
-        m_State.showState();
-
         if (m_State != m_State.STREAM && ImGui::Button("Resume Stream"))
             resumeStream();
 
@@ -153,21 +154,54 @@ namespace GLObject
         if (m_State != m_State.NORMALS && ImGui::Button("Show Normals"))
             startNormalCalculation();
 
+        if (ImGui::Button("Align Pointclouds")) {
+            alignPointclouds();
+        }
+
         ImGui::Checkbox("Alignment Mode", &m_AlignmentMode);
 
         manipulateTranslation();
     }
+    
+    void PointCloud::manipulateTranslation()
+    {
+        if (ImGui::CollapsingHeader("Translation"))
+        {
+            ImGui::InputFloat("Rotation x", &m_Rotation.x, 0.01f, 0.1f, "%.2f");
+            ImGui::InputFloat("Rotation y", &m_Rotation.y, 0.01f, 0.1f, "%.2f");
+            ImGui::InputFloat("Rotation z", &m_Rotation.z, 0.01f, 0.1f, "%.2f");
 
+            ImGui::InputFloat("Translation x", &m_Translation.x, 0.001, 0.01, "%.3f");
+            ImGui::InputFloat("Translation y", &m_Translation.y, 0.001, 0.01, "%.3f");
+            ImGui::InputFloat("Translation z", &m_Translation.z, 0.001, 0.01, "%.3f");
+        }
+
+        if (ImGui::CollapsingHeader("Scale"))
+        {
+            ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
+        }
+    }
+
+    //
+    // Getters
+    //
     glm::vec3 PointCloud::getRotation(int cameraId)
     {
-        return m_Rotation[cameraId];
+        if (cameraId == 0)
+            return m_Rotation;
+        return { };
     }
 
     glm::vec3 PointCloud::getTranslation(int cameraId)
     {
-        return m_Translation[cameraId];
+        if (cameraId == 0)
+            return m_Translation;
+        return { };
     }
 
+    //
+    // Pause and Resume
+    //
     void PointCloud::pauseStream()
     {
         m_State.setState(PointCloudStreamState::IDLE);
@@ -176,7 +210,8 @@ namespace GLObject
     void PointCloud::resumeStream()
     {
         m_State.setState(PointCloudStreamState::STREAM);
-
+        
+        m_KDTreeBuilt = false;
         m_ShowAverageNormals = false;
         m_NormalsCalculated = false;
     }
@@ -221,27 +256,12 @@ namespace GLObject
                                               (normal.z + 1) / 2.0f};
     }
 
-    void PointCloud::manipulateTranslation()
+    void PointCloud::alignPointclouds()
     {
-        for (int cam_index = 0; cam_index < m_CameraCount; cam_index++) {
-            auto camName = m_DepthCameras[cam_index]->getCameraName();
-            if (ImGui::CollapsingHeader(("Translation " + camName).c_str()))
-            {
-                ImGui::SliderFloat3(("Rotation " + m_DepthCameras[cam_index]->getCameraName()).c_str(), &m_Rotation[cam_index].x, -1.0f, 1.0f);
-                //ImGui::InputFloat(("Rotation x" + camName).c_str(), &m_Rotation[cam_index].x, 0.00001, 0.0001, "%f");
-                //ImGui::InputFloat(("Rotation y" + camName).c_str(), &m_Rotation[cam_index].y, 0.00001, 0.0001, "%f");
-                //ImGui::InputFloat(("Rotation z" + camName).c_str(), &m_Rotation[cam_index].z, 0.00001, 0.0001, "%f");
-                //ImGui::InputFloat(("Rotation Factor" + camName).c_str(), &m_RotationFactor[cam_index], 0.01, 0.1, "%f");
-
-                ImGui::InputFloat(("Translation x" + camName).c_str(), &m_Translation[cam_index].x, 0.001, 0.01, "%.3f"); 
-                ImGui::InputFloat(("Translation y" + camName).c_str(), &m_Translation[cam_index].y, 0.001, 0.01, "%.3f"); 
-                ImGui::InputFloat(("Translation z" + camName).c_str(), &m_Translation[cam_index].z, 0.001, 0.01, "%.3f");
-            }
-        }
-
-        if (ImGui::CollapsingHeader("Scale"))
-        {
-            ImGui::SliderFloat("Scale", &m_Scale, 0.001f, 10.0f);
+        if (!m_KDTreeBuilt) {
+            m_State.setState(PointCloudStreamState::ICP);
+            m_KDTree = new KDTree::Tree({ m_Points[1], m_Points[1] + m_NumElements[1] });
+            m_KDTreeBuilt = true;
         }
     }
 }

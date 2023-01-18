@@ -21,11 +21,14 @@ namespace GLObject
 	class PointCloud : public GLObject
 	{
 	public:
+		// Constructor
 		PointCloud(std::vector<DepthCamera*> depthCameras, const Camera *cam = nullptr, Renderer *renderer = nullptr);
 		
+		// Updates
 		void OnUpdate() override;
 		void OnRender() override;
 		void OnImGuiRender() override;
+		void manipulateTranslation();
 
 		glm::vec3 getRotation(int cameraId);
 		glm::vec3 getTranslation(int cameraId);
@@ -36,7 +39,7 @@ namespace GLObject
 		void streamDepth(int i, int cam_index, const int16_t* depth);
 		void startNormalCalculation();
 		void calculateNormals(int i, int cam_index);
-		void manipulateTranslation();
+		void alignPointclouds();
 
 		PointCloudStreamState m_State{ };
 
@@ -49,9 +52,8 @@ namespace GLObject
 
 		GLUtil m_GLUtil{ };
 
-		std::vector<glm::vec3> m_Rotation;
-		std::vector<float> m_RotationFactor;
-		std::vector<glm::vec3> m_Translation;
+		glm::vec3 m_Rotation;
+		glm::vec3 m_Translation;
 		float m_Scale{ 1.0f };
 
 		std::default_random_engine m_Generator;
@@ -77,5 +79,6 @@ namespace GLObject
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
 		bool m_AlignmentMode{ false };
+		bool m_KDTreeBuilt{ false };
 	};
 };

@@ -11,9 +11,10 @@ namespace KDTree
 		Node(std::vector<Point*> points, int depth);
 		~Node();
 
-		void matchPoint(Point* p, Node* currentBest);
+		void findBestNode(Point* p, Node* currentBest, float bestDistance);
+		Point* getMedian();
 	private:
-		glm::vec3 Median{ };
+		Point* Median{ };
 		Node* LeftChild{ };
 		Node* RightChild{ };
 		int Depth;
@@ -21,11 +22,12 @@ namespace KDTree
 
 	class Tree
 	{
+	public:
 		Tree() {}
 		Tree(std::vector<Point*> points);
 
 		void updatePointList(std::vector<Point*> points);
-		glm::vec3 findNearestNeighbour(Point* point);
+		Point* findNearestNeighbour(Point* point);
 	private:
 		std::vector<Point*> Points;
 		Node* RootNode{ nullptr };

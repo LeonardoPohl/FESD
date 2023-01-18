@@ -11,13 +11,12 @@ struct PointCloudStreamState
 		STREAM,
 		IDLE,
 		NORMALS,
-		CELLS,
-		CALC_CELLS
+		ICP
 	};
 
-	static const int m_StateCount = 6;
+	static const int m_StateCount = 4;
 	
-	const std::array<const char *, m_StateCount> m_StateNames{ "Stream", "Idle", "Show Normals", "Show Cells", "Calculate Cells" };
+	const std::array<const char *, m_StateCount> m_StateNames{ "Stream", "Idle", "Show Normals", "ICP"};
 
 	State m_State{ STREAM };
 	int m_StateElem{ 0 };
@@ -37,10 +36,8 @@ struct PointCloudStreamState
 			m_StateElem = 1;
 		else if (state == NORMALS)
 			m_StateElem = 2;
-		else if (state == CELLS)
+		else if (state == ICP)
 			m_StateElem = 3;
-		else if (state == CALC_CELLS)
-			m_StateElem = 4;
 		
 	}
 
