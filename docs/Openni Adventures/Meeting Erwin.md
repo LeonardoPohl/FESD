@@ -44,6 +44,15 @@
 
 ## 19-01-2022
 
+## Todo
+
+- define calibration protocol for recording sessions
+- Nuitrack for recording session
+- State goal
+- formalise the setup
+- process line
+	- goal
+
 ### Done since last meeting
 
 - Playback and recording working for RS and Orbbec
@@ -79,7 +88,7 @@
 	- ICP
 	- Openpose recording
 - Recording
-	- How much should I record for a good dataset?
+	- How much should I record for a good dataset? - one simple scenario, some simple action (maybe 3 times) - describe this process, formal description
 	- How often should I repeat the same action?
 	- Should I make the light conditions optimal, or record different light settings?
 	- Should I complete incomplete skeletons with the second skeleton if available?
