@@ -21,11 +21,11 @@ public:
 	inline std::string getCameraName() const override;
 	void showCameraInfo() override;
 	void printDeviceInfo() const;
-	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
-	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
-	inline float getIntrinsics(INTRINSICS intrin) const override;
-	inline glm::mat3 getIntrinsics() const override;
-	inline float getMetersPerUnit() const override;
+	unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
+	unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
+	float getIntrinsics(INTRINSICS intrin) const override;
+	glm::mat3 getIntrinsics() const override;
+	float getMetersPerUnit() const override;
 
 	/// Frame retreival
 	const void *getDepth() override;

@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <GLCore/GLObject.h>
 #include <GLCore/Renderer.h>
-#include <nanoflann.hpp>
 
 #include "cameras/DepthCamera.h"
 #include "Point.h"
@@ -36,7 +35,7 @@ namespace GLObject
 		void pauseStream();
 		void resumeStream();
 
-		void streamDepth(int i, int cam_index, const int16_t* depth);
+		void streamDepth(int cam_index, const int16_t* depth);
 		void startNormalCalculation();
 		void calculateNormals(int i, int cam_index);
 		void alignPointclouds();
@@ -47,8 +46,7 @@ namespace GLObject
 		std::vector<glm::mat4> m_MVPS{};
 		const int m_CameraCount{ };
 
-		std::vector<Point *> m_Points; 
-		std::vector<Point::Vertex *> m_Vertices;
+		std::vector<Point *> m_Points;
 
 		GLUtil m_GLUtil{ };
 

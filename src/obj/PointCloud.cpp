@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ranges>
 #include <random>
+#include <execution>
 
 #include <GLCore/GLErrorManager.h>
 #include <imgui.h>
@@ -10,7 +11,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #define PixIter(cam_index) for(int i = 0; i < m_NumElements[cam_index]; i++)
-#define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i, &m_Points[cam_index][i].Vert, sizeof(Point::Vertex));
+#define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i, m_Points[cam_index][i].getVertex(), sizeof(Point::Vertex));
 
 namespace GLObject
 {
@@ -23,8 +24,6 @@ namespace GLObject
 
         GLUtil::setFlags();
 
-        m_NumElementsTotal = 0;
-
         for (auto cam : m_DepthCameras) {
             m_StreamWidths.push_back(cam->getDepthStreamWidth());
             m_StreamHeights.push_back(cam->getDepthStreamHeight());
@@ -34,8 +33,7 @@ namespace GLObject
             
             m_MVPS.push_back({ });
 
-            m_Points.push_back(new Point[m_NumElements.back()]{});
-            m_Vertices.push_back(new Point::Vertex[m_NumElements.back()]{});
+            m_Points.push_back(new Point[m_NumElements.back()]);
 
             m_BoundingBoxes.push_back({ });
             m_CellSizes.push_back({ });
@@ -60,7 +58,6 @@ namespace GLObject
                     m_Points[cam_index][i].PositionFunction = { ((float)w - cx) / fx,
                                                                 ((float)h - cy) / fy };
 
-                    m_Points[cam_index][i].HalfLengthFun = 0.5f / fy;
                     m_Points[cam_index][i].updateVertexArray(1.f, cam_index);
                     indices[i + m_ElementOffset[cam_index]] = i + m_ElementOffset[cam_index];
                 }
@@ -70,11 +67,16 @@ namespace GLObject
         m_GLUtil.mp_Renderer = renderer;
         m_GLUtil.m_VAO = std::make_unique<VertexArray>(m_NumElementsTotal);
 
-        m_GLUtil.m_VB = std::make_unique<VertexBuffer>(m_NumElementsTotal * sizeof(Point::Vertex));
+        m_GLUtil.m_VB = std::make_unique<VertexBuffer>(m_NumElementsTotal * sizeof(Point));
         m_GLUtil.m_VBL = std::make_unique<VertexBufferLayout>();
 
+        // Position Function
+        m_GLUtil.m_VBL->Push<GLfloat>(2);
+        // Depth
+        m_GLUtil.m_VBL->Push<GLfloat>(1);
+        // Color
         m_GLUtil.m_VBL->Push<GLfloat>(3);
-        m_GLUtil.m_VBL->Push<GLfloat>(3);
+        // Camera Id
         m_GLUtil.m_VBL->Push<GLint>(1);
         
         m_GLUtil.m_VAO->AddBuffer(*m_GLUtil.m_VB, *m_GLUtil.m_VBL);
@@ -86,6 +88,8 @@ namespace GLObject
 
         m_PointDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, m_NumElementsTotal - 1);
         m_ColorDistribution = std::make_unique<std::uniform_int_distribution<int>>(0, 255);
+
+        delete indices;
     }
 
     // 
@@ -103,11 +107,8 @@ namespace GLObject
             if (m_State == m_State.STREAM) {
                 depth = static_cast<const int16_t*>(cam->getDepth());
                 if (depth != nullptr) {
-                    PixIter(cam_index) 
-                    {
-                        streamDepth(i, cam_index, depth);
-                        UpdateVertices(cam_index, i)
-                    }
+        
+                    streamDepth(cam_index, depth);
                 }
             }
             else if (m_State == m_State.NORMALS) {
@@ -115,14 +116,13 @@ namespace GLObject
                 PixIter(cam_index)
                 {
                     calculateNormals(i, cam_index);
-                    UpdateVertices(cam_index, i)
                 }
             }
             else if (m_State == m_State.ICP) {
                 alignPointclouds();
             }
 
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point::Vertex) * m_ElementOffset[cam_index], sizeof(Point::Vertex) * m_NumElements[cam_index], m_Vertices[cam_index]));
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point) * m_ElementOffset[cam_index], sizeof(Point) * m_NumElements[cam_index], m_Points[cam_index]));
         }
     }
 
@@ -216,11 +216,15 @@ namespace GLObject
         m_NormalsCalculated = false;
     }
 
-    void PointCloud::streamDepth(int i, int cam_index, const int16_t *depth)
+    void PointCloud::streamDepth(int cam_index, const int16_t *depth)
     {
-        int depth_i = m_StreamWidths[cam_index] * (m_StreamHeights[cam_index] + 1) - i;
-        m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint());
-        m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit(), cam_index);
+        #pragma omp parallel for
+        PixIter(cam_index)
+        {
+            int depth_i = m_StreamWidths[cam_index] * (m_StreamHeights[cam_index] + 1) - i;
+            m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint());
+            m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit(), cam_index);
+        }
     }
 
     void PointCloud::startNormalCalculation()
@@ -251,16 +255,16 @@ namespace GLObject
 
         auto normal = m_Points[cam_index][i].getNormal(p1, p2);
 
-        m_Points[cam_index][i].Vert.Color = { (normal.x + 1) / 2.0f,
-                                              (normal.y + 1) / 2.0f,
-                                              (normal.z + 1) / 2.0f};
+        m_Points[cam_index][i].Color = { (normal.x + 1) / 2.0f,
+                                         (normal.y + 1) / 2.0f,
+                                         (normal.z + 1) / 2.0f};
     }
 
     void PointCloud::alignPointclouds()
     {
         if (!m_KDTreeBuilt) {
             m_State.setState(PointCloudStreamState::ICP);
-            m_KDTree = new KDTree::Tree({ m_Points[1], m_Points[1] + m_NumElements[1] });
+            m_KDTree = new KDTree::Tree(&m_Points[1], m_NumElements[1]);
             m_KDTreeBuilt = true;
         }
     }

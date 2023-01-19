@@ -28,7 +28,6 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
-    m_SkeletonDetector = std::make_unique<SkeletonDetector>(logger);
 }
 
 CameraHandler::~CameraHandler()
@@ -180,6 +179,7 @@ void CameraHandler::OnImGuiRender()
     }
 
     if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
+        m_SkeletonDetector = std::make_unique<SkeletonDetector>(mp_Logger);
         mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
         int i = 0;
         for (auto rec : m_Recordings) {

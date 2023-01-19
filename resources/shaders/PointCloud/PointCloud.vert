@@ -1,11 +1,13 @@
 #version 330 core
 
-// Positions/Coordinates
-layout(location = 0) in vec3 aPos;
+// Position function
+layout(location = 0) in vec3 aPosFun;
+// Depth
+layout(location = 1) in float aDepth;
 // Colors
-layout(location = 1) in vec3 aColor;
+layout(location = 2) in vec3 aColor;
 // Positions/Coordinates
-layout(location = 2) in int aCamIndex;
+layout(location = 3) in int aCamIndex;
 
 // Outputs the color for the Fragment Shader
 out vec3 v_Color;
@@ -17,11 +19,12 @@ uniform bool u_AlignmentMode;
 
 void main()
 {
+	vec3 pos = vec3(aPosFun[0] * aDepth, aPosFun[1] * aDepth, aDepth);
 	// Outputs the positions/coordinates of all vertices 
 	if (aCamIndex == 0){
-		gl_Position = u_VP * u_Model * vec4(aPos, 1.0);
+		gl_Position = u_VP * u_Model * vec4(pos, 1.0);
 	}else{
-		gl_Position = u_VP * vec4(aPos, 1.0);
+		gl_Position = u_VP * vec4(pos, 1.0);
 	}
 	
 	// Assigns the colors from the Vertex Data to "color"

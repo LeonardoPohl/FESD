@@ -8,28 +8,27 @@ namespace KDTree
 	class Node 
 	{
 	public:
-		Node(std::vector<Point*> points, int depth);
+		Node(int depth);
 		~Node();
 
 		void findBestNode(Point* p, Node* currentBest, float bestDistance);
-		Point* getMedian();
-	private:
+
 		Point* Median{ };
 		Node* LeftChild{ };
 		Node* RightChild{ };
-		int Depth;
+		int Depth{ };
 	};
 
 	class Tree
 	{
 	public:
 		Tree() {}
-		Tree(std::vector<Point*> points);
+		Tree(Point *points[], const int elem_count);
 
-		void updatePointList(std::vector<Point*> points);
+		void updatePointList(Point *points[], const int elem_count);
+		void buildTree(Point* points[], const int elem_count, Node* node);
 		Point* findNearestNeighbour(Point* point);
 	private:
-		std::vector<Point*> Points;
 		Node* RootNode{ nullptr };
 	};
 }
