@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include <GLCore/GLObject.h>
 #include <GLCore/Renderer.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 #include "cameras/DepthCamera.h"
 #include "Point.h"
@@ -46,7 +48,7 @@ namespace GLObject
 		std::vector<glm::mat4> m_MVPS{};
 		const int m_CameraCount{ };
 
-		std::vector<Point *> m_Points;
+		std::vector<std::shared_ptr<Point[]>> m_Points;
 
 		GLUtil m_GLUtil{ };
 
@@ -76,6 +78,9 @@ namespace GLObject
 		bool m_CellsAssigned{ false };
 		bool m_ShowAverageNormals{ false };
 		bool m_NormalsCalculated{ false };
+
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudIn;
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudOut;
 		bool m_AlignmentMode{ false };
 		bool m_KDTreeBuilt{ false };
 	};

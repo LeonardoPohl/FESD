@@ -9,9 +9,9 @@
 #include <imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <pcl/registration/icp.h>
 
 #define PixIter(cam_index) for(int i = 0; i < m_NumElements[cam_index]; i++)
-#define UpdateVertices(cam_index, i) memcpy(m_Vertices[cam_index] + i, m_Points[cam_index][i].getVertex(), sizeof(Point::Vertex));
 
 namespace GLObject
 {
@@ -33,7 +33,7 @@ namespace GLObject
             
             m_MVPS.push_back({ });
 
-            m_Points.push_back(new Point[m_NumElements.back()]);
+            m_Points.push_back(std::make_shared<Point[]>(m_NumElements.back()));
 
             m_BoundingBoxes.push_back({ });
             m_CellSizes.push_back({ });
@@ -58,7 +58,7 @@ namespace GLObject
                     m_Points[cam_index][i].PositionFunction = { ((float)w - cx) / fx,
                                                                 ((float)h - cy) / fy };
 
-                    m_Points[cam_index][i].updateVertexArray(1.f, cam_index);
+                    m_Points[cam_index][i].updateVertexArray(0.f, cam_index);
                     indices[i + m_ElementOffset[cam_index]] = i + m_ElementOffset[cam_index];
                 }
             }
@@ -121,8 +121,8 @@ namespace GLObject
             else if (m_State == m_State.ICP) {
                 alignPointclouds();
             }
-
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point) * m_ElementOffset[cam_index], sizeof(Point) * m_NumElements[cam_index], m_Points[cam_index]));
+            auto p = m_Points[cam_index].get();
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, sizeof(Point) * m_ElementOffset[cam_index], sizeof(Point) * m_NumElements[cam_index], m_Points[cam_index].get()));
         }
     }
 
@@ -218,11 +218,12 @@ namespace GLObject
 
     void PointCloud::streamDepth(int cam_index, const int16_t *depth)
     {
-        #pragma omp parallel for
         PixIter(cam_index)
         {
+            // Rotate the stream
             int depth_i = m_StreamWidths[cam_index] * (m_StreamHeights[cam_index] + 1) - i;
             m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint());
+            
             m_Points[cam_index][i].updateVertexArray((float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit(), cam_index);
         }
     }
@@ -263,8 +264,15 @@ namespace GLObject
     void PointCloud::alignPointclouds()
     {
         if (!m_KDTreeBuilt) {
+            m_CloudIn = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[0], 1);
+            m_CloudOut = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[1], 1);
+
+            for (int i = 0; i < m_NumElements[0]; i++) {
+
+            }
+
             m_State.setState(PointCloudStreamState::ICP);
-            m_KDTree = new KDTree::Tree(&m_Points[1], m_NumElements[1]);
+            m_KDTree = new KDTree::Tree(m_Points[1], m_NumElements[1]);
             m_KDTreeBuilt = true;
         }
     }

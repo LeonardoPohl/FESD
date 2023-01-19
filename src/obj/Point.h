@@ -11,6 +11,8 @@
 class Point
 {
 public:
+	Point() : PositionFunction{ 0.0f }, Depth(0.0f), Color{ 0.0f }, CamId( 0.0f ) {}
+
 	std::array<float, 3> getColorFromDepth(float depth) const {
 		float z = std::clamp(depth / 6.0f, 0.0f, 1.0f);
 		return CMap::getViridis(z);

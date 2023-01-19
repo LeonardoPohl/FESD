@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <memory>
 
 #include "Point.h"
 
@@ -23,10 +24,10 @@ namespace KDTree
 	{
 	public:
 		Tree() {}
-		Tree(Point *points[], const int elem_count);
+		Tree(std::shared_ptr<Point []> points, const int elem_count);
 
-		void updatePointList(Point *points[], const int elem_count);
-		void buildTree(Point* points[], const int elem_count, Node* node);
+		void updatePointList(std::shared_ptr<Point[]> points, const int elem_count);
+		void buildTree(std::shared_ptr<Point[]> points, const int elem_count, Node* node);
 		Point* findNearestNeighbour(Point* point);
 	private:
 		Node* RootNode{ nullptr };
