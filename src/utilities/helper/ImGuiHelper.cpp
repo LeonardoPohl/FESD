@@ -40,6 +40,7 @@ void ImGuiHelper::terminateImGui(){
 
 void ImGuiHelper::HelpMarker(const char* desc)
 {
+    ImGui::SameLine();
     ImGui::TextDisabled("(?)");
     if (ImGui::IsItemHovered())
     {

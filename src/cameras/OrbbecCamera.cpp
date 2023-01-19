@@ -66,8 +66,9 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     getColorFrame();
 }
 
-OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
-    mp_Logger(logger) {
+OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int* currentPlaybackFrame) :
+    mp_Logger(logger), mp_CurrentPlaybackFrame(currentPlaybackFrame)
+{
     m_RC = m_Device.open(recording.string().c_str());
     errorHandling("Couldn't open Recording!");
 
@@ -212,8 +213,8 @@ inline float OrbbecCamera::getMetersPerUnit() const
 const void *OrbbecCamera::getDepth()
 {
     if (m_IsPlayback) {
-        mp_PlaybackController->seek(m_DepthStream, m_CurrentPlaybackFrame);
-        m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
+        mp_PlaybackController->seek(m_DepthStream, *mp_CurrentPlaybackFrame);
+        //m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
     }
     else {
         int changedStreamDummy;
@@ -267,7 +268,7 @@ cv::Mat OrbbecCamera::getColorFrame()
 
     if (m_CVCameraFound) {
         if (m_IsPlayback)
-            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, m_CurrentPlaybackFrame);
+            m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, *mp_CurrentPlaybackFrame);
 
         m_ColorStream.retrieve(m_ColorFrame);
     }
@@ -314,6 +315,13 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
 
     m_CameraInfromation["Name"] = getCameraName();
     m_CameraInfromation["Type"] = getType();
+
+    m_CameraInfromation["Fx"] = getIntrinsics(INTRINSICS::FX);
+    m_CameraInfromation["Fy"] = getIntrinsics(INTRINSICS::FY);
+    m_CameraInfromation["Cx"] = getIntrinsics(INTRINSICS::CX);
+    m_CameraInfromation["Cy"] = getIntrinsics(INTRINSICS::CY);
+    m_CameraInfromation["MeterPerUnit"] =  getMetersPerUnit();
+
     m_CameraInfromation["FileName"] = filepath.filename().string();
 
     m_RC = m_Recorder.create(filepath.string().c_str());
@@ -332,7 +340,7 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Orbbec Recorder is invalid", Logger::Priority::ERR);
     }
 
-    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 30, cv::Size(m_DepthWidth, m_DepthHeight)};
+    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(m_DepthWidth, m_DepthHeight)};
 
     m_IsEnabled = true;
     m_IsRecording = true;

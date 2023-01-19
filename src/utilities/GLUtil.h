@@ -21,11 +21,10 @@ struct GLUtil
 	std::unique_ptr<VertexBufferLayout> m_VBL;
 
 	static void setFlags() {
+		GLCall(glPointSize(1.5f));
 		GLCall(glEnable(GL_BLEND));
-		GLCall(glEnable(GL_CULL_FACE));
 		GLCall(glEnable(GL_DEPTH_TEST));
 		GLCall(glDepthFunc(GL_LESS));
-		GLCall(glDepthMask(GL_FALSE));
 		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	}
 };

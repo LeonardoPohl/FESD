@@ -163,11 +163,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
-    <ClCompile Include="src\obj\Cell.cpp" />
+    <ClCompile Include="src\obj\KDTree.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
+    <ClCompile Include="src\obj\SkeletonDetector.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
   </ItemGroup>
@@ -191,9 +192,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\obj\BoundingBox.h" />
-    <ClInclude Include="src\obj\Cell.h" />
+    <ClInclude Include="src\obj\KDTree.h" />
     <ClInclude Include="src\obj\Logger.h" />
-    <ClInclude Include="src\obj\Plane.h" />
     <ClInclude Include="src\obj\Point.h" />
     <ClInclude Include="src\obj\PointCloudStreamState.h" />
     <ClInclude Include="src\cameras\CameraHandler.h" />
@@ -201,6 +201,7 @@
     <ClInclude Include="src\cameras\DepthCamera.h" />
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
+    <ClInclude Include="src\obj\SkeletonDetector.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />

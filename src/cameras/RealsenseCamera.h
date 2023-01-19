@@ -9,7 +9,7 @@ class RealSenseCamera : public DepthCamera {
 public:
 	/// Constructors & Destructors
 	RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera *cam, Renderer *renderer, int camera_id, Logger::Logger* logger);
-	RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording);
+	RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int *currentPlaybackFrame);
 	~RealSenseCamera() override;
 
 	/// Initialise all devices
@@ -21,11 +21,11 @@ public:
 	inline std::string getCameraName() const override;
 	void showCameraInfo() override;
 	void printDeviceInfo() const;
-	inline unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
-	inline unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
-	inline float getIntrinsics(INTRINSICS intrin) const override;
-	inline glm::mat3 getIntrinsics() const override;
-	inline float getMetersPerUnit() const override;
+	unsigned int getDepthStreamWidth() const override { return m_DepthWidth; }
+	unsigned int getDepthStreamHeight() const override { return m_DepthHeight; }
+	float getIntrinsics(INTRINSICS intrin) const override;
+	glm::mat3 getIntrinsics() const override;
+	float getMetersPerUnit() const override;
 
 	/// Frame retreival
 	const void *getDepth() override;
@@ -53,4 +53,6 @@ private:
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
 	float m_MetersPerUnit{};
+
+	int* mp_CurrentPlaybackFrame;
 };

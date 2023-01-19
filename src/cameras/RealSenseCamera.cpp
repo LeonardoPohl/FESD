@@ -41,8 +41,8 @@ RealSenseCamera::RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera*
 	m_MetersPerUnit = depth_frame.get_units();
 }
 
-RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording) :
-	mp_Logger(logger)
+RealSenseCamera::RealSenseCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int *currentPlaybackFrame) :
+	mp_Logger(logger), mp_CurrentPlaybackFrame(currentPlaybackFrame)
 {
 	mp_Pipe = std::make_shared<rs2::pipeline>();
 	rs2::config cfg;
@@ -192,7 +192,17 @@ const void* RealSenseCamera::getDepth()
 
 cv::Mat RealSenseCamera::getColorFrame()
 {
-	rs2::frameset data = mp_Pipe->wait_for_frames();
+	rs2::frameset data;
+
+	if (m_Device.as<rs2::playback>()) {
+		if (!mp_Pipe->poll_for_frames(&data)) {
+			return {};
+		}
+	}
+	else {
+		data = mp_Pipe->wait_for_frames();
+	}
+	 
 	// Make sure the frameset is spatialy aligned 
 	// (each pixel in depth image corresponds to the same pixel in the color image)
 	rs2::frameset aligned_set = m_AlignToDepth.process(data);
@@ -221,7 +231,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
 		mp_Logger->log("Saving " + getCameraName() + "'s stream to " + filepath.string());
-
+		
 		cfg.enable_record_to_file(filepath.string());
 		mp_Pipe->start(cfg);
 		m_Device = mp_Pipe->get_active_profile().get_device();
@@ -229,6 +239,13 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 
 	m_CameraInfromation["Name"] = getCameraName();
 	m_CameraInfromation["Type"] = getType();
+
+	m_CameraInfromation["Fx"] = getIntrinsics(INTRINSICS::FX);
+	m_CameraInfromation["Fy"] = getIntrinsics(INTRINSICS::FY);
+	m_CameraInfromation["Cx"] = getIntrinsics(INTRINSICS::CX);
+	m_CameraInfromation["Cy"] = getIntrinsics(INTRINSICS::CY);
+	m_CameraInfromation["MeterPerUnit"] =  getMetersPerUnit();
+
 	m_CameraInfromation["FileName"] = filepath.filename().string();
 
 	m_IsSelectedForRecording = true;
@@ -238,9 +255,14 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 }
 
 void RealSenseCamera::saveFrame() {
-	rs2::frameset data = mp_Pipe->wait_for_frames();
-	data.get_depth_frame();
-	data.get_color_frame();
+	try {
+		rs2::frameset data = mp_Pipe->wait_for_frames();
+		data.get_depth_frame();
+		data.get_color_frame();
+	}
+	catch (...) {
+		mp_Logger->log("Querying realsense frame failed", Logger::Priority::WARN);
+	}
 }
 
 void RealSenseCamera::stopRecording()

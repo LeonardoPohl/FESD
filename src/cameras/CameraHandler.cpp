@@ -4,14 +4,13 @@
 #include <ctime>
 #include <fstream>
 #include <filesystem>
+#include <execution>
 
 #include <json/json.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <OpenNI.h>
 #include <opencv2/opencv.hpp>
-#define OPENPOSE_FLAGS_DISABLE_POSE
-#include <openpose/flags.hpp>
 
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
@@ -30,6 +29,8 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
+    m_SkeletonDetector = std::make_unique<SkeletonDetector>(mp_Logger);
+
 }
 
 CameraHandler::~CameraHandler()
@@ -38,9 +39,6 @@ CameraHandler::~CameraHandler()
     clearCameras();
     
     openni::OpenNI::shutdown();
-
-    if (m_OpenPoseStarted)
-        m_OPWrapper.stop();
 }
 
 void CameraHandler::initAllCameras()
@@ -58,7 +56,7 @@ void CameraHandler::initAllCameras()
 
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
-        m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+        mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
 }
 
 void CameraHandler::OnUpdate()
@@ -74,40 +72,54 @@ void CameraHandler::OnUpdate()
             return;
         }
 
-        if (m_RecordedSeconds.count() > m_TimeLimit && m_LimitTime) {
+        if (m_RecordedSeconds.count() > m_TimeLimitInS && m_LimitTime) {
             stopRecording();
             return;
         }
 
         m_RecordedFrames += 1;
-    }
-    
-    if (m_DoSkeletonDetection) {
-        calculateSkeleton();
-    }
 
-    if (m_State == Streaming || 
-       (m_State == Recording && m_StreamWhileRecording) || 
-       (m_State == Playback  && !m_PlaybackPaused)) {
-        m_PointCloud->OnUpdate();
-        m_PointCloud->OnRender();
-    }
-
-    for (auto cam : m_DepthCameras)
-    {
-        if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
-        {
-            if (m_State == Recording && !m_StreamWhileRecording) {
+        if (m_StreamWhileRecording) {
+            mp_PointCloud->OnUpdate();
+            mp_PointCloud->OnRender();
+        }
+        else {
+            std::for_each(
+                std::execution::par,
+                m_DepthCameras.begin(), 
+                m_DepthCameras.end(), 
+                [](auto&& cam) {
                 cam->saveFrame();
-            }
-
-            if (m_ShowColorFrames) {
-                auto frame = cam->getColorFrame();
-                if (!frame.empty())
-                    cv::imshow(cam->getCameraName(), frame);
-            }
+            });
         }
     }
+    else {
+        if (m_State == Streaming ||
+            (m_State == Playback && !m_PlaybackPaused)) {
+            mp_PointCloud->OnUpdate();
+            mp_PointCloud->OnRender();
+        }
+
+        for (auto cam : m_DepthCameras)
+        {
+            if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
+            {
+                if ((m_ShowColorFrames || m_DoSkeletonDetection) && m_State != Recording) {
+                    auto frame = cam->getColorFrame();
+                    if (!frame.empty()) {
+                        if (m_DoSkeletonDetection) {
+                            m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                        }
+                        cv::imshow(cam->getCameraName(), frame);
+                    }
+                }
+            }
+        }
+
+        if (m_State == Playback) {
+            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+        }
+    }    
 }
 
 void CameraHandler::OnImGuiRender()
@@ -118,8 +130,14 @@ void CameraHandler::OnImGuiRender()
         initAllCameras();
     }
     if (m_CamerasExist) {
-        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
         ImGui::Checkbox("Show Color Frames", &m_ShowColorFrames);
+
+        ImGui::Checkbox("Do skeleton detection", &m_DoSkeletonDetection);
+        if (m_DoSkeletonDetection) {
+            ImGui::InputFloat("Score Threshold", &m_ScoreThreshold, 0.0f, 0.999f, "%.3f");
+            ImGui::Checkbox("Show Uncertainty", &m_ShowUncertainty);
+            ImGuiHelper::HelpMarker("Joints which are lower than the Score Thresholt will be shown in grey and the ones above will be shown ");
+        }
 
         ImGui::Text("%d Cameras Initialised", m_DepthCameras.size());
         for (auto cam : m_DepthCameras) {
@@ -152,7 +170,7 @@ void CameraHandler::OnImGuiRender()
     }
     
     ImGui::Begin("Recorded Sessions");
-
+    
     if (m_State == Playback) {
         ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
     }
@@ -173,18 +191,29 @@ void CameraHandler::OnImGuiRender()
         ImGui::Text("No Recordings Found!");
     }
 
+    if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
+        mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
+        int i = 0;
+        for (auto rec : m_Recordings) {
+            std::cout << i++ << "/" << m_Recordings.size() << "\r";
+            calculateSkeletons(rec);
+        }
+
+        mp_Logger->log("Skeleton detection done for all recordings");
+    }
+
     showRecordings();
     ImGui::EndDisabled();
 
     ImGui::End();
     if (m_CamerasExist) {
-        ImGui::Begin("PointCloud");
-        m_PointCloud->OnImGuiRender();
-        ImGui::End();
-
         for (auto cam : m_DepthCameras) {
             cam->CameraSettings();
         }
+
+        ImGui::Begin("PointCloud");
+        mp_PointCloud->OnImGuiRender();
+        ImGui::End();
     }
 }
 
@@ -194,7 +223,7 @@ void CameraHandler::showSessionSettings() {
         ImGui::BeginDisabled(m_State == Recording);
         if (ImGui::TreeNode("Settings")) {
             ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-            ImGui::SameLine(); ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, might decrease performance.");
+            ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
 
             ImGui::Checkbox("Limit Frames", &m_LimitFrames);
 
@@ -209,9 +238,9 @@ void CameraHandler::showSessionSettings() {
             ImGui::Checkbox("Limit Time", &m_LimitTime);
 
             ImGui::BeginDisabled(!m_LimitTime);
-            ImGui::InputInt("Number of Seconds", &m_TimeLimit, 1, 100);
-            if (m_TimeLimit < 0) {
-                m_TimeLimit = 0;
+            ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
+            if (m_TimeLimitInS < 0) {
+                m_TimeLimitInS = 0;
                 m_LimitTime = false;
             }
             ImGui::EndDisabled();
@@ -243,9 +272,9 @@ void CameraHandler::showRecordingStats() {
             ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
         }
         
-        if (m_LimitTime && m_TimeLimit > 0) {
+        if (m_LimitTime && m_TimeLimitInS > 0) {
             ImGui::Text("Time Limit:");
-            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimit);
+            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
         }
         ImGui::EndDisabled();
 
@@ -297,19 +326,19 @@ void CameraHandler::showRecordings() {
 
                 for (auto camera : recording["Cameras"]) {
                     if (camera["Type"].asString() == RealSenseCamera::getType()) {
-                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
+                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
                     }
                     else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString()));
+                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
                     }
                     else {
                         mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
                     }
                 }
-
+                m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
                 m_CamerasExist = !m_DepthCameras.empty();
                 if(m_CamerasExist)
-                    m_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+                    mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
             }
 
             ImGui::TreePop();
@@ -321,14 +350,14 @@ void CameraHandler::showRecordings() {
 void CameraHandler::startRecording() {
     mp_Logger->log("Starting recording");
     m_State = Recording;
-    m_RecordedFrames = 0;
-    m_RecordedSeconds = std::chrono::duration<double>::zero();
 
     for (auto cam : m_DepthCameras) {
         cam->m_IsEnabled = true;
         cam->startRecording(getFileSafeSessionName());
     }
 
+    m_RecordedFrames = 0;
+    m_RecordedSeconds = std::chrono::duration<double>::zero();
     m_RecordingStart = std::chrono::system_clock::now();
 }
 
@@ -356,12 +385,24 @@ void CameraHandler::stopRecording() {
 
     Json::Value cameras;
 
-    for (auto cam : m_DepthCameras) {
+    for (int cam_id = 0; cam_id < m_DepthCameras.size(); cam_id++) {
+        auto cam = m_DepthCameras[cam_id];
         if (cam->m_IsSelectedForRecording) {
-            cameras.append(cam->getCameraConfig());
+            auto cam_json = cam->getCameraConfig();
+
+            auto r = mp_PointCloud->getRotation(cam_id);
+            auto t = mp_PointCloud->getTranslation(cam_id);
+            float rotation[3] = { r.x, r.y, r.z };
+            float translation[3] = { t.x, t.y, t.z };
+
+            cam_json["Rotation"] = rotation;
+            cam_json["Translation"] = translation;
+            
+            cameras.append(cam_json);
+            cam->stopRecording();
         }
     }
-    std::cout << cameras;
+
     root["Cameras"] = cameras;
 
     Json::StreamWriterBuilder builder;
@@ -374,41 +415,6 @@ void CameraHandler::stopRecording() {
     findRecordings();
 
     m_State = Streaming;
-    for (auto cam : m_DepthCameras) {
-        if (cam->m_IsSelectedForRecording) {
-            cam->stopRecording();
-        }
-    } 
-}
-
-void CameraHandler::startOpenpose()
-{
-    if (m_OpenPoseStarted)
-        return;
-
-    mp_Logger->log("Configuring OpenPose");
-
-    // Starting OpenPose
-    mp_Logger->log("Starting openpose thread(s)");
-    m_OPWrapper.start();
-    m_OpenPoseStarted = true;
-}
-
-void CameraHandler::calculateSkeleton() {
-    startOpenpose();
-
-    for (auto cam : m_DepthCameras) {
-        cv::Mat im = cam->getColorFrame();
-        const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(im);
-        auto datumProcessed = m_OPWrapper.emplaceAndPop(imageToProcess);
-        if (datumProcessed != nullptr) {
-            auto keyPoints = datumProcessed->at(0)->poseKeypoints;
-            mp_Logger->log(keyPoints.toString());
-        }
-        else {
-            mp_Logger->log("Frame could not be processed.", Logger::Priority::ERR);
-        }
-    }
 }
 
 void CameraHandler::findRecordings() {
@@ -444,8 +450,47 @@ void CameraHandler::clearCameras() {
         delete cam;
 
     m_DepthCameras.clear();
-    m_PointCloud.release();
+    mp_PointCloud.release();
     m_CamerasExist = false;
+}
+
+void CameraHandler::calculateSkeletons(Json::Value recording) {
+    mp_Logger->log("Started Skeleton recording of \"" + recording["Name"].asString() + "\"");
+    m_State = Playback;
+
+    clearCameras();
+
+    for (auto camera : recording["Cameras"]) {
+        if (camera["Type"].asString() == RealSenseCamera::getType()) {
+            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else if (camera["Type"].asString() == OrbbecCamera::getType()) {
+            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else {
+            mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
+        }
+    }
+
+    m_CamerasExist = !m_DepthCameras.empty();
+
+    if (!m_CamerasExist) {
+        mp_Logger->log("No cameras could be initialised for recording \"" + recording["Name"].asString() + "\"", Logger::Priority::ERR);
+        return;
+    }
+
+    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
+
+    m_SkeletonDetector->startRecording(recording["Name"].asString());
+
+    for (m_CurrentPlaybackFrame = 0; m_CurrentPlaybackFrame < recording["RecordedFrames"].asInt(); m_CurrentPlaybackFrame++) {
+        for (auto cam : m_DepthCameras) {
+            auto frame_to_process = cam->getColorFrame();
+            m_SkeletonDetector->saveFrame(frame_to_process, cam->getCameraName());
+        }
+    }
+
+    m_SkeletonDetector->stopRecording();
 }
 
 void CameraHandler::updateSessionName() {
