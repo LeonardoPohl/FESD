@@ -54,7 +54,7 @@ private:
 
 	// Recording
 	std::string m_SessionName{ };
-	bool m_StreamWhileRecording{ true };
+	bool m_StreamWhileRecording{ false };
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
 	int m_FrameLimit{ 100 };

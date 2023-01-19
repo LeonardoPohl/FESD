@@ -4,6 +4,7 @@
 #include <ctime>
 #include <fstream>
 #include <filesystem>
+#include <execution>
 
 #include <json/json.h>
 #include <imgui.h>
@@ -28,6 +29,8 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
+    m_SkeletonDetector = std::make_unique<SkeletonDetector>(mp_Logger);
+
 }
 
 CameraHandler::~CameraHandler()
@@ -75,38 +78,48 @@ void CameraHandler::OnUpdate()
         }
 
         m_RecordedFrames += 1;
-    }
 
-    if (m_State == Streaming || 
-       (m_State == Recording && m_StreamWhileRecording) || 
-       (m_State == Playback  && !m_PlaybackPaused)) {
-        mp_PointCloud->OnUpdate();
-        mp_PointCloud->OnRender();
-    }
-
-    for (auto cam : m_DepthCameras)
-    {
-        if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
-        {
-            if (m_State == Recording && !m_StreamWhileRecording) {
+        if (m_StreamWhileRecording) {
+            mp_PointCloud->OnUpdate();
+            mp_PointCloud->OnRender();
+        }
+        else {
+            std::for_each(
+                std::execution::par,
+                m_DepthCameras.begin(), 
+                m_DepthCameras.end(), 
+                [](auto&& cam) {
                 cam->saveFrame();
-            }
+            });
+        }
+    }
+    else {
+        if (m_State == Streaming ||
+            (m_State == Playback && !m_PlaybackPaused)) {
+            mp_PointCloud->OnUpdate();
+            mp_PointCloud->OnRender();
+        }
 
-            if (m_ShowColorFrames || m_DoSkeletonDetection) {
-                auto frame = cam->getColorFrame();
-                if (!frame.empty()) {
-                    if (m_DoSkeletonDetection) {
-                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+        for (auto cam : m_DepthCameras)
+        {
+            if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
+            {
+                if ((m_ShowColorFrames || m_DoSkeletonDetection) && m_State != Recording) {
+                    auto frame = cam->getColorFrame();
+                    if (!frame.empty()) {
+                        if (m_DoSkeletonDetection) {
+                            m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                        }
+                        cv::imshow(cam->getCameraName(), frame);
                     }
-                    cv::imshow(cam->getCameraName(), frame);
                 }
             }
         }
-    }
 
-    if (m_State == Playback) {
-        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
-    }
+        if (m_State == Playback) {
+            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+        }
+    }    
 }
 
 void CameraHandler::OnImGuiRender()
@@ -179,7 +192,6 @@ void CameraHandler::OnImGuiRender()
     }
 
     if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
-        m_SkeletonDetector = std::make_unique<SkeletonDetector>(mp_Logger);
         mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
         int i = 0;
         for (auto rec : m_Recordings) {
@@ -338,14 +350,14 @@ void CameraHandler::showRecordings() {
 void CameraHandler::startRecording() {
     mp_Logger->log("Starting recording");
     m_State = Recording;
-    m_RecordedFrames = 0;
-    m_RecordedSeconds = std::chrono::duration<double>::zero();
 
     for (auto cam : m_DepthCameras) {
         cam->m_IsEnabled = true;
         cam->startRecording(getFileSafeSessionName());
     }
 
+    m_RecordedFrames = 0;
+    m_RecordedSeconds = std::chrono::duration<double>::zero();
     m_RecordingStart = std::chrono::system_clock::now();
 }
 

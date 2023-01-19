@@ -255,9 +255,14 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 }
 
 void RealSenseCamera::saveFrame() {
-	rs2::frameset data = mp_Pipe->wait_for_frames();
-	data.get_depth_frame();
-	data.get_color_frame();
+	try {
+		rs2::frameset data = mp_Pipe->wait_for_frames();
+		data.get_depth_frame();
+		data.get_color_frame();
+	}
+	catch (...) {
+		mp_Logger->log("Querying realsense frame failed", Logger::Priority::WARN);
+	}
 }
 
 void RealSenseCamera::stopRecording()
