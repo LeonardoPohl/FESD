@@ -276,6 +276,7 @@ namespace GLObject
 
             m_ICP.setInputSource(m_CloudIn);
             m_ICPInitialised = true;
+            m_AlignmentMode = true;
         }
 
         if (!m_IsAligned) {
@@ -296,8 +297,11 @@ namespace GLObject
             if (m_ICP.hasConverged()) {
                 m_IsAligned = true;
             }
-            auto transform = m_ICP.getFinalTransformation();
-            std::cout << transform << std::endl;
-        }
+
+            auto transform = Eigen::Affine3f(m_ICP.getFinalTransformation());
+            pcl::getTranslationAndEulerAngles(transform,
+                                              m_Translation.x, m_Translation.y, m_Translation.z,
+                                              m_Rotation.x, m_Rotation.y, m_Rotation.z );
+        }   
     }
 }
