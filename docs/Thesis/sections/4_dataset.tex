@@ -1,0 +1,25 @@
+\section{Dataset}
+
+This section contains notes on the Dataset, what it contains and how it was build.
+
+\subsection{Features of the Dataset}
+
+Here we discuss different features that the dataset should have to notice as many mistakes as possible, to create a benchmark, which covers as many scenarios as possible.
+
+\paragraph{Lighting} The Dataset should contain different lighting environments as it could impact the detection.
+
+\paragraph{Positioning} The position in a room relative to the camera should also be evaluated. There should also be samples where features are not fully visible, e.g no feet visible.
+
+\paragraph{Background} There should be tests related to how cramped the background is and how close a subject is to the background and what colours the subject is wearing (similar colours of the background might make it harder to detect).
+
+\paragraph{Person} The dataset should also contain samples, where the subject is wearing more reflective clothing.
+
+\paragraph{Camera} A noisy camera might impair the ability to detect efficiently. Add some artificial noise for some of the entries to simulate a noisy camera, which might be caused by a faulty connection.
+
+\subsection{Extracting the ground truth}
+
+To apply any accuracy metric a ground truth needs to be included in the dataset. This can be done manually, but this is a lot of work and also error prone, if the amount of data is overwhelming. I plan on creating a significant dataset and it would be good if things were as automated as possible.
+
+\paragraph{Stencils on the limbs for detection}
+
+I could attach Matrix bar-codes like in Figure \ref{fig:aztec} on my joints where the the skeleton joints are supposed to be and replace them, maybe using a gradient, which uses the color of all surrounding pixels. There should not be any trace left of the qr code so it cannot be used as a feature.

@@ -9,7 +9,6 @@
 #include <imgui.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <pcl/registration/icp.h>
 
 #define PixIter(cam_index) for(int i = 0; i < m_NumElements[cam_index]; i++)
 
@@ -211,7 +210,7 @@ namespace GLObject
     {
         m_State.setState(PointCloudStreamState::STREAM);
         
-        m_KDTreeBuilt = false;
+        m_ICPInitialised = false;
         m_ShowAverageNormals = false;
         m_NormalsCalculated = false;
     }
@@ -258,22 +257,47 @@ namespace GLObject
 
         m_Points[cam_index][i].Color = { (normal.x + 1) / 2.0f,
                                          (normal.y + 1) / 2.0f,
-                                         (normal.z + 1) / 2.0f};
+                                         (normal.z + 1) / 2.0f };
     }
 
     void PointCloud::alignPointclouds()
     {
-        if (!m_KDTreeBuilt) {
+        if (!m_ICPInitialised) {
+            m_State.setState(PointCloudStreamState::ICP);
             m_CloudIn = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[0], 1);
-            m_CloudOut = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[1], 1);
 
             for (int i = 0; i < m_NumElements[0]; i++) {
-
+                auto p = &(m_CloudIn.get()->at(i));
+                auto point = m_Points[0][i].getPoint();
+                p->x = point.x;
+                p->y = point.y;
+                p->z = point.z;
             }
 
-            m_State.setState(PointCloudStreamState::ICP);
-            m_KDTree = new KDTree::Tree(m_Points[1], m_NumElements[1]);
-            m_KDTreeBuilt = true;
+            m_ICP.setInputSource(m_CloudIn);
+            m_ICPInitialised = true;
+        }
+
+        if (!m_IsAligned) {
+            m_CloudOut = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[1], 1);
+
+            for (int i = 0; i < m_NumElements[1]; i++) {
+                auto p = &(m_CloudOut.get()->at(i));
+                auto point = m_Points[1][i].getPoint();
+                p->x = point.x;
+                p->y = point.y;
+                p->z = point.z;
+            }
+
+            m_ICP.setInputTarget(m_CloudOut);
+
+            pcl::PointCloud<pcl::PointXYZ> final;
+            m_ICP.align(final);
+            if (m_ICP.hasConverged()) {
+                m_IsAligned = true;
+            }
+            auto transform = m_ICP.getFinalTransformation();
+            std::cout << transform << std::endl;
         }
     }
 }

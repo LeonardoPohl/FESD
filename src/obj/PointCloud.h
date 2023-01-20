@@ -9,13 +9,13 @@
 #include <GLCore/Renderer.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <pcl/registration/icp_nl.h>
 
 #include "cameras/DepthCamera.h"
 #include "Point.h"
 #include "BoundingBox.h"
 #include "PointCloudStreamState.h"
 #include "utilities/GLUtil.h"
-#include "KDTree.h"
 
 namespace GLObject
 {
@@ -69,9 +69,6 @@ namespace GLObject
 
 		std::vector<BoundingBox> m_BoundingBoxes{ };
 		std::vector<glm::vec3> m_CellSizes{ };
-		
-		// For now only works if there are exactly 2 cameras and no more
-		KDTree::Tree *m_KDTree;
 
 		float m_PlanarThreshold{ 0.004f };
 
@@ -81,7 +78,9 @@ namespace GLObject
 
 		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudIn;
 		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudOut;
+		pcl::IterativeClosestPointNonLinear<pcl::PointXYZ, pcl::PointXYZ> m_ICP{ };
 		bool m_AlignmentMode{ false };
-		bool m_KDTreeBuilt{ false };
+		bool m_ICPInitialised{ false };
+		bool m_IsAligned{ false };
 	};
 };

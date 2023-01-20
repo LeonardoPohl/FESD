@@ -1,0 +1,37 @@
+\section{Implementation}
+
+This section contains notes about the design choices of the implementation.
+
+%\subsection{What Programming Language to use}
+
+%The choice of a good programming language is essential, since the compute resources are fairly limited. We cannot assure internet connectivity, therefore a server side solution is not viable, furthermore, the detection requires fast reaction and high latency server connections might negatively impact the user experience.
+
+%\subsubsection{Python}
+
+%A lot of efficient computer vision packages are available. If written correctly (typing and maybe even using Cython) can be efficient as well.
+
+%\subsubsection{C\#}
+
+%The programming language that most developers at SilverFit use, making it more easily maintainable, in a company aspect. Performance is also fairly good, compared to standard python.
+
+%\subsubsection{C++}
+
+%This one seems to be the best solution. It brings much needed performance, if the algorithms are designed properly. Middleware is already using C++.
+
+\subsection{Possible Solutions}
+
+Here I will note possible Solutions to the problem.
+
+\subsubsection{Improve Existing Model}
+
+One solution is to have a more specialised model tune in to detect a skeleton, if specific criteria is met. For example A model that is trained specifically on people sitting in wheelchairs.
+
+\subsubsection{Notify User}
+
+Notifying the user that there is an issue and that they should try to move might be the simplest solution to the problem and work in a lot of cases. The user wants the system to work as well, so they can try to fix it and in a lot of cases this is already enough. Still not the whole solution.
+
+This is only possible, if it is possible to detect if there is a problem.
+
+\subsubsection{[NO REAL SOLUTION] Replace existing model with better model}
+
+The experimentation should include a comparison to separate models, but the main focus should lay in trying to improve the existing model and maybe finding a general solution for autonomous fault detection and logging of edge cases based on test data.
