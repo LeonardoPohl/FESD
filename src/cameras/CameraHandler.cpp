@@ -56,7 +56,7 @@ void CameraHandler::initAllCameras()
 
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
-        mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+        mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
 }
 
 void CameraHandler::OnUpdate()
@@ -338,7 +338,7 @@ void CameraHandler::showRecordings() {
                 m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
                 m_CamerasExist = !m_DepthCameras.empty();
                 if(m_CamerasExist)
-                    mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Renderer);
+                    mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
             }
 
             ImGui::TreePop();

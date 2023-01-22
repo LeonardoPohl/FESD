@@ -47,10 +47,12 @@ public:
 		return (p1.getPoint().z < p2.getPoint().z);
 	}
 
-	void updateVertexArray(float depth, int cam_index)
+	void updateVertexArray(float depth, int cam_index, int count = 0)
 	{
-		Color = getColorFromDepth(depth);
-		Depth = depth;
+		if (count == 0 || depth != 0.0f ) {
+			Depth = (Depth * count + depth) / (count + 1);
+		}
+		Color = getColorFromDepth(Depth);
 		CamId = cam_index;
 	}
 
