@@ -1,57 +1,58 @@
-\chapter{Introduction}
+\section{Introduction}
 
 
-Human Pose Estimation (HPE) is not a new invention [Cite some early papers], it has been applied successfully in a lot of applications [cite more examples]. Most of the time the existing algorithms are very accurate [Cite papers which experiment with HPE]. However, in some cases the traditional algorithms, which are trained on healthy humans can be inaccurate if people of a different physique or disability are to be detected. These kind of complicated cases of human pose detection are proving to be very difficult to handle by companies which specialise in games for rehabilitation, such as SilverFit B.V.
 
-In 2008, SilverFit released their first product which deals with HPE for rehabilitation games. At that time RGB cameras were used with 2D HPE. Ever since then the company switched to use Time-of-flight cameras to improve the HPE, by providing depth information for a scene.
+%Human Pose Estimation (HPE) is not a new invention [Cite some early papers], it has been applied successfully in a lot of applications [cite more examples]. Most of the time the existing algorithms are very accurate [Cite papers which experiment with HPE]. However, in some cases the traditional algorithms, which are trained on healthy humans can be inaccurate if people of a different physique or disability are to be detected. These kind of complicated cases of human pose detection are proving to be very difficult to handle by companies which specialise in games for rehabilitation, such as SilverFit B.V.
 
-The current system that is in place for examining the robustness of a detector system revolves mostly around manual testing. There are two stages for the testing, firstly a tester from SilverFit tries the exercise and then tests are executed in selected care homes with actual patients. This method of testing can be quite error prone and is not easily comparable to previous test sessions, since it can vary from tester to tester and from one time to another.
+%In 2008, SilverFit released their first product which deals with HPE for rehabilitation games. At that time RGB cameras were used with 2D HPE. Ever since then the company switched to use Time-of-flight cameras to improve the HPE, by providing depth information for a scene.
 
-To improve the testing of the HPE algorithm in place I aim to introduce a system, which makes it easy to collect a dataset efficiently. Furthermore, I will apply data augmentation to further increase the size of the dataset artificially, while making the accuracy score more representative. This dataset recorder needs to be fairly efficient, so that the actual exercise is not negatively impacted. 
+%The current system that is in place for examining the robustness of a detector system revolves mostly around manual testing. There are two stages for the testing, firstly a tester from SilverFit tries the exercise and then tests are executed in selected care homes with actual patients. This method of testing can be quite error prone and is not easily comparable to previous test sessions, since it can vary from tester to tester and from one time to another.
 
-Additionally, I will introduce a way to measure the robustness and resource consumption of an HPE, since the resources of the middle-ware that is in place for HPE is limited and therefore a very important factor for the choice of an HPE method.
+%To improve the testing of the HPE algorithm in place I aim to introduce a system, which makes it easy to collect a dataset efficiently. Furthermore, I will apply data augmentation to further increase the size of the dataset artificially, while making the accuracy score more representative. This dataset recorder needs to be fairly efficient, so that the actual exercise is not negatively impacted. 
 
-Finally, I will use the dataset recorder to record and augment a dataset for one specific exercise and then finally evaluate a number of HPE methods and compare the results to existing literature.
+%Additionally, I will introduce a way to measure the robustness and resource consumption of an HPE, since the resources of the middle-ware that is in place for HPE is limited and therefore a very important factor for the choice of an HPE method.
 
-Additionally to that I might implement a way to read the data into the NUI-Track framework to write 'Unit Tests' for 
+%Finally, I will use the dataset recorder to record and augment a dataset for one specific exercise and then finally evaluate a number of HPE methods and compare the results to existing literature.
 
-\clearpage
+%Additionally to that I might implement a way to read the data into the NUI-Track framework to write 'Unit Tests' for 
 
-Focus of thesis: 
+%\clearpage
 
-Work can be split into roughly 4 Parts:
+%Focus of thesis: 
 
-\begin{enumerate}
-    \item Collect data streams
-    \begin{enumerate}
-        \item Depth streams
-        \item Color stream
-        \item Skeleton stream
-    \end{enumerate}
-    \item Evaluate recordings
-    \begin{enumerate}
-        \item Find faults in skeleton and disregard faulty recordings
-        \item 
-        \item Skeleton stream
-    \end{enumerate}
-    \item Train the model and combine it with the existing model
-    \item Run experiments
-\end{enumerate}
+%Work can be split into roughly 4 Parts:
 
-\section{Detecting the problem areas with different}
+%\begin{enumerate}
+%    \item Collect data streams
+%    \begin{enumerate}
+%        \item Depth streams
+%        \item Color stream
+%        \item Skeleton stream
+%    \end{enumerate}
+%    \item Evaluate recordings
+%    \begin{enumerate}
+%        \item Find faults in skeleton and disregard faulty recordings
+%        \item 
+%        \item Skeleton stream
+%    \end{enumerate}
+%    \item Train the model and combine it with the existing model
+%    \item Run experiments
+%\end{enumerate}
 
-We know the games where there are problems. Try to recreate the movements and create errors reliably.
+%\section{Detecting the problem areas with different}
 
-Additionally it would be good to have a way to detect if the human pose detector is not functioning correctly. This seems quite challenging. There are 2 different scenarios which need to be tackled, either the skeleton is missing or incorrect. A confidence level would be very nice.
+%We know the games where there are problems. Try to recreate the movements and create errors reliably.
 
-\section{Compile Dataset}
+%Additionally it would be good to have a way to detect if the human pose detector is not functioning correctly. This seems quite challenging. There are 2 different scenarios which need to be tackled, either the skeleton is missing or incorrect. A confidence level would be very nice.
 
-Based on the list of problematic movements compile a dataset. Also include good movements. Try different positions within the room and different light stuff and different clothing (reflectiveness might influence results of skeleton finding).
+%\section{Compile Dataset}
 
-\section{Find a solution to fix edge-cases}
+%Based on the list of problematic movements compile a dataset. Also include good movements. Try different positions within the room and different light stuff and different clothing (reflectiveness might influence results of skeleton finding).
 
-Find a solution, either rule based, or with machine learning, which solves edge cases. Maybe multiple models, which are very specified.
+%\section{Find a solution to fix edge-cases}
 
-\section{Run Experiments}
+%Find a solution, either rule based, or with machine learning, which solves edge cases. Maybe multiple models, which are very specified.
 
-Using the compiled dataset and also public data sets, like in Related work run experiments. Compare the old model, the old model in combination with the specified model and fault detector, and one or two other models, like open-cv, to have a comparison.
+%\section{Run Experiments}
+
+%Using the compiled dataset and also public data sets, like in Related work run experiments. Compare the old model, the old model in combination with the specified model and fault detector, and one or two other models, like open-cv, to have a comparison.

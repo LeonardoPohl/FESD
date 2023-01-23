@@ -212,18 +212,14 @@ namespace GLObject
     //
     // Getters
     //
-    glm::vec3 PointCloud::getRotation(int cameraId)
+    glm::vec3 PointCloud::getRotation()
     {
-        if (cameraId == 0)
-            return m_Rotation;
-        return { };
+        return m_Rotation;
     }
 
-    glm::vec3 PointCloud::getTranslation(int cameraId)
+    glm::vec3 PointCloud::getTranslation()
     {
-        if (cameraId == 0)
-            return m_Translation;
-        return { };
+        return m_Translation;
     }
 
     //

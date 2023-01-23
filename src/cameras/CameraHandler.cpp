@@ -389,21 +389,19 @@ void CameraHandler::stopRecording() {
         auto cam = m_DepthCameras[cam_id];
         if (cam->m_IsSelectedForRecording) {
             auto cam_json = cam->getCameraConfig();
-
-            auto r = mp_PointCloud->getRotation(cam_id);
-            auto t = mp_PointCloud->getTranslation(cam_id);
-            float rotation[3] = { r.x, r.y, r.z };
-            float translation[3] = { t.x, t.y, t.z };
-
-            cam_json["Rotation"] = rotation;
-            cam_json["Translation"] = translation;
-            
-            cameras.append(cam_json);
             cam->stopRecording();
         }
     }
 
     root["Cameras"] = cameras;
+
+    auto r = mp_PointCloud->getRotation();
+    auto t = mp_PointCloud->getTranslation();
+    float rotation[3] = { r.x, r.y, r.z };
+    float translation[3] = { t.x, t.y, t.z };
+
+    root["Rotation"] =(Json::arrayValue)rotation;
+    root["Translation"] = translation;
 
     Json::StreamWriterBuilder builder;
     if (m_CamerasExist) {

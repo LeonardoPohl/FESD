@@ -35,8 +35,8 @@ namespace GLObject
 		void OnImGuiRender() override;
 		void manipulateTranslation();
 
-		glm::vec3 getRotation(int cameraId);
-		glm::vec3 getTranslation(int cameraId);
+		glm::vec3 getRotation();
+		glm::vec3 getTranslation();
 	private:
 		void pauseStream();
 		void resumeStream();
