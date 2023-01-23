@@ -1,4 +1,3 @@
-
 %\usepackage{hyperref}
 \usepackage{mathtools}
 \usepackage{listings}
@@ -12,23 +11,20 @@
 \DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
 
 %\usepackage{fontspec}
-%\setmainfont{utils/style/Minion Pro Regular.ttf}
-\renewcommand{\familydefault}{Minion Pro Regular}
-
-\definecolor{uniBlue}{rgb}{0,0.07,0.35}
-
-\addbibresource{./utils/refs.bib}
+%\setmainfont{utils/MinionProRegular.ttf}
+%\renewcommand{\familydefault}{MinionProRegular}
+\usepackage[backend=biber]{biblatex}
+%\addbibresource{lauraPhd2016.bib}
+\addbibresource{utils/refs.bib}
 
 % -----------------------
 \usepackage{setspace}
 \setcounter{tocdepth}{2}
 \usepackage{float}
-\usepackage[
-  separate-uncertainty = true,
-  multi-part-units = repeat
-]{siunitx}
-
-%\usepackage{csvsimple}
+%\usepackage[
+%  separate-uncertainty = true,
+%  multi-part-units = repeat
+%]{siunitx}
 
 \geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm, bindingoffset=1.5cm, head=15pt}
 
@@ -42,86 +38,19 @@
 \usepackage{sectsty}
 \usepackage{xcolor}
 
+\definecolor{uniBlue}{rgb}{0,0.07,0.35}
 \sectionfont{\color{uniBlue}}
 \subsectionfont{\color{uniBlue}}
 \subsubsectionfont{\color{uniBlue}}
 \paragraphfont{\color{uniBlue}}
 % -----------------------
 
-% Custom colors
-\usepackage{color}
-
-\definecolor{deepblue}{rgb}{0,0,0.5}
-\definecolor{deepred}{rgb}{0.8,0,0}
-\definecolor{deepgreen}{rgb}{0,0.5,0}
-\definecolor{grey1}{rgb}{0.5,0.5,0.5}
 \usepackage{listings}
 
-% Python style for highlighting
-\newcommand\pythonstyle{\lstset{
-		language=Python,
-		basicstyle=\small\ttm,
-		otherkeywords={self},             % Add keywords here
-		keywordstyle=\small\ttb\color{deepblue},
-		emph={},          % Custom highlighting
-		emphstyle=\small\color{deepred},    % Custom highlighting style
-		stringstyle=\small\color{deepgreen},
-		commentstyle=\small\color{grey1}\ttm,
-		frame=tb,                         % Any extra options here
-		showstringspaces=false,            % 
-		breaklines=true,
-		tabsize=2
-}}
-% Python environment
-\lstnewenvironment{python}[1][] {
-	\pythonstyle
-	\lstset{#1}
-}{}
-
-% Python for external files
-\newcommand\pythonexternal[2][]{{
-		\pythonstyle
-		\lstinputlisting[#1]{#2}}}
-		
 		
 \AddToHook{cmd/section/before}{\cleardoublepage}
 
 
-\usepackage{csvsimple}
-
-% to make pretty tables
-\makeatletter
-\csvset{
-  autotabularcenter/.style={
-    file=#1,
-    after head=\csv@pretable\begin{tabular}{|*{\csv@columncount}{c|}}\csv@tablehead,
-    table head=\hline\csvlinetotablerow\\\hline,
-    late after line=\\,
-    table foot=\\\hline,
-    late after last line=\csv@tablefoot\end{tabular}\csv@posttable,
-    command=\csvlinetotablerow},
-}
-\makeatother
-
 %\usepackage{hyperref}
 \usepackage{mathtools}
-\usepackage{listings}
 %\DeclarePairedDelimiter{\norm}{\lVert}{\rVert} 
-
-%\usepackage[demo]{graphicx}
-\usepackage{subcaption}
-
-\usepackage[super]{nth}
-\renewcommand{\arraystretch}{1.15}
-\setlength{\tabcolsep}{0.5em}
-\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{10} % for bold
-\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
-\usepackage{lscape}
-% Custom colors
-\usepackage{color}
-
-\definecolor{deepblue}{rgb}{0,0,0.5}
-\definecolor{deepred}{rgb}{0.8,0,0}
-\definecolor{deepgreen}{rgb}{0,0.5,0}
-\definecolor{grey1}{rgb}{0.5,0.5,0.5}
-\usepackage{listings}
