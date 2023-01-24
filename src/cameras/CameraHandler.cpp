@@ -400,7 +400,7 @@ void CameraHandler::stopRecording() {
     float rotation[3] = { r.x, r.y, r.z };
     float translation[3] = { t.x, t.y, t.z };
 
-    root["Rotation"] =(Json::arrayValue)rotation;
+    root["Rotation"] = rotation;
     root["Translation"] = translation;
 
     Json::StreamWriterBuilder builder;

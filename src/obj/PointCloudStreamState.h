@@ -6,18 +6,16 @@
 
 struct PointCloudStreamState
 {
-	enum State
+	static enum State
 	{
 		STREAM,
 		IDLE,
-		AVERAGING,
-		NORMALS,
-		ICP
+		REGISTRATION
 	};
 
-	static const int m_StateCount = 5;
+	static const int m_StateCount = 3;
 	
-	const std::array<const char *, m_StateCount> m_StateNames{ "Stream", "Idle", "Averaging", "Show Normals", "ICP"};
+	const std::array<const char *, m_StateCount> m_StateNames{ "Stream", "Idle", "Registration"};
 
 	State m_State{ STREAM };
 	int m_StateElem{ 0 };
@@ -35,12 +33,8 @@ struct PointCloudStreamState
 			m_StateElem = 0;
 		else if (state == IDLE)
 			m_StateElem = 1;
-		else if (state == AVERAGING)
+		else if (state == REGISTRATION)
 			m_StateElem = 2;
-		else if (state == NORMALS)
-			m_StateElem = 3;
-		else if (state == ICP)
-			m_StateElem = 4;
 		
 	}
 

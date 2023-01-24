@@ -7,12 +7,43 @@
 #include <glm/glm.hpp>
 #include <GLCore/GLObject.h>
 #include <GLCore/Renderer.h>
+
+// pcl base
 #include <pcl/io/pcd_io.h>
+#include <pcl/pcl_base.h>
 #include <pcl/point_types.h>
-#include <pcl/registration/icp.h>
-#include <pcl/registration/icp_nl.h>
-#include <pcl/registration/ndt.h>
+
+// Estimating Keypoints
+#include <pcl/keypoints/narf_keypoint.h>
+#include <pcl/keypoints/iss_3d.h>
+#include <pcl/keypoints/sift_keypoint.h>
+#include <pcl/keypoints/susan.h>
+
+// Describing keypoints - Feature descriptors
+#include <pcl/features/fpfh.h>
+#include <pcl/features/fpfh_omp.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/features/normal_3d_omp.h>
+#include <pcl/features/our_cvfh.h>
+#include <pcl/features/principal_curvatures.h>
+#include <pcl/features/intensity_spin.h>
+
+// Correspondence Estimation
+#include <pcl/registration/correspondence_estimation.h>
+#include <pcl/registration/correspondence_estimation_backprojection.h>
+#include <pcl/registration/correspondence_estimation_normal_shooting.h>
+
+// Correspondence rejection
+#include <pcl/registration/correspondence_rejection_sample_consensus.h>
+#include <pcl/registration/correspondence_rejection_distance.h>
+#include <pcl/registration/correspondence_rejection_features.h>
+#include <pcl/registration/correspondence_rejection_poly.h>
+
+// Transformation Estimation
+#include <pcl/registration/transformation_estimation_svd.h>
+
 #include <pcl/filters/approximate_voxel_grid.h>
+
 
 #include "cameras/DepthCamera.h"
 #include "Logger.h"
@@ -42,9 +73,49 @@ namespace GLObject
 		void resumeStream();
 
 		void streamDepth(int cam_index, const int16_t* depth);
-		void calculateNormals(int cam_index);
-		void alignPointcloudsNDT();
-		void alignPointclouds();
+
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudStatic;
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudDynamic;
+
+		void acquireData();
+
+		void filterData();
+
+		pcl::NarfKeypoint m_NarfKP;
+		pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ> m_ISSKP;
+		pcl::SIFTKeypoint<pcl::PointXYZ, pcl::PointXYZ> m_SIFTKP;
+		pcl::SUSANKeypoint<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ, pcl::common::IntensityFieldAccessor<pcl::PointXYZ>> m_SUSANKP;
+
+		void estimateKeyPoints();
+
+		/*
+		pcl::FPFHEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_FPFHEstimation;
+		pcl::FPFHEstimationOMP< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_FPFHEstimationOMP;
+		pcl::NormalEstimation< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimation;
+		pcl::NormalEstimationOMP< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimationOMP;
+		pcl::OURCVFHEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_OURCVFHEstimation;
+		pcl::PrincipalCurvaturesEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_PrincipalCurvatureEstimation;
+		pcl::IntensitySpinEstimation< pcl::PointXYZ, pcl::PointXYZ > m_IntensitySpinEstimation;
+		*/
+		void describeKeyPoints();
+
+		/*
+		pcl::registration::CorrespondenceEstimation< PointSource, PointTarget, Scalar >
+		pcl::registration::CorrespondenceEstimationBackProjection< PointSource, PointTarget, NormalT, Scalar >
+		pcl::registration::CorrespondenceEstimationNormalShooting< PointSource, PointTarget, NormalT, Scalar >
+		*/
+		void findCorrespondence();
+
+		/*
+		pcl::registration::CorrespondenceRejectorSampleConsensus< PointT >
+		pcl::registration::CorrespondenceRejectorDistance
+		pcl::registration::CorrespondenceRejectorFeatures::FeatureContainer< FeatureT >
+		pcl::registration::CorrespondenceRejectorPoly< SourceT, TargetT >
+		*/
+		void rejectCorrespondence();
+
+		//void alignPointcloudsNDT();
+		//void alignPointclouds();
 
 		Logger::Logger* mp_Logger;
 
@@ -74,16 +145,13 @@ namespace GLObject
 		int m_AveragingCount{ 0 };
 		bool m_NormalsCalculated{ false };
 
-		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudIn;
-		pcl::PointCloud<pcl::PointXYZ>::Ptr m_CloudOut;
-		pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> m_ICP{ };
 		bool m_AlignmentMode{ false };
 		bool m_ICPInitialised{ false };
 		bool m_IsAligned{ false };
 
 		float m_TransformationEpsilon{ 0.01 };
 		float m_StepSize{ 0.1 };
-		float m_Resolution{ 1.0 };
+		float m_Resolution{ 0.5 };
 		int m_MaxIterations{ 50 };
 	};
 };
