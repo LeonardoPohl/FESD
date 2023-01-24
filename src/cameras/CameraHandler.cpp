@@ -93,33 +93,44 @@ void CameraHandler::OnUpdate()
             });
         }
     }
-    else {
-        if (m_State == Streaming ||
-            (m_State == Playback && !m_PlaybackPaused)) {
+    else if (m_State == Streaming) {
+        mp_PointCloud->OnUpdate();
+        mp_PointCloud->OnRender();
+
+        for (auto cam : m_DepthCameras)
+        {
+            if (cam->m_IsEnabled && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+                auto frame = cam->getColorFrame();
+                if (!frame.empty()) {
+                    if (m_DoSkeletonDetection) {
+                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                    }
+                    cv::imshow(cam->getCameraName(), frame);
+                }
+            }
+        }
+    }
+    else if (m_State == Playback) {
+
+        if (!m_PlaybackPaused) {
             mp_PointCloud->OnUpdate();
             mp_PointCloud->OnRender();
         }
 
         for (auto cam : m_DepthCameras)
         {
-            if (cam->m_IsEnabled || (m_State == Playback && !m_PlaybackPaused))
-            {
-                if ((m_ShowColorFrames || m_DoSkeletonDetection) && m_State != Recording) {
-                    auto frame = cam->getColorFrame();
-                    if (!frame.empty()) {
-                        if (m_DoSkeletonDetection) {
-                            m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
-                        }
-                        cv::imshow(cam->getCameraName(), frame);
+            if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+                auto frame = cam->getColorFrame();
+                if (!frame.empty()) {
+                    if (m_DoSkeletonDetection) {
+                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                     }
+                    cv::imshow(cam->getCameraName(), frame);
                 }
             }
         }
-
-        if (m_State == Playback) {
-            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
-        }
-    }    
+        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+    }
 }
 
 void CameraHandler::OnImGuiRender()

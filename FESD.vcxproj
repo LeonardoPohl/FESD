@@ -146,7 +146,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)third-party\openpose\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\include;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

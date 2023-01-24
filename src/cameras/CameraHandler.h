@@ -39,7 +39,7 @@ private:
 		Playback
 	};
 
-	State m_State;
+	State m_State{ State::Streaming };
 
 	Camera *mp_Camera;
 	Renderer *mp_Renderer;

@@ -1,5 +1,45 @@
 \section{Stream pre-processing}
 
+\subsection{Manual alignment}
+
+\subsection{Point based alignment}
+
+\subsubsection{NDT alignment}
+
+\subsubsection{ICP alignment}
+
+\subsection{Feature based alignment}
+
+\subsubsection{Keypoint detection}
+
+\paragraph{ISS}
+
+really slow
+
+\paragraph{SIFT}
+
+same amount of datapoints as ISS, but much faster
+
+\subsubsection{Keypoint description}
+
+\paragraph{FPFH - Fast Point Feature Histograms}
+https://pcl.readthedocs.io/projects/tutorials/en/latest/fpfh_estimation.html
+Articles to cite:
+R.B. Rusu, N. Blodow, M. Beetz. Fast Point Feature Histograms (FPFH) for 3D Registration. In Proceedings of the IEEE International Conference on Robotics and Automation (ICRA), Kobe, Japan, May 12-17 2009.
+R.B. Rusu, A. Holzbach, N. Blodow, M. Beetz. Fast Geometric Point Labeling using Conditional Random Fields. In Proceedings of the 22nd IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), St. Louis, MO, USA, October 11-15 2009.
+
+\subsubsection{Correspondence estimation}
+
+\subsubsection{Correspondence rejection}
+
+\subsubsection{Transformation estimation}
+
+\subsection{Validation of alignment}
+
+\subsubsection{Fitness score}
+
+\subsubsection{Overlap score}
+
 %Firstly, we preprocess the seperate streams of the various depth sensors. This is done by aligning the point clouds and the RGB streams. There are multiple ways to align the point clouds, but we found that, due to the high noise level of the depth data, the best way to align the point clouds is to do it manually. Since we scale the point cloud into meters according to the meter-per-unit ratio provided by the depth camera, manual alignment is a matter of measuring the real-world distances along the axis and then translating the point cloud accordingly. Rotation on the other hand is a lot harder to do manually, so we use the NDT algorithm to align the point clouds, with the measured distances as an initial guess. 
 
 %The NDT algorithm, Normal Distribution Transform algorithm, is a non-linear optimization algorithm, which finds the best rotation and translation to align the point clouds\cite{NDT}. The more data we can provide to the NDT algorithm, the better the alignment will be. Therefore, if we provide the algorithm with the measured distances along the axis, it will be able to find the best rotation without changing the translation.

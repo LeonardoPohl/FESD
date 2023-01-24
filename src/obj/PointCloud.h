@@ -14,16 +14,13 @@
 #include <pcl/point_types.h>
 
 // Estimating Keypoints
-#include <pcl/keypoints/narf_keypoint.h>
+//#include <pcl/keypoints/narf_keypoint.h>
 #include <pcl/keypoints/iss_3d.h>
 #include <pcl/keypoints/sift_keypoint.h>
-#include <pcl/keypoints/susan.h>
 
 // Describing keypoints - Feature descriptors
 #include <pcl/features/fpfh.h>
-#include <pcl/features/fpfh_omp.h>
 #include <pcl/features/normal_3d.h>
-#include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/our_cvfh.h>
 #include <pcl/features/principal_curvatures.h>
 #include <pcl/features/intensity_spin.h>
@@ -81,23 +78,40 @@ namespace GLObject
 
 		void filterData();
 
-		pcl::NarfKeypoint m_NarfKP;
-		pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ> m_ISSKP;
-		pcl::SIFTKeypoint<pcl::PointXYZ, pcl::PointXYZ> m_SIFTKP;
-		pcl::SUSANKeypoint<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ, pcl::common::IntensityFieldAccessor<pcl::PointXYZ>> m_SUSANKP;
+		enum KPEstimator {
+			ISS,
+			SIFT
+		};
+
+		// ISS
+		bool m_UseISS{ true };
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_ISSKPStatic;
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_ISSKPDynamic;
+
+		// SIFT
+		bool m_UseSIFT{ true };
+		float m_MinScale{ 0.1f };
+		int m_NOctaves{ 6 };
+		int m_NScalesPerOctave{ 10 };
+		float m_MinContrast{ 0.5f };
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_SIFTKPStatic;
+		pcl::PointCloud<pcl::PointXYZ>::Ptr m_SIFTKPDynamic;
 
 		void estimateKeyPoints();
 
-		/*
-		pcl::FPFHEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_FPFHEstimation;
-		pcl::FPFHEstimationOMP< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_FPFHEstimationOMP;
-		pcl::NormalEstimation< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimation;
-		pcl::NormalEstimationOMP< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimationOMP;
-		pcl::OURCVFHEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_OURCVFHEstimation;
-		pcl::PrincipalCurvaturesEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_PrincipalCurvatureEstimation;
-		pcl::IntensitySpinEstimation< pcl::PointXYZ, pcl::PointXYZ > m_IntensitySpinEstimation;
-		*/
-		void describeKeyPoints();
+		// FPFHE
+		std::unordered_map<KPEstimator, pcl::PointCloud<pcl::FPFHSignature33>::Ptr> m_FPFHsDynamic;
+		std::unordered_map<KPEstimator, pcl::PointCloud<pcl::FPFHSignature33>::Ptr> m_FPFHsStatic;
+
+		// NormalEstimation
+		//pcl::NormalEstimation< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimation;
+
+
+		//pcl::OURCVFHEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_OURCVFHEstimation;
+		//pcl::PrincipalCurvaturesEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_PrincipalCurvatureEstimation;
+		//pcl::IntensitySpinEstimation< pcl::PointXYZ, pcl::PointXYZ > m_IntensitySpinEstimation;
+		
+		void describeKeyPoints(KPEstimator estimator);
 
 		/*
 		pcl::registration::CorrespondenceEstimation< PointSource, PointTarget, Scalar >
@@ -129,8 +143,8 @@ namespace GLObject
 
 		GLUtil m_GLUtil{ };
 
-		glm::vec3 m_Rotation;
-		glm::vec3 m_Translation;
+		glm::vec3 m_Rotation{ 0 };
+		glm::vec3 m_Translation{ 0 };
 		float m_Scale{ 1.0f };
 
 		int m_NumElementsTotal{ 0 };

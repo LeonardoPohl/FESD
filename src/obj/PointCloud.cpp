@@ -140,14 +140,36 @@ namespace GLObject
         if (m_State == m_State.STREAM && ImGui::Button("Pause Stream"))
             pauseStream();
 
-
-        ImGui::InputFloat("Transformation Epsilon", &m_TransformationEpsilon, 0.01);
-        ImGui::InputFloat("Step Size", &m_StepSize, 0.05);
-        ImGui::InputFloat("Resolution", &m_Resolution, 0.1);
-        ImGui::InputInt("Max Iterations", &m_MaxIterations);
-
-        if (ImGui::Button("(Re)Align Pointclouds")) {
+        if (ImGui::Button("Acquire Data")) {
+            
         }
+
+        if (ImGui::TreeNode("NDT")) {
+            ImGui::InputFloat("Transformation Epsilon", &m_TransformationEpsilon, 0.01);
+            ImGui::InputFloat("Step Size", &m_StepSize, 0.05);
+            ImGui::InputFloat("Resolution", &m_Resolution, 0.1);
+            ImGui::InputInt("Max Iterations", &m_MaxIterations);
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Feature Based")) {
+            ImGui::Checkbox("Use ISS", &m_UseISS);
+
+            ImGui::Checkbox("Use SIFT", &m_UseSIFT);
+            
+            ImGui::BeginDisabled(!m_UseSIFT);
+            ImGui::InputFloat("Min Scale", &m_MinScale);
+            ImGui::InputInt("N Octaves", &m_NOctaves);
+            ImGui::InputInt("N ScalesPerOctave", &m_NScalesPerOctave);
+            ImGui::InputFloat("Min Contrast", &m_MinContrast);
+            ImGui::EndDisabled();
+
+            if (ImGui::Button("Gather Keypoints")) {
+                acquireData();
+                estimateKeyPoints();
+            }
+            ImGui::TreePop();
+        }
+
 
         ImGui::Checkbox("Alignment Mode", &m_AlignmentMode);
 
@@ -210,10 +232,6 @@ namespace GLObject
             int depth_i = m_StreamWidths[cam_index] * (m_StreamHeights[cam_index] + 1) - i;
             m_BoundingBoxes[cam_index].updateBox(m_Points[cam_index][i].getPoint());
             auto adapted_depth = (float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit();
-            
-            if (m_NumElements[cam_index] - i < m_StreamWidths[cam_index]) {
-                adapted_depth = 0.0f;
-            }
 
             m_Points[cam_index][i].updateVertexArray(adapted_depth, cam_index);
             
@@ -222,6 +240,9 @@ namespace GLObject
 
     void PointCloud::acquireData()
     {
+        if (m_State.m_State == m_State.REGISTRATION)
+            return;
+
         m_State.m_State = m_State.REGISTRATION;
         m_CloudStatic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>(m_NumElements[0], 1);
 
@@ -262,18 +283,167 @@ namespace GLObject
         mp_Logger->log("Filtered dynamic cloud contains " + std::to_string(m_CloudDynamic->size()) + " data points");
     }
 
+    double computeCloudResolution(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
+    {
+        double res = 0.0;
+        int n_points = 0;
+        int nres;
+        std::vector<int> indices(2);
+        std::vector<float> sqr_distances(2);
+        pcl::search::KdTree<pcl::PointXYZ> tree;
+        tree.setInputCloud(cloud);
+
+        for (std::size_t i = 0; i < cloud->size(); ++i)
+        {
+            if (!std::isfinite((*cloud)[i].x))
+            {
+                continue;
+            }
+            //Considering the second neighbor since the first is the point itself.
+            nres = tree.nearestKSearch(i, 2, indices, sqr_distances);
+            if (nres == 2)
+            {
+                res += sqrt(sqr_distances[1]);
+                ++n_points;
+            }
+        }
+        if (n_points != 0)
+        {
+            res /= n_points;
+        }
+        return res;
+    }
+
     void PointCloud::estimateKeyPoints()
     {
-        pcl::RangeImageBorderExtractor range_image_border_extractor;
-        pcl::NarfKeypoint narf_keypoint_detector(&range_image_border_extractor);
-        narf_keypoint_detector.setRangeImage(&range_image);
-        narf_keypoint_detector.getParameters().support_size = support_size;
-        //narf_keypoint_detector.getParameters ().add_points_on_straight_edges = true;
-        //narf_keypoint_detector.getParameters ().distance_for_additional_points = 0.5;
+        if (m_UseISS)
+        {// ISS 3D
+            m_ISSKPStatic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+            m_ISSKPDynamic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+            pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
+
+            double model_resolution = computeCloudResolution(m_CloudStatic);
+            // Compute model_resolution
+
+            pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> iss_detector;
+
+            iss_detector.setSearchMethod(tree);
+            iss_detector.setSalientRadius(6 * model_resolution);
+            iss_detector.setNonMaxRadius(4 * model_resolution);
+            iss_detector.setThreshold21(0.975);
+            iss_detector.setThreshold32(0.975);
+            iss_detector.setMinNeighbors(5);
+            iss_detector.setNumberOfThreads(4);
+            iss_detector.setInputCloud(m_CloudStatic);
+            iss_detector.compute(*m_ISSKPStatic);
+            iss_detector.setInputCloud(m_CloudDynamic);
+            iss_detector.compute(*m_ISSKPDynamic);
+            mp_Logger->log("ISS found " + std::to_string(m_ISSKPStatic->size()) + " key points (static)");
+            mp_Logger->log("ISS found " + std::to_string(m_ISSKPDynamic->size()) + " key points (dynamic)");
+        }
         
-        pcl::PointCloud<int> keypoint_indices;
-        narf_keypoint_detector.compute(keypoint_indices);
-        std::cout << "Found " << keypoint_indices.size() << " key points.\n";
+        if (m_UseSIFT)
+        {
+            m_SIFTKPStatic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+            m_SIFTKPDynamic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+            pcl::PointCloud<pcl::PointWithScale> result;
+            pcl::search::KdTree<pcl::PointNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointNormal>());
+            pcl::PointCloud<pcl::PointNormal>::Ptr normals_static(new pcl::PointCloud<pcl::PointNormal>);
+            pcl::PointCloud<pcl::PointNormal>::Ptr normals_dynamic(new pcl::PointCloud<pcl::PointNormal>);
+
+            for (std::size_t i = 0; i < normals_static->size(); ++i)
+            {
+                (*normals_static)[i].x = (*m_SIFTKPStatic)[i].x;
+                (*normals_static)[i].y = (*m_SIFTKPStatic)[i].y;
+                (*normals_static)[i].z = (*m_SIFTKPStatic)[i].z;
+            }
+
+            for (std::size_t i = 0; i < normals_dynamic->size(); ++i)
+            {
+                (*normals_dynamic)[i].x = (*m_SIFTKPDynamic)[i].x;
+                (*normals_dynamic)[i].y = (*m_SIFTKPDynamic)[i].y;
+                (*normals_dynamic)[i].z = (*m_SIFTKPDynamic)[i].z;
+            }
+
+            pcl::SIFTKeypoint<pcl::PointNormal, pcl::PointWithScale> sift;
+
+            sift.setSearchMethod(tree);
+            sift.setScales(m_MinScale, m_NOctaves, m_NScalesPerOctave);
+            sift.setMinimumContrast(m_MinContrast);
+            sift.setInputCloud(normals_static);
+            sift.compute(result);
+            // Copying the pointwithscale to pointxyz so as visualize the cloud
+            copyPointCloud(result, *m_SIFTKPStatic);
+
+            sift.setInputCloud(normals_dynamic);
+            sift.compute(result);
+            // Copying the pointwithscale to pointxyz so as visualize the cloud
+            copyPointCloud(result, *m_SIFTKPDynamic);
+
+            mp_Logger->log("SIFT found " + std::to_string(m_ISSKPStatic->size()) + " key points (static)");
+            mp_Logger->log("SIFT found " + std::to_string(m_ISSKPDynamic->size()) + " key points (dynamic)");
+        }
+    }
+
+    void PointCloud::describeKeyPoints(KPEstimator estimator)
+    {
+        {// FPFH
+            // Calculate normals for both pointclouds
+            pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+            pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
+            ne.setSearchMethod(tree);
+
+            // Output datasets
+            pcl::PointCloud<pcl::Normal>::Ptr normals_dynamic(new pcl::PointCloud<pcl::Normal>());
+            pcl::PointCloud<pcl::Normal>::Ptr normals_static(new pcl::PointCloud<pcl::Normal>());
+
+            // Use all neighbors in a sphere of radius 3cm
+            ne.setRadiusSearch(0.03);
+            if (estimator == ISS)
+                ne.setInputCloud(m_ISSKPDynamic);
+            else if (estimator == SIFT)
+                ne.setInputCloud(m_SIFTKPDynamic);
+            ne.compute(*normals_dynamic);
+
+            if (estimator == ISS)
+                ne.setInputCloud(m_ISSKPStatic);
+            else if (estimator == SIFT)
+                ne.setInputCloud(m_SIFTKPStatic);
+            ne.compute(*normals_static);
+
+            pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::FPFHSignature33> fpfh;
+
+            fpfh.setSearchMethod(tree);
+
+            // Output datasets
+            m_FPFHsDynamic.insert({ estimator, { std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>() } });
+            m_FPFHsStatic.insert({ estimator, { std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>() } });
+
+            // Use all neighbors in a sphere of radius 5cm
+            // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
+            fpfh.setRadiusSearch(0.05);
+
+            // Compute the features
+            if (estimator == ISS)
+                fpfh.setInputCloud(m_ISSKPStatic);
+            else if (estimator == SIFT)
+                fpfh.setInputCloud(m_SIFTKPStatic);
+            fpfh.setInputNormals(normals_static);
+            fpfh.compute(*m_FPFHsStatic.at(estimator));
+
+            if (estimator == ISS)
+                fpfh.setInputCloud(m_ISSKPDynamic);
+            else if (estimator == SIFT)
+                fpfh.setInputCloud(m_SIFTKPDynamic);
+            fpfh.setInputNormals(normals_dynamic);
+            fpfh.compute(*m_FPFHsDynamic.at(estimator));
+
+            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsStatic.at(estimator)->size()) + " descriptors (static)");
+            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsDynamic.at(estimator)->size()) + " descriptors (dynamic)");
+        }
+        {
+
+        }
     }
 
     /*

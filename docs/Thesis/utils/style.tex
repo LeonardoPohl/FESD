@@ -10,21 +10,11 @@
 \DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{10} % for bold
 \DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{10}  % for normal
 
-%\usepackage{fontspec}
-%\setmainfont{utils/MinionProRegular.ttf}
-%\renewcommand{\familydefault}{MinionProRegular}
 \usepackage[backend=biber]{biblatex}
-%\addbibresource{lauraPhd2016.bib}
 \addbibresource{utils/refs.bib}
 
 % -----------------------
-\usepackage{setspace}
 \setcounter{tocdepth}{2}
-\usepackage{float}
-%\usepackage[
-%  separate-uncertainty = true,
-%  multi-part-units = repeat
-%]{siunitx}
 
 \geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm, bindingoffset=1.5cm, head=15pt}
 
@@ -43,11 +33,8 @@
 \subsectionfont{\color{uniBlue}}
 \subsubsectionfont{\color{uniBlue}}
 \paragraphfont{\color{uniBlue}}
-% -----------------------
 
-\usepackage{listings}
-
-		
+% -----------------------		
 \AddToHook{cmd/section/before}{\cleardoublepage}
 
 

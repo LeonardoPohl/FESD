@@ -6,7 +6,7 @@
 
 struct PointCloudStreamState
 {
-	static enum State
+	enum State
 	{
 		STREAM,
 		IDLE,
