@@ -13,7 +13,6 @@ public:
 	~RealSenseCamera() override;
 
 	/// Initialise all devices
-	static rs2::device_list getAvailableDevices(rs2::context ctx);
 	static std::vector<RealSenseCamera*> initialiseAllDevices(Camera* cam, Renderer* renderer, int* starting_id, Logger::Logger* logger);
 
 	/// Camera Details
@@ -41,6 +40,7 @@ public:
 private:
 	std::shared_ptr<rs2::pipeline> mp_Pipe;
 	rs2::context* mp_Context{};
+	rs2::device* mp_ProtoDevice{};
 	rs2::device m_Device{};
 	rs2::config m_Config{};
 

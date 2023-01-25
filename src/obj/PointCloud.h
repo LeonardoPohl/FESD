@@ -76,17 +76,15 @@ namespace GLObject
 
 		void acquireData();
 
+		float m_LeafSize{ 0.01f };
+
 		void filterData();
+		
+		bool m_NormalsCalculated{ false };
+		pcl::PointCloud<pcl::Normal>::Ptr m_NormalsStatic;
+		pcl::PointCloud<pcl::Normal>::Ptr m_NormalsDynamic;
 
-		enum KPEstimator {
-			ISS,
-			SIFT
-		};
-
-		// ISS
-		bool m_UseISS{ true };
-		pcl::PointCloud<pcl::PointXYZ>::Ptr m_ISSKPStatic;
-		pcl::PointCloud<pcl::PointXYZ>::Ptr m_ISSKPDynamic;
+		void computeNormals();
 
 		// SIFT
 		bool m_UseSIFT{ true };
@@ -98,10 +96,10 @@ namespace GLObject
 		pcl::PointCloud<pcl::PointXYZ>::Ptr m_SIFTKPDynamic;
 
 		void estimateKeyPoints();
-
+		
 		// FPFHE
-		std::unordered_map<KPEstimator, pcl::PointCloud<pcl::FPFHSignature33>::Ptr> m_FPFHsDynamic;
-		std::unordered_map<KPEstimator, pcl::PointCloud<pcl::FPFHSignature33>::Ptr> m_FPFHsStatic;
+		pcl::PointCloud<pcl::FPFHSignature33>::Ptr m_FPFHsDynamic;
+		pcl::PointCloud<pcl::FPFHSignature33>::Ptr m_FPFHsStatic;
 
 		// NormalEstimation
 		//pcl::NormalEstimation< pcl::PointXYZ, pcl::PointXYZ > m_NormalEstimation;
@@ -111,7 +109,7 @@ namespace GLObject
 		//pcl::PrincipalCurvaturesEstimation< pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ > m_PrincipalCurvatureEstimation;
 		//pcl::IntensitySpinEstimation< pcl::PointXYZ, pcl::PointXYZ > m_IntensitySpinEstimation;
 		
-		void describeKeyPoints(KPEstimator estimator);
+		void describeKeyPoints();
 
 		/*
 		pcl::registration::CorrespondenceEstimation< PointSource, PointTarget, Scalar >
@@ -155,9 +153,6 @@ namespace GLObject
 
 		std::vector<BoundingBox> m_BoundingBoxes{ };
 		std::vector<glm::vec3> m_CellSizes{ };
-
-		int m_AveragingCount{ 0 };
-		bool m_NormalsCalculated{ false };
 
 		bool m_AlignmentMode{ false };
 		bool m_ICPInitialised{ false };

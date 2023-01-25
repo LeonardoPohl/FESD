@@ -11,11 +11,9 @@
             "id": "f453aab838680445",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "pdf",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
-                "mode": "source",
-                "source": false
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md"
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
           }
@@ -148,15 +146,15 @@
   },
   "active": "f453aab838680445",
   "lastOpenFiles": [
+    "Tasks.md",
+    "Meeting Erwin.md",
+    "Thesis Research.md",
+    "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
     "Papers/Collections/Camera Hardware.md",
     "Papers/Collections/Camera Calibration.md",
     "Topics/Human Pose Estimation.md",
     "Topics/Camera Hardware.md",
     "Topics/Camera Calibration.md",
-    "Meeting Erwin.md",
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
-    "Papers/Papers/An Improved RANSAC for 3D Point Cloud Plane.pdf",
-    "Papers/Collections/Human Pose Estimation.md",
-    "Papers/Papers/Fusion of Multiple Lidars and Inertial Sensors for the Real-Time Pose Tracking of Human Motion.pdf"
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
   ]
 }

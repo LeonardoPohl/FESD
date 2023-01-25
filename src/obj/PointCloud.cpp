@@ -140,10 +140,6 @@ namespace GLObject
         if (m_State == m_State.STREAM && ImGui::Button("Pause Stream"))
             pauseStream();
 
-        if (ImGui::Button("Acquire Data")) {
-            
-        }
-
         if (ImGui::TreeNode("NDT")) {
             ImGui::InputFloat("Transformation Epsilon", &m_TransformationEpsilon, 0.01);
             ImGui::InputFloat("Step Size", &m_StepSize, 0.05);
@@ -151,8 +147,11 @@ namespace GLObject
             ImGui::InputInt("Max Iterations", &m_MaxIterations);
             ImGui::TreePop();
         }
+
+        ImGui::SetNextItemOpen(true);
         if (ImGui::TreeNode("Feature Based")) {
-            ImGui::Checkbox("Use ISS", &m_UseISS);
+
+            ImGui::InputFloat("Leaf filter size (in cm)", &m_LeafSize, 0.01);
 
             ImGui::Checkbox("Use SIFT", &m_UseSIFT);
             
@@ -184,9 +183,9 @@ namespace GLObject
             ImGui::InputFloat("Rotation y", &m_Rotation.y, 0.01f, 0.1f, "%.2f");
             ImGui::InputFloat("Rotation z", &m_Rotation.z, 0.01f, 0.1f, "%.2f");
 
-            ImGui::InputFloat("Translation x", &m_Translation.x, 0.001, 0.01, "%.3f");
-            ImGui::InputFloat("Translation y", &m_Translation.y, 0.001, 0.01, "%.3f");
-            ImGui::InputFloat("Translation z", &m_Translation.z, 0.001, 0.01, "%.3f");
+            ImGui::InputFloat("Translation x", &m_Translation.x, 0.01, 0.1, "%.3f");
+            ImGui::InputFloat("Translation y", &m_Translation.y, 0.01, 0.1, "%.3f");
+            ImGui::InputFloat("Translation z", &m_Translation.z, 0.01, 0.1, "%.3f");
         }
 
         if (ImGui::CollapsingHeader("Scale"))
@@ -271,16 +270,41 @@ namespace GLObject
             p->z = point.z;
         }
         mp_Logger->log("Loaded dynamic Point cloud with " + std::to_string(m_CloudDynamic->size()) + " data points");
+        filterData();
     }
-
+    
     void PointCloud::filterData() {
-        // Filtering input scan to roughly 10% of original size to increase speed of registration.
         pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud_dynamic(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::ApproximateVoxelGrid<pcl::PointXYZ> approximate_voxel_filter;
-        approximate_voxel_filter.setLeafSize(0.2, 0.2, 0.2);
+        approximate_voxel_filter.setLeafSize(m_LeafSize, m_LeafSize, m_LeafSize);
+        approximate_voxel_filter.setInputCloud(m_CloudStatic);
+        approximate_voxel_filter.filter(*m_CloudStatic);
         approximate_voxel_filter.setInputCloud(m_CloudDynamic);
         approximate_voxel_filter.filter(*m_CloudDynamic);
+        mp_Logger->log("Filtered static cloud contains " + std::to_string(m_CloudStatic->size()) + " data points");
         mp_Logger->log("Filtered dynamic cloud contains " + std::to_string(m_CloudDynamic->size()) + " data points");
+    }
+
+    void PointCloud::computeNormals() {
+        // Calculate normals for both pointclouds
+        pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr tree_normal(new pcl::search::KdTree<pcl::PointXYZ>());
+        ne.setSearchMethod(tree_normal);
+
+        // Output datasets
+        m_NormalsStatic = std::make_shared<pcl::PointCloud<pcl::Normal>>();
+        m_NormalsDynamic = std::make_shared<pcl::PointCloud<pcl::Normal>>();
+
+        // Use all neighbors in a sphere of radius 3cm
+        ne.setRadiusSearch(std::max(0.03f, m_LeafSize));
+
+        ne.setInputCloud(m_CloudStatic);
+        ne.compute(*m_NormalsStatic);
+
+        ne.setInputCloud(m_CloudDynamic);
+        ne.compute(*m_NormalsDynamic);
+
+        m_NormalsCalculated = true;
     }
 
     double computeCloudResolution(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr& cloud)
@@ -315,131 +339,79 @@ namespace GLObject
     }
 
     void PointCloud::estimateKeyPoints()
-    {
-        if (m_UseISS)
-        {// ISS 3D
-            m_ISSKPStatic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-            m_ISSKPDynamic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-            pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
-
-            double model_resolution = computeCloudResolution(m_CloudStatic);
-            // Compute model_resolution
-
-            pcl::ISSKeypoint3D<pcl::PointXYZ, pcl::PointXYZ> iss_detector;
-
-            iss_detector.setSearchMethod(tree);
-            iss_detector.setSalientRadius(6 * model_resolution);
-            iss_detector.setNonMaxRadius(4 * model_resolution);
-            iss_detector.setThreshold21(0.975);
-            iss_detector.setThreshold32(0.975);
-            iss_detector.setMinNeighbors(5);
-            iss_detector.setNumberOfThreads(4);
-            iss_detector.setInputCloud(m_CloudStatic);
-            iss_detector.compute(*m_ISSKPStatic);
-            iss_detector.setInputCloud(m_CloudDynamic);
-            iss_detector.compute(*m_ISSKPDynamic);
-            mp_Logger->log("ISS found " + std::to_string(m_ISSKPStatic->size()) + " key points (static)");
-            mp_Logger->log("ISS found " + std::to_string(m_ISSKPDynamic->size()) + " key points (dynamic)");
-        }
-        
+    {        
         if (m_UseSIFT)
         {
             m_SIFTKPStatic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
             m_SIFTKPDynamic = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-            pcl::PointCloud<pcl::PointWithScale> result;
-            pcl::search::KdTree<pcl::PointNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointNormal>());
-            pcl::PointCloud<pcl::PointNormal>::Ptr normals_static(new pcl::PointCloud<pcl::PointNormal>);
-            pcl::PointCloud<pcl::PointNormal>::Ptr normals_dynamic(new pcl::PointCloud<pcl::PointNormal>);
 
-            for (std::size_t i = 0; i < normals_static->size(); ++i)
-            {
-                (*normals_static)[i].x = (*m_SIFTKPStatic)[i].x;
-                (*normals_static)[i].y = (*m_SIFTKPStatic)[i].y;
-                (*normals_static)[i].z = (*m_SIFTKPStatic)[i].z;
+            if (!m_NormalsCalculated) {
+                computeNormals();
             }
 
-            for (std::size_t i = 0; i < normals_dynamic->size(); ++i)
-            {
-                (*normals_dynamic)[i].x = (*m_SIFTKPDynamic)[i].x;
-                (*normals_dynamic)[i].y = (*m_SIFTKPDynamic)[i].y;
-                (*normals_dynamic)[i].z = (*m_SIFTKPDynamic)[i].z;
-            }
-
+            pcl::PointCloud<pcl::PointNormal>::Ptr normalpoint_static( new pcl::PointCloud<pcl::PointNormal>);
+            pcl::PointCloud<pcl::PointNormal>::Ptr normalpoint_dynamic( new pcl::PointCloud<pcl::PointNormal>);
+            
+            pcl::concatenateFields(*m_CloudStatic, *m_NormalsStatic, *normalpoint_static);
+            pcl::concatenateFields(*m_CloudDynamic, *m_NormalsDynamic, *normalpoint_dynamic);
+            
+            mp_Logger->log("SIFT found " + std::to_string(normalpoint_static->size()) + " key points (static)");
+            mp_Logger->log("SIFT found " + std::to_string(normalpoint_dynamic->size()) + " key points (dynamic)");
+           
             pcl::SIFTKeypoint<pcl::PointNormal, pcl::PointWithScale> sift;
+            pcl::PointCloud<pcl::PointWithScale> result;
+            pcl::search::KdTree<pcl::PointNormal>::Ptr tree_sift(new pcl::search::KdTree<pcl::PointNormal>());
 
-            sift.setSearchMethod(tree);
+            sift.setSearchMethod(tree_sift);
             sift.setScales(m_MinScale, m_NOctaves, m_NScalesPerOctave);
             sift.setMinimumContrast(m_MinContrast);
-            sift.setInputCloud(normals_static);
+            sift.setInputCloud(normalpoint_static);
             sift.compute(result);
             // Copying the pointwithscale to pointxyz so as visualize the cloud
             copyPointCloud(result, *m_SIFTKPStatic);
 
-            sift.setInputCloud(normals_dynamic);
+            sift.setInputCloud(normalpoint_dynamic);
             sift.compute(result);
             // Copying the pointwithscale to pointxyz so as visualize the cloud
             copyPointCloud(result, *m_SIFTKPDynamic);
 
-            mp_Logger->log("SIFT found " + std::to_string(m_ISSKPStatic->size()) + " key points (static)");
-            mp_Logger->log("SIFT found " + std::to_string(m_ISSKPDynamic->size()) + " key points (dynamic)");
+            mp_Logger->log("SIFT found " + std::to_string(m_SIFTKPStatic->size()) + " key points (static)");
+            mp_Logger->log("SIFT found " + std::to_string(m_SIFTKPDynamic->size()) + " key points (dynamic)");
         }
     }
 
-    void PointCloud::describeKeyPoints(KPEstimator estimator)
+    void PointCloud::describeKeyPoints()
     {
         {// FPFH
             // Calculate normals for both pointclouds
-            pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
+            if (!m_NormalsCalculated) {
+                computeNormals();
+            }
+
             pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
-            ne.setSearchMethod(tree);
-
-            // Output datasets
-            pcl::PointCloud<pcl::Normal>::Ptr normals_dynamic(new pcl::PointCloud<pcl::Normal>());
-            pcl::PointCloud<pcl::Normal>::Ptr normals_static(new pcl::PointCloud<pcl::Normal>());
-
-            // Use all neighbors in a sphere of radius 3cm
-            ne.setRadiusSearch(0.03);
-            if (estimator == ISS)
-                ne.setInputCloud(m_ISSKPDynamic);
-            else if (estimator == SIFT)
-                ne.setInputCloud(m_SIFTKPDynamic);
-            ne.compute(*normals_dynamic);
-
-            if (estimator == ISS)
-                ne.setInputCloud(m_ISSKPStatic);
-            else if (estimator == SIFT)
-                ne.setInputCloud(m_SIFTKPStatic);
-            ne.compute(*normals_static);
-
             pcl::FPFHEstimation<pcl::PointXYZ, pcl::Normal, pcl::FPFHSignature33> fpfh;
 
             fpfh.setSearchMethod(tree);
 
             // Output datasets
-            m_FPFHsDynamic.insert({ estimator, { std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>() } });
-            m_FPFHsStatic.insert({ estimator, { std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>() } });
+            m_FPFHsDynamic = std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>();
+            m_FPFHsStatic = std::make_shared<pcl::PointCloud<pcl::FPFHSignature33>>();
 
             // Use all neighbors in a sphere of radius 5cm
             // IMPORTANT: the radius used here has to be larger than the radius used to estimate the surface normals!!!
             fpfh.setRadiusSearch(0.05);
 
             // Compute the features
-            if (estimator == ISS)
-                fpfh.setInputCloud(m_ISSKPStatic);
-            else if (estimator == SIFT)
-                fpfh.setInputCloud(m_SIFTKPStatic);
-            fpfh.setInputNormals(normals_static);
-            fpfh.compute(*m_FPFHsStatic.at(estimator));
+            fpfh.setInputCloud(m_SIFTKPStatic);
+            fpfh.setInputNormals(m_NormalsStatic);
+            fpfh.compute(*m_FPFHsStatic);
 
-            if (estimator == ISS)
-                fpfh.setInputCloud(m_ISSKPDynamic);
-            else if (estimator == SIFT)
-                fpfh.setInputCloud(m_SIFTKPDynamic);
-            fpfh.setInputNormals(normals_dynamic);
-            fpfh.compute(*m_FPFHsDynamic.at(estimator));
+            fpfh.setInputCloud(m_SIFTKPDynamic);
+            fpfh.setInputNormals(m_NormalsDynamic);
+            fpfh.compute(*m_FPFHsDynamic);
 
-            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsStatic.at(estimator)->size()) + " descriptors (static)");
-            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsDynamic.at(estimator)->size()) + " descriptors (dynamic)");
+            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsStatic->size()) + " descriptors (static)");
+            mp_Logger->log("FPFH found " + std::to_string(m_FPFHsDynamic->size()) + " descriptors (dynamic)");
         }
         {
 

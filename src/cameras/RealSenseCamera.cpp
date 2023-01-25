@@ -14,6 +14,7 @@
 RealSenseCamera::RealSenseCamera(rs2::context* ctx, rs2::device* device, Camera* cam, Renderer* renderer, int camera_id, Logger::Logger* logger)
 	:
 	mp_Context(ctx),
+	mp_ProtoDevice(device),
 	m_Device(*device),
 	mp_Logger(logger)
 {
@@ -83,16 +84,12 @@ RealSenseCamera::~RealSenseCamera() {
 /// Initialise all devices
 /// 
 
-rs2::device_list RealSenseCamera::getAvailableDevices(rs2::context ctx) {
-	return ctx.query_devices();
-}
-
 std::vector<RealSenseCamera*> RealSenseCamera::initialiseAllDevices(Camera* cam, Renderer* renderer, int* starting_id, Logger::Logger* logger) {
 	rs2::context ctx;
 
 	std::vector<RealSenseCamera*> depthCameras;
 
-	for (auto&& dev : RealSenseCamera::getAvailableDevices(ctx))
+	for (auto&& dev : ctx.query_devices())
 	{
 		depthCameras.push_back(new RealSenseCamera(&ctx, &dev, cam, renderer, (*starting_id)++, logger));
 		logger->log("Initialised " + depthCameras.back()->getCameraName());
@@ -268,9 +265,4 @@ void RealSenseCamera::saveFrame() {
 void RealSenseCamera::stopRecording()
 {
 	mp_Pipe->stop();
-	mp_Pipe = std::make_shared<rs2::pipeline>();
-
-	m_Config.enable_device(m_Device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER));
-	mp_Pipe->start(m_Config);
-	m_Device = mp_Pipe->get_active_profile().get_device();
 }

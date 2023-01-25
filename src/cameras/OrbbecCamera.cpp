@@ -17,13 +17,13 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
     m_DeviceInfo(deviceInfo), mp_Logger(logger) {
     m_CameraId = camera_id;
     printDeviceInfo();
-
+    
     // Open initialised devices
     m_RC = m_Device.open(m_DeviceInfo.getUri());
     errorHandling("Couldn't open device");
-
+    
     // Create depth stream
-    if (m_Device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr) {
+    if (m_Device.hasSensor(openni::SENSOR_DEPTH)) {
         m_RC = m_DepthStream.create(m_Device, openni::SENSOR_DEPTH);
         errorHandling("Couldn't create depth stream");
     }
@@ -31,7 +31,7 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
         mp_Logger->log("Error getting Sensor Info for the Depth Sensor", Logger::Priority::ERR);
         throw std::system_error(ECONNABORTED, std::generic_category(), "Error getting Sensor Info");
     }
-
+    
     // Start depth stream
     m_RC = m_DepthStream.start();
     errorHandling("Couldn't start depth stream");
@@ -62,8 +62,8 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
 
     m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
     m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
-
-    getColorFrame();
+    
+    //getColorFrame();
 }
 
 OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int* currentPlaybackFrame) :
@@ -175,9 +175,9 @@ void OrbbecCamera::printDeviceInfo() const {
 inline float OrbbecCamera::getIntrinsics(INTRINSICS intrin) const
 {
     //https://towardsdatascience.com/inverse-projection-transformation-c866ccedef1c
-    auto fx = getDepthStreamWidth() / (2.f * tan(m_hfov / 2.f));
-    auto fy = getDepthStreamHeight() / (2.f * tan(m_vfov / 2.f));
-    auto cx = getDepthStreamWidth() / 2;
+    auto fx = getDepthStreamWidth()  / (2.f * tan(m_DepthStream.getHorizontalFieldOfView() / 2.f));
+    auto fy = getDepthStreamHeight() / (2.f * tan(m_DepthStream.getVerticalFieldOfView()   / 2.f));
+    auto cx = getDepthStreamWidth()  / 2; 
     auto cy = getDepthStreamHeight() / 2;
 
     switch (intrin)
@@ -267,12 +267,11 @@ cv::Mat OrbbecCamera::getColorFrame()
     }
 
     if (m_CVCameraFound) {
-        if (m_IsPlayback)
+        if (m_IsPlayback) {
             m_ColorStream.set(cv::CAP_PROP_POS_FRAMES, *mp_CurrentPlaybackFrame);
-
+        }
         m_ColorStream.retrieve(m_ColorFrame);
     }
-    
 
     return m_ColorFrame;
 }
@@ -340,8 +339,8 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Orbbec Recorder is invalid", Logger::Priority::ERR);
     }
 
-    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 10, cv::Size(m_DepthWidth, m_DepthHeight)};
-
+    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("mjpg").string(), cv::VideoWriter::fourcc('M','J','P','G'), 15, cv::Size(m_DepthWidth, m_DepthHeight)};
+    
     m_IsEnabled = true;
     m_IsRecording = true;
 
@@ -351,7 +350,7 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
 void OrbbecCamera::saveFrame() {
     int changedStreamDummy;
     openni::VideoStream* pStream = &m_DepthStream;
-
+    
     // Wait for a new frame
     m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     errorHandling("Wait failed for Depth! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");

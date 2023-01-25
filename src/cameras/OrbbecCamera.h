@@ -62,10 +62,6 @@ private:
 
 	Logger::Logger* mp_Logger;
 
-	const float m_hfov{ glm::radians(60.0f) };
-	const float m_vfov{ glm::radians(49.5f) };
-	const float m_dfov{ glm::radians(73.0f) };
-
 	unsigned int m_DepthWidth;
 	unsigned int m_DepthHeight;
 	float m_MetersPerUnit{ 1.f/1000.f };

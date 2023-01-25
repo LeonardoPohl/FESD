@@ -401,6 +401,7 @@ void CameraHandler::stopRecording() {
         if (cam->m_IsSelectedForRecording) {
             auto cam_json = cam->getCameraConfig();
             cam->stopRecording();
+            cameras.append(cam_json);
         }
     }
 
@@ -422,6 +423,9 @@ void CameraHandler::stopRecording() {
 
     updateSessionName();
     findRecordings();
+
+    clearCameras();
+    initAllCameras();
 
     m_State = Streaming;
 }
