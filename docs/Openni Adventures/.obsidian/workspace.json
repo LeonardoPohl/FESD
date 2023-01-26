@@ -11,9 +11,11 @@
             "id": "f453aab838680445",
             "type": "leaf",
             "state": {
-              "type": "pdf",
+              "type": "markdown",
               "state": {
-                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+                "file": "Meeting Erwin.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
+                "file": "Meeting Erwin.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
+                "file": "Meeting Erwin.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+                "file": "Meeting Erwin.md"
               }
             }
           }
@@ -146,15 +148,15 @@
   },
   "active": "f453aab838680445",
   "lastOpenFiles": [
+    "Thesis Research.md",
+    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Tasks.md",
     "Meeting Erwin.md",
-    "Thesis Research.md",
     "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
     "Papers/Collections/Camera Hardware.md",
     "Papers/Collections/Camera Calibration.md",
     "Topics/Human Pose Estimation.md",
     "Topics/Camera Hardware.md",
-    "Topics/Camera Calibration.md",
-    "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
+    "Topics/Camera Calibration.md"
   ]
 }

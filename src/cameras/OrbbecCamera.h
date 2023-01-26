@@ -1,4 +1,6 @@
 #pragma once
+#include <thread>
+
 #include <OpenNI.h>
 #include <opencv2/videoio.hpp>
 
@@ -37,6 +39,8 @@ public:
 	/// Recording
 	std::string startRecording(std::string sessionName) override;
 	void saveFrame() override;
+	void saveDepth();
+	void saveColor();
 	void stopRecording() override;
 private:
 	void errorHandling(std::string error_string = "");

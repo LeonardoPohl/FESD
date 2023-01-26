@@ -227,7 +227,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 		mp_Pipe->stop();
 		mp_Pipe = std::make_shared<rs2::pipeline>();
 		rs2::config cfg;
-		mp_Logger->log("Saving " + getCameraName() + "'s stream to " + filepath.string());
+		mp_Logger->log("Creaded Realsense Recorder");
 		
 		cfg.enable_record_to_file(filepath.string());
 		mp_Pipe->start(cfg);

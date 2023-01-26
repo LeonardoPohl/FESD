@@ -88,9 +88,11 @@ void CameraHandler::OnUpdate()
                 std::execution::par,
                 m_DepthCameras.begin(), 
                 m_DepthCameras.end(), 
-                [](auto&& cam) {
-                cam->saveFrame();
-            });
+                [](auto&& cam) 
+                {
+                    cam->saveFrame();
+                }
+            );
         }
     }
     else if (m_State == Streaming) {
@@ -135,6 +137,10 @@ void CameraHandler::OnUpdate()
 
 void CameraHandler::OnImGuiRender()
 {
+    if (m_State == Recording) {
+        showRecordingStats();
+        return;
+    }
     ImGui::Begin("Camera Handler");
 
     if (ImGui::Button("Init Cameras") && m_State != Playback) {
@@ -169,13 +175,9 @@ void CameraHandler::OnImGuiRender()
         }
 
         showSessionSettings();
-        showRecordingStats();
 
         if (m_State != Recording && ImGui::Button("Start Recording")) {
             startRecording();
-        }
-        else if (m_State == Recording && ImGui::Button("Stop Recording")) {
-            stopRecording();
         }
         ImGui::End();
     }
@@ -272,25 +274,26 @@ void CameraHandler::showSessionSettings() {
 }
 
 void CameraHandler::showRecordingStats() {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Session Stats")) {
-        ImGui::BeginDisabled(m_State == Recording);
-        ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
-        ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
+    ImGui::Begin("Session Stats");
 
-        if (m_LimitFrames && m_FrameLimit > 0) {
-            ImGui::Text("Frame Limit:");
-            ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
-        }
-        
-        if (m_LimitTime && m_TimeLimitInS > 0) {
-            ImGui::Text("Time Limit:");
-            ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
-        }
-        ImGui::EndDisabled();
+    ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
+    ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
 
-        ImGui::TreePop();
+    if (m_LimitFrames && m_FrameLimit > 0) {
+        ImGui::Text("Frame Limit:");
+        ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
     }
+        
+    if (m_LimitTime && m_TimeLimitInS > 0) {
+        ImGui::Text("Time Limit:");
+        ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
+    }
+
+    if (ImGui::Button("Stop Recording")) {
+        stopRecording();
+    }
+
+    ImGui::End();    
 }
 
 void CameraHandler::showRecordings() {

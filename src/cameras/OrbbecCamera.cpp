@@ -62,8 +62,9 @@ OrbbecCamera::OrbbecCamera(openni::DeviceInfo deviceInfo, Camera* cam, Renderer*
 
     m_ColorStream.set(cv::CAP_PROP_FRAME_WIDTH, m_DepthWidth);
     m_ColorStream.set(cv::CAP_PROP_FRAME_HEIGHT, m_DepthHeight);
-    
-    //getColorFrame();
+
+    // Find RGB camera
+    getColorFrame();
 }
 
 OrbbecCamera::OrbbecCamera(Camera* cam, Renderer* renderer, Logger::Logger* logger, std::filesystem::path recording, int* currentPlaybackFrame) :
@@ -214,7 +215,6 @@ const void *OrbbecCamera::getDepth()
 {
     if (m_IsPlayback) {
         mp_PlaybackController->seek(m_DepthStream, *mp_CurrentPlaybackFrame);
-        //m_CurrentPlaybackFrame = ++m_CurrentPlaybackFrame % mp_PlaybackController->getNumberOfFrames(m_DepthStream);
     }
     else {
         int changedStreamDummy;
@@ -339,7 +339,7 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
         mp_Logger->log("Orbbec Recorder is invalid", Logger::Priority::ERR);
     }
 
-    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("mjpg").string(), cv::VideoWriter::fourcc('M','J','P','G'), 15, cv::Size(m_DepthWidth, m_DepthHeight)};
+    m_ColorStreamRecorder = cv::VideoWriter{ filepath.replace_extension("avi").string(), cv::VideoWriter::fourcc('M','J','P','G'), 15, cv::Size(m_DepthWidth, m_DepthHeight)};
     
     m_IsEnabled = true;
     m_IsRecording = true;
@@ -348,9 +348,16 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
 }
 
 void OrbbecCamera::saveFrame() {
+    std::thread depth_save_thread(&OrbbecCamera::saveDepth, this);
+    std::thread color_save_thread(&OrbbecCamera::saveColor, this);
+    depth_save_thread.join();
+    color_save_thread.join();
+}
+
+void OrbbecCamera::saveDepth() {
     int changedStreamDummy;
     openni::VideoStream* pStream = &m_DepthStream;
-    
+
     // Wait for a new frame
     m_RC = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy, READ_WAIT_TIMEOUT);
     errorHandling("Wait failed for Depth! (timeout is " + std::to_string(READ_WAIT_TIMEOUT) + " ms)");
@@ -358,7 +365,9 @@ void OrbbecCamera::saveFrame() {
     // Get depth frame
     m_RC = m_DepthStream.readFrame(&m_DepthFrameRef);
     errorHandling("Depth Stream read failed!");
+}
 
+void OrbbecCamera::saveColor() {
     m_ColorStreamRecorder.write(getColorFrame());
 }
 
