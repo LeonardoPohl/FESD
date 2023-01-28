@@ -1,5 +1,15 @@
 \section{Introduction}
 
+\subsection{Human pose Estimation vs Skeleton detection}
+
+
+
+\subsection{Research question}
+
+In this thesis, we try to find out if it is possible to develop a method that can tell if a joint produced by human pose estimation is potentially faulty. We try to achieve this by building a dataset using RGBD cameras from different angles.
+
+This project includes both the creation of the dataset as well as the data population with estimated human pose data and the training and evaluation of a model for fault estimation. The dataset contains different challenging scenarios, which make human pose detection more error prone. These challenges include but are not limited to; lighting, background, clothing and accessories attached to the wrist and ankles, and proximity of the limbs to objects. We found that these have the largest effect on the performance of human pose estimation. 
+
 %Human Pose Estimation (HPE) is not a new invention [Cite some early papers], it has been applied successfully in a lot of applications [cite more examples]. Most of the time the existing algorithms are very accurate [Cite papers which experiment with HPE]. However, in some cases the traditional algorithms, which are trained on healthy humans can be inaccurate if people of a different physique or disability are to be detected. These kind of complicated cases of human pose detection are proving to be very difficult to handle by companies which specialise in games for rehabilitation, such as SilverFit B.V.
 
 %In 2008, SilverFit released their first product which deals with HPE for rehabilitation games. At that time RGB cameras were used with 2D HPE. Ever since then the company switched to use Time-of-flight cameras to improve the HPE, by providing depth information for a scene.

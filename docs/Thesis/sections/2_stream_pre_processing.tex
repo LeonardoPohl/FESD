@@ -1,47 +1,41 @@
 \section{Stream pre-processing}
 
-\subsection{Manual alignment}
+To get the best possible results we need to make sure that the cameras are set up in exactly the intended way. 
 
-\subsection{Point based alignment}
+\subsection{Recording session set-up}
 
-\subsubsection{NDT alignment}
+We consider different environmental setups to increase the significance of the results. In total, we achieve $6 * 2 * 2 * 2 * 2 * 2 = 192$ different combinations, which we record $3 times$ for $30s$, resulting in around $17280\s$ of recording which is recorded at around $30 FPS$ resulting in $500000$ Frames in the dataset. We consider the following setups:
 
-\subsubsection{ICP alignment}
+\paragraph{Lighting}
 
-\subsection{Feature based alignment}
+RGBD cameras function with infrared light therefore is the lighting of a scene essential. We found that direct sunlight interferes with some RGBD cameras more than others based on the infrared range that is used. Since the exact sunlighting is not controllable we choose to make it as optimal as possible to improve reproducibility. Therefore, we choose a room with no sunlight but we do include artificial light to reduce any damage that might occur to visibility issues.
 
-\subsubsection{Keypoint detection}
+\paragraph{Relative Camera Position}
 
-\paragraph{ISS}
+At SilverFit, cameras are attached above a screen at a height of $180 \{cm}$ facing downward at around $20\deg$. To form a more general model, we will experiment with different setups and angles. We experiment with six different setups in total. Three setups from different angles ($20\deg, 0\deg, 340\deg$) at two different heights ($180cm$, $120cm$). The different setups can be seen in figure TODO.
 
+\textit{
+  \textbf{UNSURE} We Develop a functionality that lets us determine the exact height and orientation of the camera. We do this by detecting the floor and thereby calculating the height of the camera and the angle at which it is pointing downward. We can also detect if the camera is not completely straight and therefore might influence the results.
+}
 
-\paragraph{SIFT}
+\paragraph{Sitting or standing}
 
+From experience, we know that detecting the joints correctly is influenced by the position of the participant. This is especially true for the difference between a sitting and a standing patient. Human pose detection is in general more reliable if the patient is standing, due to reduced occlusion. We record each scenario sitting and standing.
 
-\subsubsection{Keypoint description}
+\paragraph{Clothing and ankle and wrist attachments}
 
-\paragraph{FPFH - Fast Point Feature Histograms}
-https://pcl.readthedocs.io/projects/tutorials/en/latest/fpfh_estimation.html
-Articles to cite:
-R.B. Rusu, N. Blodow, M. Beetz. Fast Point Feature Histograms (FPFH) for 3D Registration. In Proceedings of the IEEE International Conference on Robotics and Automation (ICRA), Kobe, Japan, May 12-17 2009.
-R.B. Rusu, A. Holzbach, N. Blodow, M. Beetz. Fast Geometric Point Labeling using Conditional Random Fields. In Proceedings of the 22nd IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), St. Louis, MO, USA, October 11-15 2009.
+Clothing can have a similar effect on the efficacy of HPE as lighting. If the participant is wearing black pants infrared light will be absorbed rather than reflected leading to 'blind spots' in the legs. Since the legs are already more unreliable than the rest of the body, these blind spots can negatively affect HPE. 
 
-\subsubsection{Correspondence estimation}
+Since SilverFit develops games for rehabilitation, the supervising physiotherapist might choose to attach weights to the ankles and/or wrists to increase the effectiveness of the exercise. We therefore also include attached and held weights to simulate difficult situations.
 
-\subsubsection{Correspondence rejection}
+\paragraph{Background}
 
-\subsubsection{Transformation estimation}
+The background of the scene can have a significant effect on the results. We, therefore, record the same scenario with and without a visible background, i.e. a wall is behind the participant or there is no wall within the maximum sensor range ($6m$).
 
-\subsection{Validation of alignment}
+\paragraph{Crampedness of the Environment}
 
-\subsubsection{Fitness score}
+The Crampedness of the scene increases the number of false positives of HPE. We, therefore, record the same scenario with and without clutter. We consider clutter to be any object that is not a part of the participant's body. However, clutter is quite objective and therefore we will not be able to define it in a universally applicable way. 
 
-\subsubsection{Overlap score}
+\paragraph{Distance to the camera}
 
-%Firstly, we preprocess the seperate streams of the various depth sensors. This is done by aligning the point clouds and the RGB streams. There are multiple ways to align the point clouds, but we found that, due to the high noise level of the depth data, the best way to align the point clouds is to do it manually. Since we scale the point cloud into meters according to the meter-per-unit ratio provided by the depth camera, manual alignment is a matter of measuring the real-world distances along the axis and then translating the point cloud accordingly. Rotation on the other hand is a lot harder to do manually, so we use the NDT algorithm to align the point clouds, with the measured distances as an initial guess. 
-
-%The NDT algorithm, Normal Distribution Transform algorithm, is a non-linear optimization algorithm, which finds the best rotation and translation to align the point clouds\cite{NDT}. The more data we can provide to the NDT algorithm, the better the alignment will be. Therefore, if we provide the algorithm with the measured distances along the axis, it will be able to find the best rotation without changing the translation.
-
-%The fitness score is provided after the alignment and is a measure of how well the point clouds are aligned. The fitness score is calculated by comparing the aligned point clouds to the original point clouds. The fitness score represents the mean squared distance from each point in the aligned point cloud to its closest point in the static point cloud. Hence, the lower the fitness score, the better the alignment. Depending on the overlap of the point clouds the fitness score can vary a lot. If the point clouds are not overlapping significantly, the fitness score will be higher since the closest point is still far away and will be a bad indicator of a good alignment. Therefore, to validate the alignment of the point clouds we also use the overlap score. The overlap score is calculated by comparing the aligned point clouds to the original point clouds. The overlap score represents the percentage of points in the aligned point cloud that are within a certain distance of a point in the static point cloud. With both metrics, we can validate the alignment of the point clouds.
-
-%The rotation and translation of the point clouds are stored in the file that contains all meta-data about the recording so that we can use them to align the point clouds in the future.
+Games developed by SilverFit have a calibration step where the participant is asked to stand at a certain distance from the camera. We, therefore, record the scenario at that specific distance. This ensures that noise introduced by the depth sensor has little effect on the results. The participant is positioned 2 meters away from the camera. \textit{UNSURE, ask someone at SilverFit}.
