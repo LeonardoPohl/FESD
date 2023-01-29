@@ -1,66 +1,9 @@
-\section{Introduction}
+\chapter{Introduction}
 
-\subsection{Human pose Estimation vs Skeleton detection}
+The code of this thesis is available on \href{https://github.com/LeonardoPohl/FESD}
 
-
-
-\subsection{Research question}
+\section{Research question}
 
 In this thesis, we try to find out if it is possible to develop a method that can tell if a joint produced by human pose estimation is potentially faulty. We try to achieve this by building a dataset using RGBD cameras from different angles.
 
-This project includes both the creation of the dataset as well as the data population with estimated human pose data and the training and evaluation of a model for fault estimation. The dataset contains different challenging scenarios, which make human pose detection more error prone. These challenges include but are not limited to; lighting, background, clothing and accessories attached to the wrist and ankles, and proximity of the limbs to objects. We found that these have the largest effect on the performance of human pose estimation. 
-
-%Human Pose Estimation (HPE) is not a new invention [Cite some early papers], it has been applied successfully in a lot of applications [cite more examples]. Most of the time the existing algorithms are very accurate [Cite papers which experiment with HPE]. However, in some cases the traditional algorithms, which are trained on healthy humans can be inaccurate if people of a different physique or disability are to be detected. These kind of complicated cases of human pose detection are proving to be very difficult to handle by companies which specialise in games for rehabilitation, such as SilverFit B.V.
-
-%In 2008, SilverFit released their first product which deals with HPE for rehabilitation games. At that time RGB cameras were used with 2D HPE. Ever since then the company switched to use Time-of-flight cameras to improve the HPE, by providing depth information for a scene.
-
-%The current system that is in place for examining the robustness of a detector system revolves mostly around manual testing. There are two stages for the testing, firstly a tester from SilverFit tries the exercise and then tests are executed in selected care homes with actual patients. This method of testing can be quite error prone and is not easily comparable to previous test sessions, since it can vary from tester to tester and from one time to another.
-
-%To improve the testing of the HPE algorithm in place I aim to introduce a system, which makes it easy to collect a dataset efficiently. Furthermore, I will apply data augmentation to further increase the size of the dataset artificially, while making the accuracy score more representative. This dataset recorder needs to be fairly efficient, so that the actual exercise is not negatively impacted. 
-
-%Additionally, I will introduce a way to measure the robustness and resource consumption of an HPE, since the resources of the middle-ware that is in place for HPE is limited and therefore a very important factor for the choice of an HPE method.
-
-%Finally, I will use the dataset recorder to record and augment a dataset for one specific exercise and then finally evaluate a number of HPE methods and compare the results to existing literature.
-
-%Additionally to that I might implement a way to read the data into the NUI-Track framework to write 'Unit Tests' for 
-
-%\clearpage
-
-%Focus of thesis: 
-
-%Work can be split into roughly 4 Parts:
-
-%\begin{enumerate}
-%    \item Collect data streams
-%    \begin{enumerate}
-%        \item Depth streams
-%        \item Color stream
-%        \item Skeleton stream
-%    \end{enumerate}
-%    \item Evaluate recordings
-%    \begin{enumerate}
-%        \item Find faults in skeleton and disregard faulty recordings
-%        \item 
-%        \item Skeleton stream
-%    \end{enumerate}
-%    \item Train the model and combine it with the existing model
-%    \item Run experiments
-%\end{enumerate}
-
-%\section{Detecting the problem areas with different}
-
-%We know the games where there are problems. Try to recreate the movements and create errors reliably.
-
-%Additionally it would be good to have a way to detect if the human pose detector is not functioning correctly. This seems quite challenging. There are 2 different scenarios which need to be tackled, either the skeleton is missing or incorrect. A confidence level would be very nice.
-
-%\section{Compile Dataset}
-
-%Based on the list of problematic movements compile a dataset. Also include good movements. Try different positions within the room and different light stuff and different clothing (reflectiveness might influence results of skeleton finding).
-
-%\section{Find a solution to fix edge-cases}
-
-%Find a solution, either rule based, or with machine learning, which solves edge cases. Maybe multiple models, which are very specified.
-
-%\section{Run Experiments}
-
-%Using the compiled dataset and also public data sets, like in Related work run experiments. Compare the old model, the old model in combination with the specified model and fault detector, and one or two other models, like open-cv, to have a comparison.
+This project includes both the creation of the dataset as well as the data population with estimated human pose data and the training and evaluation of a model for fault estimation. The dataset contains different challenging scenarios, which make human pose detection more error-prone. These challenges include but are not limited to; lighting, background, clothing and accessories attached to the wrist and ankles, and proximity of the limbs to objects. We found that these have the largest effect on the performance of human pose estimation. 
