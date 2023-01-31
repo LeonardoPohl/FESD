@@ -63,8 +63,8 @@ namespace GLObject
 		void OnImGuiRender() override;
 		void manipulateTranslation();
 
-		glm::vec3 getRotation();
-		glm::vec3 getTranslation();
+		Json::Value getRotation();
+		Json::Value getTranslation();
 	private:
 		void pauseStream();
 		void resumeStream();

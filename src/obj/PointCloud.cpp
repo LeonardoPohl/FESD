@@ -139,7 +139,7 @@ namespace GLObject
 
         if (m_State == m_State.STREAM && ImGui::Button("Pause Stream"))
             pauseStream();
-
+        /*
         if (ImGui::TreeNode("NDT")) {
             ImGui::InputFloat("Transformation Epsilon", &m_TransformationEpsilon, 0.01);
             ImGui::InputFloat("Step Size", &m_StepSize, 0.05);
@@ -167,8 +167,7 @@ namespace GLObject
                 estimateKeyPoints();
             }
             ImGui::TreePop();
-        }
-
+        }*/
 
         ImGui::Checkbox("Alignment Mode", &m_AlignmentMode);
 
@@ -179,9 +178,9 @@ namespace GLObject
     {
         if (ImGui::CollapsingHeader("Translation"))
         {
-            ImGui::InputFloat("Rotation x", &m_Rotation.x, 0.01f, 0.1f, "%.2f");
-            ImGui::InputFloat("Rotation y", &m_Rotation.y, 0.01f, 0.1f, "%.2f");
-            ImGui::InputFloat("Rotation z", &m_Rotation.z, 0.01f, 0.1f, "%.2f");
+            ImGui::InputFloat("Yaw", &m_Rotation.x, 0.01f, 0.1f, "%.2f");
+            ImGui::InputFloat("Pitch", &m_Rotation.y, 0.01f, 0.1f, "%.2f");
+            ImGui::InputFloat("Roll", &m_Rotation.z, 0.01f, 0.1f, "%.2f");
 
             ImGui::InputFloat("Translation x", &m_Translation.x, 0.01, 0.1, "%.3f");
             ImGui::InputFloat("Translation y", &m_Translation.y, 0.01, 0.1, "%.3f");
@@ -197,14 +196,22 @@ namespace GLObject
     //
     // Getters
     //
-    glm::vec3 PointCloud::getRotation()
+    Json::Value PointCloud::getRotation()
     {
-        return m_Rotation;
+        Json::Value rotation;
+        rotation["Roll"] = m_Rotation.x;
+        rotation["Pitch"] = m_Rotation.y;
+        rotation["Yaw"] = m_Rotation.z;
+        return rotation;
     }
 
-    glm::vec3 PointCloud::getTranslation()
+    Json::Value PointCloud::getTranslation()
     {
-        return m_Translation;
+        Json::Value translation;
+        translation["X"] = m_Translation.x;
+        translation["Y"] = m_Translation.y;
+        translation["Z"] = m_Translation.z;
+        return translation;
     }
 
     //

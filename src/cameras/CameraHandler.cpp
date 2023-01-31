@@ -19,6 +19,7 @@
 
 #include "utilities/Consts.h"
 #include "utilities/helper/ImGuiHelper.h"
+#include "utilities/Utils.h"
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
@@ -131,7 +132,9 @@ void CameraHandler::OnUpdate()
                 }
             }
         }
-        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+        if (!m_PlaybackPaused) {
+            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+        }
     }
 }
 
@@ -333,26 +336,7 @@ void CameraHandler::showRecordings() {
             }
 
             if (ImGui::Button("Start Playback")) {
-                mp_Logger->log("Started Playback of Recording \"" + recording["Name"].asString() + "\"");
-                m_State = Playback;
-
-                clearCameras();
-
-                for (auto camera : recording["Cameras"]) {
-                    if (camera["Type"].asString() == RealSenseCamera::getType()) {
-                        m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
-                    }
-                    else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-                        m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
-                    }
-                    else {
-                        mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
-                    }
-                }
-                m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
-                m_CamerasExist = !m_DepthCameras.empty();
-                if(m_CamerasExist)
-                    mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
+                startPlayback(recording);
             }
 
             ImGui::TreePop();
@@ -364,10 +348,10 @@ void CameraHandler::showRecordings() {
 void CameraHandler::startRecording() {
     mp_Logger->log("Starting recording");
     m_State = Recording;
-
+    
     for (auto cam : m_DepthCameras) {
         cam->m_IsEnabled = true;
-        cam->startRecording(getFileSafeSessionName());
+        cam->startRecording(getFileSafeSessionName(m_SessionName));
     }
 
     m_RecordedFrames = 0;
@@ -387,7 +371,7 @@ void CameraHandler::stopRecording() {
     std::time_t end_time = std::chrono::system_clock::to_time_t(m_RecordingEnd);
     mp_Logger->log("Finished recording at " + (std::string)std::ctime(&end_time) + "elapsed time: " + std::to_string(m_RecordedSeconds.count()) + "s");
 
-    auto configPath = m_RecordingDirectory / getFileSafeSessionName();
+    auto configPath = m_RecordingDirectory / getFileSafeSessionName(m_SessionName);
     configPath += ".json";
 
     std::fstream configJson(configPath, std::ios::out | std::ios::app);
@@ -396,6 +380,7 @@ void CameraHandler::stopRecording() {
     root["Name"] = m_SessionName;
     root["DurationInSec"] = m_RecordedSeconds.count();
     root["RecordedFrames"] = m_RecordedFrames;
+    root["SkeletonCalculated"] = false;
 
     Json::Value cameras;
 
@@ -433,12 +418,40 @@ void CameraHandler::stopRecording() {
     m_State = Streaming;
 }
 
+void CameraHandler::startPlayback(Json::Value recording)
+{
+    mp_Logger->log("Started Playback of Recording \"" + recording["Name"].asString() + "\"");
+    m_State = Playback;
+
+    clearCameras();
+
+    for (auto camera : recording["Cameras"]) {
+        if (camera["Type"].asString() == RealSenseCamera::getType()) {
+            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else if (camera["Type"].asString() == OrbbecCamera::getType()) {
+            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+        }
+        else {
+            mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
+        }
+    }
+
+    m_CurrentPlaybackFrame = 0;
+    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
+    m_CamerasExist = !m_DepthCameras.empty();
+    if (m_CamerasExist)
+        mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
+}
+
 void CameraHandler::findRecordings() {
     m_Recordings.clear();
 
     for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
     {
-        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+        if (entry.is_regular_file() && 
+            entry.path().extension() == ".json" && 
+            entry.path().filename().string().find("Skeleton") == std::string::npos) {
             std::ifstream configJson(entry.path());
             Json::Value root;
 
@@ -471,54 +484,46 @@ void CameraHandler::clearCameras() {
 }
 
 void CameraHandler::calculateSkeletons(Json::Value recording) {
-    mp_Logger->log("Started Skeleton recording of \"" + recording["Name"].asString() + "\"");
-    m_State = Playback;
-
-    clearCameras();
-
-    for (auto camera : recording["Cameras"]) {
-        if (camera["Type"].asString() == RealSenseCamera::getType()) {
-            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
-        }
-        else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
-        }
-        else {
-            mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
-        }
-    }
-
-    m_CamerasExist = !m_DepthCameras.empty();
+    startPlayback(recording);
 
     if (!m_CamerasExist) {
         mp_Logger->log("No cameras could be initialised for recording \"" + recording["Name"].asString() + "\"", Logger::Priority::ERR);
         return;
     }
 
-    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
-
     m_SkeletonDetector->startRecording(recording["Name"].asString());
 
-    for (m_CurrentPlaybackFrame = 0; m_CurrentPlaybackFrame < recording["RecordedFrames"].asInt(); m_CurrentPlaybackFrame++) {
+    for (;m_CurrentPlaybackFrame < m_TotalPlaybackFrames; m_CurrentPlaybackFrame++) {
         for (auto cam : m_DepthCameras) {
+            // Get it and forget it
+            mp_PointCloud->OnUpdate();
+            mp_PointCloud->OnRender();
             auto frame_to_process = cam->getColorFrame();
+            if (!frame_to_process.empty()) {
+                cv::imshow("Processing Skeleton", frame_to_process);
+                std::cout << "Frame at " << m_CurrentPlaybackFrame << std::endl;
+            }
             m_SkeletonDetector->saveFrame(frame_to_process, cam->getCameraName());
         }
     }
 
     m_SkeletonDetector->stopRecording();
+
+    recording["SkeletonCalculated"] = true;
+
+    auto configPath = m_RecordingDirectory / recording["Name"].asString();
+    configPath += ".json";
+    std::fstream configJson(configPath, std::ios::out);
+
+    Json::StreamWriterBuilder builder;
+    configJson << Json::writeString(builder, recording);
+    configJson.close();
+
+    clearCameras();
 }
 
 void CameraHandler::updateSessionName() {
     auto tp = std::chrono::system_clock::now();
     static auto const CET = std::chrono::locate_zone("Etc/GMT-1");
     m_SessionName = "Session " + std::format("{:%FT%T}", std::chrono::zoned_time{ CET, floor<std::chrono::seconds>(tp) });
-}
-
-std::string CameraHandler::getFileSafeSessionName() {
-    std::string sessionFileName = m_SessionName;
-    std::ranges::replace(sessionFileName, ' ', '_');
-    std::ranges::replace(sessionFileName, ':', '.');
-
-    return sessionFileName;
 }

@@ -5,6 +5,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "utilities/Consts.h"
+#include "utilities/Utils.h"
+
 SkeletonDetector::SkeletonDetector(Logger::Logger* logger) : mp_Logger(logger)
 {
     // Starting OpenPose
@@ -57,13 +60,45 @@ void SkeletonDetector::drawSkeleton(cv::Mat& frame_to_process, float score_thres
 
 void SkeletonDetector::startRecording(std::string sessionName)
 {
+    m_RecordingPath = m_RecordingDirectory / (getFileSafeSessionName(sessionName) + "_Skeleton.json");
+    m_Skeletons.clear();
 }
 
 void SkeletonDetector::saveFrame(cv::Mat frame_to_process, std::string cameraName)
 {
-    
+    auto key_points = calculateSkeleton(frame_to_process);
+
+    const auto numberPeopleDetected = key_points.getSize(0);
+    const auto numberBodyParts = key_points.getSize(1);
+
+    Json::Value people;
+    for (int person = 0; person < numberPeopleDetected; person++) {
+        Json::Value p;
+        Json::Value skeleton;
+        p["Index"] = person;
+        for (int part = 0; part < numberBodyParts; part++) {
+            const auto x = key_points[{person, part, 0}];
+            const auto y = key_points[{person, part, 1}];
+            const auto score = key_points[{person, part, 2}];
+            Json::Value joint;
+            joint["i"] = part;
+            joint["u"] = key_points[{person, part, 0}];
+            joint["v"] = key_points[{person, part, 1}];
+            joint["score"] = key_points[{person, part, 2}];
+            skeleton.append(joint);
+        }
+        p["Skeleton"] = skeleton;
+        people.append(p);
+    }
+    m_Skeletons.append(people);
 }
 
 void SkeletonDetector::stopRecording()
 {
+    std::fstream configJson(m_RecordingPath, std::ios::out);
+    Json::Value root;
+    root["Skeletons"] = m_Skeletons;
+    Json::StreamWriterBuilder builder;
+    configJson << Json::writeString(builder, m_Skeletons);
+    configJson.close();
 }

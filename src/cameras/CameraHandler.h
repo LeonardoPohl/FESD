@@ -26,12 +26,12 @@ private:
 	void showRecordings();
 	void startRecording();
 	void stopRecording();
+	void startPlayback(Json::Value recording);
 	void findRecordings();
 	void calculateSkeletons(Json::Value recording);
 
 	void clearCameras();
 	void updateSessionName();
-	std::string getFileSafeSessionName();
 
 	enum State {
 		Streaming,
@@ -58,7 +58,7 @@ private:
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };
 	int m_FrameLimit{ 100 };
-	int m_TimeLimitInS{ 100 };
+	int m_TimeLimitInS{ 30 };
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
 	std::chrono::duration<double> m_RecordedSeconds;

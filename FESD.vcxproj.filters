@@ -150,6 +150,12 @@
     <ClInclude Include="src\obj\SkeletonDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\utilities\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\SessionParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="resources\fonts\Roboto-Medium.ttf" />

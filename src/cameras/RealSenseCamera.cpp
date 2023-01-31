@@ -174,12 +174,12 @@ const void* RealSenseCamera::getDepth()
 		return depth.get_data();
 	}
 	else {
-		rs2::frameset frames;
-		
-		if (mp_Pipe->poll_for_frames(&frames)) // Check if new frames are ready
+		rs2::frameset data;
+
+		if (mp_Pipe->poll_for_frames(&data)) // Check if new frames are ready
 		{
-			rs2::depth_frame depth = frames.get_depth_frame();
-			rs2::video_frame color = frames.get_color_frame();
+			rs2::depth_frame depth = data.get_depth_frame();
+			rs2::video_frame color = data.get_color_frame();
 			return depth.get_data();
 		}
 
@@ -198,12 +198,12 @@ cv::Mat RealSenseCamera::getColorFrame()
 	}
 	else {
 		data = mp_Pipe->wait_for_frames();
+
 	}
-	 
+
 	// Make sure the frameset is spatialy aligned 
 	// (each pixel in depth image corresponds to the same pixel in the color image)
 	rs2::frameset aligned_set = m_AlignToDepth.process(data);
-
 	rs2::video_frame color_frame = aligned_set.get_color_frame();
 	cv::Mat color_mat = { cv::Size(color_frame.get_width(), color_frame.get_height()), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP };
 	cv::cvtColor(color_mat, color_mat, cv::COLOR_BGR2RGB);

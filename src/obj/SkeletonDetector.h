@@ -5,6 +5,7 @@
 #include <openpose/filestream/fileStream.hpp>
 #include <openpose/pose/poseParameters.hpp>
 #include <opencv2/opencv.hpp>
+#include <json/json.h>
 
 #include "Logger.h"
 
@@ -24,5 +25,7 @@ private:
 
 	op::Wrapper m_OPWrapper{ op::ThreadManagerMode::Asynchronous };
 	std::filesystem::path m_RecordingPath;
+
+	Json::Value m_Skeletons{ };
 };
 
