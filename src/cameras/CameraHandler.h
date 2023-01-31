@@ -10,6 +10,7 @@
 #include "DepthCamera.h"
 #include "obj/Logger.h"
 #include "obj/SkeletonDetector.h"
+#include "obj/SessionParameters.h"
 
 class CameraHandler
 {
@@ -35,6 +36,7 @@ private:
 
 	enum State {
 		Streaming,
+		RecordingPre,
 		Recording,
 		Playback
 	};
@@ -54,6 +56,7 @@ private:
 
 	// Recording
 	std::string m_SessionName{ };
+	SessionParameters m_SessionParams{ };
 	bool m_StreamWhileRecording{ false };
 	bool m_LimitFrames{ false };
 	bool m_LimitTime{ true };

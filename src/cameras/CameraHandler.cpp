@@ -170,6 +170,13 @@ void CameraHandler::OnImGuiRender()
 
     ImGui::End();
     
+    if (m_State == RecordingPre) {
+        if (m_SessionParams.manipulateSessionParameters()) {
+            // TODO: add countdown
+            startRecording();
+        }
+    }
+
     if (m_CamerasExist && m_State != Playback) {
         ImGui::Begin("Recorder");
 
@@ -180,7 +187,7 @@ void CameraHandler::OnImGuiRender()
         showSessionSettings();
 
         if (m_State != Recording && ImGui::Button("Start Recording")) {
-            startRecording();
+            m_State = RecordingPre;
         }
         ImGui::End();
     }
@@ -237,39 +244,29 @@ void CameraHandler::showSessionSettings() {
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (ImGui::TreeNode("Session Settings")) {
         ImGui::BeginDisabled(m_State == Recording);
-        if (ImGui::TreeNode("Settings")) {
-            ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-            ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
 
-            ImGui::Checkbox("Limit Frames", &m_LimitFrames);
+        ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
+        ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
 
-            ImGui::BeginDisabled(!m_LimitFrames);
-            ImGui::InputInt("Number of Frames", &m_FrameLimit, 1, 100);
-            if (m_FrameLimit < 0) {
-                m_FrameLimit = 0;
-                m_LimitFrames = false;
-            }
-            ImGui::EndDisabled();
+        ImGui::Checkbox("Limit Frames", &m_LimitFrames);
 
-            ImGui::Checkbox("Limit Time", &m_LimitTime);
-
-            ImGui::BeginDisabled(!m_LimitTime);
-            ImGui::InputInt("Number of Seconds", &m_TimeLimitInS, 1, 100);
-            if (m_TimeLimitInS < 0) {
-                m_TimeLimitInS = 0;
-                m_LimitTime = false;
-            }
-            ImGui::EndDisabled();
-            ImGui::TreePop();
+        ImGui::BeginDisabled(!m_LimitFrames);
+        ImGui::InputInt("Frame Limit", &m_FrameLimit, 1, 1000);
+        if (m_FrameLimit < 0) {
+            m_FrameLimit = 0;
+            m_LimitFrames = false;
         }
+        ImGui::EndDisabled();
 
-        if (ImGui::TreeNode("Name")) {
-            if (ImGui::Button("Update Session Name")) {
-                updateSessionName();
-            }
-            ImGui::InputText("Session Name", &m_SessionName, 60);
-            ImGui::TreePop();
+        ImGui::Checkbox("Limit Time", &m_LimitTime);
+
+        ImGui::BeginDisabled(!m_LimitTime);
+        ImGui::InputInt("Time Limit (s)", &m_TimeLimitInS, 1, 100);
+        if (m_TimeLimitInS < 0) {
+            m_TimeLimitInS = 0;
+            m_LimitTime = false;
         }
+        ImGui::EndDisabled();
 
         ImGui::EndDisabled();
         ImGui::TreePop();
@@ -395,13 +392,10 @@ void CameraHandler::stopRecording() {
 
     root["Cameras"] = cameras;
 
-    auto r = mp_PointCloud->getRotation();
-    auto t = mp_PointCloud->getTranslation();
-    float rotation[3] = { r.x, r.y, r.z };
-    float translation[3] = { t.x, t.y, t.z };
+    root["Rotation"] = mp_PointCloud->getRotation();
+    root["Translation"] = mp_PointCloud->getTranslation();
 
-    root["Rotation"] = rotation;
-    root["Translation"] = translation;
+    root["Session Parameters"] = (Json::Value)m_SessionParams;
 
     Json::StreamWriterBuilder builder;
     if (m_CamerasExist) {
