@@ -1,0 +1,15 @@
+\chapter{Introduction}
+\setcounter{page}{1}
+\begin{itemize}
+  \item Introduce human pose estimation
+  \item Introduce SilverFit and their goal
+  \item Introduce the problem (rewrite research question)
+\end{itemize}
+
+The code of this thesis is available at \href{https://github.com/LeonardoPohl/FESD}.
+
+\section{Research question}
+
+In this thesis, we try to find out if it is possible to develop a method that can tell if a joint produced by human pose estimation is potentially faulty. We try to achieve this by building a dataset using RGBD cameras from different angles.
+
+This project includes both the creation of the dataset as well as the data population with estimated human pose data and the training and evaluation of a model for fault estimation. The dataset contains different challenging scenarios, which make human pose detection more error-prone. These challenges include but are not limited to; lighting, background, clothing, accessories attached to the wrist and ankles, and proximity of the limbs to objects. We found that these have the largest effect on the performance of human pose estimation. 

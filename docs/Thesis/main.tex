@@ -1,15 +1,12 @@
-\documentclass[a4paper, twoside, english, 11pt]{lni}
-
+\documentclass[a4paper, twoside, 11pt]{mitthesis}
+\usepackage{lgrind}
 \input{utils/style}
 \begin{document}
 
 \input{utils/title}
-
-\cleardoublepage
-\tableofcontents
-
+\input{utils/contents}
 \input{utils/structure}
 
-\printbibliography
+\include{utils/biblio}
 
 \end{document}
