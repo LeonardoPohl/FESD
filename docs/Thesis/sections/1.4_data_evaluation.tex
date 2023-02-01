@@ -1,5 +1,38 @@
 \section{Data Evaluation}
 
+Next, we evaluate the recorded data and especially the detected skeleton. We focus specifically on the joints with a low confidence value. 
 
-%Next, we evaluate the recorded data and especially the detected skeleton. We focus specifically on the joints with a low confidence value. Since we have the skeleton data from two perspectives at the same time, we can compare the 3D coordinates of both streams. If we notice a missing joint, we can estimate its position using the same joint of the other stream, provided it has a relatively high confidence value. In other cases, we can improve the calculated skeleton, by forming a weighted average of the 3D coordinates based on the confidence of each Joint. Another step might be to update the 2D Coordinates of the skeleton but we might just leave that for future work. % TODO, will this be future work or should we do it now?
+We discard frames with lacking pose data from the training dataset, they are not usable to train a model. We might still use it for the testing phase. If we notice that the dataset is getting too small, we might re-record some sessions.
 
+\textit{\textbf{QUESTION} Should I discard frames with limited joints?}
+
+Additionally, while recording multiple people might be wrongly detected. However, in our experiments we only consider single person recordings. Therefore, we can discard other people from the data.
+
+The pseudo code for the data evaluation process can be seen in Listing \ref{lst::data_eval}. Most of the checks mentioned, such as \texttt{selectInvalidPeople} in Line 9 or \texttt{checkJointValidity} in Line 14 happen manually. However, the data processing is done automatically by the code to redue human error.
+
+\begin{lstlisting}[language=python,
+                    firstnumber=1,
+                    caption={[Pseudo code for data evaluation]{Pseudo code for data evaluation}},
+                    label={lst:data_eval}]
+  def data_evaluation(recording):
+    invalid_frames = []
+    for frame in recording:
+      if not frame:
+        invalid_frames.append(frame)
+        continue
+      else:
+        if len(frame.people) > 1:
+          invalid_people = frame.selectInvalidPeople()
+          frame.remove(invalid_people)
+
+        for joint in frame.people[0].skeleton:
+          if joint.confidence < CONFIDENCE_THRESHOLD:
+            checkJointValidity(joint)
+    
+    if len(invalid_frames) > INVALID_LIMIT:
+      return False
+    
+    recording.replace(invalid_frames, Null)
+
+    return True
+\end{lstlisting}
