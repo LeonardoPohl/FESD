@@ -1,5 +1,6 @@
 \chapter{Introduction}
 \setcounter{page}{1}
+
 \begin{itemize}
   \item Introduce human pose estimation
   \item Introduce SilverFit and their goal
@@ -13,3 +14,9 @@ The code of this thesis is available on GitHub \footnote{\url{https://github.com
 In this thesis, we try to find out if it is possible to develop a method that can tell if a joint produced by human pose estimation is potentially faulty. We try to achieve this by building a dataset using RGBD cameras from different angles.
 
 This project includes both the creation of the dataset as well as the data population with estimated human pose data and the training and evaluation of a model for fault estimation. The dataset contains different challenging scenarios, which make human pose detection more error-prone. These challenges include but are not limited to; lighting, background, clothing, accessories attached to the wrist and ankles, and proximity of the limbs to objects. We found that these have the largest effect on the performance of human pose estimation. 
+
+We aim to create software that allows us to record the RGBD data stream of multiple cameras and allows us to visualize the data. We also want to be able to extract the human pose data from the RGBD data stream and store it in a file. The software should also allow us to evaluate the data and filter out faulty data. Finally, we want to be able to augment the data to increase the size of the dataset.
+
+We then record the dataset with various scenarios. We record each scenario two to three times. To improve the quality of the dataset, we evaluate the data and filter out faulty data. We also augment the data to increase the size of the dataset.
+
+Finally, we develop a model that can be used to estimate if a joint is faulty or not. We use the dataset to train and evaluate the model. We use the evaluation results to determine if the model can estimate if a joint is faulty or not.
