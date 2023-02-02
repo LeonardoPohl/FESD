@@ -66,75 +66,13 @@ void CameraHandler::OnUpdate()
         return;
 
     if (m_State == Recording) {
-        m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
-
-        if (m_RecordedFrames > m_FrameLimit && m_LimitFrames) {
-            stopRecording();
-            return;
-        }
-
-        if (m_RecordedSeconds.count() > m_TimeLimitInS && m_LimitTime) {
-            stopRecording();
-            return;
-        }
-
-        m_RecordedFrames += 1;
-
-        if (m_StreamWhileRecording) {
-            mp_PointCloud->OnUpdate();
-            mp_PointCloud->OnRender();
-        }
-        else {
-            std::for_each(
-                std::execution::par,
-                m_DepthCameras.begin(), 
-                m_DepthCameras.end(), 
-                [](auto&& cam) 
-                {
-                    cam->saveFrame();
-                }
-            );
-        }
+        record();
     }
     else if (m_State == Streaming) {
-        mp_PointCloud->OnUpdate();
-        mp_PointCloud->OnRender();
-
-        for (auto cam : m_DepthCameras)
-        {
-            if (cam->m_IsEnabled && (m_ShowColorFrames || m_DoSkeletonDetection)) {
-                auto frame = cam->getColorFrame();
-                if (!frame.empty()) {
-                    if (m_DoSkeletonDetection) {
-                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
-                    }
-                    cv::imshow(cam->getCameraName(), frame);
-                }
-            }
-        }
+        stream();
     }
     else if (m_State == Playback) {
-
-        if (!m_PlaybackPaused) {
-            mp_PointCloud->OnUpdate();
-            mp_PointCloud->OnRender();
-        }
-
-        for (auto cam : m_DepthCameras)
-        {
-            if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
-                auto frame = cam->getColorFrame();
-                if (!frame.empty()) {
-                    if (m_DoSkeletonDetection) {
-                        m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
-                    }
-                    cv::imshow(cam->getCameraName(), frame);
-                }
-            }
-        }
-        if (!m_PlaybackPaused) {
-            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
-        }
+        playback();
     }
 }
 
@@ -172,7 +110,6 @@ void CameraHandler::OnImGuiRender()
     
     if (m_State == RecordingPre) {
         if (m_SessionParams.manipulateSessionParameters()) {
-            // TODO: add countdown
             startRecording();
         }
     }
@@ -183,8 +120,6 @@ void CameraHandler::OnImGuiRender()
         for (auto cam : m_DepthCameras) {
             ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_IsSelectedForRecording);
         }
-
-        showSessionSettings();
 
         if (m_State != Recording && ImGui::Button("Start Recording")) {
             m_State = RecordingPre;
@@ -240,53 +175,20 @@ void CameraHandler::OnImGuiRender()
     }
 }
 
-void CameraHandler::showSessionSettings() {
-    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-    if (ImGui::TreeNode("Session Settings")) {
-        ImGui::BeginDisabled(m_State == Recording);
-
-        ImGui::Checkbox("Stream While Recording", &m_StreamWhileRecording);
-        ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
-
-        ImGui::Checkbox("Limit Frames", &m_LimitFrames);
-
-        ImGui::BeginDisabled(!m_LimitFrames);
-        ImGui::InputInt("Frame Limit", &m_FrameLimit, 1, 1000);
-        if (m_FrameLimit < 0) {
-            m_FrameLimit = 0;
-            m_LimitFrames = false;
-        }
-        ImGui::EndDisabled();
-
-        ImGui::Checkbox("Limit Time", &m_LimitTime);
-
-        ImGui::BeginDisabled(!m_LimitTime);
-        ImGui::InputInt("Time Limit (s)", &m_TimeLimitInS, 1, 100);
-        if (m_TimeLimitInS < 0) {
-            m_TimeLimitInS = 0;
-            m_LimitTime = false;
-        }
-        ImGui::EndDisabled();
-
-        ImGui::EndDisabled();
-        ImGui::TreePop();
-    }
-}
-
 void CameraHandler::showRecordingStats() {
     ImGui::Begin("Session Stats");
 
     ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
     ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
 
-    if (m_LimitFrames && m_FrameLimit > 0) {
+    if (m_SessionParams.LimitFrames && m_SessionParams.FrameLimit > 0) {
         ImGui::Text("Frame Limit:");
-        ImGui::ProgressBar((float)m_RecordedFrames / (float)m_FrameLimit);
+        ImGui::ProgressBar((float)m_RecordedFrames / (float)m_SessionParams.FrameLimit);
     }
         
-    if (m_LimitTime && m_TimeLimitInS > 0) {
+    if (m_SessionParams.LimitTime && m_SessionParams.TimeLimitInS > 0) {
         ImGui::Text("Time Limit:");
-        ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_TimeLimitInS);
+        ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_SessionParams.TimeLimitInS);
     }
 
     if (ImGui::Button("Stop Recording")) {
@@ -353,7 +255,86 @@ void CameraHandler::startRecording() {
 
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
-    m_RecordingStart = std::chrono::system_clock::now();
+}
+
+void CameraHandler::record()
+{
+    if (m_SessionParams.countDown()) {
+        m_RecordingStart = std::chrono::system_clock::now();
+        return;
+    }
+    m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
+
+    if (m_RecordedFrames > m_SessionParams.FrameLimit && m_SessionParams.LimitFrames) {
+        stopRecording();
+        return;
+    }
+
+    if (m_RecordedSeconds.count() > m_SessionParams.TimeLimitInS && m_SessionParams.LimitTime) {
+        stopRecording();
+        return;
+    }
+
+    m_RecordedFrames += 1;
+
+    if (m_SessionParams.StreamWhileRecording) {
+        mp_PointCloud->OnUpdate();
+        mp_PointCloud->OnRender();
+    }
+    else {
+        std::for_each(
+            std::execution::par,
+            m_DepthCameras.begin(),
+            m_DepthCameras.end(),
+            [](auto&& cam)
+            {
+                cam->saveFrame();
+            }
+        );
+    }
+}
+
+void CameraHandler::stream()
+{
+    mp_PointCloud->OnUpdate();
+    mp_PointCloud->OnRender();
+
+    for (auto cam : m_DepthCameras)
+    {
+        if (cam->m_IsEnabled && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+            auto frame = cam->getColorFrame();
+            if (!frame.empty()) {
+                if (m_DoSkeletonDetection) {
+                    m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                }
+                cv::imshow(cam->getCameraName(), frame);
+            }
+        }
+    }
+}
+
+void CameraHandler::playback()
+{
+    if (!m_PlaybackPaused) {
+        mp_PointCloud->OnUpdate();
+        mp_PointCloud->OnRender();
+    }
+
+    for (auto cam : m_DepthCameras)
+    {
+        if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+            auto frame = cam->getColorFrame();
+            if (!frame.empty()) {
+                if (m_DoSkeletonDetection) {
+                    m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                }
+                cv::imshow(cam->getCameraName(), frame);
+            }
+        }
+    }
+    if (!m_PlaybackPaused) {
+        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+    }
 }
 
 #pragma warning(disable : 4996)

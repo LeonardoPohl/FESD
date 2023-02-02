@@ -22,10 +22,12 @@ public:
 	void OnUpdate();
 	void OnImGuiRender();
 private:
-	void showSessionSettings();
 	void showRecordingStats();
 	void showRecordings();
 	void startRecording();
+	void record();
+	void stream();
+	void playback();
 	void stopRecording();
 	void startPlayback(Json::Value recording);
 	void findRecordings();
@@ -57,11 +59,6 @@ private:
 	// Recording
 	std::string m_SessionName{ };
 	SessionParameters m_SessionParams{ };
-	bool m_StreamWhileRecording{ false };
-	bool m_LimitFrames{ false };
-	bool m_LimitTime{ true };
-	int m_FrameLimit{ 100 };
-	int m_TimeLimitInS{ 30 };
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingStart;
 	std::chrono::time_point<std::chrono::system_clock> m_RecordingEnd;
 	std::chrono::duration<double> m_RecordedSeconds;
