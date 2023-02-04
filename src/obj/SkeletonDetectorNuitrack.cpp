@@ -11,15 +11,44 @@ SkeletonDetectorNuitrack::SkeletonDetectorNuitrack(Logger::Logger* logger, std::
 {
 	mp_Logger->log("Initialising Nuitrack");
 	tdv::nuitrack::Nuitrack::init();
-	if (camera_type == RealSenseCamera::getType())
+	
+	if (camera_type == RealSenseCamera::getType()) {
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.FPS", "30");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.RawWidth", "1280");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.RawHeight", "720");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessWidth", "1280");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessHeight", "720");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessMaxDepth", "7000");
+
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.FPS", "30");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.RawWidth", "1280");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.RawHeight", "720");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessWidth", "1280");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessHeight", "720");
+
+		// post processing setting
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_alpha", "0.1");
+		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_delta", "50");
+
 		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.FileRecord", (m_RecordingDirectory / recordingPath).string());
-	else if (camera_type == OrbbecCamera::getType())
-		tdv::nuitrack::Nuitrack::setConfigValue("OrbbecAstra2Module.FileRecord", (m_RecordingDirectory / recordingPath).string());
+		//tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth2ColorRegistration", "true");
+	}
+	else if (camera_type == OrbbecCamera::getType()) {
+		tdv::nuitrack::Nuitrack::setConfigValue("OpenNIModule.FileRecord", (m_RecordingDirectory / recordingPath).string());
+	}
+	else {
+		return;
+	}
 
 	// Create Tracker
 	m_SkeletonTracker = tdv::nuitrack::SkeletonTracker::create();
 
-	tdv::nuitrack::Nuitrack::run();
+	try {
+		tdv::nuitrack::Nuitrack::run();
+	}
+	catch (const tdv::nuitrack::Exception& e) {
+		mp_Logger->log("Error running Nuitrack: " + std::to_string(*e.what()), Logger::Priority::ERR);
+	}
 }
 
 SkeletonDetectorNuitrack::~SkeletonDetectorNuitrack()
@@ -28,7 +57,7 @@ SkeletonDetectorNuitrack::~SkeletonDetectorNuitrack()
 }
 
 void SkeletonDetectorNuitrack::update() {
-	tdv::nuitrack::Nuitrack::update();
+	//tdv::nuitrack::Nuitrack::update();
 
 	// Update Tracker
 	try {

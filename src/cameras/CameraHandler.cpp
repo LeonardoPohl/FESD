@@ -82,6 +82,24 @@ void CameraHandler::OnImGuiRender()
         showRecordingStats();
         return;
     }
+    
+    showGeneralGui();    
+    showRecordingGui();    
+    showPlaybackGui();
+
+    if (m_CamerasExist) {
+        for (auto cam : m_DepthCameras) {
+            cam->CameraSettings();
+        }
+
+        ImGui::Begin("PointCloud");
+        mp_PointCloud->OnImGuiRender();
+        ImGui::End();
+    }
+}
+
+void CameraHandler::showGeneralGui()
+{
     ImGui::Begin("Camera Handler");
 
     if (ImGui::Button("Init Cameras") && m_State != Playback) {
@@ -107,28 +125,46 @@ void CameraHandler::OnImGuiRender()
     }
 
     ImGui::End();
-    
+}
+
+void CameraHandler::showRecordingGui()
+{
     if (m_State == RecordingPre) {
         if (m_SessionParams.manipulateSessionParameters()) {
+            m_State = Countdown;
+        }
+    }
+
+    if (m_State == Countdown) {
+        if (m_SessionParams.countDown()) {
             startRecording();
         }
     }
 
     if (m_CamerasExist && m_State != Playback) {
         ImGui::Begin("Recorder");
-
+        ImGui::BeginDisabled(m_State == RecordingPre);
         for (auto cam : m_DepthCameras) {
             ImGui::Checkbox(("Record " + cam->getCameraName()).c_str(), &cam->m_IsSelectedForRecording);
         }
 
-        if (m_State != Recording && ImGui::Button("Start Recording")) {
+        if (m_State != RecordingPre && ImGui::Button("Start Recording Prep")) {
             m_State = RecordingPre;
         }
+        ImGui::EndDisabled();
+
+        if (m_State == RecordingPre && ImGui::Button("Stop Recording Prep")) {
+            m_State = Streaming;
+        }
+
         ImGui::End();
     }
-    
+}
+
+void CameraHandler::showPlaybackGui()
+{
     ImGui::Begin("Recorded Sessions");
-    
+
     if (m_State == Playback) {
         ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
     }
@@ -164,15 +200,6 @@ void CameraHandler::OnImGuiRender()
     ImGui::EndDisabled();
 
     ImGui::End();
-    if (m_CamerasExist) {
-        for (auto cam : m_DepthCameras) {
-            cam->CameraSettings();
-        }
-
-        ImGui::Begin("PointCloud");
-        mp_PointCloud->OnImGuiRender();
-        ImGui::End();
-    }
 }
 
 void CameraHandler::showRecordingStats() {

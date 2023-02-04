@@ -70,12 +70,12 @@ public:
 
 	bool countDown() {
 		if (CountdownInS <= (std::chrono::system_clock::now() - CountdownStart).count())
-			return false;
+			return true;
 		ImGui::Begin("Countdown");
 		ImGui::ProgressBar((double)CountdownInS / (std::chrono::system_clock::now() - CountdownStart).count());
 		ImGui::End();
 
-		return true;
+		return false;
 	}
 
 	bool StreamWhileRecording{ false };

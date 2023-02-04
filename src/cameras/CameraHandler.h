@@ -23,8 +23,13 @@ public:
 	void OnUpdate();
 	void OnImGuiRender();
 private:
+	void showGeneralGui();
+	void showRecordingGui();
+	void showPlaybackGui();
+
 	void showRecordingStats();
 	void showRecordings();
+
 	void startRecording();
 	void record();
 	void stream();
@@ -42,6 +47,7 @@ private:
 	enum State {
 		Streaming,
 		RecordingPre,
+		Countdown,
 		Recording,
 		Playback
 	};
