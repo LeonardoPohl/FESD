@@ -30,7 +30,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
-    m_SkeletonDetector = std::make_unique<SkeletonDetector>(mp_Logger);
+    m_SkeletonDetectorOpenPose = std::make_unique<SkeletonDetectorOpenPose>(mp_Logger);
 
 }
 
@@ -154,7 +154,7 @@ void CameraHandler::OnImGuiRender()
         int i = 0;
         for (auto rec : m_Recordings) {
             std::cout << i++ << "/" << m_Recordings.size() << "\r";
-            calculateSkeletons(rec);
+            calculateSkeletonsNuitrack(rec);
         }
 
         mp_Logger->log("Skeleton detection done for all recordings");
@@ -305,7 +305,7 @@ void CameraHandler::stream()
             auto frame = cam->getColorFrame();
             if (!frame.empty()) {
                 if (m_DoSkeletonDetection) {
-                    m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                    m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                 }
                 cv::imshow(cam->getCameraName(), frame);
             }
@@ -326,7 +326,7 @@ void CameraHandler::playback()
             auto frame = cam->getColorFrame();
             if (!frame.empty()) {
                 if (m_DoSkeletonDetection) {
-                    m_SkeletonDetector->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                    m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                 }
                 cv::imshow(cam->getCameraName(), frame);
             }
@@ -458,7 +458,41 @@ void CameraHandler::clearCameras() {
     m_CamerasExist = false;
 }
 
-void CameraHandler::calculateSkeletons(Json::Value recording) {
+void CameraHandler::calculateSkeletonsNuitrack(Json::Value recording) {
+    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
+
+    for (auto camera : recording["Cameras"]) {
+        if (camera["Type"].asString() != RealSenseCamera::getType() &&
+            camera["Type"].asString() != OrbbecCamera::getType()) {
+            mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::ERR);
+            return;
+        }
+
+        m_SkeletonDetectorNuitrack = std::make_unique<SkeletonDetectorNuitrack>(mp_Logger, camera["FileName"].asString(), camera["Type"].asString());
+        m_SkeletonDetectorNuitrack->startRecording(recording["Name"].asString());
+        m_CurrentPlaybackFrame = 0;
+
+        for (; m_CurrentPlaybackFrame < m_TotalPlaybackFrames; m_CurrentPlaybackFrame++) {
+            m_SkeletonDetectorNuitrack->update();
+        }
+
+        m_SkeletonDetectorNuitrack->stopRecording();
+    }
+
+    recording["SkeletonCalculated"] = true;
+
+    auto configPath = m_RecordingDirectory / recording["Name"].asString();
+    configPath += ".json";
+    std::fstream configJson(configPath, std::ios::out);
+
+    Json::StreamWriterBuilder builder;
+    configJson << Json::writeString(builder, recording);
+    configJson.close();
+
+    clearCameras();
+}
+
+void CameraHandler::calculateSkeletonsOpenpose(Json::Value recording) {
     startPlayback(recording);
 
     if (!m_CamerasExist) {
@@ -466,7 +500,7 @@ void CameraHandler::calculateSkeletons(Json::Value recording) {
         return;
     }
 
-    m_SkeletonDetector->startRecording(recording["Name"].asString());
+    m_SkeletonDetectorOpenPose->startRecording(recording["Name"].asString());
 
     for (;m_CurrentPlaybackFrame < m_TotalPlaybackFrames; m_CurrentPlaybackFrame++) {
         for (auto cam : m_DepthCameras) {
@@ -478,11 +512,11 @@ void CameraHandler::calculateSkeletons(Json::Value recording) {
                 cv::imshow("Processing Skeleton", frame_to_process);
                 std::cout << "Frame at " << m_CurrentPlaybackFrame << std::endl;
             }
-            m_SkeletonDetector->saveFrame(frame_to_process, cam->getCameraName());
+            m_SkeletonDetectorOpenPose->saveFrame(frame_to_process);
         }
     }
 
-    m_SkeletonDetector->stopRecording();
+    m_SkeletonDetectorOpenPose->stopRecording();
 
     recording["SkeletonCalculated"] = true;
 

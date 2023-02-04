@@ -9,7 +9,8 @@
 
 #include "DepthCamera.h"
 #include "obj/Logger.h"
-#include "obj/SkeletonDetector.h"
+#include "obj/SkeletonDetectorOpenPose.h"
+#include "obj/SkeletonDetectorNuitrack.h"
 #include "obj/SessionParameters.h"
 
 class CameraHandler
@@ -31,7 +32,9 @@ private:
 	void stopRecording();
 	void startPlayback(Json::Value recording);
 	void findRecordings();
-	void calculateSkeletons(Json::Value recording);
+
+	void calculateSkeletonsNuitrack(Json::Value recording);
+	void calculateSkeletonsOpenpose(Json::Value recording);
 
 	void clearCameras();
 	void updateSessionName();
@@ -74,6 +77,7 @@ private:
 	bool m_DoSkeletonDetection{ false };
 	float m_ScoreThreshold{ 0.0f };
 	bool m_ShowUncertainty{ false };
-	std::unique_ptr<SkeletonDetector> m_SkeletonDetector;
+	std::unique_ptr<SkeletonDetectorOpenPose> m_SkeletonDetectorOpenPose;
+	std::unique_ptr<SkeletonDetectorNuitrack> m_SkeletonDetectorNuitrack;
 };
 

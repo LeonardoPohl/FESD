@@ -9,16 +9,16 @@
 
 #include "Logger.h"
 
-class SkeletonDetector
+class SkeletonDetectorOpenPose
 {
 public:
-	SkeletonDetector(Logger::Logger *logger);
+	SkeletonDetectorOpenPose(Logger::Logger *logger);
 
 	op::Array<float> calculateSkeleton(cv::Mat frame_to_process);
 	void drawSkeleton(cv::Mat &frame_to_process, float score_threshold = 0.0f, bool show_uncertainty = false);
 
 	void startRecording(std::string sessionName);
-	void saveFrame(cv::Mat frame_to_process, std::string cameraName);
+	void saveFrame(cv::Mat frame_to_process);
 	void stopRecording();
 private:
 	Logger::Logger *mp_Logger;

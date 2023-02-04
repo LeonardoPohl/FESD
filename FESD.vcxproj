@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)third-party\openpose\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\include;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third-party\openpose\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\include;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\include;$(SolutionDir)third-party\nuitrack-sdk\Nuitrack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -157,8 +157,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\openpose\build\src\openpose\Release;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\x64\vc15\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;freeglut.lib;glog.lib;gflags.lib;caffe.lib;caffeproto.lib;opencv_world450.lib;openpose.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\openpose\build\src\openpose\Release;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\x64\vc15\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\lib;$(SolutionDir)third-party\nuitrack-sdk\Nuitrack\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;freeglut.lib;glog.lib;gflags.lib;caffe.lib;caffeproto.lib;opencv_world450.lib;openpose.lib;middleware.lib;nuitrack.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,7 +167,8 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
     <ClCompile Include="src\cameras\RealSenseCamera.cpp" />
-    <ClCompile Include="src\obj\SkeletonDetector.cpp" />
+    <ClCompile Include="src\obj\SkeletonDetectorNuitrack.cpp" />
+    <ClCompile Include="src\obj\SkeletonDetectorOpenPose.cpp" />
     <ClCompile Include="src\utilities\helper\GLFWHelper.cpp" />
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp" />
   </ItemGroup>
@@ -200,7 +201,8 @@
     <ClInclude Include="src\cameras\OrbbecCamera.h" />
     <ClInclude Include="src\cameras\RealsenseCamera.h" />
     <ClInclude Include="src\obj\SessionParameters.h" />
-    <ClInclude Include="src\obj\SkeletonDetector.h" />
+    <ClInclude Include="src\obj\SkeletonDetectorNuitrack.h" />
+    <ClInclude Include="src\obj\SkeletonDetectorOpenPose.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />
@@ -210,6 +212,62 @@
     <ClInclude Include="src\utilities\Status.h" />
     <ClInclude Include="src\utilities\Utils.h" />
     <ClInclude Include="src\utilities\WindowInfo.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\middleware\DepthProviderAdapterAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\ColorSensor_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\DepthSensor_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\GestureRecognizer_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\HandTracker_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\IOS_StructureCallbackProvider_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\IssueTracker_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\NuitrackDevice_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\NuitrackModule_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\Nuitrack_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\Public_Nuitrack_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\SkeletonTracker_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\UserTracker_CAPI.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\middleware\android\NuitrackManager.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\middleware\android\USBGateKeeper.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\ColorSensor.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\DepthSensor.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\GestureRecognizer.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\HandTracker.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\HeaderOnlyAPI_Module.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\Module.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\NuitrackModule.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\SkeletonTracker.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\UserTracker.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\Nuitrack.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\BoundingBox.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Color3.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\DepthFrame.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Error.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Export.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Frame.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\FrameBorderIssue.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Gesture.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\GestureData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Hand.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\HandTrackerData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Human.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\HumanData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Issue.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\IssuesData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\NuitrackDevice.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\NuitrackDeviceCommon.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\ObjectData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\OcclusionIssue.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Orientation.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\OutputMode.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\RGBFrame.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\RGBMark.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\SensorIssue.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Skeleton.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\SkeletonData.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\User.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\UserFrame.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Vector3.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\utils\CallbackStruct.h" />
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\utils\ExceptionTranslator.h" />
     <ClInclude Include="third-party\OpenNI_SDK\Include\OpenNI.h" />
   </ItemGroup>
   <ItemGroup>

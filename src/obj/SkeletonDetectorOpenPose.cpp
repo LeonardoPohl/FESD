@@ -1,4 +1,4 @@
-#include "SkeletonDetector.h"
+#include "SkeletonDetectorOpenPose.h"
 
 #define OPENPOSE_FLAGS_DISABLE_POSE
 #include <openpose/flags.hpp>
@@ -8,14 +8,14 @@
 #include "utilities/Consts.h"
 #include "utilities/Utils.h"
 
-SkeletonDetector::SkeletonDetector(Logger::Logger* logger) : mp_Logger(logger)
+SkeletonDetectorOpenPose::SkeletonDetectorOpenPose(Logger::Logger* logger) : mp_Logger(logger)
 {
     // Starting OpenPose
     mp_Logger->log("Starting openpose thread(s)");
     m_OPWrapper.start();
 }
 
-op::Array<float> SkeletonDetector::calculateSkeleton(cv::Mat frame_to_process)
+op::Array<float> SkeletonDetectorOpenPose::calculateSkeleton(cv::Mat frame_to_process)
 {
     const op::Matrix imageToProcess = OP_CV2OPCONSTMAT(frame_to_process);
     auto datumProcessed = m_OPWrapper.emplaceAndPop(imageToProcess);
@@ -31,7 +31,7 @@ op::Array<float> SkeletonDetector::calculateSkeleton(cv::Mat frame_to_process)
     }
 }
 
-void SkeletonDetector::drawSkeleton(cv::Mat& frame_to_process, float score_threshold, bool show_uncertainty)
+void SkeletonDetectorOpenPose::drawSkeleton(cv::Mat& frame_to_process, float score_threshold, bool show_uncertainty)
 {
     auto key_points = calculateSkeleton(frame_to_process);
 
@@ -58,13 +58,13 @@ void SkeletonDetector::drawSkeleton(cv::Mat& frame_to_process, float score_thres
     }
 }
 
-void SkeletonDetector::startRecording(std::string sessionName)
+void SkeletonDetectorOpenPose::startRecording(std::string sessionName)
 {
-    m_RecordingPath = m_RecordingDirectory / (getFileSafeSessionName(sessionName) + "_Skeleton.json");
+    m_RecordingPath = m_RecordingDirectory / (getFileSafeSessionName(sessionName) + "_OPSkeleton.json");
     m_Skeletons.clear();
 }
 
-void SkeletonDetector::saveFrame(cv::Mat frame_to_process, std::string cameraName)
+void SkeletonDetectorOpenPose::saveFrame(cv::Mat frame_to_process)
 {
     auto key_points = calculateSkeleton(frame_to_process);
 
@@ -93,7 +93,7 @@ void SkeletonDetector::saveFrame(cv::Mat frame_to_process, std::string cameraNam
     m_Skeletons.append(people);
 }
 
-void SkeletonDetector::stopRecording()
+void SkeletonDetectorOpenPose::stopRecording()
 {
     std::fstream configJson(m_RecordingPath, std::ios::out);
     Json::Value root;

@@ -54,7 +54,10 @@
     <ClCompile Include="src\utilities\helper\ImGuiHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\obj\SkeletonDetector.cpp">
+    <ClCompile Include="src\obj\SkeletonDetectorOpenPose.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\obj\SkeletonDetectorNuitrack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,13 +150,184 @@
     <ClInclude Include="src\utilities\CMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\obj\SkeletonDetector.h">
+    <ClInclude Include="src\obj\SkeletonDetectorOpenPose.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\utilities\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\obj\SessionParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\obj\SkeletonDetectorNuitrack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\middleware\DepthProviderAdapterAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\ColorSensor_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\DepthSensor_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\GestureRecognizer_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\HandTracker_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\IOS_StructureCallbackProvider_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\IssueTracker_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\Nuitrack_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\NuitrackDevice_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\NuitrackModule_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\Public_Nuitrack_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\SkeletonTracker_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\capi\UserTracker_CAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\middleware\android\NuitrackManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\middleware\android\USBGateKeeper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\ColorSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\DepthSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\GestureRecognizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\HandTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\HeaderOnlyAPI_Module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\Module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\NuitrackModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\SkeletonTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\modules\UserTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\BoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Color3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\DepthFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\FrameBorderIssue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Gesture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\GestureData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Hand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\HandTrackerData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Human.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\HumanData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Issue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\IssuesData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\NuitrackDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\NuitrackDeviceCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\ObjectData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\OcclusionIssue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Orientation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\OutputMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\RGBFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\RGBMark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\SensorIssue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Skeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\SkeletonData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\User.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\UserFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\types\Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\utils\CallbackStruct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\utils\ExceptionTranslator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\nuitrack-sdk\Nuitrack\include\nuitrack\Nuitrack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
