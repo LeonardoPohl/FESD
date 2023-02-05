@@ -65,11 +65,11 @@ void CameraHandler::OnUpdate()
     if (!m_CamerasExist)
         return;
 
-    if (m_State == Recording) {
-        record();
-    }
-    else if (m_State == Streaming) {
+    if (m_State == Streaming) {
         stream();
+    }
+    else if (m_State == Recording) {
+        record();
     }
     else if (m_State == Playback) {
         playback();
@@ -81,6 +81,9 @@ void CameraHandler::OnImGuiRender()
     if (m_State == Recording) {
         showRecordingStats();
         return;
+    }
+    else if (m_State == Countdown) {
+        countdown();
     }
     
     showGeneralGui();    
@@ -131,13 +134,7 @@ void CameraHandler::showRecordingGui()
 {
     if (m_State == RecordingPre) {
         if (m_SessionParams.manipulateSessionParameters()) {
-            m_State = Countdown;
-        }
-    }
-
-    if (m_State == Countdown) {
-        if (m_SessionParams.countDown()) {
-            startRecording();
+            initRecording();
         }
     }
 
@@ -271,25 +268,35 @@ void CameraHandler::showRecordings() {
     }
 }
 
-void CameraHandler::startRecording() {
-    mp_Logger->log("Starting recording");
-    m_State = Recording;
-    
+void CameraHandler::initRecording() {
+    mp_Logger->log("Initialise recording");
     for (auto cam : m_DepthCameras) {
         cam->m_IsEnabled = true;
         cam->startRecording(getFileSafeSessionName(m_SessionName));
     }
 
+    countdown();
+}
+
+void CameraHandler::countdown() {
+    m_State = Countdown;
+    if (m_SessionParams.countDown()) {
+        startRecording();
+    }
+}
+
+void CameraHandler::startRecording() {
+    mp_Logger->log("Starting recording");
+    m_State = Recording;
+
     m_RecordedFrames = 0;
     m_RecordedSeconds = std::chrono::duration<double>::zero();
+    m_RecordingStart = std::chrono::system_clock::now();
 }
+
 
 void CameraHandler::record()
 {
-    if (m_SessionParams.countDown()) {
-        m_RecordingStart = std::chrono::system_clock::now();
-        return;
-    }
     m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
 
     if (m_RecordedFrames > m_SessionParams.FrameLimit && m_SessionParams.LimitFrames) {
@@ -319,6 +326,7 @@ void CameraHandler::record()
             }
         );
     }
+     
 }
 
 void CameraHandler::stream()

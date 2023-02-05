@@ -30,10 +30,14 @@ private:
 	void showRecordingStats();
 	void showRecordings();
 
+	void initRecording();
+	void countdown();
 	void startRecording();
+
 	void record();
 	void stream();
 	void playback();
+
 	void stopRecording();
 	void startPlayback(Json::Value recording);
 	void findRecordings();

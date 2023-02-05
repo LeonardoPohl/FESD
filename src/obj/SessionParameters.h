@@ -45,7 +45,6 @@ public:
 		ImGui::SliderInt("Countdown in S", &CountdownInS, 0, 10);
 
 		if (ImGui::Button("Begin Recording")) {
-			CountdownStart = std::chrono::system_clock::now();
 			return true;
 		}
 		ImGui::End();
@@ -68,11 +67,26 @@ public:
 		return val;
 	}
 
+	/// <summary>
+	/// Display a countdown before starting to record
+	/// </summary>
+	/// <returns>
+	/// True - If the countdown is over and False - If the coundown is running
+	/// </returns>
 	bool countDown() {
-		if (CountdownInS <= (std::chrono::system_clock::now() - CountdownStart).count())
+		if (!CountdownStarted) {
+			CountdownStarted = true;
+			CountdownStart = std::chrono::system_clock::now();
+		}
+
+		if (CountdownInS == 0 ||
+			CountdownInS <= std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - CountdownStart).count()) {
+			CountdownStarted = false;
 			return true;
+		}
+
 		ImGui::Begin("Countdown");
-		ImGui::ProgressBar((double)CountdownInS / (std::chrono::system_clock::now() - CountdownStart).count());
+		ImGui::ProgressBar(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - CountdownStart).count() / (double)CountdownInS);
 		ImGui::End();
 
 		return false;
@@ -90,10 +104,12 @@ private:
 	bool Dark_Clothing{ true };
 	bool Holding_Weight{ false };
 	bool Ankle_Weight{ false };
+	
 
 	float Height{ 1.8f };
 	float Angle{ 20.0 };
 
-	int CountdownInS;
+	bool CountdownStarted{ false };
+	int CountdownInS{ 10 };
 	std::chrono::time_point<std::chrono::system_clock> CountdownStart;
 };
