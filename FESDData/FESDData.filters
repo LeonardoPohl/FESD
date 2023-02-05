@@ -92,7 +92,6 @@
     <None Include="packages.config" />
     <None Include="imgui.ini" />
     <None Include="resources\shaders\PointCloud\PointCloud.vert" />
-    <None Include="src\fesd.ipynb" />
     <None Include="resources\shaders\PointCloud\PointCloud.frag" />
   </ItemGroup>
   <ItemGroup>

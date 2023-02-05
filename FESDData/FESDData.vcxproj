@@ -22,10 +22,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1eb587f7-3e82-48c8-b562-c1ee46bf488b}</ProjectGuid>
+    <ProjectGuid>{82485C3F-7F8B-4D8A-BEBD-4A9F21C32D54}</ProjectGuid>
     <RootNamespace>OpenniAdventures</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>FESD</ProjectName>
+    <ProjectName>FESDData</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -80,13 +80,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -131,13 +131,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Dependencies\GLFW\include;$(ProjectDir)third-party\OpenGL;$(ProjectDir)src;$(ProjectDir)third-party\OpenNI_SDK\Include;$(ProjectDir)Dependencies\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)Dependencies\GLEW\lib\Release\x64;$(ProjectDir)Dependencies\GLFW\lib-vc2022;$(ProjectDir)third-party\OpenNI_SDK\libs;$(ProjectDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)third-party\openpose\include;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)third-party\OpenGL;$(SolutionDir)src;$(SolutionDir)third-party\OpenNI_SDK\Include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\include;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\include;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\include;$(SolutionDir)third-party\nuitrack-sdk\Nuitrack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)third-party\openpose\include;$(ProjectDir)Dependencies\GLFW\include;$(ProjectDir)third-party\OpenGL;$(ProjectDir)src;$(ProjectDir)third-party\OpenNI_SDK\Include;$(ProjectDir)Dependencies\GLEW\include;$(ProjectDir)third-party\openpose\3rdparty\windows\opencv\include;$(ProjectDir)third-party\openpose\3rdparty\windows\caffe\include;$(ProjectDir)third-party\openpose\3rdparty\windows\caffe3rdparty\include;$(ProjectDir)third-party\openpose\3rdparty\windows\freeglut\include;$(ProjectDir)third-party\openpose\3rdparty\windows\spinnaker\include;$(ProjectDir)third-party\nuitrack-sdk\Nuitrack\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -157,7 +157,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)third-party\openpose\build\src\openpose\Release;$(SolutionDir)third-party\OpenNI_SDK\libs;$(SolutionDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);$(SolutionDir)third-party\openpose\3rdparty\windows\opencv\x64\vc15\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\freeglut\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe3rdparty\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\caffe\lib;$(SolutionDir)third-party\openpose\3rdparty\windows\spinnaker\lib;$(SolutionDir)third-party\nuitrack-sdk\Nuitrack\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)Dependencies\GLEW\lib\Release\x64;$(ProjectDir)Dependencies\GLFW\lib-vc2022;$(ProjectDir)third-party\openpose\build\src\openpose\Release;$(ProjectDir)third-party\OpenNI_SDK\libs;$(ProjectDir)third-party\OpenGL\bin\$(Platform)\$(Configuration);$(ProjectDir)third-party\openpose\3rdparty\windows\opencv\x64\vc15\lib;$(ProjectDir)third-party\openpose\3rdparty\windows\freeglut\lib;$(ProjectDir)third-party\openpose\3rdparty\windows\caffe3rdparty\lib;$(ProjectDir)third-party\openpose\3rdparty\windows\caffe\lib;$(ProjectDir)third-party\openpose\3rdparty\windows\spinnaker\lib;$(ProjectDir)third-party\nuitrack-sdk\Nuitrack\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;OpenGL.lib;OpenNI2.lib;freeglut.lib;glog.lib;gflags.lib;caffe.lib;caffeproto.lib;opencv_world450.lib;openpose.lib;middleware.lib;nuitrack.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -174,12 +174,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="docs\Orbbec\en\0000_Overview.md" />
-    <None Include="docs\Orbbec\en\0100_Installation.md" />
-    <None Include="docs\Orbbec\en\0200_Code samples.md" />
-    <None Include="docs\Orbbec\en\0300_SDK knowledge base.md" />
-    <None Include="docs\Orbbec\en\0400_API.md" />
-    <None Include="docs\Orbbec\en\0500_Product Support.md" />
     <None Include="imgui.ini">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -187,7 +181,6 @@
     <None Include="Readme.md" />
     <None Include="resources\shaders\PointCloud\PointCloud.frag" />
     <None Include="resources\shaders\PointCloud\PointCloud.vert" />
-    <None Include="src\fesd.ipynb" />
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
