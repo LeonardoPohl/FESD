@@ -15,11 +15,7 @@
 % -----------------------
 \setcounter{tocdepth}{2}
 
-%\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm, bindingoffset=1.5cm, head=15pt}
-
-%\usepackage{plain}
-%\usepackage[numbib,notlof,notlot,nottoc]{tocbibind}
-%\pagenumbering{gobble}
+\pagenumbering{gobble}
 % -----------------------
 
 % -----------------------
@@ -28,10 +24,10 @@
 \usepackage{xcolor}
 
 \definecolor{uniBlue}{rgb}{0,0.07,0.35}
-\sectionfont{\color{uniBlue}}
-\subsectionfont{\color{uniBlue}}
-\subsubsectionfont{\color{uniBlue}}
-\paragraphfont{\color{uniBlue}}
+%\sectionfont{\color{uniBlue}}
+%\subsectionfont{\color{uniBlue}}
+%\subsubsectionfont{\color{uniBlue}}
+%\paragraphfont{\color{uniBlue}}
 
 % -----------------------		
 %\AddToHook{cmd/section/before}{\cleardoublepage}
@@ -48,6 +44,11 @@
 \definecolor{delim}{RGB}{20,105,176}
 \colorlet{numb}{magenta!60!black}
 
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+
 \lstdefinelanguage{python}{
     basicstyle=\linespread{1}\small\normalfont\ttm,
     morekeywords={self},              % Add keywords here
@@ -58,10 +59,6 @@
     frame=tb,                         % Any extra options here
     showstringspaces=false
 }
-
-\definecolor{deepblue}{rgb}{0,0,0.5}
-\definecolor{deepred}{rgb}{0.6,0,0}
-\definecolor{deepgreen}{rgb}{0,0.5,0}
 
 % Python style for highlighting
 \newcommand\pythonstyle{\lstset{

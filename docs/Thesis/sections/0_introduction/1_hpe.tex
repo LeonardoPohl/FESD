@@ -1,3 +1,33 @@
 \section{Human pose estimation}
 
+To interact with computers humans have come up with a plethora of methods. Ranging from early punch cards to modern touch screens, the methods have evolved to be more natural and intuitive. In recent years, the use of cameras to interact with computers has become more popular, since they require no physical contact and can make the use of computer systems seamless when developed properly.
+
+In this section, we discuss some of the methods that have been used to extract the pose of a human from videos of different formats. We also discuss possible applications of human pose estimation.
+
+In a later section, we go into more detail about the method we used to extract the pose and what factors influence the result of the pose estimation. 
+
+\subsection{Human Pose Estimation methods}
+
+There are many methods to estimate the pose of a human using different types of cameras and resulting in different types of output. Firstly, the source of the video can be either an RGB camera or a depth camera, which usually results in RGBD videos or frames. RGBD frames are normal color frames with additional depth information. The depth information can improve the accuracy of the pose estimation by adding more information that can be used to understand the structure of the scene. For example, to separate the person from the background is easier using depth information than using solely RGB data.
+
+However, RGB cameras are far more widely spread and generally cheaper than depth cameras. Hence, most methods use RGB cameras to estimate the pose of a human.
+
+Tianxu Xu, et.al have created a very good review of different point cloud-based methods for human pose estimation\cite{hpeReview2021}. In their review, they describe three different approaches to estimating the pose of a human; Template-based, Feature-based, and Machine Learning-based methods.
+
+For more details please refer to their review, it is a very good read which goes into a lot of detail.
+
+\subsubsection{Template-based methods}
+
+\subsubsection{Feature-based methods}
+
+\subsubsection{Machine Learning-based methods}
+
+Notable examples of Machine Learning-based methods are OpenPose\cite{openpose}, AlphaPose\cite{alphapose}, and NuiTrack\cite{nuitrack}.
+
+\subsection{Depth cameras}
+
+As mentioned earlier, human pose estimation generally works based on visual information. However, the use of depth cameras offers more detailed information about the scene, which can in turn improve the reliability of the pose estimation.
+
 \subsection{Applications}
+
+
