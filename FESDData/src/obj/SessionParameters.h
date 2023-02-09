@@ -5,18 +5,18 @@
 #include <json/json.h>
 
 #include "utilities/helper/ImGuiHelper.h"
+#include "Exercise.h"
 
 class SessionParameters {
 public:
 	bool manipulateSessionParameters() {
 		ImGui::Begin("Session Parameters");
-		ImGui::Checkbox("Sitting", &Sitting);
+
+		exercise.imguiExercise();
+
 		ImGui::Checkbox("Background close", &Background_Close);
 		ImGui::Checkbox("Cramped", &Cramped);
 		ImGui::Checkbox("Dark Clothing", &Dark_Clothing);
-		ImGui::Checkbox("Holding Weight", &Holding_Weight);
-		ImGui::Checkbox("Ankle Weight", &Ankle_Weight);
-		ImGui::InputText("Exercise", Exercise, 100);
 		ImGui::Separator();
 
 		ImGui::Checkbox("Stream While Recording", &StreamWhileRecording);
@@ -56,15 +56,12 @@ public:
 	explicit operator Json::Value () const {
 		Json::Value val;
 
-		val["Sitting"] = Sitting;
 		val["Background close"] = Background_Close;
 		val["Cramped"] = Cramped;
 		val["Dark Clothing"] = Dark_Clothing;
-		val["Holding Weight"] = Holding_Weight;
-		val["Ankle Weight"] = Ankle_Weight;
 		val["Height"] = Height;
 		val["Angle"] = Angle;
-		val["Exercise"] = Exercise;
+		val["Exercise"] = (Json::Value)exercise;
 
 		return val;
 	}
@@ -100,19 +97,16 @@ public:
 	int FrameLimit{ 100 };
 	int TimeLimitInS{ 20 };
 private:
-	bool Sitting{ false };
 	bool Background_Close{ true };
 	bool Cramped{ false };
 	bool Dark_Clothing{ true };
-	bool Holding_Weight{ false };
-	bool Ankle_Weight{ false };
 
-	char Exercise[100];
+	Exercise exercise{ };
 
-	float Height{ 1.8f };
+	float Height{ 1.75f };
 	float Angle{ 20.0 };
 
 	bool CountdownStarted{ false };
-	int CountdownInS{ 10 };
+	int CountdownInS{ 5 };
 	std::chrono::time_point<std::chrono::system_clock> CountdownStart;
 };

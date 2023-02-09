@@ -85,10 +85,10 @@ void SkeletonDetectorNuitrack::update() {
 			
 			joint_json["u"] = joint.proj.x;
 			joint_json["v"] = joint.proj.y;
-			
-			joint_json["x"] = joint.proj.x;
-			joint_json["y"] = joint.proj.y;
-			joint_json["z"] = joint.proj.z;
+
+			joint_json["x"] = joint.real.x;
+			joint_json["y"] = joint.real.y;
+			joint_json["z"] = joint.real.z;
 			
 			joint_json["score"] = joint.confidence;
 			
