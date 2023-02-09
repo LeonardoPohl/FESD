@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="FESDModel.py" />
+    <Compile Include="src\recording.py" />
+    <Compile Include="src\skeleton.py" />
+    <Compile Include="src\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
@@ -37,6 +40,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="src\__pycache__\recording.cpython-39.pyc" />
+    <Content Include="src\__pycache__\__init__.cpython-39.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\" />
+    <Folder Include="src\__pycache__\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

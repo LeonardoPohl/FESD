@@ -1,3 +1,8 @@
 import numpy as np
+from src import Recording, get_recordings
 
-recording_dir = 'H:\Recordings'
+
+if __name__ == "__main__":
+  recordings = get_recordings()
+  for rec in recordings:
+    print(rec.name)
