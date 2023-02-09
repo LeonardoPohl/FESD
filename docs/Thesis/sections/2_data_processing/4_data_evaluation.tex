@@ -9,7 +9,7 @@ We discard frames with lacking pose data from the training dataset, they are not
 
 Additionally, while recording multiple people might be wrongly detected. However, in our experiments we only consider single person recordings. Therefore, we can discard other people from the data.
 
-The pseudo code for the data evaluation process can be seen in Listing \ref{lst::data_eval}. Most of the checks mentioned, such as \texttt{selectInvalidPeople} in Line 9 or \texttt{checkJointValidity} in Line 14 happen manually. However, the data processing is done automatically by the code to redue human error.
+The pseudo code for the data evaluation process can be seen in Listing \ref{lst:data_eval}. Most of the checks mentioned, such as \texttt{selectInvalidPeople} in Line 9 or \texttt{checkJointValidity} in Line 14 happen manually. However, the data processing is done automatically by the code to redue human error.
 
 \begin{lstlisting}[language=python,
                     firstnumber=1,

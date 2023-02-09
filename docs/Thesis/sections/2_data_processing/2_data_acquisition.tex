@@ -18,7 +18,7 @@ The camera metadata contains the camera intrinsics, which we will use to recreat
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.9\textwidth]{figures/CameraCalibration/pinhole_camera_model.png}
-  \caption[Pinhole camera model]{The pinhole camera model showing the principal point. The principal point is the point where the optical axis intersects the image plane. The field of view is the angle between the optical axis and the image plane.}
+  \caption[Pinhole camera model]{The pinhole camera model that shows the principal point. The principal point is the point where the optical axis intersects the image plane. The field of view is the angle between the optical axis and the image plane.}
   \label{fig:pinhole_camera_model}
 \end{figure}
 
@@ -91,12 +91,12 @@ Using the OpenNI2 API we can also record the depth stream to a file. The depth s
 Sadly, the OpenNI2 API does not provide a way to access the RGB stream. Therefore, we use the OpenNI2 API to access the depth stream and OpenCV to access the RGB stream. The RGB stream is stored as a \texttt{.AVI} file. The \texttt{.AVI} file format is a container format that stores multiple video streams in a single file. The \texttt{.AVI} file format is described in detail in the Microsoft documentation\footnote{\url{https://docs.microsoft.com/en-us/previous-versions/ms779636(v=vs.85)}}. 
 
 \textit{
-  \textbf{ISSUE}: currently the playback of the \texttt{.AVI} file is only possible at a specific framerate, which is set at the beginning of the recording session. This poses a substantial issue regarding synchronisation. Shoul I write about this?
+  \textbf{ISSUE}: currently the playback of the \texttt{.AVI} file is only possible at a specific framerate, which is set at the beginning of the recording session. This poses a substantial issue regarding synchronisation. Should I write about this? Should I only use depth data? 
 }
 
 \subsection{Recording process}
 
-Once the scene is set and the pointclouds have been aligned the user can start the recording. Firstly, there are pre recording settings such as a frame and/or time limit in seconds, which allows accurate time and/or frame constraints to create equal recordings. Secondly, the user can select whether or not to display the pointcloud while recording. This allows the user to see the pointcloud in real-time and adjust the recording accordingly, however, this leads to a substantially reduced framerate\footnote{From 30 FPS, without pointcloud to 15 FPS with pointcloud}. These can be set in the GUI as shown in Figure \ref{fig:recording_gui}. Finally, the user can configure the session parameters described earlier. After the recording has beend started by the user a preconfigured countdown will be started, allowing the user to get into position in time. Once the countdown has finished the recording will start. The recording will stop once the time or frame limit has been reached. The recording will also stop if the user presses the stop button.  
+Once the scene is set and the point clouds have been aligned the user can start the recording. Firstly, there are pre-recording settings such as a frame and/or time limit in seconds, which allows accurate time and/or frame constraints to create equal recordings. Secondly, the user can select whether or not to display the point cloud while recording. This allows the user to see the point cloud in real-time and adjust the recording accordingly, however, this leads to a substantially reduced framerate\footnote{From 30 FPS, without point cloud to 15 FPS with pointcloud}. These can be set in the GUI as shown in Figure \ref{fig:recording_gui}. Finally, the user can configure the session parameters described earlier. After the recording has beend started by the user a preconfigured countdown will be started, allowing the user to get into position in time. Once the countdown has finished the recording will start. The recording will stop once the time or frame limit has been reached. The recording will also stop if the user presses the stop button.  
 
 \begin{figure}[ht]
   \centering
