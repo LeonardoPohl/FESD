@@ -94,6 +94,7 @@ void SkeletonDetectorNuitrack::update() {
 			
 			skeleton_json.append(joint_json);
 		}
+
 		person_json["Skeleton"] = skeleton_json;
 		people.append(person_json);
 	}
@@ -106,7 +107,7 @@ void SkeletonDetectorNuitrack::startRecording(std::string sessionName)
 	m_Skeletons.clear();
 }
 
-void SkeletonDetectorNuitrack::stopRecording()
+std::string SkeletonDetectorNuitrack::stopRecording()
 {
 	std::fstream configJson(m_RecordingPath, std::ios::out);
 	Json::Value root;
@@ -114,4 +115,5 @@ void SkeletonDetectorNuitrack::stopRecording()
 	Json::StreamWriterBuilder builder;
 	configJson << Json::writeString(builder, m_Skeletons);
 	configJson.close();
+	return m_RecordingPath.filename().string();
 }

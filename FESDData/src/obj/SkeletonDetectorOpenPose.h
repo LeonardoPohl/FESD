@@ -19,7 +19,7 @@ public:
 
 	void startRecording(std::string sessionName);
 	void saveFrame(cv::Mat frame_to_process);
-	void stopRecording();
+	std::string stopRecording();
 private:
 	Logger::Logger *mp_Logger;
 

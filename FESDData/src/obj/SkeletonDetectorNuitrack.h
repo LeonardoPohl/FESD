@@ -16,7 +16,7 @@ public:
     void update();
 
 	void startRecording(std::string sessionName);
-	void stopRecording();
+	std::string stopRecording();
 private:
 	Logger::Logger* mp_Logger;
 

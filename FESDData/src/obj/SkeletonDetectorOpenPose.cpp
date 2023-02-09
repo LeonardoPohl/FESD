@@ -93,7 +93,7 @@ void SkeletonDetectorOpenPose::saveFrame(cv::Mat frame_to_process)
     m_Skeletons.append(people);
 }
 
-void SkeletonDetectorOpenPose::stopRecording()
+std::string SkeletonDetectorOpenPose::stopRecording()
 {
     std::fstream configJson(m_RecordingPath, std::ios::out);
     Json::Value root;
@@ -101,4 +101,5 @@ void SkeletonDetectorOpenPose::stopRecording()
     Json::StreamWriterBuilder builder;
     configJson << Json::writeString(builder, m_Skeletons);
     configJson.close();
+    return m_RecordingPath.filename().string();
 }

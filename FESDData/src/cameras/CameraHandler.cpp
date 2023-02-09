@@ -391,9 +391,8 @@ void CameraHandler::stopRecording() {
     Json::Value root;
 
     root["Name"] = m_SessionName;
-    root["DurationInSec"] = m_RecordedSeconds.count();
-    root["RecordedFrames"] = m_RecordedFrames;
-    root["SkeletonCalculated"] = false;
+    root["Duration"] = m_RecordedSeconds.count();
+    root["Frames"] = m_RecordedFrames;
 
     Json::Value cameras;
 
@@ -551,9 +550,9 @@ void CameraHandler::calculateSkeletonsOpenpose(Json::Value recording) {
         }
     }
 
-    m_SkeletonDetectorOpenPose->stopRecording();
+    
 
-    recording["SkeletonCalculated"] = true;
+    recording["SkeletonCalculated"] = m_SkeletonDetectorOpenPose->stopRecording();
 
     auto configPath = m_RecordingDirectory / recording["Name"].asString();
     configPath += ".json";

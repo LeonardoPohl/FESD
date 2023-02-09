@@ -16,6 +16,7 @@ public:
 		ImGui::Checkbox("Dark Clothing", &Dark_Clothing);
 		ImGui::Checkbox("Holding Weight", &Holding_Weight);
 		ImGui::Checkbox("Ankle Weight", &Ankle_Weight);
+		ImGui::InputText("Exercise", Exercise, 100);
 		ImGui::Separator();
 
 		ImGui::Checkbox("Stream While Recording", &StreamWhileRecording);
@@ -63,6 +64,7 @@ public:
 		val["Ankle Weight"] = Ankle_Weight;
 		val["Height"] = Height;
 		val["Angle"] = Angle;
+		val["Exercise"] = Exercise;
 
 		return val;
 	}
@@ -96,15 +98,16 @@ public:
 	bool LimitFrames{ false };
 	bool LimitTime{ true };
 	int FrameLimit{ 100 };
-	int TimeLimitInS{ 30 };
+	int TimeLimitInS{ 20 };
 private:
-	bool Sitting{ true };
+	bool Sitting{ false };
 	bool Background_Close{ true };
 	bool Cramped{ false };
 	bool Dark_Clothing{ true };
 	bool Holding_Weight{ false };
 	bool Ankle_Weight{ false };
-	
+
+	char Exercise[100];
 
 	float Height{ 1.8f };
 	float Angle{ 20.0 };
