@@ -246,8 +246,8 @@ void CameraHandler::showRecordings() {
 
         ImGui::BeginDisabled(!isValid);
         if (ImGui::TreeNode(tabName.c_str())) {
-            ImGui::Text("Duration (s): %.2f", recording["DurationInSec"].asFloat());
-            ImGui::Text("Recorded Frames: %d", recording["RecordedFrames"].asInt());
+            ImGui::Text("Duration (s): %.2f", recording["Duration"].asFloat());
+            ImGui::Text("Recorded Frames: %d", recording["Frames"].asInt());
 
             ImGui::Text("Cameras:");
             for (auto camera : recording["Cameras"]) {
@@ -422,9 +422,14 @@ void CameraHandler::stopRecording() {
     findRecordings();
 
     clearCameras();
+
+
     initAllCameras();
 
-    m_State = Streaming;
+    if (m_SessionParams.stopRecording())
+        initRecording();
+    else
+        m_State = Streaming;
 }
 
 void CameraHandler::startPlayback(Json::Value recording)
@@ -447,7 +452,7 @@ void CameraHandler::startPlayback(Json::Value recording)
     }
 
     m_CurrentPlaybackFrame = 0;
-    m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
+    m_TotalPlaybackFrames = recording["Frames"].asInt();
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
         mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
@@ -460,7 +465,8 @@ void CameraHandler::findRecordings() {
     {
         if (entry.is_regular_file() && 
             entry.path().extension() == ".json" && 
-            entry.path().filename().string().find("Skeleton") == std::string::npos) {
+            entry.path().filename().string().find("Skeleton") == std::string::npos &&
+            entry.path().filename().string().find("Exercise") == std::string::npos) {
             std::ifstream configJson(entry.path());
             Json::Value root;
 

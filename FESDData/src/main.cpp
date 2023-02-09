@@ -21,7 +21,7 @@
 #include "utilities/helper/GLFWHelper.h"
 #include "utilities/helper/ImGuiHelper.h"
 #include "utilities/WindowInfo.h"
-
+#include "samples/nuitrack_sample.h"
 Camera *cam = nullptr;
 
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);

@@ -9,6 +9,9 @@
 
 class SessionParameters {
 public:
+	SessionParameters() {
+		
+	}
 	bool manipulateSessionParameters() {
 		ImGui::Begin("Session Parameters");
 
@@ -44,8 +47,10 @@ public:
 
 		ImGui::Separator();
 		ImGui::SliderInt("Countdown in S", &CountdownInS, 0, 10);
+		ImGui::SliderInt("Repetitions", &RepeatNTimes, 0, 10);
 
 		if (ImGui::Button("Begin Recording")) {
+			Repetitions = 0;
 			return true;
 		}
 		ImGui::End();
@@ -61,7 +66,7 @@ public:
 		val["Dark Clothing"] = Dark_Clothing;
 		val["Height"] = Height;
 		val["Angle"] = Angle;
-		val["Exercise"] = (Json::Value)exercise;
+		val["Exercise"] = exercise.Id;
 
 		return val;
 	}
@@ -91,17 +96,29 @@ public:
 		return false;
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns>true if all repetitions are done</returns>
+	bool stopRecording() {
+		return RepeatNTimes == ++Repetitions;
+	}
+
+
 	bool StreamWhileRecording{ false };
 	bool LimitFrames{ false };
 	bool LimitTime{ true };
+	int RepeatNTimes{ 1 };
+	int Repetitions{ 0 };
 	int FrameLimit{ 100 };
 	int TimeLimitInS{ 20 };
 private:
 	bool Background_Close{ true };
 	bool Cramped{ false };
-	bool Dark_Clothing{ true };
+	bool Dark_Clothing{ true };	
 
-	Exercise exercise{ };
+	std::vector<Exercise> exercise{ };
+	std::vector<Exercise> exercises{ };
 
 	float Height{ 1.75f };
 	float Angle{ 20.0 };

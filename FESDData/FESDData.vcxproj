@@ -197,6 +197,7 @@
     <ClInclude Include="src\obj\SessionParameters.h" />
     <ClInclude Include="src\obj\SkeletonDetectorNuitrack.h" />
     <ClInclude Include="src\obj\SkeletonDetectorOpenPose.h" />
+    <ClInclude Include="src\samples\nuitrack_sample.h" />
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />
