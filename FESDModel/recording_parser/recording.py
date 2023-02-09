@@ -1,5 +1,12 @@
 import os
 import json
+
+from .camera import Camera
+from .translation import Translation
+from .rotation import Rotation
+from .skeleton import Skeleton
+from .session import Session
+
 recording_dir = 'H:\Recordings'
 
 def get_recordings():
@@ -18,11 +25,13 @@ class Recording:
       self.name = data['Name']
       self.frames = data['Frames']
       self.duration = data['Duration']
-      self.roatation = data['Rotation']
-      self.translation = data['Translation']
-      self.cameras = data['Cameras']
-      self.recordings = []
-      for cam in self.cameras:
-        self.recordings.append(cam["FileName"])
-      self.session = data['Session Parameters']
-    
+
+      self.session = Session(data['Session Parameters'])
+      
+      self.roatation = Rotation(data['Rotation'])
+      self.translation = Translation(data['Translation'])
+
+      self.cameras = []
+      for cam in data['Cameras']:
+        self.cameras.append(Camera(cam))
+        

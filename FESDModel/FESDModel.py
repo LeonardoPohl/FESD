@@ -1,5 +1,5 @@
 import numpy as np
-from src import Recording, get_recordings
+from recording_parser import Recording, get_recordings
 
 
 if __name__ == "__main__":
