@@ -423,10 +423,9 @@ void CameraHandler::stopRecording() {
 
     clearCameras();
 
-
     initAllCameras();
 
-    if (m_SessionParams.stopRecording())
+    if (!m_SessionParams.stopRecording())
         initRecording();
     else
         m_State = Streaming;
