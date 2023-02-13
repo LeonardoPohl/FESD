@@ -15,7 +15,25 @@ public:
 	enum class Difficulty;
 	Exercise(){}
 	Exercise(std::string id, std::string description, Difficulty difficulty, bool sitting, bool holding_weight, bool ankle_weight) 
-		: Id(id), Description(description), difficulty(difficulty), Sitting(sitting), Holding_Weight(holding_weight), Ankle_Weight(ankle_weight)  {}
+		: Id(id), Description(description), difficulty(difficulty), Sitting(sitting), Holding_Weight(holding_weight), Ankle_Weight(ankle_weight)  {
+		switch (difficulty) 
+		{
+		case Difficulty::Trivial:
+			DifficultyElem = 0;
+			break;
+		case Difficulty::Easy:
+			DifficultyElem = 1;
+			break;
+		case Difficulty::Medium:
+			DifficultyElem = 2;
+			break;
+		case Difficulty::Hard:
+			DifficultyElem = 3;
+			break;
+		default:
+			break;
+		}
+	}
 	
 	static std::vector<Exercise> getPredefinedExercises() {
 		std::vector<Exercise> exercises;

@@ -44,8 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="FESDModel.ipynb" />
     <Content Include="recording_parser\__pycache__\recording.cpython-39.pyc" />
     <Content Include="recording_parser\__pycache__\__init__.cpython-39.pyc" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="recording_parser\" />

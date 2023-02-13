@@ -134,12 +134,20 @@ public:
 
 		ImGui::Begin("Countdown");
 		selectedExercises.front().imguiExercise();
-		char buf[32];
-		sprintf(buf, "Exercise %d/%d", selectedExercises.size(), TotalExercises);
-		ImGui::ProgressBar((double)selectedExercises.size() / (double)TotalExercises);
-		sprintf(buf, "Repetition %d/%d", Repetitions, RepeatNTimes);
+		char buf1[32];
+		char buf2[32];
+
+		ImGui::Text("Exercises:");
+		sprintf(buf1, "Exercise %d/%d", (int)selectedExercises.size(), TotalExercises);
+		ImGui::ProgressBar(1.0 - (double)selectedExercises.size() / (double)TotalExercises);
+		ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+
+		ImGui::Text("Repetitions:");
+		sprintf(buf2, "Repetition %d/%d", Repetitions, RepeatNTimes);
 		ImGui::ProgressBar((double)Repetitions / (double)RepeatNTimes);
+
 		ImGui::ProgressBar(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - CountdownStart).count() / (double)CountdownInS);
+
 		ImGui::End();
 
 		return false;
@@ -163,7 +171,7 @@ public:
 	bool StreamWhileRecording{ false };
 	bool LimitFrames{ false };
 	bool LimitTime{ true };
-	int RepeatNTimes{ 1 };
+	int RepeatNTimes{ 2 };
 	int Repetitions{ 0 };
 	int TotalExercises{ 0 };
 	int FrameLimit{ 100 };
@@ -171,7 +179,7 @@ public:
 private:
 	bool Background_Close{ true };
 	bool Cramped{ false };
-	bool Dark_Clothing{ true };	
+	bool Dark_Clothing{ false };
 
 	bool selectedAnyExercise{ false };
 	Exercise manualExercise{ };
