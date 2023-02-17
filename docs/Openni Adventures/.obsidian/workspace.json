@@ -11,11 +11,9 @@
             "id": "f453aab838680445",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "pdf",
               "state": {
-                "file": "Meeting Erwin.md",
-                "mode": "source",
-                "source": false
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Meeting Erwin.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Meeting Erwin.md",
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Meeting Erwin.md"
+                "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
           }
@@ -148,10 +146,10 @@
   },
   "active": "f453aab838680445",
   "lastOpenFiles": [
+    "Meeting Erwin.md",
     "Thesis Research.md",
     "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf",
     "Tasks.md",
-    "Meeting Erwin.md",
     "Papers/Collections/Camera or Point Cloud Linking, Matching or Registration.md",
     "Papers/Collections/Camera Hardware.md",
     "Papers/Collections/Camera Calibration.md",

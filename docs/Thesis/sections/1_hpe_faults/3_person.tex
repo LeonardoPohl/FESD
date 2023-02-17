@@ -18,52 +18,72 @@ Finally, the most important factor is the exercise that is carried out. In this 
 
 These exercises might not be the most realistic, but they represent common issues with pose estimation in a reproducible manner. Furthermore, these exercises are not too difficult to perform, which makes them suitable for testing the pose estimators. The difficulty rating of the exercise might not reflect the difficulty of the exercise for the user, but it does reflect the difficulty of the exercise for the pose estimator.
 
+The exercises are numbered according to the difficulty. The first letter is an identifier that it is an exercise. The first digit indicates the difficulty of the exercise, while the second digit indicates the number of the exercise. The difficulty is rated from 0 to 4, where 0 is the easiest and 4 is the most difficult. The exercises are divided into four categories: trivial, easy, medium and hard.
+
 \subsubsection{Trivial Exercises}
+
+Trivial exercises are exercises that are easy to detect and are therefore good for testing the pose estimators. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. 
+
+\paragraph{E-0.00 - Arms hanging to the side}
 
 In the most trivial case, the person is standing still with their arms stretched to the side. In this case, the person is not moving and the joints are not changing position. This is the easiest case for human pose estimation, as the joints are always in the same position. However, this is not a realistic case, as the person is not exercising but it offers a baseline for the other exercises.
 
-The arms stretched to the side reduce the possibility of occlusion, as the side of the body is not blocking the joints of the arms. Furthermore, the person is standing still, which reduces the possibility of occlusion as well.
+\paragraph{E-0.01 - Arms extended to the side}
+
+Another trivial case is to extend the arms to both sides of the body.  
 
 \subsubsection{Easy Exercises}
 
 Easy exercises are essential for creating a good baseline of how the pose estimators should work. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to detect.
 
-\paragraph{Raising the arms to the side}
+\paragraph{E-1.00 - Raising the arms to the side}
 
 The first easy exercise is only a small step up from the trivial exercise. In this exercise, the person raises their arms to the side. This exercise is easy to detect, as the arms are raised to the side and the joints are not occluded by the body. Furthermore, the person is standing still, which reduces the possibility of occlusion as well. However, now the arms are moving. This should not pose a problem for the pose estimators, as the arms are not moving too fast. However, it is important to note that the arms are moving, as this can cause issues in some pose estimators.
 
-\paragraph{Raising the arms to the front}
+\paragraph{E-1.01 - Raising the arms to the front}
 
 A slightly more challenging exercise is when the user raises the arms to the front. This exercise is slightly more challenging than the previous exercise, as the arms are now occluding themselves.
+
+\paragraph{E-1.02 - Raising the arms to the front}
+
+In a standing position raise first the right knee to the front and then the left knee to the front.  
+
+\paragraph{E-1.03 - Raising the arms to the front}
+
+Finally, in a sedentry position keep both arms hanging to the side. Sitting positions are more challenging to detect than standing positions, as the joints are more occluded by the body. However, this exercise is still easy to detect, as the arms are not moving and the joints are not occluded by the body.
 
 \subsubsection{Medium Exercises}
 
 Exercises performed in a seated position are harder to detect. Medium exercises focus on exercises, which are performed in a seated position. These exercises only involve arm movement which is easier to detect.
 
-\paragraph{Raising the arms to the side}
+\paragraph{E-2.00 - Raising the arms to the side}
 
 The first medium exercise is similar to the easy exercise, but now the person is sitting down. Additionally, the user will be holding weights to increase the difficulty of the exercise.
 
-\paragraph{Raising the arms to the front}
+\paragraph{E-2.01 - Raising the arms to the front}
 
 As with the previous exercise, the user will be sitting down and holding weights. However, now the user will be raising the arms to the front. 
 
-\paragraph{Crossing the arms}
+\paragraph{E-2.02 - Crossing the arms}
 
-The last medium exercise is when the user crosses the arms in front of the body. This exercise is slightly more challenging than the previous exercise, as the arms are now occluding themselves, as well as the upper body.
+ In the next exercise the user crosses their arms in front of the body. This exercise is slightly more challenging than the previous exercise, as the arms are now occluding themselves, as well as the upper body.
+
+\paragraph{E-2.03 - Crossing the arms}
+
+Finally, the user will be standing and bowing forward. 
 
 \subsubsection{Difficult Exercises}
 
 Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for the pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world exercises.
 
-\paragraph{Raising the knee}
+\paragraph{E-3.00 - Raising the knee}
 
 The first exercise is when the user raises the knee. This exercise had to be reworked at SilverFit to function well since the pose estimation was too unreliable. From a neutral sitting position with knees at around 90 degrees, the user lifts the knee to a 45-degree angle. Meanwhile, the arms are down to the side.
 
-\paragraph{Raising the knee leaning forward}
+\paragraph{E-3.01 - Raising the knee leaning forward}
 
 Additionally to raising the knee, the user will now lean forward, to emulate bad posture.
 
-\paragraph{Raising the knee leaning forward facing away from the camera}
+\paragraph{E-3.02 - Raising the knee leaning forward facing away from the camera}
 
 The user will now lean forward and the body will face away from the camera at a 20-degree angle. This leads to more occlusion and the complete lack of visibility of one of the arms. 
