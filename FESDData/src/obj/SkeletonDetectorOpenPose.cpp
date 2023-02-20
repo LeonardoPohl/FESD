@@ -76,12 +76,16 @@ void SkeletonDetectorOpenPose::saveFrame(cv::Mat frame_to_process)
         Json::Value p;
         Json::Value skeleton;
         p["Index"] = person;
+        p ["valid"] = true;
+
         for (int part = 0; part < numberBodyParts; part++) {
             const auto x = key_points[{person, part, 0}];
             const auto y = key_points[{person, part, 1}];
             const auto score = key_points[{person, part, 2}];
             Json::Value joint;
             joint["i"] = part;
+            joint["valid"] = true;
+
             joint["u"] = key_points[{person, part, 0}];
             joint["v"] = key_points[{person, part, 1}];
             joint["score"] = key_points[{person, part, 2}];

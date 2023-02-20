@@ -172,6 +172,10 @@ void CameraHandler::showPlaybackGui()
         clearCameras();
     }
 
+    if (ImGui::Checkbox("Fix Skeleton", &m_FixSkeleton)) {
+        m_CurrentPlaybackFrame = 0;
+    }
+
     ImGui::BeginDisabled(m_State == Playback);
 
     if (ImGui::Button("Refresh Recordings")) {
@@ -181,19 +185,26 @@ void CameraHandler::showPlaybackGui()
     if (m_Recordings.empty()) {
         ImGui::Text("No Recordings Found!");
     }
+    else {
+        ImGui::Checkbox("Use Nuitrack", &m_UseNuitrack);
 
-    if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
-        mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
-        int i = 0;
-        for (auto rec : m_Recordings) {
-            std::cout << i++ << "/" << m_Recordings.size() << "\r";
-            calculateSkeletonsNuitrack(rec);
+        if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
+            mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
+            int i = 0;
+            for (auto rec : m_Recordings) {
+                std::cout << i++ << "/" << m_Recordings.size() << "\r";
+                if (m_UseNuitrack)
+                    calculateSkeletonsNuitrack(rec);
+                else
+                    calculateSkeletonsOpenpose(rec);
+            }
+
+            mp_Logger->log("Skeleton detection done for all recordings");
         }
 
-        mp_Logger->log("Skeleton detection done for all recordings");
+        showRecordings();
     }
 
-    showRecordings();
     ImGui::EndDisabled();
 
     ImGui::End();
@@ -326,7 +337,6 @@ void CameraHandler::record()
             }
         );
     }
-     
 }
 
 void CameraHandler::stream()
@@ -355,19 +365,63 @@ void CameraHandler::playback()
         mp_PointCloud->OnRender();
     }
 
+    bool fixingSkeleton = m_FixSkeleton;
+
     for (auto cam : m_DepthCameras)
     {
-        if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+        if (m_FixSkeleton || (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection))) {
             auto frame = cam->getColorFrame();
             if (!frame.empty()) {
-                if (m_DoSkeletonDetection) {
-                    m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                if (m_FixSkeleton && m_FoundRecordedSkeleton) {
+                    // TODO: This wont work if there are multiple cameras
+                    ImGui::Begin("Fix Skeleton", &m_FixSkeleton);  
+                    
+                    for (auto skel_frame : m_RecordedSkeleton) {
+                        for (auto person : skel_frame) {
+                            bool person_valid = person["valid"].asBool();
+                            if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
+                                person["valid"] = person_valid;
+                            }
+
+                            for (auto joint : person["Skeleton"]) {
+                                const auto score = joint["score"].asDouble();
+
+                                bool joint_valid = person["valid"].asBool();
+                                if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
+                                    joint["valid"] = joint_valid;
+                                }
+
+                                bool isValid = joint["valid"].asBool() && person["valid"].asBool();
+                                cv::Scalar color{ 1.0, 0.0, 0.0 };
+
+                                if (m_ScoreThreshold < score || m_ShowUncertainty) {
+                                    if (isValid) {
+                                        color = { 0, 0, 0 };
+                                    }                               
+                                    else if (m_ShowUncertainty && m_ScoreThreshold < score) {
+                                        color = { 0.3, 0.3, 0.3 };
+                                    }
+                                    else {
+                                        color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
+                                    }
+                                    cv::circle(frame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
+                                }
+                            }
+                        }
+                    }
+                    if (ImGui::Button("Continue")) {
+                        fixingSkeleton = false;
+                    }
+                    ImGui::End();
                 }
                 cv::imshow(cam->getCameraName(), frame);
             }
+            else if (m_DoSkeletonDetection) {
+                m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+            }
         }
     }
-    if (!m_PlaybackPaused) {
+    if (!m_PlaybackPaused && !fixingSkeleton) {
         m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
     }
 }
@@ -387,7 +441,7 @@ void CameraHandler::stopRecording() {
     auto configPath = m_RecordingDirectory / getFileSafeSessionName(m_SessionName);
     configPath += ".json";
 
-    std::fstream configJson(configPath, std::ios::out | std::ios::app);
+    std::fstream configJson(configPath, std::ios::out);
     Json::Value root;
 
     root["Name"] = m_SessionName;
@@ -438,6 +492,9 @@ void CameraHandler::startPlayback(Json::Value recording)
 
     clearCameras();
 
+    m_FoundRecordedSkeleton = false;
+    m_Recording = recording;
+
     for (auto camera : recording["Cameras"]) {
         if (camera["Type"].asString() == RealSenseCamera::getType()) {
             m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
@@ -450,11 +507,51 @@ void CameraHandler::startPlayback(Json::Value recording)
         }
     }
 
+    if (!recording["Skeleton"].isNull()) {
+        std::ifstream configJson(m_RecordingDirectory / recording["Skeleton"].asString());
+        Json::Value root;
+
+        Json::CharReaderBuilder builder;
+
+        builder["collectComments"] = true;
+
+        JSONCPP_STRING errs;
+
+        if (!parseFromStream(builder, configJson, &root, &errs)) {
+            mp_Logger->log(errs, Logger::Priority::ERR);
+        }
+        else {
+            m_FoundRecordedSkeleton = true;
+            m_RecordedSkeleton = root;
+            for (auto member : root[0][0].getMemberNames())
+                std::cout << member << std::endl;
+        }
+
+        mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
+    }
+
     m_CurrentPlaybackFrame = 0;
     m_TotalPlaybackFrames = recording["Frames"].asInt();
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
         mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
+}
+
+void CameraHandler::stopPlayback()
+{
+    if (m_FoundRecordedSkeleton) {
+        m_RecordedSkeleton["fixed"] = m_FixSkeleton;
+        auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
+        configPath += ".json";
+
+        std::fstream configJson(configPath, std::ios::out);
+
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_RecordedSkeleton);
+        configJson.close();
+        
+    }
+    m_FoundRecordedSkeleton = false;
 }
 
 void CameraHandler::findRecordings() {
@@ -513,15 +610,17 @@ void CameraHandler::calculateSkeletonsNuitrack(Json::Value recording) {
 
         for (; m_CurrentPlaybackFrame < m_TotalPlaybackFrames; m_CurrentPlaybackFrame++) {
             m_SkeletonDetectorNuitrack->update();
+            std::cout << m_CurrentPlaybackFrame << "/" << m_TotalPlaybackFrames << " Processed" << "\r";
         }
 
-        m_SkeletonDetectorNuitrack->stopRecording();
+        recording["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording();
     }
-
-    recording["SkeletonCalculated"] = true;
 
     auto configPath = m_RecordingDirectory / recording["Name"].asString();
     configPath += ".json";
+
+    remove(configPath);
+
     std::fstream configJson(configPath, std::ios::out);
 
     Json::StreamWriterBuilder builder;
@@ -545,22 +644,19 @@ void CameraHandler::calculateSkeletonsOpenpose(Json::Value recording) {
         for (auto cam : m_DepthCameras) {
             // Get it and forget it
             mp_PointCloud->OnUpdate();
-            mp_PointCloud->OnRender();
             auto frame_to_process = cam->getColorFrame();
-            if (!frame_to_process.empty()) {
-                cv::imshow("Processing Skeleton", frame_to_process);
-                std::cout << "Frame at " << m_CurrentPlaybackFrame << std::endl;
-            }
             m_SkeletonDetectorOpenPose->saveFrame(frame_to_process);
         }
+        std::cout << m_CurrentPlaybackFrame << "/" << m_TotalPlaybackFrames << " Processed" << "\r";
     }
 
-    
-
-    recording["SkeletonCalculated"] = m_SkeletonDetectorOpenPose->stopRecording();
+    recording["Skeleton"] = m_SkeletonDetectorOpenPose->stopRecording();
 
     auto configPath = m_RecordingDirectory / recording["Name"].asString();
     configPath += ".json";
+    
+    std::filesystem::remove(configPath);
+
     std::fstream configJson(configPath, std::ios::out);
 
     Json::StreamWriterBuilder builder;

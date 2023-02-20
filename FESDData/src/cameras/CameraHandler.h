@@ -40,6 +40,7 @@ private:
 
 	void stopRecording();
 	void startPlayback(Json::Value recording);
+	void stopPlayback();
 	void findRecordings();
 
 	void calculateSkeletonsNuitrack(Json::Value recording);
@@ -79,6 +80,10 @@ private:
 
 	// Playback
 	std::vector<Json::Value> m_Recordings;
+	bool m_FoundRecordedSkeleton{ false };
+	Json::Value m_Recording;
+	Json::Value m_RecordedSkeleton;
+	bool m_FixSkeleton{ false };
 	bool m_PlaybackPaused{ false };
 	int m_TotalPlaybackFrames{ 0 };
 	int m_CurrentPlaybackFrame{ 0 };
@@ -87,6 +92,7 @@ private:
 	bool m_DoSkeletonDetection{ false };
 	float m_ScoreThreshold{ 0.0f };
 	bool m_ShowUncertainty{ false };
+	bool m_UseNuitrack{ false };
 	std::unique_ptr<SkeletonDetectorOpenPose> m_SkeletonDetectorOpenPose;
 	std::unique_ptr<SkeletonDetectorNuitrack> m_SkeletonDetectorNuitrack;
 };

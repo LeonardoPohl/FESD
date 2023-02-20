@@ -77,10 +77,12 @@ void SkeletonDetectorNuitrack::update() {
 		Json::Value person_json;
 		Json::Value skeleton_json;
 		person_json["Index"] = skeleton.id;
+		person_json["valid"] = true;
+
 		const std::vector<tdv::nuitrack::Joint> joints = skeleton.joints;
 		for (const tdv::nuitrack::Joint& joint : joints) {
 			Json::Value joint_json;
-
+			joint_json["valid"] = true;
 			joint_json["i"] = joint.type;
 			
 			joint_json["u"] = joint.proj.x;
