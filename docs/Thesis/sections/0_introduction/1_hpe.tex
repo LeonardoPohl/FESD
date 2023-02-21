@@ -2,27 +2,45 @@
 
 To interact with computers humans have come up with a plethora of methods. Ranging from early punch cards to modern touch screens, the methods have evolved to be more natural and intuitive. In recent years, the use of cameras to interact with computers has become more popular, since they require no physical contact and can make the use of computer systems seamless when developed properly.
 
-In this section, we discuss some of the methods that have been used to extract the pose of a human from videos of different formats. We also discuss possible applications of human pose estimation.
+In this section, we discuss some of the methods that have been used to extract the pose of a human from videos of different formats. We also discuss possible applications of human pose estimation. Finally, we 
 
-In a later section, we go into more detail about the method we used to extract the pose and what factors influence the result of the pose estimation. 
+In chapter \ref{sec:errors} Human Pose Estimation Difficulties, we go into more detail about the method we used to extract the pose and what factors influence the result of the pose estimation.
 
-\subsection{Human Pose Estimation methods}
+We will go into more detail about some of the state-of-the-art human pose estimators for both RGB and RGBD data and even from point clouds in Section \ref{sec:related_work} Related Work.
 
-There are many methods to estimate the pose of a human using different types of cameras and resulting in different types of output. Firstly, the source of the video can be either an RGB camera or a depth camera, which usually results in RGBD videos or frames. RGBD frames are normal color frames with additional depth information. The depth information can improve the accuracy of the pose estimation by adding more information that can be used to understand the structure of the scene. For example, to separate the person from the background is easier using depth information than using solely RGB data.
+\subsection{Pose visualisation}
 
-However, RGB cameras are far more widely spread and generally cheaper than depth cameras. Hence, most methods use RGB cameras to estimate the pose of a human.
+There are mainly three different ways the human pose can be visualised. The first and most basic way is to visualise the pose as a skeleton. This is the most common way to visualise the pose of a human. The skeleton is made up of joints, which are connected by bones. The number of joints and bones can vary, but the most common skeleton is made up of 17 joints and 16 bones, as can be seen in Figure \ref{fig:pose_example}. The joints are usually labeled with a number, which is used to identify the joint in the output of the pose estimation. The representation of a joint in the data varies, but it is usually a 2D or 3D point in space. In some cases, an additional joint representation is provided with a keypoint orientation that enables the clear representation of all degrees of freedoms joints have\cite{KeypointOrientation}. Additionally, in some cases, especially if the human pose was estimated using a neural network, a confidence rating or score is added which can be used to determine the reliability of the joint.
 
-Tianxu Xu, et.al have created a very good review of different point cloud-based methods for human pose estimation\cite{ReviewPointcloudHPE}. In their review, they describe three different approaches to estimating the pose of a human; Template-based, Feature-based, and Machine Learning-based methods.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/HPE/PoseExample.png}
+    \caption{Example of a human pose captured with different methods. (a) A captured skeleton using MoCap which we do not focus on in this report. (b) A traditional human skeleton representation. (c) A pose representation that includes the orientation of the joints as well as the bones as presented by Martin Fish and Ronald Clark\cite{KeypointOrientation}}
+    \label{fig:pose_example}
+\end{figure}
 
-We will go into more detail about some of these methods in Section \ref{sec:related_work} Related Work.
+The second way to visualise a human pose is by using a 2D silhouette or 2D rectangles and shapes. These methods are also called contour-based methods. An example of contour-based methods was introduced by Yunheng Liu\cite{contourHPE}. Contour-based methods are often used in combination with a skeleton representation. The skeleton is used to determine the location of the joints, while the contour is used to determine the shape of the body. This is useful when the skeleton is not able to determine the shape of the body, for example, when the person is wearing a coat or a jacket. This is also used for some games developed by SilverFit.
 
-\subsubsection{Template-based methods}
+Finally, the third way to represent a human pose is with a three-dimensional volume. This volume may be simple cylindrical shapes or a body mesh. A body mesh is a 3D representation of the body, which is made up of vertices and triangles. The three different representations of the human pose can be seen in Figure \ref{fig:pose_representation}.
 
-\subsubsection{Feature-based methods}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/HPE/PoseRepresentation.png}
+    \caption{Different representations of the human pose. (a) Skeleton representation. (b) Contour representation. (c) 3D volume representation. \cite{HPESurveyOriginal}}
+    \label{fig:pose_representation}
+\end{figure}
 
-\subsubsection{Machine Learning-based methods}
+\subsection{Pose estimation data sources}
 
-Notable examples of Machine Learning-based methods are OpenPose\cite{openpose}, AlphaPose\cite{alphapose}, and NuiTrack\cite{nuitrack}.
+The pose of a human can be estimated from different types of data sources. The most common data source is RGB videos. RGB videos are any videos that are captured with normal cameras that record the color of the scene. The provided data can be either from a video or a stream of data or a still image. There is a large number of datasets that can be used to train and test pose estimation algorithms from RGB data. Some of the most common datasets are the MPII Human Pose Dataset\cite{MPII}, the COCO dataset\cite{Coco}, and HumanEva-I dataset\cite{HumanEva-I}.
+
+Additionally, some datasets are captured with depth cameras. Depth cameras are cameras that can record the depth of the scene. This depth information can be used to improve the accuracy of the pose estimation. Some of the most common datasets that are captured with depth cameras are the MRI dataset\cite{mRI}, and the Human3.6M dataset\cite{h36m_pami}.
+
+Finally, there are also methods of human pose estimation that use point clouds. Point clouds are a collection of points in space, which can be used to represent the shape of an object. Point clouds are often used in combination with RGB data. Some of the most common datasets that are captured with depth cameras are the SMMC-10 dataset\cite{SMMC10}, and the EVAL dataset\cite{EVAL}.
+
+Additionally, to the data that is provided, we also differentiate between monocular and multi-modal data. Monocular data is data that is captured with a single camera. Multi-modal data is data that is captured with multiple cameras. The most common multi-modal data is stereo data, which is data that is captured with two cameras. The cameras are usually placed next to each other and are angled toward the same scene. This allows the cameras to capture the same scene from different angles and therefore improving the accuracy of the pose estimation. There are not many datasets for this type of data, but the most common one was captured by Waymo\cite{Waymo}.
+
+However, RGB cameras are far more widely spread and generally cheaper than depth cameras. Hence, most methods use RGB cameras to estimate the pose of a human. However, since depth cameras can provide more detailed information about the scene, they can be used to improve the accuracy of the pose estimation and in this report, we will mainly focus on monocular RGBD data.
 
 \subsection{Depth cameras}
 
