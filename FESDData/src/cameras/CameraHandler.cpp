@@ -10,7 +10,6 @@
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <OpenNI.h>
-#include <opencv2/opencv.hpp>
 
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
@@ -360,70 +359,101 @@ void CameraHandler::stream()
 
 void CameraHandler::playback()
 {
-    if (!m_PlaybackPaused) {
-        mp_PointCloud->OnUpdate();
-        mp_PointCloud->OnRender();
+    if (m_FixSkeleton && m_FoundRecordedSkeleton) {
+        fixSkeleton();
     }
-
-    bool fixingSkeleton = m_FixSkeleton;
-
-    for (auto cam : m_DepthCameras)
-    {
-        if (m_FixSkeleton || (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection))) {
-            auto frame = cam->getColorFrame();
-            if (!frame.empty()) {
-                if (m_FixSkeleton && m_FoundRecordedSkeleton) {
-                    // TODO: This wont work if there are multiple cameras
-                    ImGui::Begin("Fix Skeleton", &m_FixSkeleton);  
-                    
-                    for (auto skel_frame : m_RecordedSkeleton) {
-                        for (auto person : skel_frame) {
-                            bool person_valid = person["valid"].asBool();
-                            if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
-                                person["valid"] = person_valid;
-                            }
-
-                            for (auto joint : person["Skeleton"]) {
-                                const auto score = joint["score"].asDouble();
-
-                                bool joint_valid = person["valid"].asBool();
-                                if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
-                                    joint["valid"] = joint_valid;
-                                }
-
-                                bool isValid = joint["valid"].asBool() && person["valid"].asBool();
-                                cv::Scalar color{ 1.0, 0.0, 0.0 };
-
-                                if (m_ScoreThreshold < score || m_ShowUncertainty) {
-                                    if (isValid) {
-                                        color = { 0, 0, 0 };
-                                    }                               
-                                    else if (m_ShowUncertainty && m_ScoreThreshold < score) {
-                                        color = { 0.3, 0.3, 0.3 };
-                                    }
-                                    else {
-                                        color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
-                                    }
-                                    cv::circle(frame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
-                                }
-                            }
-                        }
+    else {
+        if (!m_PlaybackPaused) {
+            mp_PointCloud->OnUpdate();
+        }
+        mp_PointCloud->OnRender();
+        for (auto cam : m_DepthCameras)
+        {
+            if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+                auto frame = cam->getColorFrame();
+                if (!frame.empty()) {
+                    if (m_DoSkeletonDetection) {
+                        m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                     }
-                    if (ImGui::Button("Continue")) {
-                        fixingSkeleton = false;
-                    }
-                    ImGui::End();
+                    cv::imshow(cam->getCameraName(), frame);
                 }
-                cv::imshow(cam->getCameraName(), frame);
-            }
-            else if (m_DoSkeletonDetection) {
-                m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
             }
         }
     }
-    if (!m_PlaybackPaused && !fixingSkeleton) {
-        m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+}
+
+void CameraHandler::fixSkeleton() {
+    // TODO: This wont work if there are multiple cameras so we only use the first
+    auto cam = m_DepthCameras[0];
+
+    if (m_CurrentColorFrame.empty()) {
+        if (m_CurrentPlaybackFrame != 0) {
+            mp_Logger->log("Needed to skip frame for unknown reason!", Logger::Priority::WARN);
+        }
+        mp_PointCloud->OnUpdate();
+        m_CurrentColorFrame = cam->getColorFrame();
+        if (m_CurrentColorFrame.empty()) {
+            mp_Logger->log("No color frame!", Logger::Priority::ERR);
+            return;
+        }
     }
+
+    ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
+
+    auto& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
+    for (auto& person : skel_frame) {
+        bool person_valid = person["valid"].asBool();
+        if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
+            person["valid"] = person_valid;
+        }
+        
+        ImGui::BeginDisabled(&person_valid);
+
+        for (auto& joint : person["Skeleton"]) {
+            const auto score = joint["score"].asDouble();
+
+            bool joint_valid = joint["valid"].asBool();
+            if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
+                joint["valid"] = joint_valid;
+            }
+
+            bool isValid = joint["valid"].asBool() && person["valid"].asBool();
+            cv::Scalar color{ 1.0, 0.0, 0.0 };
+
+            if (m_ScoreThreshold < score || m_ShowUncertainty) {
+                if (!isValid) {
+                    color = { 0, 0, 0 };
+                }
+                else if (m_ShowUncertainty && m_ScoreThreshold < score) {
+                    color = { 0.3, 0.3, 0.3 };
+                }
+                else {
+                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
+                }
+                cv::circle(m_CurrentColorFrame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
+            }
+        }
+
+        ImGui::EndDisabled();
+    }
+    
+    if (ImGui::Button("Continue")) {
+        m_CurrentPlaybackFrame += 1;
+        if (m_CurrentPlaybackFrame + 1 == m_TotalPlaybackFrames) {
+            stopPlayback();
+            return;
+        }
+        mp_PointCloud->OnUpdate();
+        m_CurrentColorFrame = cam->getColorFrame();
+        if (m_CurrentColorFrame.empty()) {
+            mp_Logger->log("No color frame!", Logger::Priority::ERR);
+            return;
+        }
+    }
+    ImGui::End();
+    
+    mp_PointCloud->OnRender();
+    cv::imshow(cam->getCameraName(), m_CurrentColorFrame);
 }
 
 #pragma warning(disable : 4996)
@@ -521,6 +551,8 @@ void CameraHandler::startPlayback(Json::Value recording)
             mp_Logger->log(errs, Logger::Priority::ERR);
         }
         else {
+            mp_Logger->log("Found Skeleton!");
+
             m_FoundRecordedSkeleton = true;
             m_RecordedSkeleton = root;
             for (auto member : root[0][0].getMemberNames())
@@ -529,7 +561,11 @@ void CameraHandler::startPlayback(Json::Value recording)
 
         mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
     }
-
+    else {
+        mp_Logger->log("No Skeleton Found for selected recording!", Logger::Priority::WARN);
+    }
+    
+    m_CurrentColorFrame = cv::Mat{};
     m_CurrentPlaybackFrame = 0;
     m_TotalPlaybackFrames = recording["Frames"].asInt();
     m_CamerasExist = !m_DepthCameras.empty();

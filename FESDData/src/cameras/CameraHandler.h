@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 
+#include <opencv2/opencv.hpp>
 #include <GLCore/Camera.h>
 #include <GLCore/Renderer.h>
 
@@ -37,6 +38,8 @@ private:
 	void record();
 	void stream();
 	void playback();
+
+	void fixSkeleton();
 
 	void stopRecording();
 	void startPlayback(Json::Value recording);
@@ -83,6 +86,7 @@ private:
 	bool m_FoundRecordedSkeleton{ false };
 	Json::Value m_Recording;
 	Json::Value m_RecordedSkeleton;
+	cv::Mat m_CurrentColorFrame{ };
 	bool m_FixSkeleton{ false };
 	bool m_PlaybackPaused{ false };
 	int m_TotalPlaybackFrames{ 0 };
