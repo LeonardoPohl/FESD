@@ -7,80 +7,84 @@
 #include "utilities/Consts.h"
 #include "utilities/Utils.h"
 
+using namespace tdv::nuitrack;
+
 SkeletonDetectorNuitrack::SkeletonDetectorNuitrack(Logger::Logger* logger, std::string recordingPath, std::string camera_type) : mp_Logger(logger)
 {
 	mp_Logger->log("Initialising Nuitrack");
-	tdv::nuitrack::Nuitrack::init();
-	
+	Nuitrack::init();
+	/*
 	if (camera_type == RealSenseCamera::getType()) {
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.FPS", "30");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.RawWidth", "1280");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.RawHeight", "720");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessWidth", "1280");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessHeight", "720");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessMaxDepth", "7000");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.FPS", "30");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.RawWidth", "1280");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.RawHeight", "720");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessWidth", "1280");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessHeight", "720");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.ProcessMaxDepth", "7000");
 
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.FPS", "30");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.RawWidth", "1280");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.RawHeight", "720");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessWidth", "1280");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessHeight", "720");
+		Nuitrack::setConfigValue("Realsense2Module.RGB.FPS", "30");
+		Nuitrack::setConfigValue("Realsense2Module.RGB.RawWidth", "1280");
+		Nuitrack::setConfigValue("Realsense2Module.RGB.RawHeight", "720");
+		Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessWidth", "1280");
+		Nuitrack::setConfigValue("Realsense2Module.RGB.ProcessHeight", "720");
 
 		// post processing setting
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_alpha", "0.1");
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_delta", "50");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_alpha", "0.1");
+		Nuitrack::setConfigValue("Realsense2Module.Depth.PostProcessing.SpatialFilter.spatial_delta", "50");
 
-		tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.FileRecord", (m_RecordingDirectory / recordingPath).string());
-		//tdv::nuitrack::Nuitrack::setConfigValue("Realsense2Module.Depth2ColorRegistration", "true");
+		Nuitrack::setConfigValue("Realsense2Module.FileRecord", (m_RecordingDirectory / recordingPath).string());
+		//Nuitrack::setConfigValue("Realsense2Module.Depth2ColorRegistration", "true");
 	}
 	else if (camera_type == OrbbecCamera::getType()) {
-		tdv::nuitrack::Nuitrack::setConfigValue("OpenNIModule.FileRecord", (m_RecordingDirectory / recordingPath).string());
+		Nuitrack::setConfigValue("OpenNIModule.FileRecord", (m_RecordingDirectory / recordingPath).string());
 	}
 	else {
 		return;
-	}
+	}*/
 
+	auto devices = Nuitrack::getDeviceList();
+	Nuitrack::setDevice(devices[0]);
 	// Create Tracker
-	m_SkeletonTracker = tdv::nuitrack::SkeletonTracker::create();
+	m_SkeletonTracker = SkeletonTracker::create();
 
 	try {
-		tdv::nuitrack::Nuitrack::run();
+		Nuitrack::run();
 	}
-	catch (const tdv::nuitrack::Exception& e) {
+	catch (const Exception& e) {
 		mp_Logger->log("Error running Nuitrack: " + std::to_string(*e.what()), Logger::Priority::ERR);
 	}
 }
 
 SkeletonDetectorNuitrack::~SkeletonDetectorNuitrack()
 {
-	tdv::nuitrack::Nuitrack::release();
+	Nuitrack::release();
 }
 
 void SkeletonDetectorNuitrack::update() {
-	//tdv::nuitrack::Nuitrack::update();
+	//Nuitrack::update();
 
 	// Update Tracker
 	try {
-		tdv::nuitrack::Nuitrack::waitUpdate(m_SkeletonTracker);
+		Nuitrack::waitUpdate(m_SkeletonTracker);
 	}
-	catch (const tdv::nuitrack::LicenseNotAcquiredException& ex) {
+	catch (const LicenseNotAcquiredException& ex) {
 		throw std::runtime_error("failed license not acquired");
 	}
 
 	// Retrieve Skeleton Data
 	m_SkeletonData = m_SkeletonTracker->getSkeletons();
 
-	const std::vector<tdv::nuitrack::Skeleton> skeletons = m_SkeletonData->getSkeletons();
+	const std::vector<Skeleton> skeletons = m_SkeletonData->getSkeletons();
 
 	Json::Value people;
-	for (const tdv::nuitrack::Skeleton& skeleton : skeletons) {
+	for (const Skeleton& skeleton : skeletons) {
 		Json::Value person_json;
 		Json::Value skeleton_json;
 		person_json["Index"] = skeleton.id;
 		person_json["valid"] = true;
 
-		const std::vector<tdv::nuitrack::Joint> joints = skeleton.joints;
-		for (const tdv::nuitrack::Joint& joint : joints) {
+		const std::vector<Joint> joints = skeleton.joints;
+		for (const Joint& joint : joints) {
 			Json::Value joint_json;
 			joint_json["valid"] = true;
 			joint_json["i"] = joint.type;

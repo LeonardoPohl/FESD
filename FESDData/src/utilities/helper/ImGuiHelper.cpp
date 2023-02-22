@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include "GLFWHelper.h"
 
 void ImGuiHelper::initImGui(GLFWwindow *window){ 
     IMGUI_CHECKVERSION();
@@ -51,4 +52,10 @@ void ImGuiHelper::HelpMarker(const char* desc)
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
+}
+
+void ImGuiHelper::showImage(cv::Mat im)
+{
+    GLuint image_texture = matToTexture(im, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP);
+    ImGui::Image((void*)(intptr_t)image_texture, { (float)im.size[1], (float)im.size[0] });
 }

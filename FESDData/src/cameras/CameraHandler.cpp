@@ -19,6 +19,7 @@
 #include "utilities/Consts.h"
 #include "utilities/helper/ImGuiHelper.h"
 #include "utilities/Utils.h"
+#include <utilities/helper/GLFWHelper.h>
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
@@ -351,7 +352,10 @@ void CameraHandler::stream()
                 if (m_DoSkeletonDetection) {
                     m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                 }
-                cv::imshow(cam->getCameraName(), frame);
+
+                ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
+                ImGuiHelper::showImage(frame);
+                ImGui::End();
             }
         }
     }
@@ -375,7 +379,9 @@ void CameraHandler::playback()
                     if (m_DoSkeletonDetection) {
                         m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                     }
-                    cv::imshow(cam->getCameraName(), frame);
+                    ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
+                    ImGuiHelper::showImage(frame);
+                    ImGui::End();
                 }
             }
         }
@@ -399,6 +405,8 @@ void CameraHandler::fixSkeleton() {
     }
 
     ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
+    
+    ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
 
     auto& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
     for (auto& person : skel_frame) {
@@ -407,7 +415,7 @@ void CameraHandler::fixSkeleton() {
             person["valid"] = person_valid;
         }
         
-        ImGui::BeginDisabled(&person_valid);
+        ImGui::BeginDisabled(person_valid);
 
         for (auto& joint : person["Skeleton"]) {
             const auto score = joint["score"].asDouble();
@@ -439,7 +447,7 @@ void CameraHandler::fixSkeleton() {
     
     if (ImGui::Button("Continue")) {
         m_CurrentPlaybackFrame += 1;
-        if (m_CurrentPlaybackFrame + 1 == m_TotalPlaybackFrames) {
+        if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
             stopPlayback();
             return;
         }
@@ -453,7 +461,10 @@ void CameraHandler::fixSkeleton() {
     ImGui::End();
     
     mp_PointCloud->OnRender();
-    cv::imshow(cam->getCameraName(), m_CurrentColorFrame);
+    
+    ImGui::Begin("Skeleton Fix Color Frame");
+    ImGuiHelper::showImage(m_CurrentColorFrame);
+    ImGui::End();
 }
 
 #pragma warning(disable : 4996)
