@@ -1,2 +1,2 @@
-FESDData/Dependencies/* linguist-vendored
-FESDData/third-party/* linguist-vendored
+FESDData/Dependencies/** linguist-vendored
+FESDData/third-party/** linguist-vendored
