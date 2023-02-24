@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\cameras\CameraHandler.cpp" />
+    <ClCompile Include="src\cameras\NuiPlaybackCamera.cpp" />
     <ClCompile Include="src\obj\PointCloud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\cameras\OrbbecCamera.cpp" />
@@ -177,6 +178,30 @@
     <None Include="imgui.ini">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="nuitrack\CnnDetector\TFCnnDetector\model_description.bin">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\CnnHPE\model.bin">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\license.json">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\license.json.lock">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\nuitrack.config">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\nuitrack_local.config">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\regStat\trees.bin">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="nuitrack\regStat\trees_stat#0.bin">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
     <None Include="resources\shaders\PointCloud\PointCloud.frag" />
@@ -184,6 +209,7 @@
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\cameras\NuiPlaybackCamera.h" />
     <ClInclude Include="src\obj\BoundingBox.h" />
     <ClInclude Include="src\obj\Exercise.h" />
     <ClInclude Include="src\obj\Logger.h" />
@@ -273,7 +299,28 @@
     <Image Include="resources\textures\ml.png" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="nuitrack\user_id.txt">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Text>
     <Text Include="src\requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="nuitrack\FABRIKSkeleton.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+    <Xml Include="nuitrack\kinematic_filter.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+    <Xml Include="nuitrack\OrbbecSDKConfig_v1.0.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+    <Xml Include="nuitrack\poseoptimization\skeleton.xml" />
+    <Xml Include="nuitrack\skeleton.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
+    <Xml Include="nuitrack\skeleton_limits.xml">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

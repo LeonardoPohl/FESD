@@ -60,7 +60,7 @@ void SkeletonDetectorOpenPose::drawSkeleton(cv::Mat& frame_to_process, float sco
 
 void SkeletonDetectorOpenPose::startRecording(std::string sessionName)
 {
-    m_RecordingPath = m_RecordingDirectory / (getFileSafeSessionName(sessionName) + "_OPSkeleton.json");
+    m_RecordingPath = m_RecordingDirectory / sessionName / "OPSkeleton.json";
     m_Skeletons.clear();
 }
 
@@ -76,7 +76,7 @@ void SkeletonDetectorOpenPose::saveFrame(cv::Mat frame_to_process)
         Json::Value p;
         Json::Value skeleton;
         p["Index"] = person;
-        p ["valid"] = true;
+        p["valid"] = true;
 
         for (int part = 0; part < numberBodyParts; part++) {
             const auto x = key_points[{person, part, 0}];
@@ -99,7 +99,7 @@ void SkeletonDetectorOpenPose::saveFrame(cv::Mat frame_to_process)
 
 std::string SkeletonDetectorOpenPose::stopRecording()
 {
-    std::fstream configJson(m_RecordingPath, std::ios::out);
+    std::fstream configJson(m_RecordingPath, std::ios::out | std::ios::trunc);
     Json::Value root;
     root["Skeletons"] = m_Skeletons;
     Json::StreamWriterBuilder builder;

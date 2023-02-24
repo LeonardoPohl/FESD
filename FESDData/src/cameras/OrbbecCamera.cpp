@@ -310,7 +310,7 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
 {
     auto cameraName = getCameraName();
     std::ranges::replace(cameraName, ' ', '_');
-    std::filesystem::path filepath = m_RecordingDirectory / (sessionName + "_" + cameraName + ".oni");
+    std::filesystem::path filepath = m_RecordingDirectory / sessionName / (cameraName + (std::string)".oni");
 
     m_CameraInfromation["Name"] = getCameraName();
     m_CameraInfromation["Type"] = getType();
@@ -321,7 +321,7 @@ std::string OrbbecCamera::startRecording(std::string sessionName)
     m_CameraInfromation["Cy"] = getIntrinsics(INTRINSICS::CY);
     m_CameraInfromation["MeterPerUnit"] =  getMetersPerUnit();
 
-    m_CameraInfromation["FileName"] = filepath.filename().string();
+    m_CameraInfromation["FileName"] = sessionName + "/" + filepath.filename().string();
 
     m_RC = m_Recorder.create(filepath.string().c_str());
     errorHandling("Recorder Creation Failed!");

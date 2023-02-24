@@ -221,7 +221,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 	auto cameraName = getCameraName();
 	std::ranges::replace(cameraName, ' ', '_');
 
-	std::filesystem::path filepath = m_RecordingDirectory / (sessionName + "_" + cameraName + ".bag");
+	std::filesystem::path filepath = m_RecordingDirectory / sessionName / (cameraName + ".bag");
 	if (!(m_Device).as<rs2::recorder>())
 	{
 		mp_Pipe->stop();
@@ -243,7 +243,7 @@ std::string RealSenseCamera::startRecording(std::string sessionName)
 	m_CameraInfromation["Cy"] = getIntrinsics(INTRINSICS::CY);
 	m_CameraInfromation["MeterPerUnit"] =  getMetersPerUnit();
 
-	m_CameraInfromation["FileName"] = filepath.filename().string();
+	m_CameraInfromation["FileName"] = sessionName + "/" + filepath.filename().string();
 
 	m_IsSelectedForRecording = true;
 	m_IsEnabled = true;

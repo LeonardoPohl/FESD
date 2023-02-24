@@ -48,12 +48,15 @@ public:
 		ImGui::Separator();
 		ImGui::EndDisabled();
 
-		ImGui::Checkbox("Background close", &Background_Close);
+		ImGui::Checkbox("Background close", &BackgroundClose);
 		ImGui::Checkbox("Cramped", &Cramped);
-		ImGui::Checkbox("Dark Clothing", &Dark_Clothing);
+		ImGui::Checkbox("Dark Clothing", &DarkClothing);
 		ImGui::Separator();
 
-		ImGui::Checkbox("Stream While Recording", &StreamWhileRecording);
+		ImGui::Checkbox("Estimate Skeleton", &EstimateSkeleton);
+		ImGuiHelper::HelpMarker("Estimate the skeleton while recording.");
+
+		ImGui::Checkbox("Stream", &StreamWhileRecording);
 		ImGuiHelper::HelpMarker("Show the Live Pointcloud while recording, this might decrease performance.");
 		
 		ImGui::Checkbox("Limit Frames", &LimitFrames);
@@ -70,7 +73,7 @@ public:
 
 		ImGui::BeginDisabled(!LimitTime);
 		ImGui::InputInt("Time Limit (s)", &TimeLimitInS, 1, 100);
-		if (TimeLimitInS < 0) {
+		if (TimeLimitInS < 0 || TimeLimitInS > 180) {
 			TimeLimitInS = 0;
 			LimitTime = false;
 		}
@@ -106,9 +109,9 @@ public:
 	explicit operator Json::Value () const {
 		Json::Value val;
 
-		val["Background close"] = Background_Close;
+		val["Background close"] = BackgroundClose;
 		val["Cramped"] = Cramped;
-		val["Dark Clothing"] = Dark_Clothing;
+		val["Dark Clothing"] = DarkClothing;
 		val["Exercise"] = selectedExercises.front().Id;
 
 		return val;
@@ -171,15 +174,16 @@ public:
 	bool StreamWhileRecording{ false };
 	bool LimitFrames{ false };
 	bool LimitTime{ true };
+	bool EstimateSkeleton{ true };
 	int RepeatNTimes{ 2 };
 	int Repetitions{ 0 };
 	int TotalExercises{ 0 };
 	int FrameLimit{ 100 };
 	int TimeLimitInS{ 20 };
 private:
-	bool Background_Close{ true };
+	bool BackgroundClose{ true };
 	bool Cramped{ false };
-	bool Dark_Clothing{ false };
+	bool DarkClothing{ false };
 
 	bool selectedAnyExercise{ false };
 	Exercise manualExercise{ };
