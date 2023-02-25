@@ -197,6 +197,9 @@ void CameraHandler::showPlaybackGui()
             mp_Logger->log("Skeleton detection done for all recordings");
         }
 
+        if (m_State == Playback) {
+            ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
+        }
     }
 
     ImGui::End();
@@ -429,6 +432,9 @@ void CameraHandler::playback()
                     ImGui::End();
                 }
             }
+        }
+        if (!m_PlaybackPaused) {
+            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
         }
     }
 }
