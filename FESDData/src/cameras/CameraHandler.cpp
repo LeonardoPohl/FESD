@@ -13,6 +13,7 @@
 
 #include "RealsenseCamera.h"
 #include "OrbbecCamera.h"
+#include "NuiPlaybackCamera.h"
 
 #include "obj/PointCloud.h"
 
@@ -176,8 +177,6 @@ void CameraHandler::showPlaybackGui()
         m_CurrentPlaybackFrame = 0;
     }
 
-    ImGui::BeginDisabled(m_State == Playback);
-
     if (ImGui::Button("Refresh Recordings")) {
         findRecordings();
     }
@@ -186,17 +185,12 @@ void CameraHandler::showPlaybackGui()
         ImGui::Text("No Recordings Found!");
     }
     else {
-        ImGui::Checkbox("Use Nuitrack", &m_UseNuitrack);
-
         if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
             mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
             int i = 0;
             for (auto rec : m_Recordings) {
                 std::cout << i++ << "/" << m_Recordings.size() << "\r";
-                if (m_UseNuitrack)
-                    calculateSkeletonsNuitrack(rec);
-                else
-                    calculateSkeletonsOpenpose(rec);
+                calculateSkeletonsOpenpose(rec);
             }
 
             mp_Logger->log("Skeleton detection done for all recordings");
@@ -204,8 +198,6 @@ void CameraHandler::showPlaybackGui()
 
         showRecordings();
     }
-
-    ImGui::EndDisabled();
 
     ImGui::End();
 }
@@ -236,6 +228,7 @@ void CameraHandler::showRecordingStats() {
 void CameraHandler::showRecordings() {
     for (auto recording : m_Recordings) {
         bool isValid = false;
+        bool isNuitrack = false;
         std::string tabName = "(";
         for (auto camera : recording["Cameras"]) {
             if (camera["Type"].asString() == RealSenseCamera::getType()) {
@@ -245,6 +238,11 @@ void CameraHandler::showRecordings() {
             else if (camera["Type"].asString() == OrbbecCamera::getType()) {
                 tabName += "OB";
                 isValid = true;
+            }
+            else if (camera["Type"].asString() == NuiPlaybackCamera::getType()) {
+                tabName += "NUI";
+                isValid = true;
+                isNuitrack = true;
             }
             else {
                 isValid = false;
@@ -269,11 +267,8 @@ void CameraHandler::showRecordings() {
                 }
             }
 
-            if (ImGui::Button("Calculate Skeleton")) {
-                if (m_UseNuitrack)
-                    calculateSkeletonsNuitrack(recording);
-                else
-                    calculateSkeletonsOpenpose(recording);
+            if (!isNuitrack && ImGui::Button("Calculate Skeleton")) {
+                calculateSkeletonsOpenpose(recording);
             }
 
             if (!recording["Skeleton"].isNull() && ImGui::Button("Fix Skeleton")) {
@@ -532,11 +527,12 @@ void CameraHandler::stopRecording() {
             }
         }
 
-        root["Cameras"] = cameras;
     }
     else {
-        root["Cameras"] = m_SkeletonDetectorNuitrack->getCameraJson();
+        cameras.append(m_SkeletonDetectorNuitrack->getCameraJson());
+        m_SkeletonDetectorNuitrack->stopRecording();
     }
+    root["Cameras"] = cameras;
 
     if (m_DepthCameras.size() > 1) {
         root["Rotation"] = mp_PointCloud->getRotation();
@@ -550,10 +546,12 @@ void CameraHandler::stopRecording() {
     }
     
     Json::StreamWriterBuilder builder;
-    if (m_CamerasExist) {
-        configJson << Json::writeString(builder, root);
-    }
+    configJson << Json::writeString(builder, root);
     configJson.close();
+
+    if (m_SessionParams.EstimateSkeleton) {
+        m_SkeletonDetectorNuitrack->freeCameras();
+    }
 
     updateSessionName();
     findRecordings();
@@ -576,14 +574,21 @@ void CameraHandler::startPlayback(Json::Value recording)
     clearCameras();
 
     m_FoundRecordedSkeleton = false;
+    stopPlayback();
+
     m_Recording = recording;
 
     for (auto camera : recording["Cameras"]) {
+        auto rec_dir = (m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / camera["FileName"].asCString());
         if (camera["Type"].asString() == RealSenseCamera::getType()) {
-            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+            m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, rec_dir, &m_CurrentPlaybackFrame));
         }
         else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, m_RecordingDirectory / camera["FileName"].asCString(), &m_CurrentPlaybackFrame));
+            m_DepthCameras.push_back(new OrbbecCamera(mp_Camera, mp_Renderer, mp_Logger, rec_dir, &m_CurrentPlaybackFrame));
+        }
+        else if (camera["Type"].asString() == NuiPlaybackCamera::getType()) {
+            m_DepthCameras.push_back(new NuiPlaybackCamera(mp_Camera, mp_Renderer, mp_Logger, rec_dir, &m_CurrentPlaybackFrame, camera));
+            m_FoundRecordedSkeleton = true;
         }
         else {
             mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
@@ -591,7 +596,9 @@ void CameraHandler::startPlayback(Json::Value recording)
     }
 
     if (!recording["Skeleton"].isNull()) {
-        std::ifstream configJson(m_RecordingDirectory / recording["Skeleton"].asString());
+        mp_Logger->log("Skeleton found in '" + (m_RecordingDirectory / recording["Skeleton"].asString()).string() + "'");
+
+        std::ifstream configJson(m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / recording["Skeleton"].asString());
         Json::Value root;
 
         Json::CharReaderBuilder builder;
@@ -608,11 +615,12 @@ void CameraHandler::startPlayback(Json::Value recording)
 
             m_FoundRecordedSkeleton = true;
             m_RecordedSkeleton = root;
-            for (auto member : root[0][0].getMemberNames())
-                std::cout << member << std::endl;
         }
 
         mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
+    }
+    else if (m_FoundRecordedSkeleton) {
+        // TODO Build skeleton
     }
     else {
         mp_Logger->log("No Skeleton Found for selected recording!", Logger::Priority::WARN);

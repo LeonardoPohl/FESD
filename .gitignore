@@ -39,3 +39,4 @@ bin/
 *.prototxt
 dlls/
 packages/
+FESDData/nuitrack/

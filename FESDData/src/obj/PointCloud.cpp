@@ -103,7 +103,6 @@ namespace GLObject
             if (m_State == m_State.STREAM) {
                 depth = static_cast<const int16_t*>(cam->getDepth());
                 if (depth != nullptr) {
-
                     streamDepth(cam_index, depth);
                 }
             }
@@ -125,7 +124,6 @@ namespace GLObject
         model = glm::translate(model, m_Translation);
 
         m_GLUtil.m_Shader->SetUniformMat4f(("u_Model"), model);
-        
 
         m_GLUtil.m_Shader->SetUniformMat4f("u_VP", camera->getViewProjection());
         m_GLUtil.m_Shader->SetUniformBool("u_AlignmentMode", m_AlignmentMode);
@@ -240,7 +238,6 @@ namespace GLObject
             auto adapted_depth = (float)depth[depth_i] * m_DepthCameras[cam_index]->getMetersPerUnit();
 
             m_Points[cam_index][i].updateVertexArray(adapted_depth, cam_index);
-            
         }
     }
 

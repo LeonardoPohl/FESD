@@ -16,8 +16,10 @@ public:
 	SkeletonDetectorNuitrack(Logger::Logger* logger, std::string recordingPath, std::string camera_type);
 	~SkeletonDetectorNuitrack();
 
-	Json::Value getCameraJson();
+	static std::string getFrameName(int frame);
+	void freeCameras();
 
+	Json::Value getCameraJson();
 	bool startRecording(std::string sessionName);
 	bool update(double times_tamp, bool save = true);
 	std::string stopRecording();
@@ -30,6 +32,8 @@ private:
 	float m_MetersPerUnit{ };
 
 	std::fstream m_CSVRec{ };
+	cv::FileStorage m_FrameStorage{ };
+	Json::Value m_Skeletons{ };
 	glm::mat3 m_Intrinsics{ };
 
     // Skeleton Tracker
