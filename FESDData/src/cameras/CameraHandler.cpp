@@ -4,6 +4,7 @@
 #include <ctime>
 #include <fstream>
 #include <filesystem>
+#include <ranges>
 #include <execution>
 
 #include <json/json.h>
@@ -161,7 +162,7 @@ void CameraHandler::showRecordingGui()
 
 void CameraHandler::showPlaybackGui()
 {
-    ImGui::Begin("Recorded Sessions");
+    ImGui::Begin("Playback");
 
     if (m_State == Playback) {
         ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
@@ -196,10 +197,13 @@ void CameraHandler::showPlaybackGui()
             mp_Logger->log("Skeleton detection done for all recordings");
         }
 
-        showRecordings();
     }
 
     ImGui::End();
+
+    if (!m_Recordings.empty()) {
+        showRecordings();
+    }
 }
 
 void CameraHandler::showRecordingStats() {
@@ -226,63 +230,81 @@ void CameraHandler::showRecordingStats() {
 }
 
 void CameraHandler::showRecordings() {
-    for (auto recording : m_Recordings) {
-        bool isValid = false;
-        bool isNuitrack = false;
-        std::string tabName = "(";
-        for (auto camera : recording["Cameras"]) {
-            if (camera["Type"].asString() == RealSenseCamera::getType()) {
-                tabName += "RS";
-                isValid = true;
-            }
-            else if (camera["Type"].asString() == OrbbecCamera::getType()) {
-                tabName += "OB";
-                isValid = true;
-            }
-            else if (camera["Type"].asString() == NuiPlaybackCamera::getType()) {
-                tabName += "NUI";
-                isValid = true;
-                isNuitrack = true;
-            }
-            else {
-                isValid = false;
-                tabName += "??";
-            }
-        }
+    ImGui::Begin("Recordings");
+    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    if (ImGui::BeginTable("Recordings", 9, flags)) {
+        ImGui::TableSetupColumn("Cameras");
+        ImGui::TableSetupColumn("Exercise");
+        ImGui::TableSetupColumn("Date");
+        ImGui::TableSetupColumn("Time");
+        ImGui::TableSetupColumn("Frames");
+        ImGui::TableSetupColumn("Seconds");
+        ImGui::TableSetupColumn("Calculate Skeleton");
+        ImGui::TableSetupColumn("Fix Skeleton");
+        ImGui::TableSetupColumn("Playback");
+        ImGui::TableHeadersRow();
 
-        tabName += ") - ";
-        tabName += recording["Name"].asString();
-
-        ImGui::BeginDisabled(!isValid);
-        if (ImGui::TreeNode(tabName.c_str())) {
-            ImGui::Text("Duration (s): %.2f", recording["Duration"].asFloat());
-            ImGui::Text("Recorded Frames: %d", recording["Frames"].asInt());
-
-            ImGui::Text("Cameras:");
+        for (auto recording : m_Recordings) {
+            ImGui::TableNextRow();
+            bool isValid = false;
+            bool isNuitrack = false;
+            std::string cams = "";
             for (auto camera : recording["Cameras"]) {
-                if (ImGui::TreeNode(camera["Name"].asCString())) {
-                    ImGui::Text("Type: %s", camera["Type"].asCString());
-                    ImGui::Text("FileName: %s", camera["FileName"].asCString());
-                    ImGui::TreePop();
+                if (cams != "") {
+                    cams += ", ";
                 }
+
+                cams += camera["Type"].asString();
+                isValid = camera["Type"].asString() == NuiPlaybackCamera::getType() ||
+                    camera["Type"].asString() == OrbbecCamera::getType() ||
+                    camera["Type"].asString() == RealSenseCamera::getType();
             }
 
-            if (!isNuitrack && ImGui::Button("Calculate Skeleton")) {
+            ImGui::BeginDisabled(!isValid);
+            // Cameras
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(cams.c_str());
+            // Exercise
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text(recording["Session Parameters"]["Exercise"].asCString());
+            // Date
+            std::string date = recording["Name"].asString().substr(7);
+            std::string time = date.substr(date.find("T") + 1);
+            date = date.substr(0, date.find("T"));
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text(date.c_str());
+            // Time
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text(time.c_str());
+            // Frames
+            ImGui::TableSetColumnIndex(4);
+            ImGui::Text("%d", recording["Frames"].asInt());
+            // Seconds
+            ImGui::TableSetColumnIndex(5);
+            ImGui::Text("%.2fs", recording["Duration"].asFloat());
+            // Skeleton
+            ImGui::TableSetColumnIndex(6);
+            if (!isNuitrack && ImGui::Button("Calculate")) {
                 calculateSkeletonsOpenpose(recording);
             }
-
-            if (!recording["Skeleton"].isNull() && ImGui::Button("Fix Skeleton")) {
+            // Fix Skeleton
+            ImGui::TableSetColumnIndex(7);
+            ImGui::BeginDisabled(recording["Skeleton"].isNull());
+            if (ImGui::Button("Fix")) {
                 mp_Logger->log("IMPLEMENT THIS!!", Logger::Priority::ERR);
             }
-
+            ImGui::EndDisabled();
+            // PLayback
+            ImGui::TableSetColumnIndex(8);
             if (ImGui::Button("Start Playback")) {
                 startPlayback(recording);
             }
-
-            ImGui::TreePop();
+            ImGui::EndDisabled();
         }
-        ImGui::EndDisabled();
+        ImGui::EndTable();
     }
+    ImGui::End();
 }
 
 void CameraHandler::initRecording() {
