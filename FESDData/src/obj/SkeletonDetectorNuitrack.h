@@ -27,13 +27,14 @@ private:
 	Logger::Logger* mp_Logger;
 
 	std::filesystem::path m_RecordingPath;
+	std::filesystem::path m_FramePath;
 
 	int m_Frame{ 0 };
 	float m_MetersPerUnit{ };
 
 	std::fstream m_CSVRec{ };
-	cv::FileStorage m_FrameStorage{ };
 	Json::Value m_Skeletons{ };
+	std::vector<cv::Mat> m_Frames{ };
 	glm::mat3 m_Intrinsics{ };
 
     // Skeleton Tracker

@@ -68,7 +68,7 @@ Json::Value SkeletonDetectorNuitrack::getCameraJson()
 
 	camera["MetersPerUnit"] = 1;
 
-	camera["FileName"] = "Frames.yml";
+	camera["FileName"] = m_FramePath.filename().string();
 
 	return camera;
 }
@@ -92,16 +92,14 @@ bool SkeletonDetectorNuitrack::startRecording(std::string sessionName)
 	}
 
 	m_RecordingPath = m_RecordingDirectory / sessionName;
+	m_FramePath = m_RecordingPath / "Frames";
 
 	std::filesystem::create_directory(m_RecordingPath);
+	std::filesystem::create_directory(m_FramePath);
 
 	m_CSVRec = std::fstream{ m_RecordingPath / "Timestamps.csv", std::ios::out };
 	m_CSVRec << "frame_index,timestamp" << std::endl;
-
-	m_FrameStorage = cv::FileStorage((m_RecordingPath / "Frames.yml").string(), cv::FileStorage::WRITE);
-
 	m_Frame = 0;
-	//update(0.0, false);
 
 	return true;
 }
@@ -144,19 +142,11 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	cv::split(colorMat, channels);
 	channels.push_back(depthMat);
 	
-
 	cv::Mat fin;
 	cv::merge(channels, fin);
 	fin.convertTo(fin, CV_32F);
 	if (save) {
-		try{
-			m_FrameStorage.write(getFrameName(m_Frame), fin);
-		}
-		catch (cv::Exception& e)
-		{
-			mp_Logger->log(e.msg, Logger::Priority::ERR);
-			return false;
-		}
+		m_Frames.push_back(fin);
 	}
 
 	// Retrieve Skeleton Data	
@@ -204,7 +194,19 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 std::string SkeletonDetectorNuitrack::stopRecording()
 {
 	m_CSVRec.close();
-	m_FrameStorage.release();
+
+	for (int i = 0; i <= m_Frames.size(); i++) {
+		cv::FileStorage frameStorage ((m_FramePath / (getFrameName(i) + ".yml")).string(), cv::FileStorage::WRITE);
+		try {
+			frameStorage.write("frame", m_Frames[i]);
+		}
+		catch (cv::Exception& e)
+		{
+			mp_Logger->log(e.msg, Logger::Priority::ERR);
+		}
+		frameStorage.release();
+
+	}
 
 	std::fstream configJson(m_RecordingPath / "SkeletonNui.json", std::ios::out | std::ios::trunc);
 	Json::Value root;

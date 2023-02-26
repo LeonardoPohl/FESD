@@ -204,9 +204,7 @@ void CameraHandler::showPlaybackGui()
 
     ImGui::End();
 
-    if (!m_Recordings.empty()) {
-        showRecordings();
-    }
+    showRecordings();
 }
 
 void CameraHandler::showRecordingStats() {
