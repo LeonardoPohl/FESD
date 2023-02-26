@@ -33,7 +33,7 @@ public:
 	void stopRecording() override { mp_Logger->log("NuiPlayback does not support Recording", Logger::Priority::ERR); };
 private:
 	Logger::Logger* mp_Logger;
-	int m_QueriesFrame{ -1 };
+	int m_QueriedFrame{ -1 };
 	int* mp_CurrentPlaybackFrame;
 
 	cv::FileStorage m_Frames{};

@@ -5,7 +5,7 @@
 
 using namespace tdv::nuitrack;
 
-SkeletonDetectorNuitrack::SkeletonDetectorNuitrack(Logger::Logger* logger, float meters_per_unit, glm::mat3 intrinsics) : mp_Logger(logger), m_MetersPerUnit(meters_per_unit), m_Intrinsics(intrinsics)
+SkeletonDetectorNuitrack::SkeletonDetectorNuitrack(Logger::Logger* logger, glm::mat3 intrinsics) : mp_Logger(logger), m_Intrinsics(intrinsics)
 {
 	mp_Logger->log("Initialising Nuitrack");
 	Nuitrack::init("nuitrack/nuitrack.config");
@@ -136,7 +136,7 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	cv::Mat depthMat(cv::Size{ depthFrame->getCols(), depthFrame->getRows() }, CV_16UC1, depth);
 	depthMat.convertTo(depthMat, CV_16FC1);
 	std::cout << depthMat.type();
-	depthMat *= m_MetersPerUnit; // Convert units to meters
+	depthMat /= 1000.f; // Convert units to meters
 
 	std::vector<cv::Mat> channels;
 	cv::split(colorMat, channels);
@@ -157,16 +157,17 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 		Json::Value person_json;
 		Json::Value skeleton_json;
 		person_json["id"] = skeleton.id;
-		person_json["valid"] = true;
+		person_json["error"] = 0;
 
 		const std::vector<Joint> joints = skeleton.joints;
 		for (const Joint& joint : joints) {
 			Json::Value joint_json;
-			joint_json["valid"] = true;
+			joint_json["error"] = joint.proj.x == 0 && joint.proj.y == 0 ? 1 : 0;
 			joint_json["i"] = joint.type;
 			
 			joint_json["u"] = joint.proj.x * colorFrame->getCols();
 			joint_json["v"] = joint.proj.y * colorFrame->getRows();
+			joint_json["d"] = joint.proj.z / 1000.f;
 
 			// Units are in cm but depth stored in m
 			joint_json["x"] = joint.real.x / 1000.f;
@@ -195,7 +196,9 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 {
 	m_CSVRec.close();
 
-	for (int i = 0; i <= m_Frames.size(); i++) {
+	#pragma omp parallel for 
+	for (int i = 0; i < m_Frames.size(); i++) {
+		std::cout << i << "/" << m_Frames.size() << " Frames stored!\r";
 		cv::FileStorage frameStorage ((m_FramePath / (getFrameName(i) + ".yml")).string(), cv::FileStorage::WRITE);
 		try {
 			frameStorage.write("frame", m_Frames[i]);
@@ -205,8 +208,9 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 			mp_Logger->log(e.msg, Logger::Priority::ERR);
 		}
 		frameStorage.release();
-
 	}
+	
+	mp_Logger->log("All frames stored!");
 
 	std::fstream configJson(m_RecordingPath / "SkeletonNui.json", std::ios::out | std::ios::trunc);
 	Json::Value root;

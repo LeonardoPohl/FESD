@@ -18,16 +18,10 @@ NuiPlaybackCamera::NuiPlaybackCamera(Camera* cam, Renderer* renderer, Logger::Lo
     mp_Logger(logger), mp_CurrentPlaybackFrame(currentPlaybackFrame), m_RecordingPath(recording)
 {
     mp_Logger->log("Opening NuiRecording in '" + m_RecordingPath.string() + "'");
-    m_Frames = cv::FileStorage(recording.string(), cv::FileStorage::READ);
-    cv::Mat frame;
-    m_Frames[SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame)] >> frame;
-
-    if (frame.empty()) {
-        mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
-        return;
-    }
-
-    auto size = frame.size;
+    m_QueriedFrame = -1;
+    
+    queryFrame();
+    auto size = m_CurrentDepthFrame.size;
     m_DepthWidth = size[1];
     m_DepthHeight = size[0];
 
@@ -101,13 +95,15 @@ inline float NuiPlaybackCamera::getMetersPerUnit() const
 /// 
 
 void NuiPlaybackCamera::queryFrame() {
-    if (m_QueriesFrame == *mp_CurrentPlaybackFrame) {
+    if (m_QueriedFrame == *mp_CurrentPlaybackFrame) {
         return;
     }
     try {        
         cv::Mat frame;
-        m_Frames[SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame)] >> frame;
+        cv::FileStorage frameStore((m_RecordingPath / (SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + ".yml")).string(), cv::FileStorage::READ);
 
+        frameStore["frame"] >> frame;
+        frameStore.release();
         if (frame.empty()) {
             mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
             return;
@@ -127,7 +123,7 @@ void NuiPlaybackCamera::queryFrame() {
         m_CurrentColorFrame *= 255;
         m_CurrentColorFrame.convertTo(m_CurrentColorFrame, CV_8UC3);
 
-        m_QueriesFrame = *mp_CurrentPlaybackFrame;
+        m_QueriedFrame = *mp_CurrentPlaybackFrame;
     }
     catch (cv::Exception& e)
     {

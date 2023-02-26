@@ -12,7 +12,7 @@
 class SkeletonDetectorNuitrack
 {
 public:
-	SkeletonDetectorNuitrack(Logger::Logger* logger, float meters_per_unit, glm::mat3 intrinsics);
+	SkeletonDetectorNuitrack(Logger::Logger* logger, glm::mat3 intrinsics);
 	SkeletonDetectorNuitrack(Logger::Logger* logger, std::string recordingPath, std::string camera_type);
 	~SkeletonDetectorNuitrack();
 

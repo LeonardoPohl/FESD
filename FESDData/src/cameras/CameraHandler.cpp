@@ -132,6 +132,33 @@ void CameraHandler::showGeneralGui()
     ImGui::End();
 }
 
+
+void CameraHandler::stream()
+{
+    mp_PointCloud->OnUpdate();
+    mp_PointCloud->OnRender();
+
+    for (auto cam : m_DepthCameras)
+    {
+        if (cam->m_IsEnabled && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+            auto frame = cam->getColorFrame();
+            if (!frame.empty()) {
+                if (m_DoSkeletonDetection) {
+                    m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                }
+
+                ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
+                ImGuiHelper::showImage(frame);
+                ImGui::End();
+            }
+        }
+    }
+}
+
+/// 
+/// Recording
+/// 
+
 void CameraHandler::showRecordingGui()
 {
     if (m_State == RecordingPre) {
@@ -160,165 +187,21 @@ void CameraHandler::showRecordingGui()
     }
 }
 
-void CameraHandler::showPlaybackGui()
-{
-    ImGui::Begin("Playback");
-
-    if (m_State == Playback) {
-        ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
-    }
-
-    if (m_State == Playback && ImGui::Button("Stop Playback")) {
-        mp_Logger->log("Stopping Playback");
-        m_State = Streaming;
-        clearCameras();
-    }
-
-    if (ImGui::Checkbox("Fix Skeleton", &m_FixSkeleton)) {
-        m_CurrentPlaybackFrame = 0;
-    }
-
-    if (ImGui::Button("Refresh Recordings")) {
-        findRecordings();
-    }
-
-    if (m_Recordings.empty()) {
-        ImGui::Text("No Recordings Found!");
-    }
-    else {
-        if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
-            mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
-            int i = 0;
-            for (auto rec : m_Recordings) {
-                std::cout << i++ << "/" << m_Recordings.size() << "\r";
-                calculateSkeletonsOpenpose(rec);
-            }
-
-            mp_Logger->log("Skeleton detection done for all recordings");
-        }
-
-        if (m_State == Playback) {
-            ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
-        }
-    }
-
-    ImGui::End();
-
-    showRecordings();
-}
-
-void CameraHandler::showRecordingStats() {
-    ImGui::Begin("Session Stats");
-
-    ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
-    ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
-
-    if (m_SessionParams.LimitFrames && m_SessionParams.FrameLimit > 0) {
-        ImGui::Text("Frame Limit:");
-        ImGui::ProgressBar((float)m_RecordedFrames / (float)m_SessionParams.FrameLimit);
-    }
-        
-    if (m_SessionParams.LimitTime && m_SessionParams.TimeLimitInS > 0) {
-        ImGui::Text("Time Limit:");
-        ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_SessionParams.TimeLimitInS);
-    }
-
-    if (ImGui::Button("Stop Recording")) {
-        stopRecording();
-    }
-
-    ImGui::End();    
-}
-
-void CameraHandler::showRecordings() {
-    ImGui::Begin("Recordings");
-    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-    if (ImGui::BeginTable("Recordings", 9, flags)) {
-        ImGui::TableSetupColumn("Cameras");
-        ImGui::TableSetupColumn("Exercise");
-        ImGui::TableSetupColumn("Date");
-        ImGui::TableSetupColumn("Time");
-        ImGui::TableSetupColumn("Frames");
-        ImGui::TableSetupColumn("Seconds");
-        ImGui::TableSetupColumn("Calculate Skeleton");
-        ImGui::TableSetupColumn("Fix Skeleton");
-        ImGui::TableSetupColumn("Playback");
-        ImGui::TableHeadersRow();
-
-        for (auto recording : m_Recordings) {
-            ImGui::TableNextRow();
-            bool isValid = false;
-            bool isNuitrack = false;
-            std::string cams = "";
-            for (auto camera : recording["Cameras"]) {
-                if (cams != "") {
-                    cams += ", ";
-                }
-
-                cams += camera["Type"].asString();
-                isValid = camera["Type"].asString() == NuiPlaybackCamera::getType() ||
-                    camera["Type"].asString() == OrbbecCamera::getType() ||
-                    camera["Type"].asString() == RealSenseCamera::getType();
-            }
-
-            ImGui::BeginDisabled(!isValid);
-            // Cameras
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text(cams.c_str());
-            // Exercise
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text(recording["Session Parameters"]["Exercise"].asCString());
-            // Date
-            std::string date = recording["Name"].asString().substr(7);
-            std::string time = date.substr(date.find("T") + 1);
-            date = date.substr(0, date.find("T"));
-
-            ImGui::TableSetColumnIndex(2);
-            ImGui::Text(date.c_str());
-            // Time
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text(time.c_str());
-            // Frames
-            ImGui::TableSetColumnIndex(4);
-            ImGui::Text("%d", recording["Frames"].asInt());
-            // Seconds
-            ImGui::TableSetColumnIndex(5);
-            ImGui::Text("%.2fs", recording["Duration"].asFloat());
-            // Skeleton
-            ImGui::TableSetColumnIndex(6);
-            if (!isNuitrack && ImGui::Button("Calculate")) {
-                calculateSkeletonsOpenpose(recording);
-            }
-            // Fix Skeleton
-            ImGui::TableSetColumnIndex(7);
-            ImGui::BeginDisabled(recording["Skeleton"].isNull());
-            if (ImGui::Button("Fix")) {
-                mp_Logger->log("IMPLEMENT THIS!!", Logger::Priority::ERR);
-            }
-            ImGui::EndDisabled();
-            // PLayback
-            ImGui::TableSetColumnIndex(8);
-            if (ImGui::Button("Start Playback")) {
-                startPlayback(recording);
-            }
-            ImGui::EndDisabled();
-        }
-        ImGui::EndTable();
-    }
-    ImGui::End();
-}
-
 void CameraHandler::initRecording() {
     mp_Logger->log("Initialise recording");
 
     std::filesystem::create_directory(m_RecordingDirectory / getFileSafeSessionName(m_SessionName));
 
     if (m_SessionParams.EstimateSkeleton) {
-        float mpu = m_DepthCameras[0]->getMetersPerUnit();
-        auto intrin = m_DepthCameras[0]->getIntrinsics();
-        clearCameras();
-        m_SkeletonDetectorNuitrack = std::make_unique<SkeletonDetectorNuitrack>(mp_Logger, mpu, intrin);
-        m_SkeletonDetectorNuitrack->startRecording(getFileSafeSessionName(m_SessionName));
+        if (!m_DepthCameras.empty()) {
+            auto intrin = m_DepthCameras[0]->getIntrinsics();
+            m_SkeletonDetectorNuitrack = std::make_unique<SkeletonDetectorNuitrack>(mp_Logger, intrin);
+        }
+
+        if (m_SkeletonDetectorNuitrack) {
+            clearCameras();
+            m_SkeletonDetectorNuitrack->startRecording(getFileSafeSessionName(m_SessionName));
+        }
     }
     else {
         for (auto cam : m_DepthCameras) {
@@ -385,137 +268,26 @@ void CameraHandler::record()
     }
 }
 
-void CameraHandler::stream()
-{
-    mp_PointCloud->OnUpdate();
-    mp_PointCloud->OnRender();
+void CameraHandler::showRecordingStats() {
+    ImGui::Begin("Session Stats");
 
-    for (auto cam : m_DepthCameras)
-    {
-        if (cam->m_IsEnabled && (m_ShowColorFrames || m_DoSkeletonDetection)) {
-            auto frame = cam->getColorFrame();
-            if (!frame.empty()) {
-                if (m_DoSkeletonDetection) {
-                    m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
-                }
+    ImGui::Text("Elapsed Seconds: %.2f s", m_RecordedSeconds.count());
+    ImGui::Text("Elapsed Frames: %d", m_RecordedFrames);
 
-                ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
-                ImGuiHelper::showImage(frame);
-                ImGui::End();
-            }
-        }
-    }
-}
-
-void CameraHandler::playback()
-{
-    if (m_FixSkeleton && m_FoundRecordedSkeleton) {
-        fixSkeleton();
-    }
-    else {
-        if (!m_PlaybackPaused) {
-            mp_PointCloud->OnUpdate();
-        }
-        mp_PointCloud->OnRender();
-        for (auto cam : m_DepthCameras)
-        {
-            if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
-                auto frame = cam->getColorFrame();
-                if (!frame.empty()) {
-                    if (m_DoSkeletonDetection) {
-                        m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
-                    }
-                    ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
-                    ImGuiHelper::showImage(frame);
-                    ImGui::End();
-                }
-            }
-        }
-        if (!m_PlaybackPaused) {
-            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
-        }
-    }
-}
-
-void CameraHandler::fixSkeleton() {
-    // TODO: This wont work if there are multiple cameras so we only use the first
-    auto cam = m_DepthCameras[0];
-
-    if (m_CurrentColorFrame.empty()) {
-        if (m_CurrentPlaybackFrame != 0) {
-            mp_Logger->log("Needed to skip frame for unknown reason!", Logger::Priority::WARN);
-        }
-        mp_PointCloud->OnUpdate();
-        m_CurrentColorFrame = cam->getColorFrame();
-        if (m_CurrentColorFrame.empty()) {
-            mp_Logger->log("No color frame!", Logger::Priority::ERR);
-            return;
-        }
+    if (m_SessionParams.LimitFrames && m_SessionParams.FrameLimit > 0) {
+        ImGui::Text("Frame Limit:");
+        ImGui::ProgressBar((float)m_RecordedFrames / (float)m_SessionParams.FrameLimit);
     }
 
-    ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
-    
-    ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
-    int valid_people = 0;
-    auto& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
-    for (auto& person : skel_frame) {
-        bool person_valid = person["valid"].asBool();
-        if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
-            person["valid"] = person_valid;
-        }
-        if (person_valid)
-            valid_people += 1;
-        ImGui::BeginDisabled(person_valid);
-
-        for (auto& joint : person["Skeleton"]) {
-            const auto score = joint["score"].asDouble();
-
-            bool joint_valid = joint["valid"].asBool();
-            if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
-                joint["valid"] = joint_valid;
-            }
-
-            bool isValid = joint["valid"].asBool() && person["valid"].asBool();
-            cv::Scalar color{ 1.0, 0.0, 0.0 };
-
-            if (m_ScoreThreshold < score || m_ShowUncertainty) {
-                if (!isValid) {
-                    color = { 0, 0, 0 };
-                }
-                else if (m_ShowUncertainty && m_ScoreThreshold < score) {
-                    color = { 0.3, 0.3, 0.3 };
-                }
-                else {
-                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
-                }
-                cv::circle(m_CurrentColorFrame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
-            }
-        }
-
-        ImGui::EndDisabled();
+    if (m_SessionParams.LimitTime && m_SessionParams.TimeLimitInS > 0) {
+        ImGui::Text("Time Limit:");
+        ImGui::ProgressBar(m_RecordedSeconds.count() / (float)m_SessionParams.TimeLimitInS);
     }
-    
-    ImGui::BeginDisabled(valid_people > 1);
-    if (ImGui::Button("Continue")) {
-        m_CurrentPlaybackFrame += 1;
-        if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
-            stopPlayback();
-            return;
-        }
-        mp_PointCloud->OnUpdate();
-        m_CurrentColorFrame = cam->getColorFrame();
-        if (m_CurrentColorFrame.empty()) {
-            mp_Logger->log("No color frame!", Logger::Priority::ERR);
-            return;
-        }
+
+    if (ImGui::Button("Stop Recording")) {
+        stopRecording();
     }
-    ImGui::EndDisabled();
-    ImGui::End();
-    
-    mp_PointCloud->OnRender();
-    
-    ImGui::Begin("Skeleton Fix Color Frame");
-    ImGuiHelper::showImage(m_CurrentColorFrame);
+
     ImGui::End();
 }
 
@@ -552,11 +324,10 @@ void CameraHandler::stopRecording() {
                 cameras.append(cam_json);
             }
         }
-
     }
     else {
         cameras.append(m_SkeletonDetectorNuitrack->getCameraJson());
-        m_SkeletonDetectorNuitrack->stopRecording();
+        root["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording();
     }
     root["Cameras"] = cameras;
 
@@ -567,10 +338,6 @@ void CameraHandler::stopRecording() {
 
     root["Session Parameters"] = (Json::Value)m_SessionParams;
 
-    if (m_SessionParams.EstimateSkeleton) {
-        root["Skeleton"] = getFileSafeSessionName(m_SessionName) + "/" + "Recording.csv";
-    }
-    
     Json::StreamWriterBuilder builder;
     configJson << Json::writeString(builder, root);
     configJson.close();
@@ -590,6 +357,122 @@ void CameraHandler::stopRecording() {
         initRecording();
     else
         m_State = Streaming;
+}
+
+/// 
+/// Recording
+/// 
+
+void CameraHandler::findRecordings() {
+    m_Recordings.clear();
+
+    for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
+    {
+        if (entry.is_regular_file() &&
+            entry.path().extension() == ".json" &&
+            entry.path().filename().string().find("Skeleton")  == std::string::npos &&
+            entry.path().filename().string().find("Exercises") == std::string::npos &&
+            entry.path().filename().string().find("Errors")    == std::string::npos) {
+            std::ifstream configJson(entry.path());
+            Json::Value root;
+
+            Json::CharReaderBuilder builder;
+
+            builder["collectComments"] = true;
+
+            JSONCPP_STRING errs;
+
+            if (!parseFromStream(builder, configJson, &root, &errs)) {
+                mp_Logger->log(errs, Logger::Priority::ERR);
+            }
+            else {
+                m_Recordings.push_back(root);
+            }
+        }
+    }
+
+    std::reverse(m_Recordings.begin(), m_Recordings.end());
+
+    mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
+}
+
+void CameraHandler::showRecordings() {
+    ImGui::Begin("Recordings");
+    static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    if (ImGui::BeginTable("Recordings", 9, flags)) {
+        ImGui::TableSetupColumn("Cameras");
+        ImGui::TableSetupColumn("Exercise");
+        ImGui::TableSetupColumn("Date");
+        ImGui::TableSetupColumn("Time");
+        ImGui::TableSetupColumn("Frames");
+        ImGui::TableSetupColumn("Seconds");
+        ImGui::TableSetupColumn("Calculate Skeleton");
+        ImGui::TableSetupColumn("Fix Skeleton");
+        ImGui::TableSetupColumn("Playback");
+        ImGui::TableHeadersRow();
+
+        for (auto recording : m_Recordings) {
+            ImGui::TableNextRow();
+            bool isValid = false;
+            bool isNuitrack = false;
+            std::string cams = "";
+            for (auto camera : recording["Cameras"]) {
+                if (cams != "") {
+                    cams += ", ";
+                }
+
+                cams += camera["Type"].asString();
+                isValid = camera["Type"].asString() == NuiPlaybackCamera::getType() ||
+                    camera["Type"].asString() == OrbbecCamera::getType() ||
+                    camera["Type"].asString() == RealSenseCamera::getType();
+            }
+
+            ImGui::BeginDisabled(!isValid);
+            // Cameras
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text(cams.c_str());
+            // Exercise
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text(recording["Session Parameters"]["Exercise"].asCString());
+            // Date
+            std::string date = recording["Name"].asString().substr(7);
+            std::string time = date.substr(date.find("T") + 1);
+            date = date.substr(0, date.find("T"));
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text(date.c_str());
+            // Time
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text(time.c_str());
+            // Frames
+            ImGui::TableSetColumnIndex(4);
+            ImGui::Text("%d", recording["Frames"].asInt());
+            // Seconds
+            ImGui::TableSetColumnIndex(5);
+            ImGui::Text("%.2fs", recording["Duration"].asFloat());
+            // Skeleton
+            ImGui::TableSetColumnIndex(6);
+            if (!isNuitrack && ImGui::Button("Calculate")) {
+                calculateSkeletonsOpenpose(recording);
+            }
+            // Fix Skeleton
+            ImGui::TableSetColumnIndex(7);
+            ImGui::BeginDisabled(recording["Skeleton"].isNull());
+            if (ImGui::Button("Fix")) {
+                m_FixSkeleton = true;
+                startPlayback(recording);
+            }
+            ImGui::EndDisabled();
+            // PLayback
+            ImGui::TableSetColumnIndex(8);
+            if (ImGui::Button("Start Playback")) {
+                startPlayback(recording);
+            }
+            ImGui::EndDisabled();
+        }
+        ImGui::EndTable();
+    }
+    ImGui::End();
 }
 
 void CameraHandler::startPlayback(Json::Value recording)
@@ -614,7 +497,6 @@ void CameraHandler::startPlayback(Json::Value recording)
         }
         else if (camera["Type"].asString() == NuiPlaybackCamera::getType()) {
             m_DepthCameras.push_back(new NuiPlaybackCamera(mp_Camera, mp_Renderer, mp_Logger, rec_dir, &m_CurrentPlaybackFrame, camera));
-            m_FoundRecordedSkeleton = true;
         }
         else {
             mp_Logger->log("Camera Type '" + camera["Type"].asString() + "' unknown", Logger::Priority::WARN);
@@ -622,7 +504,7 @@ void CameraHandler::startPlayback(Json::Value recording)
     }
 
     if (!recording["Skeleton"].isNull()) {
-        mp_Logger->log("Skeleton found in '" + (m_RecordingDirectory / recording["Skeleton"].asString()).string() + "'");
+        mp_Logger->log("Skeleton found in '" + (m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / recording["Skeleton"].asString()).string() + "'");
 
         std::ifstream configJson(m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / recording["Skeleton"].asString());
         Json::Value root;
@@ -642,11 +524,6 @@ void CameraHandler::startPlayback(Json::Value recording)
             m_FoundRecordedSkeleton = true;
             m_RecordedSkeleton = root;
         }
-
-        mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
-    }
-    else if (m_FoundRecordedSkeleton) {
-        // TODO Build skeleton
     }
     else {
         mp_Logger->log("No Skeleton Found for selected recording!", Logger::Priority::WARN);
@@ -658,6 +535,188 @@ void CameraHandler::startPlayback(Json::Value recording)
     m_CamerasExist = !m_DepthCameras.empty();
     if (m_CamerasExist)
         mp_PointCloud = std::make_unique<GLObject::PointCloud>(m_DepthCameras, mp_Camera, mp_Logger, mp_Renderer);
+}
+
+void CameraHandler::playback()
+{
+    if (m_FixSkeleton && m_FoundRecordedSkeleton) {
+        fixSkeleton();
+    }
+    else {
+        if (!m_PlaybackPaused) {
+            mp_PointCloud->OnUpdate();
+        }
+        mp_PointCloud->OnRender();
+        for (auto cam : m_DepthCameras)
+        {
+            if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
+                auto frame = cam->getColorFrame();
+                if (!frame.empty()) {
+                    if (m_DoSkeletonDetection) {
+                        m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
+                    }
+                    ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
+                    ImGuiHelper::showImage(frame);
+                    ImGui::End();
+                }
+            }
+        }
+        if (!m_PlaybackPaused) {
+            m_CurrentPlaybackFrame = (m_CurrentPlaybackFrame + 1) % m_TotalPlaybackFrames;
+        }
+    }
+}
+
+void CameraHandler::showPlaybackGui()
+{
+    ImGui::Begin("Playback");
+
+    if (m_State == Playback) {
+        ImGui::Checkbox("Pause Playback", &m_PlaybackPaused);
+    }
+
+    if (m_State == Playback && ImGui::Button("Stop Playback")) {
+        mp_Logger->log("Stopping Playback");
+        m_State = Streaming;
+        clearCameras();
+    }
+
+    if (ImGui::Checkbox("Fix Skeleton", &m_FixSkeleton)) {
+        m_CurrentPlaybackFrame = 0;
+    }
+
+    if (ImGui::Button("Refresh Recordings")) {
+        findRecordings();
+    }
+
+    if (m_Recordings.empty()) {
+        ImGui::Text("No Recordings Found!");
+    }
+    else {
+        if (ImGui::Button("(Re)Calculate Skeleton for all recordings")) {
+            mp_Logger->log("Starting skeleton detection for " + std::to_string(m_Recordings.size()) + " Recordings");
+            int i = 0;
+            for (auto rec : m_Recordings) {
+                std::cout << i++ << "/" << m_Recordings.size() << "\r";
+                calculateSkeletonsOpenpose(rec);
+            }
+
+            mp_Logger->log("Skeleton detection done for all recordings");
+        }
+
+        if (m_State == Playback) {
+            ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
+        }
+    }
+
+    ImGui::End();
+
+    showRecordings();
+}
+
+void CameraHandler::fixSkeleton() {
+    // TODO: This wont work if there are multiple cameras so we only use the first
+    auto cam = m_DepthCameras[0];
+
+    if (m_CurrentColorFrame.empty()) {
+        if (m_CurrentPlaybackFrame != 0) {
+            mp_Logger->log("Needed to skip frame for unknown reason!", Logger::Priority::WARN);
+        }
+        mp_PointCloud->OnUpdate();
+        m_CurrentColorFrame = cam->getColorFrame();
+        if (m_CurrentColorFrame.empty()) {
+            mp_Logger->log("No color frame!", Logger::Priority::ERR);
+            return;
+        }
+    }
+
+    ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
+
+    ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
+    int valid_people = 0;
+    Json::Value& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
+
+    for (Json::Value& person : skel_frame) {
+        bool person_valid = person["error"].asInt() == 0;
+        ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid);
+                
+        if (person_valid) {
+            if (person["error"].asInt() != 0) {
+                person["error"] = 0;
+            }
+            valid_people += 1;
+        }
+        else {
+            if (person["error"].asInt() == 0) {
+                person["error"] = 1;
+            }
+            ImGui::SameLine();
+            
+        }
+            person["error"] = person_valid;
+        ImGui::BeginDisabled(person_valid);
+
+        for (Json::Value& joint : person["Skeleton"]) {
+            const auto score = joint["score"].asDouble();
+
+            bool joint_valid = joint["error"].asInt() == 0;
+            ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid);
+
+            if (joint_valid) {
+                if (person["error"].asInt() != 0) {
+                    person["error"] = 0;
+                }
+            }
+            else {
+                if (person["error"].asInt() == 0) {
+                    person["error"] = 1;
+                }
+                ImGui::SameLine();
+
+            }
+
+            bool isValid = joint_valid && person_valid;
+            cv::Scalar color{ 1.0, 0.0, 0.0 };
+
+            if (m_ScoreThreshold < score || m_ShowUncertainty) {
+                if (!isValid) {
+                    color = { 0, 0, 0 };
+                }
+                else if (m_ShowUncertainty && m_ScoreThreshold < score) {
+                    color = { 0.3, 0.3, 0.3 };
+                }
+                else {
+                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
+                }
+                cv::circle(m_CurrentColorFrame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
+            }
+        }
+
+        ImGui::EndDisabled();
+    }
+
+    ImGui::BeginDisabled(valid_people > 1);
+    if (ImGui::Button("Continue")) {
+        m_CurrentPlaybackFrame += 1;
+        if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
+            stopPlayback();
+            return;
+        }
+        mp_PointCloud->OnUpdate();
+        m_CurrentColorFrame = cam->getColorFrame();
+        if (m_CurrentColorFrame.empty()) {
+            mp_Logger->log("No color frame!", Logger::Priority::ERR);
+            return;
+        }
+    }
+    ImGui::EndDisabled();
+    ImGui::End();
+
+    mp_PointCloud->OnRender();
+
+    ImGui::Begin("Skeleton Fix Color Frame");
+    ImGuiHelper::showImage(m_CurrentColorFrame);
+    ImGui::End();
 }
 
 void CameraHandler::stopPlayback()
@@ -677,45 +736,10 @@ void CameraHandler::stopPlayback()
     m_FoundRecordedSkeleton = false;
 }
 
-void CameraHandler::findRecordings() {
-    m_Recordings.clear();
 
-    for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
-    {
-        if (entry.is_regular_file() && 
-            entry.path().extension() == ".json" && 
-            entry.path().filename().string().find("Skeleton") == std::string::npos &&
-            entry.path().filename().string().find("Exercise") == std::string::npos) {
-            std::ifstream configJson(entry.path());
-            Json::Value root;
-
-            Json::CharReaderBuilder builder;
-
-            builder["collectComments"] = true;
-
-            JSONCPP_STRING errs;
-
-            if (!parseFromStream(builder, configJson, &root, &errs)) {
-                mp_Logger->log(errs, Logger::Priority::ERR);
-            }
-            else {
-                m_Recordings.push_back(root);
-            }
-        }
-    }
-
-    mp_Logger->log("Found " + std::to_string(m_Recordings.size()) + " Recordings in '" + m_RecordingDirectory.generic_string() + "'");
-}
-
-
-void CameraHandler::clearCameras() {
-    for (auto cam : m_DepthCameras)
-        delete cam;
-
-    m_DepthCameras.clear();
-    mp_PointCloud.release();
-    m_CamerasExist = false;
-}
+/// 
+/// Skeleton Calculator (kind of depricated)
+/// 
 
 void CameraHandler::calculateSkeletonsNuitrack(Json::Value recording) {
     m_TotalPlaybackFrames = recording["RecordedFrames"].asInt();
@@ -801,6 +825,19 @@ void CameraHandler::calculateSkeletonsOpenpose(Json::Value recording) {
     initAllCameras();
 
     m_State = Streaming;
+}
+
+/// 
+/// Utils
+/// 
+
+void CameraHandler::clearCameras() {
+    for (auto cam : m_DepthCameras)
+        delete cam;
+
+    m_DepthCameras.clear();
+    mp_PointCloud.release();
+    m_CamerasExist = false;
 }
 
 void CameraHandler::updateSessionName() {

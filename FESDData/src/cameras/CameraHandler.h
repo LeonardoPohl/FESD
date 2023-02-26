@@ -20,35 +20,38 @@ public:
 	CameraHandler(Camera *cam, Renderer *r, Logger::Logger *logger);
 	~CameraHandler();
 
-	void initAllCameras();
 	void OnUpdate();
 	void OnImGuiRender();
 private:
+	void initAllCameras();
+
+	// Streaming
 	void showGeneralGui();
-	void showRecordingGui();
-	void showPlaybackGui();
+	void stream();
 
-	void showRecordingStats();
-	void showRecordings();
-
+	// Recording
 	void initRecording();
 	void countdown();
 	void startRecording();
-
+	void showRecordingGui();
+	void showRecordingStats();
 	void record();
-	void stream();
-	void playback();
-
-	void fixSkeleton();
-
 	void stopRecording();
-	void startPlayback(Json::Value recording);
-	void stopPlayback();
-	void findRecordings();
 
+	// PLayback
+	void findRecordings();
+	void showRecordings();
+	void startPlayback(Json::Value recording);
+	void showPlaybackGui();
+	void playback();
+	void fixSkeleton();
+	void stopPlayback();
+
+	// Skeleton Detection
 	void calculateSkeletonsNuitrack(Json::Value recording);
 	void calculateSkeletonsOpenpose(Json::Value recording);
 
+	// Utils
 	void clearCameras();
 	void updateSessionName();
 
