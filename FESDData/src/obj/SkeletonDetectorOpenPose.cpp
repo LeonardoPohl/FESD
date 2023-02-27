@@ -5,6 +5,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include "Error.h"
 #include "utilities/Consts.h"
 #include "utilities/Utils.h"
 

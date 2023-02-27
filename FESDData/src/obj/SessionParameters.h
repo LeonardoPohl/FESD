@@ -86,6 +86,7 @@ public:
 		if (ImGui::Button("Begin Recording")) {
 			Repetitions = 0;
 			TotalExercises = 0;
+			m_RecordingLenghts.clear();
 
 			if (selectedAnyExercise) {
 				for (int i = 0; i < exercises.size(); i++) {
@@ -136,9 +137,25 @@ public:
 		}
 
 		ImGui::Begin("Countdown");
+		ImGui::BeginDisabled(selectedAnyExercise);
 		selectedExercises.front().imguiExercise();
 		char buf1[32];
 		char buf2[32];
+
+		if (!m_RecordingLenghts.empty()) {
+			int exercises_left = (TotalExercises * RepeatNTimes) - m_RecordingLenghts.size();
+			std::chrono::duration<double> avg = std::chrono::duration<double>::zero();
+			for (auto duration : m_RecordingLenghts) {
+				avg += duration;
+			}
+			avg /= m_RecordingLenghts.size();
+			ImGui::Text("Average duration: %.2fs", avg.count());
+			std::chrono::duration<double> seconds_left(avg.count() * exercises_left);
+			ImGui::Text("Appx Left: %.2fs", seconds_left.count());
+			auto eta = std::chrono::system_clock::now() + seconds_left;
+			ImGui::Text("ETA: ", "%D %T %Z\n", floor<std::chrono::milliseconds>(eta));
+		}
+			
 
 		ImGui::Text("Exercises:");
 		sprintf(buf1, "Exercise %d/%d", (int)selectedExercises.size(), TotalExercises);
@@ -150,14 +167,16 @@ public:
 		ImGui::ProgressBar((double)Repetitions / (double)RepeatNTimes);
 
 		ImGui::ProgressBar(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - CountdownStart).count() / (double)CountdownInS);
-
+		ImGui::EndDisabled();
 		ImGui::End();
 
 		return false;
 	}
 
 	/// <returns>true if all repetitions are done</returns>
-	bool stopRecording() {
+	bool stopRecording(std::chrono::duration<double> duration) {
+		m_RecordingLenghts.push_back(duration);
+
 		Repetitions += 1;
 
 		if (RepeatNTimes == Repetitions) {
@@ -194,4 +213,5 @@ private:
 	bool CountdownStarted{ false };
 	int CountdownInS{ 5 };
 	std::chrono::time_point<std::chrono::system_clock> CountdownStart;
+	std::vector<std::chrono::duration<double>> m_RecordingLenghts{};
 };

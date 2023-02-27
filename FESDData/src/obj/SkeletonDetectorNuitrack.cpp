@@ -1,5 +1,6 @@
 #include "SkeletonDetectorNuitrack.h"
 
+#include "Error.h"
 #include "utilities/Consts.h"
 #include "utilities/Utils.h"
 
@@ -135,7 +136,6 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	
 	cv::Mat depthMat(cv::Size{ depthFrame->getCols(), depthFrame->getRows() }, CV_16UC1, depth);
 	depthMat.convertTo(depthMat, CV_16FC1);
-	std::cout << depthMat.type();
 	depthMat /= 1000.f; // Convert units to meters
 
 	std::vector<cv::Mat> channels;
@@ -157,12 +157,12 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 		Json::Value person_json;
 		Json::Value skeleton_json;
 		person_json["id"] = skeleton.id;
-		person_json["error"] = 0;
+		person_json["error"] = SkeltonErrors[0].id;
 
 		const std::vector<Joint> joints = skeleton.joints;
 		for (const Joint& joint : joints) {
 			Json::Value joint_json;
-			joint_json["error"] = joint.proj.x == 0 && joint.proj.y == 0 ? 1 : 0;
+			joint_json["error"] = JointErrors[joint.proj.x == 0 && joint.proj.y == 0 ? 1 : 0].id;
 			joint_json["i"] = joint.type;
 			
 			joint_json["u"] = joint.proj.x * colorFrame->getCols();
@@ -192,11 +192,10 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	return true;
 }
 
-std::string SkeletonDetectorNuitrack::stopRecording()
+std::string SkeletonDetectorNuitrack::stopRecording(bool sound)
 {
 	m_CSVRec.close();
 
-	#pragma omp parallel for 
 	for (int i = 0; i < m_Frames.size(); i++) {
 		std::cout << i << "/" << m_Frames.size() << " Frames stored!\r";
 		cv::FileStorage frameStorage ((m_FramePath / (getFrameName(i) + ".yml")).string(), cv::FileStorage::WRITE);
@@ -209,7 +208,8 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 		}
 		frameStorage.release();
 	}
-	
+	m_Frames.clear();
+
 	mp_Logger->log("All frames stored!");
 
 	std::fstream configJson(m_RecordingPath / "SkeletonNui.json", std::ios::out | std::ios::trunc);
@@ -218,5 +218,10 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 	Json::StreamWriterBuilder builder;
 	configJson << Json::writeString(builder, m_Skeletons);
 	configJson.close();
+
+	if (sound) {
+		std::cout << "\a";
+	}
+
 	return "SkeletonNui.json";
 }

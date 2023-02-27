@@ -211,6 +211,7 @@
   <ItemGroup>
     <ClInclude Include="src\cameras\NuiPlaybackCamera.h" />
     <ClInclude Include="src\obj\BoundingBox.h" />
+    <ClInclude Include="src\obj\Error.h" />
     <ClInclude Include="src\obj\Exercise.h" />
     <ClInclude Include="src\obj\Logger.h" />
     <ClInclude Include="src\obj\Point.h" />

@@ -17,6 +17,7 @@
 #include "NuiPlaybackCamera.h"
 
 #include "obj/PointCloud.h"
+#include "obj/Error.h"
 
 #include "utilities/Consts.h"
 #include "utilities/helper/ImGuiHelper.h"
@@ -233,6 +234,7 @@ void CameraHandler::startRecording() {
 void CameraHandler::record()
 {
     m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
+    m_RecordedFrames += 1;
 
     if (m_RecordedFrames > m_SessionParams.FrameLimit && m_SessionParams.LimitFrames) {
         stopRecording();
@@ -243,8 +245,6 @@ void CameraHandler::record()
         stopRecording();
         return;
     }
-
-    m_RecordedFrames += 1;
         
     if (m_SessionParams.EstimateSkeleton) {
         m_SkeletonDetectorNuitrack->update(m_RecordedSeconds.count());
@@ -327,7 +327,7 @@ void CameraHandler::stopRecording() {
     }
     else {
         cameras.append(m_SkeletonDetectorNuitrack->getCameraJson());
-        root["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording();
+        root["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording(true);
     }
     root["Cameras"] = cameras;
 
@@ -349,11 +349,13 @@ void CameraHandler::stopRecording() {
     updateSessionName();
     findRecordings();
 
-    clearCameras();
+    if (!m_SessionParams.EstimateSkeleton) {
+        clearCameras();
 
-    initAllCameras();
+        initAllCameras();
+    }
 
-    if (!m_SessionParams.stopRecording())
+    if (!m_SessionParams.stopRecording(std::chrono::system_clock::now() - m_RecordingStart))
         initRecording();
     else
         m_State = Streaming;
@@ -618,23 +620,28 @@ void CameraHandler::fixSkeleton() {
     // TODO: This wont work if there are multiple cameras so we only use the first
     auto cam = m_DepthCameras[0];
 
-    if (m_CurrentColorFrame.empty()) {
-        if (m_CurrentPlaybackFrame != 0) {
-            mp_Logger->log("Needed to skip frame for unknown reason!", Logger::Priority::WARN);
-        }
-        mp_PointCloud->OnUpdate();
-        m_CurrentColorFrame = cam->getColorFrame();
-        if (m_CurrentColorFrame.empty()) {
-            mp_Logger->log("No color frame!", Logger::Priority::ERR);
-            return;
-        }
-    }
-
     ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
 
     ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
-    int valid_people = 0;
     Json::Value& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
+
+    if (!skel_frame) {
+        m_CurrentPlaybackFrame += 1;
+        if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
+            stopPlayback();
+        }
+        return;
+    }
+
+    int valid_people = 0;
+
+    mp_PointCloud->OnUpdate();
+    m_CurrentColorFrame = cam->getColorFrame();
+    if (m_CurrentColorFrame.empty()) {
+        mp_Logger->log("No color frame!", Logger::Priority::ERR);
+        return;
+    }
+
 
     for (Json::Value& person : skel_frame) {
         bool person_valid = person["error"].asInt() == 0;
@@ -651,7 +658,9 @@ void CameraHandler::fixSkeleton() {
                 person["error"] = 1;
             }
             ImGui::SameLine();
-            
+            int err = person["error"].asInt();
+            SkeltonErrors.Slider(&err);
+            person["error"] = err;
         }
             person["error"] = person_valid;
         ImGui::BeginDisabled(person_valid);
@@ -663,16 +672,18 @@ void CameraHandler::fixSkeleton() {
             ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid);
 
             if (joint_valid) {
-                if (person["error"].asInt() != 0) {
-                    person["error"] = 0;
+                if (joint["error"].asInt() != 0) {
+                    joint["error"] = 0;
                 }
             }
             else {
-                if (person["error"].asInt() == 0) {
-                    person["error"] = 1;
+                if (joint["error"].asInt() == 0) {
+                    joint["error"] = 1;
                 }
                 ImGui::SameLine();
-
+                int err = joint["error"].asInt();
+                JointErrors.Slider(&err);
+                joint["error"] = err;
             }
 
             bool isValid = joint_valid && person_valid;
@@ -695,7 +706,6 @@ void CameraHandler::fixSkeleton() {
         ImGui::EndDisabled();
     }
 
-    ImGui::BeginDisabled(valid_people > 1);
     if (ImGui::Button("Continue")) {
         m_CurrentPlaybackFrame += 1;
         if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
@@ -709,7 +719,7 @@ void CameraHandler::fixSkeleton() {
             return;
         }
     }
-    ImGui::EndDisabled();
+
     ImGui::End();
 
     mp_PointCloud->OnRender();
