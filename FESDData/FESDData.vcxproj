@@ -204,8 +204,17 @@
     </None>
     <None Include="packages.config" />
     <None Include="Readme.md" />
+    <None Include="resources\Exercises.json">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
+    <None Include="resources\JointErrors.json">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
     <None Include="resources\shaders\PointCloud\PointCloud.frag" />
     <None Include="resources\shaders\PointCloud\PointCloud.vert" />
+    <None Include="resources\SkeletonErrors.json">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </None>
     <None Include="vcpkg.json" />
   </ItemGroup>
   <ItemGroup>

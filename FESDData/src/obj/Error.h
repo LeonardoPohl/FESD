@@ -28,7 +28,7 @@ struct Errors
 {
 public:
 	Errors(ErrorType et) : errorType(et){
-		std::filesystem::path file = m_RecordingDirectory;
+		std::filesystem::path file{"resources"};
 
 		if (et == ErrorType::Joint) {
 			file /= "JointErrors.json";

@@ -38,45 +38,43 @@ public:
 	static std::vector<Exercise> getPredefinedExercises() {
 		std::vector<Exercise> exercises;
 		//std::string id, std::string Description, bool sitting, bool holding_weight, bool ankle_weight
+		std::filesystem::path exercise_json{"resources/Exercises.json"};
+		if (!std::filesystem::exists(exercise_json)) {
+			std::cout << exercise_json << " does not exist. Errors could not be loaded!" << std::endl;
+		}
+		std::ifstream configJson(exercise_json);
+		Json::Value root;
+		configJson >> root;
 
-		for (const auto& entry : std::filesystem::directory_iterator(m_RecordingDirectory))
-		{
-			if (entry.path().filename().string().find("Exercises.json") != std::string::npos) {
-				std::ifstream configJson(entry.path());
-				Json::Value root;
-				configJson >> root;
-
-				auto es = root["Exercises"];				
-				for (auto exercise : es) {
-					Difficulty difficulty;
-					switch (exercise["Id"].asString()[2])
-					{
-					case '0':
-						difficulty = Difficulty::Trivial;
-						break;
-					case '1':
-						difficulty = Difficulty::Easy;
-						break;
-					case '2':
-						difficulty = Difficulty::Medium;
-						break;
-					case '3':
-						difficulty = Difficulty::Hard;
-						break;
-					default:
-						difficulty = Difficulty::Trivial;
-						break;
-					}
-					exercises.push_back({
-							exercise["Id"].asString(),
-							exercise["Description"].asString(),
-							difficulty,
-							exercise["Sitting"].asBool(),
-							exercise["Ankle Weight"].asBool(),
-							exercise["Holding Weight"].asBool()
-						});
-				}
+		auto es = root["Exercises"];
+		for (auto exercise : es) {
+			Difficulty difficulty;
+			switch (exercise["Id"].asString()[2])
+			{
+			case '0':
+				difficulty = Difficulty::Trivial;
+				break;
+			case '1':
+				difficulty = Difficulty::Easy;
+				break;
+			case '2':
+				difficulty = Difficulty::Medium;
+				break;
+			case '3':
+				difficulty = Difficulty::Hard;
+				break;
+			default:
+				difficulty = Difficulty::Trivial;
+				break;
 			}
+			exercises.push_back({
+					exercise["Id"].asString(),
+					exercise["Description"].asString(),
+					difficulty,
+					exercise["Sitting"].asBool(),
+					exercise["Ankle Weight"].asBool(),
+					exercise["Holding Weight"].asBool()
+				});
 		}
 
 		return exercises;
