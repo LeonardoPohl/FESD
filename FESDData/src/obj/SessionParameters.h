@@ -87,6 +87,7 @@ public:
 			Repetitions = 0;
 			TotalExercises = 0;
 			m_RecordingLenghts.clear();
+			CancelRecording = false;
 
 			if (selectedAnyExercise) {
 				for (int i = 0; i < exercises.size(); i++) {
@@ -174,7 +175,14 @@ public:
 		showCurrentSession();
 		char buf1[32];
 		char buf2[32];
-			
+		ImGui::Checkbox("Pause Countdown", &CountdownPaused);
+		if (CountdownPaused) {
+			CountdownStart = std::chrono::system_clock::now();
+		}
+		if (ImGui::Button("Stop recording")) {
+			CancelRecording = true;
+		}
+
 		ImGui::Text("Exercises:");
 		sprintf(buf1, "Exercise %d/%d", (int)selectedExercises.size(), TotalExercises);
 		ImGui::ProgressBar(1.0 - (double)selectedExercises.size() / (double)TotalExercises);
@@ -188,6 +196,10 @@ public:
 		ImGui::End();
 
 		return false;
+	}
+
+	bool cancelRecording() {
+		return CancelRecording;
 	}
 
 	/// <returns>true if all repetitions are done</returns>
@@ -228,6 +240,8 @@ private:
 	std::queue<Exercise> selectedExercises{ };
 
 	bool CountdownStarted{ false };
+	bool CountdownPaused{ false };
+	bool CancelRecording{ false };
 	int CountdownInS{ 5 };
 	std::chrono::time_point<std::chrono::system_clock> CountdownStart;
 	std::vector<std::chrono::duration<double>> m_RecordingLenghts{};

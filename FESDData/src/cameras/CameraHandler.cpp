@@ -221,8 +221,21 @@ void CameraHandler::initRecording() {
 
 void CameraHandler::countdown() {
     m_State = Countdown;
+    
     if (m_SessionParams.countDown()) {
         startRecording();
+    }
+    else if (m_SessionParams.cancelRecording()) {
+        updateSessionName();
+        findRecordings();
+
+        if (!m_SessionParams.EstimateSkeleton) {
+            clearCameras();
+
+            initAllCameras();
+        }
+
+        m_State = Streaming;
     }
 }
 
@@ -368,7 +381,7 @@ void CameraHandler::stopRecording() {
 }
 
 /// 
-/// Recording
+/// Playback
 /// 
 
 void CameraHandler::findRecordings() {
