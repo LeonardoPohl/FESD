@@ -69,7 +69,7 @@ Json::Value SkeletonDetectorNuitrack::getCameraJson()
 
 	camera["MetersPerUnit"] = 1;
 
-	camera["FileName"] = m_FramePath.filename().string();
+	camera["FileName"] = (m_FramePath.parent_path().filename() / m_FramePath.filename()).string();
 
 	return camera;
 }
@@ -213,15 +213,14 @@ std::string SkeletonDetectorNuitrack::stopRecording(bool sound)
 	mp_Logger->log("All frames stored!");
 
 	std::fstream configJson(m_RecordingPath / "SkeletonNui.json", std::ios::out | std::ios::trunc);
-	Json::Value root;
-	root["Skeletons"] = m_Skeletons;
 	Json::StreamWriterBuilder builder;
 	configJson << Json::writeString(builder, m_Skeletons);
 	configJson.close();
+	m_Skeletons.clear();
 
 	if (sound) {
 		std::cout << "\a";
 	}
 
-	return "SkeletonNui.json";
+	return (m_RecordingPath.filename() / "SkeletonNui.json").string();
 }

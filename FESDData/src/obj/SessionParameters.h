@@ -223,5 +223,5 @@ private:
 	std::chrono::duration<double> AverageDuration;
 	std::chrono::duration<double> SecondsLeft;
 	std::chrono::duration<double> SecondsTotal;
-	std::chrono::time_point<std::chrono::system_clock> ETA;
+	std::chrono::time_point<std::chrono::system_clock, std::chrono::duration<double>> ETA;
 };

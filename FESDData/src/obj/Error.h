@@ -58,8 +58,11 @@ public:
 		}
 	}
 
-	void Slider(int *err_id) {
-		ImGui::SliderInt("", err_id, 0, errors.size(), errors[*err_id].name.c_str());
+	void Slider(int *err_id, int id) {
+		
+		if (ImGui::SliderInt("##" + id, err_id, 0, errors.size(), errors[*err_id].name.c_str())) {
+			std::cout << errors.size() << std::endl;
+		}
 	}
 
 	Error operator[](int i) {

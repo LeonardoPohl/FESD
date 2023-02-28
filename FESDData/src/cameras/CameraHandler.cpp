@@ -460,14 +460,14 @@ void CameraHandler::showRecordings() {
             // Fix Skeleton
             ImGui::TableSetColumnIndex(7);
             ImGui::BeginDisabled(recording["Skeleton"].isNull());
-            if (ImGui::Button("Fix")) {
+            if (ImGui::Button(("Fix##" + recording["Name"].asString()).c_str())) {
                 m_FixSkeleton = true;
                 startPlayback(recording);
             }
             ImGui::EndDisabled();
             // PLayback
             ImGui::TableSetColumnIndex(8);
-            if (ImGui::Button("Start Playback")) {
+            if (ImGui::Button(("Play##" + recording["Name"].asString()).c_str())) {
                 startPlayback(recording);
             }
             ImGui::EndDisabled();
@@ -490,7 +490,7 @@ void CameraHandler::startPlayback(Json::Value recording)
     m_Recording = recording;
 
     for (auto camera : recording["Cameras"]) {
-        auto rec_dir = (m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / camera["FileName"].asCString());
+        auto rec_dir = (m_RecordingDirectory / camera["FileName"].asCString());
         if (camera["Type"].asString() == RealSenseCamera::getType()) {
             m_DepthCameras.push_back(new RealSenseCamera(mp_Camera, mp_Renderer, mp_Logger, rec_dir, &m_CurrentPlaybackFrame));
         }
@@ -506,9 +506,9 @@ void CameraHandler::startPlayback(Json::Value recording)
     }
 
     if (!recording["Skeleton"].isNull()) {
-        mp_Logger->log("Skeleton found in '" + (m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / recording["Skeleton"].asString()).string() + "'");
+        mp_Logger->log("Skeleton found in '" + (m_RecordingDirectory / recording["Skeleton"].asString()).string() + "'");
 
-        std::ifstream configJson(m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString()) / recording["Skeleton"].asString());
+        std::ifstream configJson(m_RecordingDirectory / recording["Skeleton"].asString());
         Json::Value root;
 
         Json::CharReaderBuilder builder;
@@ -645,44 +645,42 @@ void CameraHandler::fixSkeleton() {
 
     for (Json::Value& person : skel_frame) {
         bool person_valid = person["error"].asInt() == 0;
-        ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid);
-                
-        if (person_valid) {
-            if (person["error"].asInt() != 0) {
+        if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
+            if (person_valid) {
                 person["error"] = 0;
             }
-            valid_people += 1;
-        }
-        else {
-            if (person["error"].asInt() == 0) {
+            else {
                 person["error"] = 1;
             }
+        }
+                
+        if (!person_valid) {
             ImGui::SameLine();
             int err = person["error"].asInt();
-            SkeltonErrors.Slider(&err);
+            SkeltonErrors.Slider(&err, person["Index"].asInt());
             person["error"] = err;
         }
-            person["error"] = person_valid;
-        ImGui::BeginDisabled(person_valid);
+
+        ImGui::BeginDisabled(!person_valid);
 
         for (Json::Value& joint : person["Skeleton"]) {
             const auto score = joint["score"].asDouble();
 
             bool joint_valid = joint["error"].asInt() == 0;
-            ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid);
 
-            if (joint_valid) {
-                if (joint["error"].asInt() != 0) {
+            if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
+                if (joint_valid) {
                     joint["error"] = 0;
                 }
-            }
-            else {
-                if (joint["error"].asInt() == 0) {
+                else {
                     joint["error"] = 1;
                 }
+            }
+
+            if (!joint_valid) {
                 ImGui::SameLine();
                 int err = joint["error"].asInt();
-                JointErrors.Slider(&err);
+                JointErrors.Slider(&err, joint["i"].asInt());
                 joint["error"] = err;
             }
 
@@ -732,7 +730,6 @@ void CameraHandler::fixSkeleton() {
 void CameraHandler::stopPlayback()
 {
     if (m_FoundRecordedSkeleton) {
-        m_RecordedSkeleton["fixed"] = m_FixSkeleton;
         auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
         configPath += ".json";
 
