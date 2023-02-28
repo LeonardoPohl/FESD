@@ -83,6 +83,8 @@ void CameraHandler::OnImGuiRender()
 {
     if (m_State == Recording) {
         showRecordingStats();
+        m_SessionParams.showCurrentSession();
+
         return;
     }
     else if (m_State == Countdown) {

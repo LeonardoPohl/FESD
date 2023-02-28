@@ -118,6 +118,25 @@ public:
 		return val;
 	}
 
+
+	void showCurrentSession() {
+		ImGui::Begin("Current Recording Session");
+		ImGui::BeginDisabled(selectedAnyExercise);
+		selectedExercises.front().imguiExercise();
+
+		if (!m_RecordingLenghts.empty()) {
+			ImGui::Text("Average duration: %.2fs", AverageDuration.count());
+			ImGui::Text("Appx Left: %.2fs", SecondsLeft.count());
+			ImGui::Text(("ETA: " + std::format("{:%F %T}", floor<std::chrono::minutes>(ETA))).c_str());
+		}
+		else {
+			ImGui::Text("Average duration: ---");
+			ImGui::Text("Appx Left: ---");
+			ImGui::Text("ETA: --- ");
+		}
+		ImGui::EndDisabled();
+		ImGui::End();
+	}
 	/// <summary>
 	/// Display a countdown before starting to record
 	/// </summary>
@@ -129,18 +148,20 @@ public:
 			CountdownStarted = true;
 			CountdownStart = std::chrono::system_clock::now();
 
-			TotalLeft = (TotalExercises * RepeatNTimes) - m_RecordingLenghts.size();
-			AverageDuration = std::chrono::duration<double>::zero();
-			for (auto duration : m_RecordingLenghts) {
-				AverageDuration += duration;
-			}
+			if (!m_RecordingLenghts.empty()) {
+				TotalLeft = (TotalExercises * RepeatNTimes) - m_RecordingLenghts.size();
+				AverageDuration = std::chrono::duration<double>::zero();
+				for (auto duration : m_RecordingLenghts) {
+					AverageDuration += duration;
+				}
 
-			AverageDuration /= m_RecordingLenghts.size();
-			SecondsLeft = AverageDuration * TotalLeft;
-			SecondsTotal = AverageDuration * (TotalExercises * RepeatNTimes);
-			ETA = (std::chrono::system_clock::now() + SecondsLeft);
-			std::cout << "Seconds left: " << SecondsLeft.count() << " s => " << SecondsLeft.count() / 60.0 << " min" << std::endl;
-			std::cout << "ETA: " << std::format("{:%F %T}", floor<std::chrono::minutes>(ETA)) << std::endl;
+				AverageDuration /= m_RecordingLenghts.size();
+				SecondsLeft = AverageDuration * TotalLeft;
+				SecondsTotal = AverageDuration * (TotalExercises * RepeatNTimes);
+				ETA = (std::chrono::system_clock::now() + SecondsLeft);
+				std::cout << "Seconds left: " << SecondsLeft.count() << " s => " << SecondsLeft.count() / 60.0 << " min" << std::endl;
+				std::cout << "ETA: " << std::format("{:%F %T}", floor<std::chrono::minutes>(ETA)) << std::endl;
+			}			
 		}
 
 		if (CountdownInS == 0 ||
@@ -150,18 +171,10 @@ public:
 		}
 
 		ImGui::Begin("Countdown");
-		ImGui::BeginDisabled(selectedAnyExercise);
-		selectedExercises.front().imguiExercise();
+		showCurrentSession();
 		char buf1[32];
 		char buf2[32];
-
-		if (!m_RecordingLenghts.empty()) {
-			ImGui::Text("Average duration: %.2fs", AverageDuration.count());
-			ImGui::Text("Appx Left: %.2fs", SecondsLeft.count());
-			ImGui::Text(("ETA: " + std::format("{:%F %T}", floor<std::chrono::minutes>(ETA))).c_str());
-		}
 			
-
 		ImGui::Text("Exercises:");
 		sprintf(buf1, "Exercise %d/%d", (int)selectedExercises.size(), TotalExercises);
 		ImGui::ProgressBar(1.0 - (double)selectedExercises.size() / (double)TotalExercises);
@@ -172,7 +185,6 @@ public:
 		ImGui::ProgressBar((double)Repetitions / (double)RepeatNTimes);
 
 		ImGui::ProgressBar(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - CountdownStart).count() / (double)CountdownInS);
-		ImGui::EndDisabled();
 		ImGui::End();
 
 		return false;
