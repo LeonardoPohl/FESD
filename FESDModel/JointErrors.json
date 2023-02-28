@@ -1,0 +1,20 @@
+[
+  {
+    "Id" : 0,
+    "Name" : "No Error"
+  },
+  {
+    "Id" : 1,
+    "Name" : "Joint Not Found"
+  },
+  {
+    "Id" : 2,
+    "Name" : "Unrealistic Joint Position",
+    "Description" : "The joint position is not realistic. This can be caused by a joint being in a position that is not possible for the human body."
+  },
+  {
+    "Id" : 3,
+    "Name" : "Wrong Joint Position",
+    "Description" : "The joint position is wrong. An example for this might be that instead of the leg a leg of the chair is detected."
+  }
+]

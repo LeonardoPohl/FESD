@@ -44,10 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="Exercises.json" />
     <Content Include="FESDModel.ipynb" />
+    <Content Include="JointErrors.json" />
     <Content Include="recording_parser\__pycache__\recording.cpython-39.pyc" />
     <Content Include="recording_parser\__pycache__\__init__.cpython-39.pyc" />
     <Content Include="requirements.txt" />
+    <Content Include="SkeletonErrors.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="recording_parser\" />

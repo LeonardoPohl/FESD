@@ -1,0 +1,95 @@
+{
+  "Exercises":[
+    {
+      "Id": "E-0.00",
+      "Description": "Hold the arms to the sides in a hanging position.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-0.01",
+      "Description": "Hold the arms to the sides at a 90 degree angle.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-1.00",
+      "Description": "Start with the arms hanging to the sides. First raise the right arm to the side, then lower it. Then raise the left arm to the side and lower it. Finally raise both arms to the side and lower them.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-1.01",
+      "Description": "Start with the arms hanging to the sides. First raise the right arm to the front, then lower it. Then raise the left arm to the front and lower it. Finally raise both arms to the front and lower them.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-1.02",
+      "Description": "In a natural standing position raise one knee to the chest and lower it and then raise the other knee to the chest and lower it. Repeat this.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-1.03",
+      "Description": "Sit in front of the camera with the arms lowered.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-2.00",
+      "Description": "Start with the arms to the sides. First raise the right arm to the side, then lower it. Then raise the left arm to the side and lower it. Finally raise both arms to the side and lower them.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-2.01",
+      "Description": "Start with the arms to the sides. First raise the right arm to the front, then lower it. Then raise the left arm to the front and lower it. Finally raise both arms to the front and lower them.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-2.02",
+      "Description": "Start with the arms to the sides. First cross the right arm to the left sholder, then lower it. Then cross the left arm to the right sholder and lower it. Repeat this.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-2.03",
+      "Description": "In a standing position, bow forward and then return to the standing position. Repeat this.",
+			"Sitting" : false,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-3.00",
+      "Description": "In a natural sitting position, raise the knees to the chest and lower them.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-3.01",
+      "Description": "In a forward leaning sitting position, raise the knees to the chest and lower them.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    },
+    {
+      "Id": "E-3.02",
+      "Description": "In a forward leaning sitting position facing away from the camera at 20 degree, raise the knees to the chest and lower them.",
+			"Sitting" : true,
+      "Ankle Weight" : false,
+			"Holding Weight" : false
+    }
+  ]
+}
