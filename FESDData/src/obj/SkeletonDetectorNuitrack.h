@@ -22,7 +22,7 @@ public:
 	Json::Value getCameraJson();
 	bool startRecording(std::string sessionName);
 	bool update(double times_tamp, bool save = true);
-	std::string stopRecording(bool sound = false);
+	std::string stopRecording();
 private:
 	Logger::Logger* mp_Logger;
 

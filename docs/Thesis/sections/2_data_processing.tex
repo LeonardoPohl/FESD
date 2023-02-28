@@ -1,10 +1,19 @@
 \chapter{Data Processing}
 \label{sec:data_processing}
 
-In this chapter, we discuss the data processing steps that are required to prepare the data for the model development process. Firstly, we address different session parameters and how they might influence the data. Secondly, we explain the data acquisition process and how the data is stored in files such that it can be used in the future. Thirdly, we discuss the data population process in which the human pose data is extracted from the raw data. To ensure the quality of the dataset we then evaluate the data by filtering invalid skeletons and marking data points as valid or invalid. Finally, we discuss the data augmentation process in which the data is augmented to increase the size of the dataset.
+One of the most important aspects of the model development process is the data. The data is used to train the model and to evaluate the model. Therefore, it is important to ensure that the data is of high quality. During the development of the project, multiple different approaches were considered. First, we will discuss the different approaches that were considered and then we will discuss the approach that was chosen. We then discuss difficulties that were encountered during the data processing process.
 
-\input{sections/2_data_processing/1_stream_pre_processing.tex}
-\input{sections/2_data_processing/2_data_acquisition.tex}
-\input{sections/2_data_processing/3_data_population.tex}
-\input{sections/2_data_processing/4_data_evaluation.tex}
-\input{sections/2_data_processing/5_data_augmentation.tex}
+In this thesis, we propose a method that enables the fault detection of human pose estimation. Therefore, part of the data processing process is human pose estimation. In section \ref{sec:related_work}, we have already discussed different methods that can be used for human pose estimation. In the scope of this thesis, we will only focus on a single human pose estimator. This has multiple reasons. Firstly, we do not intend to develop a general fault detector. Different pose estimators have different flaws so increasing the pool of pose estimators would presumably create a more general fault detector but less accurate fault detector. Some faults might be generally applicable while others are more specific to a specific estimator. This is especially true if a pose estimator uses a different modality, e.g., OpenPose solely uses RGB data, whereas the human pose estimator proposed by C. Zimmermann et.al utilises RGBD data\cite{OpenPosePose, RGBDHPEforRoboticTaskLearning}. Furthermore, different pose estimators usually do not result in the same joints as they have been developed for different purposes. For example, OpenPose detects multiple joints in the face, while others use a single head joint. This discrepancy makes it difficult to develop a general fault detector for multiple pose estimators. 
+
+We chose the same pose estimator that is used by SilverFit. SilverFit uses Nuitrack which was developed by 3DiVi Inc\footnote{\url{https://nuitrack.com/}}
+
+% In this chapter, we discuss the data processing steps that are required to prepare the data for the model development process. 
+
+
+% Firstly, we address different session parameters and how they might influence the data. Secondly, we explain the data acquisition process and how the data is stored in files such that it can be used in the future. Thirdly, we discuss the data population process in which the human pose data is extracted from the raw data. To ensure the quality of the dataset we then evaluate the data by filtering invalid skeletons and marking data points as valid or invalid. Finally, we discuss the data augmentation process in which the data is augmented to increase the size of the dataset.
+
+% \input{sections/2_data_processing/1_stream_pre_processing.tex}
+% \input{sections/2_data_processing/2_data_acquisition.tex}
+% \input{sections/2_data_processing/3_data_population.tex}
+% \input{sections/2_data_processing/4_data_evaluation.tex}
+% \input{sections/2_data_processing/5_data_augmentation.tex}

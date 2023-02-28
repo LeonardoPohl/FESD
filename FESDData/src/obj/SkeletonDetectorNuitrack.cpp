@@ -192,7 +192,7 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	return true;
 }
 
-std::string SkeletonDetectorNuitrack::stopRecording(bool sound)
+std::string SkeletonDetectorNuitrack::stopRecording()
 {
 	m_CSVRec.close();
 
@@ -217,10 +217,6 @@ std::string SkeletonDetectorNuitrack::stopRecording(bool sound)
 	configJson << Json::writeString(builder, m_Skeletons);
 	configJson.close();
 	m_Skeletons.clear();
-
-	if (sound) {
-		std::cout << "\a";
-	}
 
 	return (m_RecordingPath.filename() / "SkeletonNui.json").string();
 }

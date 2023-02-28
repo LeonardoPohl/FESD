@@ -213,6 +213,9 @@ void CameraHandler::initRecording() {
         }
     }
 
+    // Sound an alarm that the countdown is starting
+    std::cout << "\a";
+
     countdown();
 }
 
@@ -236,9 +239,8 @@ void CameraHandler::startRecording() {
 void CameraHandler::record()
 {
     m_RecordedSeconds = std::chrono::system_clock::now() - m_RecordingStart;
-    m_RecordedFrames += 1;
 
-    if (m_RecordedFrames > m_SessionParams.FrameLimit && m_SessionParams.LimitFrames) {
+    if (m_RecordedFrames + 1 > m_SessionParams.FrameLimit && m_SessionParams.LimitFrames) {
         stopRecording();
         return;
     }
@@ -247,6 +249,8 @@ void CameraHandler::record()
         stopRecording();
         return;
     }
+
+    m_RecordedFrames += 1;
         
     if (m_SessionParams.EstimateSkeleton) {
         m_SkeletonDetectorNuitrack->update(m_RecordedSeconds.count());
@@ -329,7 +333,7 @@ void CameraHandler::stopRecording() {
     }
     else {
         cameras.append(m_SkeletonDetectorNuitrack->getCameraJson());
-        root["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording(true);
+        root["Skeleton"] = m_SkeletonDetectorNuitrack->stopRecording();
     }
     root["Cameras"] = cameras;
 
@@ -482,12 +486,12 @@ void CameraHandler::showRecordings() {
 void CameraHandler::startPlayback(Json::Value recording)
 {
     mp_Logger->log("Started Playback of Recording \"" + recording["Name"].asString() + "\"");
-    m_State = Playback;
 
     clearCameras();
 
     m_FoundRecordedSkeleton = false;
     stopPlayback();
+    m_State = Playback;
 
     m_Recording = recording;
 
@@ -625,6 +629,15 @@ void CameraHandler::fixSkeleton() {
     ImGui::Begin("Fix Skeleton", &m_FixSkeleton);
 
     ImGui::ProgressBar((float)m_CurrentPlaybackFrame / (float)m_TotalPlaybackFrames);
+    ImGui::InputInt("Frame", &m_CurrentPlaybackFrame, 1);
+
+    if (m_CurrentPlaybackFrame < 0) {
+        m_CurrentPlaybackFrame = m_TotalPlaybackFrames - 1;
+    } 
+    else if (m_CurrentPlaybackFrame >= m_TotalPlaybackFrames) {
+        m_CurrentPlaybackFrame = 0;
+    }
+
     Json::Value& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
 
     if (!skel_frame) {
@@ -643,7 +656,6 @@ void CameraHandler::fixSkeleton() {
         mp_Logger->log("No color frame!", Logger::Priority::ERR);
         return;
     }
-
 
     for (Json::Value& person : skel_frame) {
         bool person_valid = person["error"].asInt() == 0;
@@ -733,7 +745,6 @@ void CameraHandler::stopPlayback()
 {
     if (m_FoundRecordedSkeleton) {
         auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
-        configPath += ".json";
 
         std::fstream configJson(configPath, std::ios::out);
 
@@ -743,6 +754,9 @@ void CameraHandler::stopPlayback()
         
     }
     m_FoundRecordedSkeleton = false;
+
+    clearCameras();
+    m_State = Streaming;
 }
 
 
