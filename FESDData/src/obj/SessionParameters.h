@@ -128,6 +128,19 @@ public:
 		if (!CountdownStarted) {
 			CountdownStarted = true;
 			CountdownStart = std::chrono::system_clock::now();
+
+			TotalLeft = (TotalExercises * RepeatNTimes) - m_RecordingLenghts.size();
+			AverageDuration = std::chrono::duration<double>::zero();
+			for (auto duration : m_RecordingLenghts) {
+				AverageDuration += duration;
+			}
+
+			AverageDuration /= m_RecordingLenghts.size();
+			SecondsLeft = AverageDuration * TotalLeft;
+			SecondsTotal = AverageDuration * (TotalExercises * RepeatNTimes);
+			ETA = (std::chrono::system_clock::now() + SecondsLeft);
+			std::cout << "Seconds left: " << SecondsLeft.count() << " s => " << SecondsLeft.count() / 60.0 << " min" << std::endl;
+			std::cout << "ETA: " << std::format("{:%F %T}", floor<std::chrono::minutes>(ETA)) << std::endl;
 		}
 
 		if (CountdownInS == 0 ||
@@ -143,17 +156,9 @@ public:
 		char buf2[32];
 
 		if (!m_RecordingLenghts.empty()) {
-			int exercises_left = (TotalExercises * RepeatNTimes) - m_RecordingLenghts.size();
-			std::chrono::duration<double> avg = std::chrono::duration<double>::zero();
-			for (auto duration : m_RecordingLenghts) {
-				avg += duration;
-			}
-			avg /= m_RecordingLenghts.size();
-			ImGui::Text("Average duration: %.2fs", avg.count());
-			std::chrono::duration<double> seconds_left(avg.count() * exercises_left);
-			ImGui::Text("Appx Left: %.2fs", seconds_left.count());
-			auto eta = std::chrono::system_clock::now() + seconds_left;
-			ImGui::Text("ETA: ", "%D %T %Z\n", floor<std::chrono::milliseconds>(eta));
+			ImGui::Text("Average duration: %.2fs", AverageDuration.count());
+			ImGui::Text("Appx Left: %.2fs", SecondsLeft.count());
+			ImGui::Text(("ETA: " + std::format("{:%F %T}", floor<std::chrono::minutes>(ETA))).c_str());
 		}
 			
 
@@ -214,4 +219,9 @@ private:
 	int CountdownInS{ 5 };
 	std::chrono::time_point<std::chrono::system_clock> CountdownStart;
 	std::vector<std::chrono::duration<double>> m_RecordingLenghts{};
+	int TotalLeft{ 0 };
+	std::chrono::duration<double> AverageDuration;
+	std::chrono::duration<double> SecondsLeft;
+	std::chrono::duration<double> SecondsTotal;
+	std::chrono::time_point<std::chrono::system_clock> ETA;
 };
