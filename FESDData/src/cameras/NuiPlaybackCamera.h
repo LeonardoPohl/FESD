@@ -1,6 +1,9 @@
 #pragma once
+#include <memory>
+
 #include "DepthCamera.h"
 #include "json/json.h"
+
 class NuiPlaybackCamera : public DepthCamera
 {
 public:
@@ -40,6 +43,7 @@ private:
 
 	cv::Mat m_CurrentDepthFrame{};
 	cv::Mat m_CurrentColorFrame{};
+	std::unordered_map<int, cv::Mat> m_FrameBuffer{};
 
 	std::filesystem::path m_RecordingPath{ };
 

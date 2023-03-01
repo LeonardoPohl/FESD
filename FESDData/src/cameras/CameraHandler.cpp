@@ -700,7 +700,7 @@ void CameraHandler::fixSkeleton() {
                     joint["error"] = 0;
                 }
                 else {
-                    joint["error"] = 1;
+                    joint["error"] = 2;
                 }
             }
 
@@ -732,6 +732,15 @@ void CameraHandler::fixSkeleton() {
     }
 
     if (ImGui::Button("Continue")) {
+        // Continuing saves
+        auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
+
+        std::fstream configJson(configPath, std::ios::out);
+
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_RecordedSkeleton);
+        configJson.close();
+
         m_CurrentPlaybackFrame += 1;
         if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
             stopPlayback();
@@ -743,6 +752,25 @@ void CameraHandler::fixSkeleton() {
             mp_Logger->log("No color frame!", Logger::Priority::ERR);
             return;
         }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Save")) {
+        auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
+
+        std::fstream configJson(configPath, std::ios::out);
+
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_RecordedSkeleton);
+        configJson.close();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Stop")) {
+        stopPlayback();
+        return;
     }
 
     ImGui::End();

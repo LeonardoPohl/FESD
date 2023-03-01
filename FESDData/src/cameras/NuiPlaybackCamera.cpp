@@ -98,16 +98,23 @@ void NuiPlaybackCamera::queryFrame() {
     if (m_QueriedFrame == *mp_CurrentPlaybackFrame) {
         return;
     }
-    try {        
+    try {  
         cv::Mat frame;
-        cv::FileStorage frameStore((m_RecordingPath / (SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + ".yml")).string(), cv::FileStorage::READ);
-
-        frameStore["frame"] >> frame;
-        frameStore.release();
-        if (frame.empty()) {
-            mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
-            return;
+        if (m_FrameBuffer.contains(*mp_CurrentPlaybackFrame)) {
+            frame = m_FrameBuffer[*mp_CurrentPlaybackFrame];
         }
+        else {
+            cv::FileStorage frameStore((m_RecordingPath / (SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + ".yml")).string(), cv::FileStorage::READ);
+
+            frameStore["frame"] >> frame;
+            frameStore.release();
+            if (frame.empty()) {
+                mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
+                return;
+            }
+            m_FrameBuffer.insert({ *mp_CurrentPlaybackFrame , frame});
+        }
+        
 
         std::vector<cv::Mat> channels;
         cv::split(frame, channels);
