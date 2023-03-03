@@ -670,9 +670,10 @@ void CameraHandler::fixSkeleton() {
         return;
     }
 
-    for (Json::Value& person : skel_frame) {
+    for (int i = 0; i < skel_frame.size(); i++){
+        Json::Value& person = skel_frame[i];
         bool person_valid = person["error"].asInt() == 0;
-        if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
+        if (ImGui::Checkbox(((std::string)"Person No " + std::to_string(i)).c_str(), &person_valid)) {
             if (person_valid) {
                 person["error"] = 0;
             }
@@ -695,7 +696,7 @@ void CameraHandler::fixSkeleton() {
 
             bool joint_valid = joint["error"].asInt() == 0;
 
-            if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
+            if (ImGui::Checkbox(((std::string)"  Joint No " + joint["i"].asString() + (std::string)"##"+ std::to_string(i)).c_str(), &joint_valid)) {
                 if (joint_valid) {
                     joint["error"] = 0;
                 }

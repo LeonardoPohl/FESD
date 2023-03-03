@@ -16,8 +16,19 @@
                 "file": "Papers/Papers/A_Review_Point_Cloud-Based_3D_Human_Joints_Estimat.pdf"
               }
             }
+          },
+          {
+            "id": "487eb7914b168b8a",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.1.15"
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -144,7 +155,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "f453aab838680445",
+  "active": "487eb7914b168b8a",
   "lastOpenFiles": [
     "Meeting Erwin.md",
     "Thesis Research.md",
