@@ -45,11 +45,21 @@ class FESDDataset(data.Dataset):
     self.error_transform = transforms.Compose([
       transforms.ToTensor()])
 
-    self.augmentation_params = AugmentationParams(flip=False, crop=False, crop_random=False, crop_pad=50, gaussian=False)
+    self.augmentation_params = AugmentationParams(flip=False, crop=False, crop_random=False, crop_pad=0, gaussian=False)
+    self.randomize_augmentation_params = False
+
+  def reset_augmentation_params(self):
+    self.randomize_augmentation_params = False
+    self.augmentation_params = AugmentationParams(flip=False, crop=False, crop_random=False, crop_pad=0, gaussian=False) 
 
   def __getitem__(self, index):
     session = index // self.frames_per_session
     index = index % self.frames_per_session
+    
+    if self.randomize_augmentation_params:
+      self.augmentation_params.Randomize()
+      print(self.augmentation_params)
+
     return load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
 
   def __len__(self):

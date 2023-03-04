@@ -95,10 +95,10 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
         seed = params.seed
 
       np.random.seed(seed)
-      min_x = np.random.randint(0, min_x)
-      min_y = np.random.randint(0, min_y)
-      max_x = np.random.randint(max_x, rgb.shape[1])
-      max_y = np.random.randint(max_y, rgb.shape[0])
+      min_x = np.random.randint(0, max(0, min_x))
+      min_y = np.random.randint(0, max(0, min_y))
+      max_x = np.random.randint(min(rgb.shape[1], max_x), rgb.shape[1])
+      max_y = np.random.randint(min(rgb.shape[0], max_y), rgb.shape[0])
 
     rgb = rgb[min_x:max_x, min_y:max_y]
     depth = depth[min_x:max_x, min_y:max_y] 
