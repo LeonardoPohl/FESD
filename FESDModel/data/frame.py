@@ -9,7 +9,7 @@ FIGURES_DIR = Path('../docs/Thesis/figures/')
 class Frame:
     rgb: np.ndarray
     depth: np.ndarray
-    poses_2d: np.ndarray
+    pose_2d: np.ndarray
     poses_3d: np.ndarray
     errors: np.ndarray
     

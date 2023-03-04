@@ -1,11 +1,14 @@
 import json
 import os
+import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
 import numpy as np
 from pathlib import Path
 
-from utils import load_frame, AugmentationParams, Frame
+from .frame_loader import load_frame
+from .augmentation_parameters import AugmentationParams 
+from .frame import Frame
   
 class FESDDataset(data.Dataset):
   def __init__(self, recording_dir, trainsize):
@@ -31,19 +34,19 @@ class FESDDataset(data.Dataset):
     print(f"Total Frames: {self.size}")
 
     self.img_transform = transforms.Compose([
-      transforms.Resize((self.trainsize, self.trainsize)),
-      transforms.ToTensor(),
-      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]) # not sure if this is correct
+      #transforms.Resize((self.trainsize, self.trainsize)),
+      transforms.ToTensor()
+      #transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+      ]) # not sure if this is correct
 
     self.depths_transform = transforms.Compose([
-      transforms.Resize((self.trainsize, self.trainsize)),
-      transforms.ToTensor()])
+      #transforms.Resize((self.trainsize, self.trainsize)),
+      transforms.ToTensor()
+      ])
 
     self.pose_transform = transforms.Compose([
-      transforms.ToTensor()])
-
-    self.error_transform = transforms.Compose([
-      transforms.ToTensor()])
+      transforms.ToTensor()
+      ])
 
     self.augmentation_params = AugmentationParams(flip=False, crop=False, crop_random=False, crop_pad=0, gaussian=False)
     self.randomize_augmentation_params = False
@@ -60,7 +63,15 @@ class FESDDataset(data.Dataset):
       self.augmentation_params.Randomize()
       print(self.augmentation_params)
 
-    return load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
+    frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
+    
+    rgb = self.img_transform(frame.rgb.copy())
+    depth = self.depths_transform(frame.depth.copy())
+    pose_2d = self.pose_transform(frame.pose_2d.copy())[0]
+    errors = torch.tensor(frame.errors, dtype=torch.int8)
+    depth_new = depth.repeat(3, 1, 1)
+
+    return frame, rgb, depth_new, pose_2d, errors
 
   def __len__(self):
     return self.size

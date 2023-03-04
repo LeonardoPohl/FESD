@@ -15,38 +15,43 @@ def id_2_name(i: int):
 #              For query frames, use the bounding box of the first frame and return list of list of frames as video
 # Question: Should the videos be overlapping in frames?
 # TODO: Add augmentation maybe?
-def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
-  poses = []
-  pose_errors = []
+def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
-  for person in skeletons_json:
-    joints = np.ndarray(shape=[0, 6])
-    errors = []  
-    origin = person['Skeleton'][4]
-
-    for joint in person['Skeleton']:
-      if (joint['error'] != 1):
-        bounding_boxes_2d[0] = np.minimum(bounding_boxes_2d[0], [joint['u'], joint['v'], joint['d']])
-        bounding_boxes_2d[1] = np.maximum(bounding_boxes_2d[1], [joint['u'], joint['v'], joint['d']])
-        bounding_boxes_3d[0] = np.minimum(bounding_boxes_3d[0], [joint['x'], joint['y'], joint['z']])
-        bounding_boxes_3d[1] = np.maximum(bounding_boxes_3d[1], [joint['x'], joint['y'], joint['z']])
-
-      joints = np.append(joints, [[
-        joint['u'] - origin['u'],
-        joint['v'] - origin['v'],
-        joint['d'] - origin['d'],
-        joint['x'] - origin['x'],
-        joint['y'] - origin['y'],
-        joint['z'] - origin['z']
-        ]], axis=0) * (-1 if flip else 1)
-
-      errors.append(1 if person['error'] == 1 else joint['error'])
-        
-  poses.append(joints)
-  pose_errors.append(errors)
   
-  return np.asarray(poses), np.asarray(pose_errors), bounding_boxes_2d, bounding_boxes_3d
+  i = np.random.randint(0, len(skeletons_json))
+  
+  person = skeletons_json[i]
+  joints_2d = np.ndarray(shape=[0, 3])
+  joints_3d = np.ndarray(shape=[0, 3])
+  errors = np.ndarray(shape=[0])
+  origin = person['Skeleton'][4]
+
+  for joint in person['Skeleton']:
+    if (joint['error'] != 1):
+      bounding_boxes_2d[0] = np.minimum(bounding_boxes_2d[0], [joint['u'], joint['v'], joint['d']])
+      bounding_boxes_2d[1] = np.maximum(bounding_boxes_2d[1], [joint['u'], joint['v'], joint['d']])
+      bounding_boxes_3d[0] = np.minimum(bounding_boxes_3d[0], [joint['x'], joint['y'], joint['z']])
+      bounding_boxes_3d[1] = np.maximum(bounding_boxes_3d[1], [joint['x'], joint['y'], joint['z']])
+
+    joints_2d = np.append(joints_2d, [[
+      joint['u'] - origin['u'],
+      joint['v'] - origin['v'],
+      joint['d'] - origin['d']
+      ]], axis=0)
+
+    joints_3d = np.append(joints_3d, [[
+      joint['x'] - origin['x'],
+      joint['y'] - origin['y'],
+      joint['z'] - origin['z']
+      ]], axis=0)
+
+    errors = np.append(errors, 1 if person['error'] == 1 else joint['error'])
+
+  joints_2d *= -1 if flip else 1
+  joints_3d *= -1 if flip else 1
+  
+  return joints_2d, joints_3d, errors, bounding_boxes_2d, bounding_boxes_3d
 
 def load_frames(recording_dir: Path, session: json, start: int, stop: int, params: AugmentationParams = AugmentationParams()) -> list[Frame]:
   frames = []
@@ -67,16 +72,14 @@ def load_frames(recording_dir: Path, session: json, start: int, stop: int, param
 
 def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams()) -> Frame:
   frame_path = recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id)
-  print(frame_path)
   frame_file = cv2.FileStorage(str(frame_path), cv2.FileStorage_READ)
   frame = np.asarray( frame_file.getNode('frame').mat()[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
-
+  
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id]
-    poses, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)
-    pose_2d, pose_3d = np.split(poses, 2, axis=2)
-  
+    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)
+
   if (params.flip):
     rgb = np.flip(rgb, axis=1)
     depth = np.flip(depth, axis=1)
@@ -97,8 +100,8 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
       np.random.seed(seed)
       min_x = np.random.randint(0, max(0, min_x))
       min_y = np.random.randint(0, max(0, min_y))
-      max_x = np.random.randint(min(rgb.shape[1], max_x), rgb.shape[1])
-      max_y = np.random.randint(min(rgb.shape[0], max_y), rgb.shape[0])
+      max_x = np.random.randint(min(rgb.shape[1] - 1, max_x), rgb.shape[1])
+      max_y = np.random.randint(min(rgb.shape[0] - 1, max_y), rgb.shape[0])
 
     rgb = rgb[min_x:max_x, min_y:max_y]
     depth = depth[min_x:max_x, min_y:max_y] 
