@@ -79,15 +79,14 @@ def read_frame(path: Path) -> cv2.Mat:
     channels = np.frombuffer(f.read(4), dtype=np.int32)[0]
 
     # Read data
-    mat = np.frombuffer(f.read(), dtype=np.float16)
+    mat = np.frombuffer(f.read(), dtype=np.float32)
     mat = mat.reshape(rows, cols, channels)
 
   return mat
 
 def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams()) -> Frame:
-  frame_path = recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id)
-  frame_file = cv2.FileStorage(str(frame_path), cv2.FileStorage_READ)
-  frame = np.asarray( frame_file.getNode('frame').mat()[:,:] )
+  frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id))
+  frame = np.asarray( frame_mat[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
   
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:

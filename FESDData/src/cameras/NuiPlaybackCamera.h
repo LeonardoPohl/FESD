@@ -43,7 +43,6 @@ private:
 
 	cv::Mat m_CurrentDepthFrame{};
 	cv::Mat m_CurrentColorFrame{};
-	std::unordered_map<int, cv::Mat> m_FrameBuffer{};
 
 	std::filesystem::path m_RecordingPath{ };
 
