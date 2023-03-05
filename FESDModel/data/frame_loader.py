@@ -88,7 +88,17 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
   frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id))
   frame = np.asarray( frame_mat[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
-  
+
+  # calculate number of rows/columns to remove
+  c_to_remove = rgb.shape[1] - rgb.shape[0]
+
+  if c_to_remove % 2 == 0:
+      rgb = rgb[:, c_to_remove//2:-c_to_remove//2, :]
+      depth = depth[:, c_to_remove//2:-c_to_remove//2, :]
+  else:
+      rgb = rgb[:, (c_to_remove-1)//2:-(c_to_remove+1)//2, :]
+      depth = depth[:, (c_to_remove-1)//2:-(c_to_remove+1)//2, :]
+
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id]
     pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)

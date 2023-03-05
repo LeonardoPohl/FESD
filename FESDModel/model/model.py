@@ -265,10 +265,12 @@ class FESD(nn.Module):
 
         self.rd3d = RD3D(channel, resnet)
 
-    def forward(self, x):
-        print(x.size())
-        print(x)
-        size = x.size()[3:]
-        pred_s = self.rd3d(x)
+    def forward(self, img, pose):
+        print(img.size())
+        print(img)
+        print(pose.size())
+        print(pose)
+        size = img.size()[3:]
+        pred_s = self.rd3d(img)
 
         return pred_s

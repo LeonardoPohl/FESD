@@ -16,11 +16,11 @@ class Frame:
     def show(self):
       depth_norm = self.depth / 5
       depth_im = np.dstack((depth_norm, depth_norm, depth_norm)) 
-      im = np.dstack((self.rgb, depth_im))
-      print(im.shape)
-      im.convertTo(im, CV_8UC3, 255.0)
+      im = np.hstack((self.rgb, depth_im))
+      print(depth_im.shape)
+      im = im.astype(dtype=np.float32)
       cv2.imshow('depth', im)
-      cv2.waitKey()
+      cv2.waitKey(1000)
       cv2.destroyAllWindows()
 
     def save(self, name: str='GaussianBlur.png', path: Path=FIGURES_DIR / 'Model' / 'Augmentation'):

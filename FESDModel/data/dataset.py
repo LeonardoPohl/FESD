@@ -26,21 +26,17 @@ class FESDDataset(data.Dataset):
           self.frames_per_session = data['Frames']
           self.recording_jsons.append(data)
 
-    assert self.size > 0, "No recordings found in {}".format(recording_dir)
-    assert self.frames_per_session > 0, "No frames found in {}".format(recording_dir)
-    assert self.size / len(self.recording_jsons) == self.frames_per_session, "Frames dont match frames per session {}".format(recording_dir)
-
     print(f"Recordings Found: {len(self.recording_jsons)}")
     print(f"Total Frames: {self.size}")
 
     self.img_transform = transforms.Compose([
-      #transforms.Resize((self.trainsize, self.trainsize)),
+      transforms.Resize((self.trainsize, self.trainsize)),
       transforms.ToTensor()
       #transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
       ]) # not sure if this is correct
 
     self.depths_transform = transforms.Compose([
-      #transforms.Resize((self.trainsize, self.trainsize)),
+      transforms.Resize((self.trainsize, self.trainsize)),
       transforms.ToTensor()
       ])
 
@@ -65,11 +61,10 @@ class FESDDataset(data.Dataset):
 
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
 
-    rgb = self.img_transform(self.frame.rgb.copy())
-    depth = self.depths_transform(self.frame.depth.copy())
-    depth_new = depth.repeat(3, 1, 1)
+    rgb = torch.tensor(self.frame.rgb)
+    depth_new = torch.tensor(self.frame.depth).repeat(1, 1, 3)
 
-    pose_2d = self.pose_transform(self.frame.pose_2d.copy())[0]
+    pose_2d = torch.tensor(self.frame.pose_2d.copy())
     errors = torch.tensor(self.frame.errors, dtype=torch.int8)
     
     return rgb, depth_new, pose_2d, errors
