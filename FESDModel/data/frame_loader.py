@@ -79,7 +79,7 @@ def read_frame(path: Path) -> cv2.Mat:
     channels = np.frombuffer(f.read(4), dtype=np.int32)[0]
 
     # Read data
-    mat = np.frombuffer(f.read(), dtype=np.float32)
+    mat = np.frombuffer(f.read(), dtype=np.float16)
     mat = mat.reshape(rows, cols, channels)
 
   return mat

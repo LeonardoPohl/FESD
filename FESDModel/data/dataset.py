@@ -68,10 +68,10 @@ class FESDDataset(data.Dataset):
     rgb = self.img_transform(self.frame.rgb.copy())
     depth = self.depths_transform(self.frame.depth.copy())
     depth_new = depth.repeat(3, 1, 1)
-    
+
     pose_2d = self.pose_transform(self.frame.pose_2d.copy())[0]
     errors = torch.tensor(self.frame.errors, dtype=torch.int8)
-
+    
     return rgb, depth_new, pose_2d, errors
 
   def __len__(self):

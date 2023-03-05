@@ -258,3 +258,17 @@ class RD3D(nn.Module):
         pred_s = F.upsample(pred_s, size=size, mode='bilinear', align_corners=True)
 
         return pred_s
+
+class FESD(nn.Module):
+    def __init__(self, channel, resnet):
+        super(FESD, self).__init__()
+
+        self.rd3d = RD3D(channel, resnet)
+
+    def forward(self, x):
+        print(x.size())
+        print(x)
+        size = x.size()[3:]
+        pred_s = self.rd3d(x)
+
+        return pred_s

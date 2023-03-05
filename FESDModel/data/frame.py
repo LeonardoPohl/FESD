@@ -16,8 +16,9 @@ class Frame:
     def show(self):
       depth_norm = self.depth / 5
       depth_im = np.dstack((depth_norm, depth_norm, depth_norm)) 
-      im = np.hstack((self.rgb, depth_im))
-
+      im = np.dstack((self.rgb, depth_im))
+      print(im.shape)
+      im.convertTo(im, CV_8UC3, 255.0)
       cv2.imshow('depth', im)
       cv2.waitKey()
       cv2.destroyAllWindows()
