@@ -22,7 +22,8 @@
 #include "utilities/Consts.h"
 #include "utilities/helper/ImGuiHelper.h"
 #include "utilities/Utils.h"
-#include <utilities/helper/GLFWHelper.h>
+#include "utilities/helper/GLFWHelper.h"
+#include "utilities/ConvertRecordings.h"
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
@@ -608,6 +609,10 @@ void CameraHandler::showPlaybackGui()
 
     if (ImGui::Button("Refresh Recordings")) {
         findRecordings();
+    }
+
+    if (ImGui::Button("Convert Recordings")) {
+        convertRecordings(m_Recordings, true);
     }
 
     if (m_Recordings.empty()) {

@@ -104,10 +104,34 @@ void NuiPlaybackCamera::queryFrame() {
             frame = m_FrameBuffer[*mp_CurrentPlaybackFrame];
         }
         else {
-            cv::FileStorage frameStore((m_RecordingPath / (SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + ".yml")).string(), cv::FileStorage::READ);
+            auto frame_path = m_RecordingPath / SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame);
+            if (std::filesystem::exists(frame_path.replace_extension(".bin"))) {
+                std::ifstream fs(frame_path.replace_extension(".bin"), std::fstream::binary);
 
-            frameStore["frame"] >> frame;
-            frameStore.release();
+                // Header
+                int rows, cols, type, channels;
+                fs.read((char*)&rows, sizeof(int));         // rows
+                fs.read((char*)&cols, sizeof(int));         // cols
+                fs.read((char*)&type, sizeof(int));         // type
+                fs.read((char*)&channels, sizeof(int));     // channels
+
+                // Data
+                cv::Mat mat( rows, cols, type );
+                fs.read((char*)mat.data, CV_ELEM_SIZE(type) * rows * cols);
+                frame = mat;
+            }
+            else if (std::filesystem::exists(frame_path.replace_extension(".yml")))
+            {
+                cv::FileStorage frameStore((frame_path.replace_extension(".yml")).string(), cv::FileStorage::READ);
+
+                frameStore["frame"] >> frame;
+                frameStore.release();
+            }
+            else {
+                mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
+                return;
+            }
+            
             if (frame.empty()) {
                 mp_Logger->log("Frame '" + SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame) + "' not found!", Logger::Priority::ERR);
                 return;

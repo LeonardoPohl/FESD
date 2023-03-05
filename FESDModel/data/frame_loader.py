@@ -6,7 +6,7 @@ from .augmentation_parameters import AugmentationParams
 from .frame import Frame
 
 def id_2_name(i: int):
-  return 'frame_' + str(i) + '.yml'
+  return 'frame_' + str(i) + '.bin'
 
 # Load Frames(/Videos(Later maybe)) and skeletons from a recording
 
@@ -69,6 +69,20 @@ def load_frames(recording_dir: Path, session: json, start: int, stop: int, param
     frames.append(load_frame(recording_dir, session, frame_id, params))
   
   return frames
+
+def read_frame(path: Path) -> cv2.Mat:
+  with open(path, "rb") as f:
+    # Read header
+    rows = np.frombuffer(f.read(4), dtype=np.int32)[0]
+    cols = np.frombuffer(f.read(4), dtype=np.int32)[0]
+    type = np.frombuffer(f.read(4), dtype=np.int32)[0]
+    channels = np.frombuffer(f.read(4), dtype=np.int32)[0]
+
+    # Read data
+    mat = np.frombuffer(f.read(), dtype=np.float16)
+    mat = mat.reshape(rows, cols, channels)
+
+  return mat
 
 def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams()) -> Frame:
   frame_path = recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id)

@@ -144,7 +144,7 @@ bool SkeletonDetectorNuitrack::update(double time_stamp, bool save) {
 	
 	cv::Mat fin;
 	cv::merge(channels, fin);
-	fin.convertTo(fin, CV_32F);
+	fin.convertTo(fin, CV_16F);
 	if (save) {
 		m_Frames.push_back(fin);
 	}
@@ -198,7 +198,30 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 
 	for (int i = 0; i < m_Frames.size(); i++) {
 		std::cout << i << "/" << m_Frames.size() << " Frames stored!\r";
-		cv::FileStorage frameStorage ((m_FramePath / (getFrameName(i) + ".yml")).string(), cv::FileStorage::WRITE);
+		std::ofstream fs((m_FramePath / (getFrameName(i) + ".bin")).string(), std::fstream::binary);
+
+		// Header
+		int type = m_Frames[i].type();
+		int channels = m_Frames[i].channels();
+		fs.write((char*)&m_Frames[i].rows, sizeof(int));    // rows
+		fs.write((char*)&m_Frames[i].cols, sizeof(int));    // cols
+		fs.write((char*)&type, sizeof(int));				// type
+		fs.write((char*)&channels, sizeof(int));    // channels
+
+		// Data
+		if (m_Frames[i].isContinuous())
+		{
+			fs.write(m_Frames[i].ptr<char>(0), (m_Frames[i].dataend - m_Frames[i].datastart));
+		}
+		else
+		{
+			int rowsz = CV_ELEM_SIZE(type) * m_Frames[i].cols;
+			for (int r = 0; r < m_Frames[i].rows; ++r)
+			{
+				fs.write(m_Frames[i].ptr<char>(r), rowsz);
+			}
+		}
+		/*cv::FileStorage frameStorage ((m_FramePath / (getFrameName(i) + ".yml")).string(), cv::FileStorage::WRITE);
 		try {
 			frameStorage.write("frame", m_Frames[i]);
 		}
@@ -206,7 +229,7 @@ std::string SkeletonDetectorNuitrack::stopRecording()
 		{
 			mp_Logger->log(e.msg, Logger::Priority::ERR);
 		}
-		frameStorage.release();
+		frameStorage.release();*/
 	}
 	m_Frames.clear();
 

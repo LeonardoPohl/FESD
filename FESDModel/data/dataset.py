@@ -63,15 +63,16 @@ class FESDDataset(data.Dataset):
       self.augmentation_params.Randomize()
       print(self.augmentation_params)
 
-    frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
-    
-    rgb = self.img_transform(frame.rgb.copy())
-    depth = self.depths_transform(frame.depth.copy())
-    pose_2d = self.pose_transform(frame.pose_2d.copy())[0]
-    errors = torch.tensor(frame.errors, dtype=torch.int8)
-    depth_new = depth.repeat(3, 1, 1)
+    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
 
-    return frame, rgb, depth_new, pose_2d, errors
+    rgb = self.img_transform(self.frame.rgb.copy())
+    depth = self.depths_transform(self.frame.depth.copy())
+    depth_new = depth.repeat(3, 1, 1)
+    
+    pose_2d = self.pose_transform(self.frame.pose_2d.copy())[0]
+    errors = torch.tensor(self.frame.errors, dtype=torch.int8)
+
+    return rgb, depth_new, pose_2d, errors
 
   def __len__(self):
     return self.size
