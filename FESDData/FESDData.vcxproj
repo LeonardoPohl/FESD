@@ -237,6 +237,7 @@
     <ClInclude Include="src\utilities\Callbacks.h" />
     <ClInclude Include="src\utilities\CMaps.h" />
     <ClInclude Include="src\utilities\Consts.h" />
+    <ClInclude Include="src\utilities\ConvertRecordings.h" />
     <ClInclude Include="src\utilities\GLUtil.h" />
     <ClInclude Include="src\utilities\helper\GLFWHelper.h" />
     <ClInclude Include="src\utilities\helper\ImGuiHelper.h" />

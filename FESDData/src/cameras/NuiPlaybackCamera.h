@@ -1,6 +1,9 @@
 #pragma once
+#include <memory>
+
 #include "DepthCamera.h"
 #include "json/json.h"
+
 class NuiPlaybackCamera : public DepthCamera
 {
 public:

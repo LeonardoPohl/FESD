@@ -22,7 +22,8 @@
 #include "utilities/Consts.h"
 #include "utilities/helper/ImGuiHelper.h"
 #include "utilities/Utils.h"
-#include <utilities/helper/GLFWHelper.h>
+#include "utilities/helper/GLFWHelper.h"
+#include "utilities/ConvertRecordings.h"
 
 CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* logger) : mp_Camera(cam), mp_Renderer(renderer), mp_Logger(logger)
 {
@@ -610,6 +611,10 @@ void CameraHandler::showPlaybackGui()
         findRecordings();
     }
 
+    if (ImGui::Button("Convert Recordings")) {
+        convertRecordings(m_Recordings, true);
+    }
+
     if (m_Recordings.empty()) {
         ImGui::Text("No Recordings Found!");
     }
@@ -670,9 +675,10 @@ void CameraHandler::fixSkeleton() {
         return;
     }
 
-    for (Json::Value& person : skel_frame) {
+    for (int i = 0; i < skel_frame.size(); i++){
+        Json::Value& person = skel_frame[i];
         bool person_valid = person["error"].asInt() == 0;
-        if (ImGui::Checkbox(((std::string)"Person No " + person["Index"].asString()).c_str(), &person_valid)) {
+        if (ImGui::Checkbox(((std::string)"Person No " + std::to_string(i)).c_str(), &person_valid)) {
             if (person_valid) {
                 person["error"] = 0;
             }
@@ -695,12 +701,12 @@ void CameraHandler::fixSkeleton() {
 
             bool joint_valid = joint["error"].asInt() == 0;
 
-            if (ImGui::Checkbox(((std::string)"Person " + person["Index"].asString() + (std::string)" Joint No " + joint["i"].asString()).c_str(), &joint_valid)) {
+            if (ImGui::Checkbox(((std::string)"  Joint No " + joint["i"].asString() + (std::string)"##"+ std::to_string(i)).c_str(), &joint_valid)) {
                 if (joint_valid) {
                     joint["error"] = 0;
                 }
                 else {
-                    joint["error"] = 1;
+                    joint["error"] = 2;
                 }
             }
 
@@ -732,6 +738,15 @@ void CameraHandler::fixSkeleton() {
     }
 
     if (ImGui::Button("Continue")) {
+        // Continuing saves
+        auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
+
+        std::fstream configJson(configPath, std::ios::out);
+
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_RecordedSkeleton);
+        configJson.close();
+
         m_CurrentPlaybackFrame += 1;
         if (m_CurrentPlaybackFrame == m_TotalPlaybackFrames) {
             stopPlayback();
@@ -743,6 +758,25 @@ void CameraHandler::fixSkeleton() {
             mp_Logger->log("No color frame!", Logger::Priority::ERR);
             return;
         }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Save")) {
+        auto configPath = m_RecordingDirectory / m_Recording["Skeleton"].asString();
+
+        std::fstream configJson(configPath, std::ios::out);
+
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_RecordedSkeleton);
+        configJson.close();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Stop")) {
+        stopPlayback();
+        return;
     }
 
     ImGui::End();
