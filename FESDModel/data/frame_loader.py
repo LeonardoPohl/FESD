@@ -104,12 +104,9 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
     skeleton_json = json.load(file)[frame_id]
     pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)
 
-  print(rgb.shape, depth.shape)
-
   if (params.flip):
     rgb = np.flip(rgb, axis=1)
     depth = np.flip(depth, axis=1)
-  print(rgb.shape, depth.shape)
 
   if params.crop or params.crop_random:
     mi = min(int(np.floor(bounding_boxes_2d[0][1])), int(np.floor(bounding_boxes_2d[0][0])))
@@ -134,8 +131,6 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
   if (params.gaussian and False):
     rgb = cv2.GaussianBlur(rgb, (5, 5), 0)
     depth = cv2.GaussianBlur(depth, (5, 5), 0)
-
-  print(rgb.shape, depth.shape)
 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
 

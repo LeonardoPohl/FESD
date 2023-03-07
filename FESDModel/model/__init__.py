@@ -1,2 +1,2 @@
-from .model import RD3D, FESD
+from .model import FESD
 from .train import train

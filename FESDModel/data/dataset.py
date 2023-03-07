@@ -52,12 +52,10 @@ class FESDDataset(data.Dataset):
     depth.unsqueeze(0)
     depth = transforms.Resize(self.trainsize)(depth.permute(2, 0, 1))
 
-    print(depth.shape)
     if self.augmentation_params.gaussian:
       blurrer = transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))
       rgb = blurrer(rgb)
       depth = blurrer(depth)
-    print(depth.shape)
     
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)

@@ -19,8 +19,6 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         depths = depths.cuda()
         poses = poses_2d.cuda()
 
-        print(rgbs.shape, depths.shape, poses.shape, errors.shape)
-
         gt = errors.cuda()
         
         pred_s = model(rgbs, depths, poses)
@@ -37,7 +35,7 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         
         loss_record.update(loss.data, 1)
 
-        mse[i%100] = sum((pred_s - gt)**2) / len(pred_s)
+        mse[i%100] = sum(sum((pred_s - gt)**2) / len(pred_s)) / rgbs.shape[0]
         rmse[i%100] = np.sqrt(mse[i%100])
 
         if i % 100 == 0 or i == len(train_loader):
@@ -47,5 +45,5 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
                   Step [{i:04d}/{len(train_loader):04d}], \
                   Loss: {loss_record.show():.4f}, \
                   MSE: {torch.mean(mse_c):.4f}, \
-                  RMSE: {torch.mean(rmse_c):.4f}', end='\r')
+                  RMSE: {torch.mean(rmse_c):.4f}')
       
