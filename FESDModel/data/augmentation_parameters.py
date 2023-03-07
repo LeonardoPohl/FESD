@@ -12,8 +12,8 @@ class AugmentationParams:
 
     def Randomize(self):
         self.flip = np.random.choice([True, False])
-        self.crop = np.random.choice([True, False])
-        self.crop_random = np.random.choice([True, False])
+        # self.crop = np.random.choice([True, False])
+        # self.crop_random = np.random.choice([True, False])
         self.crop_pad = np.random.randint(0, 100)
         self.gaussian = np.random.choice([True, False])
         self.seed = np.random.randint(0, 100000)

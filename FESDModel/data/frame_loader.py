@@ -88,6 +88,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
   frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id))
   frame = np.asarray( frame_mat[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
+  rgb, depth = rgb.astype(np.float32), depth.astype(np.float32)
 
   # calculate number of rows/columns to remove
   c_to_remove = rgb.shape[1] - rgb.shape[0]
@@ -108,11 +109,13 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
     depth = np.flip(depth, axis=1)
 
   if params.crop or params.crop_random:
-    min_x = max(0, int(np.floor(bounding_boxes_2d[0][1])) - params.crop_pad)
-    min_y = max(0, int(np.floor(bounding_boxes_2d[0][0])) - params.crop_pad)
+    mi = min(int(np.floor(bounding_boxes_2d[0][1])), int(np.floor(bounding_boxes_2d[0][0])))
+    mi = max(0, mi - params.crop_pad)
 
-    max_x = min(rgb.shape[1], int(np.ceil(bounding_boxes_2d[1][1])) + params.crop_pad)
-    max_y = min(rgb.shape[0], int(np.ceil(bounding_boxes_2d[1][0])) + params.crop_pad)
+    ma = max(int(np.ceil(bounding_boxes_2d[1][1])), int(np.ceil(bounding_boxes_2d[1][0])))
+    print(int(np.ceil(bounding_boxes_2d[1][1])), int(np.ceil(bounding_boxes_2d[1][0])))
+    print(rgb.shape[0], rgb.shape[1])
+    ma = min(min(rgb.shape[0], rgb.shape[1]), ma + params.crop_pad)
 
     if (params.crop_random):
       if (params.seed == -1):
@@ -121,17 +124,17 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
         seed = params.seed
 
       np.random.seed(seed)
-      min_x = np.random.randint(0, max(0, min_x))
-      min_y = np.random.randint(0, max(0, min_y))
-      max_x = np.random.randint(min(rgb.shape[1] - 1, max_x), rgb.shape[1])
-      max_y = np.random.randint(min(rgb.shape[0] - 1, max_y), rgb.shape[0])
+      mi = np.random.randint(0, max(0, mi))
+      ma = np.random.randint(min(rgb.shape[1] - 1, ma), rgb.shape[1])
 
-    rgb = rgb[min_x:max_x, min_y:max_y]
-    depth = depth[min_x:max_x, min_y:max_y] 
+    rgb = rgb[mi:ma, mi:ma]
+    depth = depth[mi:ma, mi:ma] 
   
   if (params.gaussian):
     rgb = cv2.GaussianBlur(rgb, (5, 5), 0)
     depth = cv2.GaussianBlur(depth, (5, 5), 0)
+
+  rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
 
   return Frame(rgb, depth, pose_2d, pose_3d, errors)
 

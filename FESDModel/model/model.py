@@ -142,6 +142,7 @@ class ThreeDDecoder(nn.Module):
         x4_flatten_up = self.upsample(x4_flatten)
         x4_up = x4_flatten_up.view(B, C4, T4, 2 * H4, 2 * W4)
         x4_upconv = self.conv_upsample4(x4_up)
+        # print(x4_upconv.shape, x3.shape, x2_downconv1.shape, x1_downconv2.shape, x0_downconv3.shape)
         residual3 = torch.cat((x4_upconv, x3, x2_downconv1, x1_downconv2, x0_downconv3), 2)
         x3_ = self.conv_cat4(residual3)
         x3_flatten = x3_.view(x3_.shape[0], x3_.shape[1] * x3_.shape[2], x3_.shape[3], x3_.shape[4])
@@ -192,7 +193,7 @@ class ThreeDDecoder(nn.Module):
         x0 = residual0 + x0_
         x0 = self.downt4(x0)
         x = x0.squeeze(2)
-
+        
         out = self.out(x)
 
         return out
@@ -233,6 +234,8 @@ class Unet3D(nn.Module):
         x_s4 = self.reductions4(x4)
 
         pred_s = self.output_s(x_s0, x_s1, x_s2, x_s3, x_s4)
+        # print("Pred_s UNET")
+        # print(pred_s.shape)
 
         return pred_s
 
@@ -254,23 +257,66 @@ class RD3D(nn.Module):
         x2 = self.resnet.layer2(x1)
         x3 = self.resnet.layer3(x2)
         x4 = self.resnet.layer4(x3)
-        pred_s = self.unet(x0, x1, x2, x3, x4)
-        pred_s = F.upsample(pred_s, size=size, mode='bilinear', align_corners=True)
 
-        return pred_s
+        return self.unet(x0, x1, x2, x3, x4)
+
+class FESDPose(nn.Module):
+    def __init__(self, channel):
+        super(FESDPose, self).__init__()
+
+        self.conv3 = nn.Conv1d(3, 3, 2, stride=1, padding=1)
+        self.conv5 = nn.Conv1d(3, 5, 3, stride=1, padding=2)
+        self.conv10 = nn.Conv1d(5, 10, 3, stride=1, padding=2)
+        self.pool3 = nn.MaxPool1d(3, stride=1)
+        self.pool5 = nn.MaxPool1d(5, stride=1)
+        self.pool10 = nn.MaxPool1d(10, stride=1)
+        self.relu = nn.ReLU()
+
+    def forward(self, pose):
+        # print("FESDPose")
+
+        x = pose.squeeze()
+
+        x = self.conv3(x)
+        x = self.relu(x)
+        x = self.pool3(x)
+
+        x = self.conv5(x)
+        x = self.relu(x)
+        x = self.pool5(x)
+
+        x = self.conv10(x)
+        x = self.relu(x)
+        x = self.pool10(x)
+
+
+        return x
 
 class FESD(nn.Module):
     def __init__(self, channel, resnet):
         super(FESD, self).__init__()
 
         self.rd3d = RD3D(channel, resnet)
+        self.pose = FESDPose(channel)
+        self.pool5 = nn.MaxPool1d(5, stride=1)
+
+        self.fc_rd3d_pred = torch.nn.Linear(30976, 25).cuda()
+        self.fc_fesd_pose_pred = torch.nn.Linear(150, 25).cuda()
+
+        self.fc_combined = torch.nn.Linear(50, 25)
 
     def forward(self, img, pose):
-        print(img.size())
-        print(img)
-        print(pose.size())
-        print(pose)
-        size = img.size()[3:]
-        pred_s = self.rd3d(img)
+        rd3d_pred = self.rd3d(img.to(torch.float32)).squeeze()
+        rd3d_pred = rd3d_pred.flatten()
+        rd3d_pred = self.fc_rd3d_pred (rd3d_pred)
+        
+        fesd_pose_pred = self.pose(pose)
+        fesd_pose_pred = fesd_pose_pred.flatten()
+        
+        fesd_pose_pred = self.fc_fesd_pose_pred(fesd_pose_pred)
+        
+        combined_tensor = torch.cat((rd3d_pred, fesd_pose_pred), dim=0).cuda()
+        
+        output = self.fc_combined(combined_tensor)
 
-        return pred_s
+        return output
