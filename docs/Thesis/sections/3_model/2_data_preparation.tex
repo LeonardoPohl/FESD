@@ -1,0 +1,29 @@
+\section{Data preparation}
+\label{sec:data_preparation}
+
+
+% TODO rework this section
+
+\subsection{Data augmentation}
+
+The data is augmented with a number of different methods. The data is augmented to increase the amount of data available for training. The data is also augmented to increase the variety of the data. This is done to make the model more robust to different variations in the data. We augment the data with the following methods:
+
+\begin{itemize}
+  \item Rotation
+  \item Flip
+  \item Translation
+  \item Resizing
+  \item Zoom
+  \item Brightness
+  \item Contrast
+  \item Saturation
+  \item Hue
+  \item Gaussian noise
+  \item Dropout
+  \item Coarse dropout
+  \item Elastic deformation
+\end{itemize}
+
+\subsection{Data splitting}
+
+The data is split into three parts. The first part is the training data. The training data is used to train the model. The second part is the validation data. The validation data is used to validate the model during training. The third part is the test data. The test data is used to test the model after training. The data is split into training data, validation data, and test data using the scikit-learn function \texttt{train\_test\_split}. The data is split into training data and validation data with a ratio of $0.7$ to $0.3$. The validation data is then split into validation data and test data with a ratio of $0.5$ to $0.5$. The data is split in this way to ensure that the validation data is always of the same size as the test data. This is done to ensure that the validation data is not biased towards certain classes. The validation data is not biased towards certain classes because the validation data is the same size as the test data. 

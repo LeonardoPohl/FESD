@@ -1,0 +1,8 @@
+\subsection{Data labeling}
+\label{sec:data_labeling}
+
+A large part of the data preparation is the labeling of the data. The data is labeled with error labels. We define two different areas of errors. First, there are skeleton errors. Skeleton errors occur when the pose estimator detects a human in places where there are no humans. This can be caused by the pose estimator detecting a human in the background due to certain features that the estimator assumes are human.
+
+Second, there are joint errors. Joint errors occur when the pose estimator detects a joint in the wrong place. This can be caused by the pose estimator detecting a joint in the background due to certain features that the estimator assumes are a joint. It can also be caused by the estimator labeling a joint incorrectly. For example, the estimator might label the left hand as the right hand. This is a common error, especially when the joints are close to each other. An estimator might also not detect a joint at all. This might be caused through occlusion, be it by another joint, an object, or by the image border. Most applications avoid the last cause for occlusion by defining a minimum distance from the camera and specific camera placement to ensure that the user is always fully in view.
+
+In the data, no error is denoted with $0$. If the skeleton error occurs it is labeled with $1$. If a joint is not detected, it is labeled with $1$. If a joint is detected in the wrong place, it is labeled with $2$. If a joint is detected in the approximate position of where another joint should be then it is labeled with $3$.
