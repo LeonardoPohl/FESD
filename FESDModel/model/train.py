@@ -1,35 +1,30 @@
 from utils import AvgMeter, clip_gradient
 import torch
+import numpy as np
+from torchviz import make_dot
 
 # training
 def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epochs):
     loss_record = AvgMeter()
 
-    correct = 0
+    mse = np.zeros(100)
+    rmse = np.zeros(100)
+
     for i, pack in enumerate(train_loader, start=1):
         optimizer.zero_grad()
         
         rgbs, depths, poses_2d, errors = pack
         
-        # RD3D
         rgbs = rgbs.cuda()
         depths = depths.cuda()
-        print(rgbs.shape)
-        print(depths.shape)
-        rgbs = rgbs.unsqueeze(2)
-        depths = depths.unsqueeze(2)
-
-        # probably not correct
-        images = torch.cat([rgbs, depths], 2)
-        
-        # Seperate Network
         poses = poses_2d.cuda()
 
-        gt = errors.cuda()
-        gt = gt.squeeze()
+        print(rgbs.shape, depths.shape, poses.shape, errors.shape)
 
-        pred_s = model(images, poses)
-        if (i == 1 and False):
+        gt = errors.cuda()
+        
+        pred_s = model(rgbs, depths, poses)
+        if (i == 1):
             make_dot(pred_s.mean(), params=dict(list(model.named_parameters()))).render("rnn_torchviz", format="png")
 
         # TODO Calculate different loss based on the error label
@@ -41,44 +36,16 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         scheduler.step()
         
         loss_record.update(loss.data, 1)
-        correct += (pred_s == gt).float().sum()
+
+        mse[i%100] = sum((pred_s - gt)**2) / len(pred_s)
+        rmse[i%100] = np.sqrt(mse[i%100])
 
         if i % 100 == 0 or i == len(train_loader):
-          print(pred_s)
-          print(gt)
-          print('Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}], Loss: {:.4f}, Accuracy: {:.4f}'.format(epoch, epochs, i, len(train_loader),
-                               loss_record.show(), correct / 100))
-          correct = 0
-    #     images = images.cuda()
-    #     gts = gts.cuda()
-    #     depths = depths.cuda()
-
-    #     # multi-scale training samples
-    #     trainsize = int(round(opt.trainsize * rate / 32) * 32)
-    #     if rate != 1:
-    #         images = F.upsample(images, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
-    #         images = images.unsqueeze(2)
-    #         gts = F.upsample(gts, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
-
-    #         depths = F.upsample(depths, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
-    #         depths = depths.unsqueeze(2)
-    #         images = torch.cat([images, depths], 2)
-
-    #     if rate == 1:
-    #         images = images.unsqueeze(2)
-    #         depths = depths.unsqueeze(2)
-    #         images = torch.cat([images, depths], 2)
-
-    #     # forward
-    #     pred_s = model(images)
-    #     # TODO Calculate different loss based on the error label
-    #     loss = criterion(pred_s, gts)
-
-    #     loss.backward()
-    #     clip_gradient(optimizer, opt.clip)
-    #     optimizer.step()
-    #     scheduler.step()
-    #     if rate == 1:
-            
-    #         loss_record.update(loss.data, opt.batchsize)
+          mse_c = torch.tensor(mse).cuda()
+          rmse_c = torch.tensor(rmse).cuda()
+          print(f'Epoch [{epoch:03d}/{epochs:03d}], \
+                  Step [{i:04d}/{len(train_loader):04d}], \
+                  Loss: {loss_record.show():.4f}, \
+                  MSE: {torch.mean(mse_c):.4f}, \
+                  RMSE: {torch.mean(rmse_c):.4f}', end='\r')
       

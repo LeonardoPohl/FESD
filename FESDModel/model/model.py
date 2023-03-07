@@ -260,9 +260,9 @@ class RD3D(nn.Module):
 
         return self.unet(x0, x1, x2, x3, x4)
 
-class FESDPose(nn.Module):
+class FESDVis(nn.Module):
     def __init__(self, channel):
-        super(FESDPose, self).__init__()
+        super(FESDVis, self).__init__()
 
         self.conv3 = nn.Conv1d(3, 3, 2, stride=1, padding=1)
         self.conv5 = nn.Conv1d(3, 5, 3, stride=1, padding=2)
@@ -272,7 +272,7 @@ class FESDPose(nn.Module):
         self.pool10 = nn.MaxPool1d(10, stride=1)
         self.relu = nn.ReLU()
 
-    def forward(self, pose):
+    def forward(self, rgb, depth):
         # print("FESDPose")
 
         x = pose.squeeze()
@@ -289,34 +289,217 @@ class FESDPose(nn.Module):
         x = self.relu(x)
         x = self.pool10(x)
 
+        return x
+
+
+class FESDVis(nn.Module):
+    def __init__(self):
+        super(FESDVis, self).__init__()
+
+        # RGB input convolution layers
+        self.conv1_rgb = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2_rgb = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv3_rgb = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+
+        # Depth input convolution layers
+        self.conv1_depth = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2_depth = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv3_depth = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+
+        # Fully connected layers
+        self.fc1 = nn.Linear(128 * 75 * 75, 1024)
+        self.fc2 = nn.Linear(1024, 512)
+
+        # Dropout layer
+        self.dropout = nn.Dropout(p=0.5)
+
+    def forward(self, rgb, depth):
+        # RGB input convolution
+        x_rgb = self.conv1_rgb(rgb)
+        x_rgb = nn.functional.relu(x_rgb)
+        x_rgb = self.conv2_rgb(x_rgb)
+        x_rgb = nn.functional.relu(x_rgb)
+        x_rgb = self.conv3_rgb(x_rgb)
+        x_rgb = nn.functional.relu(x_rgb)
+        x_rgb = nn.functional.max_pool2d(x_rgb, kernel_size=2)
+
+        # Depth input convolution
+        x_depth = self.conv1_depth(depth)
+        x_depth = nn.functional.relu(x_depth)
+        x_depth = self.conv2_depth(x_depth)
+        x_depth = nn.functional.relu(x_depth)
+        x_depth = self.conv3_depth(x_depth)
+        x_depth = nn.functional.relu(x_depth)
+        x_depth = nn.functional.max_pool2d(x_depth, kernel_size=2)
+
+        # Concatenate RGB and depth features
+        x = torch.cat((x_rgb, x_depth), dim=1)
+
+        # Flatten and fully connected layers
+        x = x.view(-1, 128 * 75 * 75)
+        x = self.dropout(nn.functional.relu(self.fc1(x)))
+        x = self.dropout(nn.functional.relu(self.fc2(x)))
 
         return x
 
+class FESDPose(nn.Module):
+    def __init__(self):
+        super(FESDPose, self).__init__()
+
+        # Input convolution layers
+        self.conv1 = nn.Conv1d(75, 64, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv1d(128, 256, kernel_size=3, stride=1, padding=1)
+
+        # Fully connected layers
+        self.fc1 = nn.Linear(256 * 25, 1024)
+        self.fc2 = nn.Linear(1024, 512)
+        self.fc3 = nn.Linear(512, 2)
+
+        # Dropout layer
+        self.dropout = nn.Dropout(p=0.5)
+
+    def forward(self, joints):
+        # Input convolution
+        x = self.conv1(joints)
+        x = nn.functional.relu(x)
+        x = self.conv2(x)
+        x = nn.functional.relu(x)
+        x = self.conv3(x)
+        x = nn.functional.relu(x)
+
+        # Flatten and fully connected layers
+        x = x.view(-1, 256 * 25)
+        x = self.dropout(nn.functional.relu(self.fc1(x)))
+        x = self.dropout(nn.functional.relu(self.fc2(x)))
+        x = self.fc3(x)
+
+        return x
+
+# class FESDPose(nn.Module):
+#     def __init__(self, channel):
+#         super(FESDPose, self).__init__()
+
+#         self.conv3 = nn.Conv1d(3, 3, 2, stride=1, padding=1)
+#         self.conv5 = nn.Conv1d(3, 5, 3, stride=1, padding=2)
+#         self.conv10 = nn.Conv1d(5, 10, 3, stride=1, padding=2)
+#         self.pool3 = nn.MaxPool1d(3, stride=1)
+#         self.pool5 = nn.MaxPool1d(5, stride=1)
+#         self.pool10 = nn.MaxPool1d(10, stride=1)
+#         self.relu = nn.ReLU()
+
+#     def forward(self, pose):
+#         # print("FESDPose")
+
+#         x = pose.squeeze()
+
+#         x = self.conv3(x)
+#         x = self.relu(x)
+#         x = self.pool3(x)
+
+#         x = self.conv5(x)
+#         x = self.relu(x)
+#         x = self.pool5(x)
+
+#         x = self.conv10(x)
+#         x = self.relu(x)
+#         x = self.pool10(x)
+
+#         return x
+
+# class FESD(nn.Module):
+#     def __init__(self, channel, resnet):
+#         super(FESD, self).__init__()
+
+#         self.rd3d = RD3D(channel, resnet)
+#         self.pose = FESDPose(channel)
+
+#         self.fc_rd3d_pred = torch.nn.Linear(30976, 25).cuda()
+#         self.fc_fesd_pose_pred = torch.nn.Linear(150, 25).cuda()
+
+#         self.fc_combined = torch.nn.Linear(50, 25)
+
+#     def forward(self, img, pose):
+#         rd3d_pred = self.rd3d(img.to(torch.float32)).squeeze()
+#         rd3d_pred = rd3d_pred.flatten()
+#         rd3d_pred = self.fc_rd3d_pred (rd3d_pred)
+        
+#         fesd_pose_pred = self.pose(pose)
+#         fesd_pose_pred = fesd_pose_pred.flatten()
+        
+#         fesd_pose_pred = self.fc_fesd_pose_pred(fesd_pose_pred)
+        
+#         combined_tensor = torch.cat((rd3d_pred, fesd_pose_pred), dim=0).cuda()
+        
+#         output = self.fc_combined(combined_tensor)
+
+#         return output
+
 class FESD(nn.Module):
-    def __init__(self, channel, resnet):
+    def __init__(self):
         super(FESD, self).__init__()
 
-        self.rd3d = RD3D(channel, resnet)
-        self.pose = FESDPose(channel)
-        self.pool5 = nn.MaxPool1d(5, stride=1)
+        # RGB Input convolution layers
+        self.rgb_conv1 = nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1)
+        self.rgb_conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.rgb_conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.rgb_conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
 
-        self.fc_rd3d_pred = torch.nn.Linear(30976, 25).cuda()
-        self.fc_fesd_pose_pred = torch.nn.Linear(150, 25).cuda()
+        # Depth Input convolution layers
+        self.depth_conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        self.depth_conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.depth_conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.depth_conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
 
-        self.fc_combined = torch.nn.Linear(50, 25)
+        # Joint Input convolution layers
+        self.joint_conv1 = nn.Conv1d(3, 32, kernel_size=3, stride=1, padding=1)
+        self.joint_conv2 = nn.Conv1d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.joint_conv3 = nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1)
 
-    def forward(self, img, pose):
-        rd3d_pred = self.rd3d(img.to(torch.float32)).squeeze()
-        rd3d_pred = rd3d_pred.flatten()
-        rd3d_pred = self.fc_rd3d_pred (rd3d_pred)
-        
-        fesd_pose_pred = self.pose(pose)
-        fesd_pose_pred = fesd_pose_pred.flatten()
-        
-        fesd_pose_pred = self.fc_fesd_pose_pred(fesd_pose_pred)
-        
-        combined_tensor = torch.cat((rd3d_pred, fesd_pose_pred), dim=0).cuda()
-        
-        output = self.fc_combined(combined_tensor)
+        # Fully connected layers
+        self.fc1 = nn.Linear(256 * 75 + 256 * 75 + 128 * 25, 1024)
+        self.fc2 = nn.Linear(1024, 512)
+        self.fc3 = nn.Linear(512, 25)
 
-        return output
+        # Dropout layer
+        self.dropout = nn.Dropout(p=0.5)
+
+    def forward(self, rgb_image, depth_image, joint_data):
+        # RGB Input convolution
+        x = self.rgb_conv1(rgb_image)
+        x = nn.functional.relu(x)
+        x = self.rgb_conv2(x)
+        x = nn.functional.relu(x)
+        x = self.rgb_conv3(x)
+        x = nn.functional.relu(x)
+
+        # Depth Input convolution
+        y = self.depth_conv1(depth_image)
+        y = nn.functional.relu(y)
+        y = self.depth_conv2(y)
+        y = nn.functional.relu(y)
+        y = self.depth_conv3(y)
+        y = nn.functional.relu(y)
+
+        # Joint Input convolution
+        z = self.joint_conv1(joint_data)
+        z = nn.functional.relu(z)
+        z = self.joint_conv2(z)
+        z = nn.functional.relu(z)
+        z = self.joint_conv3(z)
+        z = nn.functional.relu(z)
+
+        print(x.shape, y.shape, z.shape)
+        # Flatten and concatenate all three inputs
+        x = x.view(-1, 128 * 300 * 300)
+        y = y.view(-1, 128 * 300 * 300)
+        z = z.view(-1, 128 * 25)
+        print(x.shape, y.shape, z.shape)
+        w = torch.cat([x, y, z], dim=1)
+
+        # Fully connected layers
+        w = self.dropout(nn.functional.relu(self.fc1(w)))
+        w = self.dropout(nn.functional.relu(self.fc2(w)))
+        w = self.fc3(w)
+
+        return w

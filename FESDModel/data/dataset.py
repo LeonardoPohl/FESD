@@ -42,16 +42,22 @@ class FESDDataset(data.Dataset):
     
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
-      print(self.augmentation_params)
 
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
     
-    rgb = torch.tensor(self.frame.rgb.copy())
+    rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
     rgb = transforms.Resize(self.trainsize)(rgb.permute(2, 0, 1))
     
-    depth = torch.tensor(self.frame.depth.copy()).squeeze()
-    depth = depth.repeat(3, 1, 1)
-    depth = transforms.Resize((self.trainsize, self.trainsize))(depth)
+    depth = torch.tensor(self.frame.depth.copy(), dtype=torch.float32)
+    depth.unsqueeze(0)
+    depth = transforms.Resize(self.trainsize)(depth.permute(2, 0, 1))
+
+    print(depth.shape)
+    if self.augmentation_params.gaussian:
+      blurrer = transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))
+      rgb = blurrer(rgb)
+      depth = blurrer(depth)
+    print(depth.shape)
     
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)

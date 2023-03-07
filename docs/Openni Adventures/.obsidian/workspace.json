@@ -26,9 +26,19 @@
                 "currentVersion": "1.1.15"
               }
             }
+          },
+          {
+            "id": "f554a5a10dfedbd8",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.1.16"
+              }
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -155,7 +165,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "487eb7914b168b8a",
+  "active": "f554a5a10dfedbd8",
   "lastOpenFiles": [
     "Meeting Erwin.md",
     "Thesis Research.md",

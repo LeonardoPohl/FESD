@@ -40,3 +40,4 @@ bin/
 dlls/
 packages/
 FESDData/nuitrack/
+FESDModel/rnn_torchviz.png
