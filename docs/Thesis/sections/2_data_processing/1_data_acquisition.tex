@@ -1,4 +1,8 @@
-\section{Data Acquisition Methods}
+\section{Data acquisition}
 \label{sec:data_acquisition}
 
-In this section, we discuss different methods that were considered for the data acquisition process. We then discuss the method that was chosen and the reasons for choosing this method. 
+In our project, we capture different data streams. Our main mode of data acquisition is video streams from RGBD cameras. With RGBD cameras, as the name suggests, we capture two different modalities, RGB data and depth data. RGBD was discussed in section \ref{sec:rgbd_cameras}. In addition to the RGBD data, we also capture the human pose data from the Nuitrack system. The data acquisition is done using the Nuitrack SDK. The Nuitrack SDK is a software development kit that allows us to capture data from the Nuitrack system. The Nuitrack SDK is discussed in section \ref{sec:nuitrack_sdk}. Additionally, the Nuitrack SDK allows us to capture the data from the RGBD cameras. This provides us with inherently synchronized data from the RGBD cameras and the pose data.
+
+Once the visual data is acquired from any stream there are only limited options to optimise the data. The most important aspect of this is the frames per second. Once a stream is recorded at a certain framerate, it is not possible to change this, except for duplicating or interpolating frames, which do not offer a high-quality result. Therefore, it is important to ensure that the frames can be recorded at a high enough rate. In a lot of cases, the first thought might be to record and query frames asynchronously but with asynchronous data acquisition the question of synchronisation arises. This is especially true if the data is recorded from multiple streams.
+
+To maximise the framerate, we limit any overhead that might be introduced by the data acquisition process. During the recording, we do not store the frames to file but instead, store the raw frames in memory to store them in the file later on. This reduces the overhead of writing to files and it is viable since we can manually limit the frames that are recorded for each recording beforehand to avoid any slow down due to memory limitations.

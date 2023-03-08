@@ -1,0 +1,14 @@
+\section{Model architecture}
+\label{sec:model_architecture}
+
+With the data prepared and the data layout known, we can start to build a model to predict the errors in the data. As is common practice in computer vision tasks, we use a convolutional neural network to predict the error type of the individual joints. The input of the network are the individual datastreams, i.e. a stream of RGB data, a stream of depth data, and a stream of joint data. The output of the network is a list of error labels for each joint. The network is trained to predict the error labels for each joint. The error labels are the same as the error labels used in the data labeling. The error labels are explained in section \ref{sec:data_labeling}. 
+
+The different modalities are combined in the final three fully connected layers. The model architecture is shown in figure \ref{fig:model_architecture}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\linewidth]{figures/model_architecture.png}
+  \caption{Model architecture}
+  \label{fig:model_architecture}
+\end{figure}
+
