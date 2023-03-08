@@ -30,7 +30,7 @@ class FESD(nn.Module):
         # Fully connected layers
         self.fc1 = nn.Linear(128 * 18 * 18 + 128 * 18 * 18 + 128 * 25, 1024)
         self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, 25)
+        self.fc3 = nn.Linear(512, 100)
 
         # Dropout layer
         self.dropout = nn.Dropout(p=0.5)
