@@ -42,3 +42,4 @@ packages/
 FESDData/nuitrack/
 FESDModel/rnn_torchviz.png
 FESDModel/checkpoints/
+FESDModel/runs/
