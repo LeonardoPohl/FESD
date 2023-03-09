@@ -713,7 +713,7 @@ void CameraHandler::fixSkeleton() {
             if (!joint_valid) {
                 ImGui::SameLine();
                 int err = joint["error"].asInt();
-                JointErrors.Slider(&err, joint["i"].asInt());
+                JointErrors.Slider(&err, person["Index"].asInt(), joint["i"].asInt());
                 joint["error"] = err;
             }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <filesystem>
+#include <format>
 
 #include <json/json.h>
 
@@ -58,9 +59,10 @@ public:
 		}
 	}
 
-	void Slider(int *err_id, int id) {
-		
-		if (ImGui::SliderInt("##" + id, err_id, 1, errors.size() - 1, errors[*err_id].name.c_str())) {
+	void Slider(int* err_id, int skel_id, int joint_id = -1) {
+		auto slider_id = std::format("##{}.{}", skel_id, joint_id).c_str();
+
+		if (ImGui::SliderInt(slider_id, err_id, 1, errors.size() - 1, errors[*err_id].name.c_str())) {
 			std::cout << errors.size() << std::endl;
 		}
 	}
