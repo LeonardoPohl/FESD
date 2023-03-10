@@ -82,4 +82,6 @@ class FESD(nn.Module):
         w = self.dropout(nn.functional.relu(self.fc2(w)))
         w = self.fc3(w)
 
+        w = nn.functional.log_softmax(w, dim=1)
+
         return w

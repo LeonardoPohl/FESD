@@ -700,8 +700,12 @@ void CameraHandler::fixSkeleton() {
             const auto score = joint["score"].asDouble();
 
             bool joint_valid = joint["error"].asInt() == 0;
+            auto joint_i = joint["i"].asInt();
 
-            if (ImGui::Checkbox(((std::string)"  Joint No " + joint["i"].asString() + (std::string)"##"+ std::to_string(i)).c_str(), &joint_valid)) {
+            auto checkbox_name = (std::string)"  " + SkeletonDetectorNuitrack::getJointName(joint_i);
+            auto checkbox_id = (std::string)"##C" + std::to_string(i) + (std::string)"." + joint["i"].asString();
+            
+            if (ImGui::Checkbox((checkbox_name + checkbox_id).c_str(), &joint_valid)) {
                 if (joint_valid) {
                     joint["error"] = 0;
                 }
@@ -717,18 +721,19 @@ void CameraHandler::fixSkeleton() {
                 joint["error"] = err;
             }
 
+
             bool isValid = joint_valid && person_valid;
-            cv::Scalar color{ 1.0, 0.0, 0.0 };
+            cv::Scalar color{ 1.0, 0.0, 0.0, 0.75 };
 
             if (m_ScoreThreshold < score || m_ShowUncertainty) {
                 if (!isValid) {
-                    color = { 0, 0, 0 };
+                    color = { 0, 0, 0, 0.75 };
                 }
                 else if (m_ShowUncertainty && m_ScoreThreshold < score) {
-                    color = { 0.3, 0.3, 0.3 };
+                    color = { 0.3, 0.3, 0.3, 0.75 };
                 }
                 else {
-                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3 };
+                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3, 0.5 };
                 }
                 cv::circle(m_CurrentColorFrame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
             }

@@ -1,5 +1,7 @@
 #include "SkeletonDetectorNuitrack.h"
 
+#include <vector>
+
 #include "Error.h"
 #include "utilities/Consts.h"
 #include "utilities/Utils.h"
@@ -54,6 +56,14 @@ std::string SkeletonDetectorNuitrack::getFrameName(int frame)
 void SkeletonDetectorNuitrack::freeCameras()
 {
 	Nuitrack::release();
+}
+
+
+std::string SkeletonDetectorNuitrack::getJointName(int joint_id)
+{
+	std::vector<std::string> joint_names{ "-", "Head", "Neck", "Torso", "Waist", "Left collar", "Left shoulder", "Left elbow", "Left wrist", "Left hand", "-", "Right collar", "Right shoulder", "Right elbow", "Right wrist", "Right hand", "-", "Left hip", "Left knee", "Left ankle", "-", "Right hip", "Right knee", "Right ankle", "-"};
+
+	return joint_names[joint_id];
 }
 
 Json::Value SkeletonDetectorNuitrack::getCameraJson()

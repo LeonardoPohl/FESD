@@ -134,5 +134,5 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
 
-  return Frame(rgb, depth, pose_2d, pose_3d, errors)
+  return Frame(rgb, depth, pose_2d, pose_3d, errors, session)
 
