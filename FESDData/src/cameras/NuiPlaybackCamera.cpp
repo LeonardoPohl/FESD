@@ -100,7 +100,7 @@ void NuiPlaybackCamera::queryFrame() {
     }
     try {  
         cv::Mat frame;
-        auto frame_path = m_RecordingPath / SkeletonDetectorNuitrack::getFrameName(*mp_CurrentPlaybackFrame);
+        auto frame_path = m_RecordingPath / SkeletonDetectorNuitrack::getFrameName((*mp_CurrentPlaybackFrame) * 10);
         if (std::filesystem::exists(frame_path.replace_extension(".bin"))) {
             std::ifstream fs(frame_path.replace_extension(".bin"), std::fstream::binary);
 

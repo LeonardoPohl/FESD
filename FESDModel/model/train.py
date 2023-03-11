@@ -26,7 +26,7 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         pred = model(rgbs, depths, poses)
         if (i == 1):
             make_dot(pred.mean(), params=dict(list(model.named_parameters()))).render("rnn_torchviz", format="png")
-
+        print(pred.shape, gt.shape)
         loss = criterion(pred, gt)
         
         loss.backward()
@@ -56,10 +56,10 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         accuracy = (tp + tn) / (tp + tn + fp + fn)
         metric = BinaryCohenKappa()
 
-        writer.add_scalar('accuracy/complete/train', accuracy, i)
-        writer.add_scalar('precision/complete/train', precision, i)
-        writer.add_scalar('recall/complete/train', recall, i)
-        writer.add_scalar('f1/complete/train', f1, i)
+        writer.add_scalar('accuracy/complete/train', accuracy, i, global_step=epoch)
+        writer.add_scalar('precision/complete/train', precision, i, global_step=epoch)
+        writer.add_scalar('recall/complete/train', recall, i, global_step=epoch)
+        writer.add_scalar('f1/complete/train', f1, i, global_step=epoch)
 
         pred_err = pred_err.apply_(lambda x: 0 if x == 0 else 1)
         gt_err = gt_err.apply_(lambda x: 0 if x == 0 else 1)
@@ -75,11 +75,11 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
 
         accuracy = (tp + tn) / (tp + tn + fp + fn)
 
-        writer.add_scalar('accuracy/simplified/train', accuracy, i)
-        writer.add_scalar('precision/simplified/train', precision, i)
-        writer.add_scalar('recall/simplified/train', recall, i)
-        writer.add_scalar('f1/simplified/train', f1, i)
-        writer.add_scalar('cohen_kappa/simplified/train', metric(pred_err, gt_err), i)
+        writer.add_scalar('accuracy/simplified/train', accuracy, i, global_step=epoch)
+        writer.add_scalar('precision/simplified/train', precision, i, global_step=epoch)
+        writer.add_scalar('recall/simplified/train', recall, i, global_step=epoch)
+        writer.add_scalar('f1/simplified/train', f1, i, global_step=epoch)
+        writer.add_scalar('cohen_kappa/simplified/train', metric(pred_err, gt_err), i, global_step=epoch)
 
         if i % 100 == 0 or i == len(train_loader):
           print(f'Epoch [{epoch:03d}/{epochs:03d}], \

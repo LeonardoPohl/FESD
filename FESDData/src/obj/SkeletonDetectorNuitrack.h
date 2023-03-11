@@ -20,6 +20,8 @@ public:
 	void freeCameras();
 
 	static std::string getJointName(int joint_id);
+	static cv::Scalar getJointColor(int joint_id);
+
 	Json::Value getCameraJson();
 	bool startRecording(std::string sessionName);
 	bool update(double times_tamp, bool save = true);

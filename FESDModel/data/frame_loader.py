@@ -53,23 +53,6 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
   
   return joints_2d, joints_3d, errors, bounding_boxes_2d, bounding_boxes_3d
 
-def load_frames(recording_dir: Path, session: json, start: int, stop: int, params: AugmentationParams = AugmentationParams()) -> list[Frame]:
-  frames = []
-
-  if (start > stop):
-    start, stop = stop, start
-  if (start < 0):
-    start = 0
-  if (stop > session['Frames']):
-    stop = session['Frames'] 
-  
-  params.seed = np.random.randint(0, 100000)
-  
-  for frame_id in range(start, stop):
-    frames.append(load_frame(recording_dir, session, frame_id, params))
-  
-  return frames
-
 def read_frame(path: Path) -> cv2.Mat:
   with open(path, "rb") as f:
     # Read header
@@ -85,7 +68,7 @@ def read_frame(path: Path) -> cv2.Mat:
   return mat
 
 def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams()) -> Frame:
-  frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id))
+  frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id * 10))
   frame = np.asarray( frame_mat[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
   rgb, depth = rgb.astype(np.float32), depth.astype(np.float32)
@@ -101,7 +84,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
       depth = depth[:, (c_to_remove-1)//2:-(c_to_remove+1)//2, :]
 
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
-    skeleton_json = json.load(file)[frame_id]
+    skeleton_json = json.load(file)[frame_id * 10]
     pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)
 
   if (params.flip):

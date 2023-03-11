@@ -546,6 +546,7 @@ void CameraHandler::startPlayback(Json::Value recording)
             m_FoundRecordedSkeleton = true;
             m_RecordedSkeleton = root;
         }
+        configJson.close();
     }
     else {
         mp_Logger->log("No Skeleton Found for selected recording!", Logger::Priority::WARN);
@@ -656,7 +657,7 @@ void CameraHandler::fixSkeleton() {
         m_CurrentPlaybackFrame = 0;
     }
 
-    Json::Value& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame];
+    Json::Value& skel_frame = m_RecordedSkeleton[m_CurrentPlaybackFrame * 10];
 
     if (!skel_frame) {
         m_CurrentPlaybackFrame += 1;
@@ -704,7 +705,10 @@ void CameraHandler::fixSkeleton() {
 
             auto checkbox_name = (std::string)"  " + SkeletonDetectorNuitrack::getJointName(joint_i);
             auto checkbox_id = (std::string)"##C" + std::to_string(i) + (std::string)"." + joint["i"].asString();
-            
+            auto joint_col = SkeletonDetectorNuitrack::getJointColor(joint_i);
+
+            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(joint_col[2] * 255, joint_col[1] * 255, joint_col[0] * 255, 255));
+
             if (ImGui::Checkbox((checkbox_name + checkbox_id).c_str(), &joint_valid)) {
                 if (joint_valid) {
                     joint["error"] = 0;
@@ -713,6 +717,7 @@ void CameraHandler::fixSkeleton() {
                     joint["error"] = 2;
                 }
             }
+            ImGui::PopStyleColor();
 
             if (!joint_valid) {
                 ImGui::SameLine();
@@ -729,11 +734,8 @@ void CameraHandler::fixSkeleton() {
                 if (!isValid) {
                     color = { 0, 0, 0, 0.75 };
                 }
-                else if (m_ShowUncertainty && m_ScoreThreshold < score) {
-                    color = { 0.3, 0.3, 0.3, 0.75 };
-                }
                 else {
-                    color = { (0.7 * (score - m_ScoreThreshold) / (1.0 - m_ScoreThreshold)) + 0.3, 0.3, 0.3, 0.5 };
+                    color = joint_col;
                 }
                 cv::circle(m_CurrentColorFrame, { joint["u"].asInt(), joint["v"].asInt(), }, 5, color * 255.0f, cv::FILLED);
             }

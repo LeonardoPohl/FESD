@@ -61,9 +61,16 @@ void SkeletonDetectorNuitrack::freeCameras()
 
 std::string SkeletonDetectorNuitrack::getJointName(int joint_id)
 {
-	std::vector<std::string> joint_names{ "-", "Head", "Neck", "Torso", "Waist", "Left collar", "Left shoulder", "Left elbow", "Left wrist", "Left hand", "-", "Right collar", "Right shoulder", "Right elbow", "Right wrist", "Right hand", "-", "Left hip", "Left knee", "Left ankle", "-", "Right hip", "Right knee", "Right ankle", "-"};
+	std::vector<std::string> joint_names{ "-", "Head", "Neck", "Torso", "Waist", "Left collar", "Left shoulder", "Left elbow", "Left wrist", "Left hand", "-", "Right collar", "Right shoulder", "Right elbow", "Right wrist", "Right hand", "-", "Left hip", "Left knee", "Left ankle", "-", "Right hip", "Right knee", "Right ankle", "-" };
 
 	return joint_names[joint_id];
+}
+
+cv::Scalar SkeletonDetectorNuitrack::getJointColor(int joint_id)
+{
+	std::vector<cv::Scalar> joint_color{ {0.000, 0.000, 0.000}, {0.902, 0.098, 0.294}, {0.235, 0.706, 0.294}, {1.000, 0.882, 0.098}, {0.000, 0.510, 0.784}, {0.961, 0.510, 0.188}, {0.569, 0.118, 0.706}, {0.275, 0.941, 0.941}, {0.941, 0.196, 0.902}, {0.824, 0.961, 0.235}, {0.000, 0.000, 0.000}, {0.980, 0.745, 0.831}, {0.000, 0.502, 0.502}, {0.863, 0.745, 1.000}, {0.667, 0.431, 0.157}, {1.000, 0.980, 0.784}, {0.000, 0.000, 0.000}, {0.502, 0.000, 0.000}, {0.667, 1.000, 0.765}, {0.502, 0.502, 0.000}, {1.000, 0.843, 0.706}, {0.000, 0.000, 0.000}, {0.000, 0.000, 0.502}, {0.502, 0.502, 0.502}, {1.000, 1.000, 1.000}, {1.000, 0.876, 0.513}, {0.000, 0.000, 0.000} };
+
+	return joint_color[joint_id];
 }
 
 Json::Value SkeletonDetectorNuitrack::getCameraJson()
