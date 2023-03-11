@@ -1,7 +1,6 @@
 from utils import AvgMeter, clip_gradient
 import torch
 import numpy as np
-from torchviz import make_dot
 from data import errs2gts, gts2errs
 from torchmetrics.classification import BinaryCohenKappa
 
@@ -24,9 +23,7 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         gt = gt.cuda()
         
         pred = model(rgbs, depths, poses)
-        if (i == 1):
-            make_dot(pred.mean(), params=dict(list(model.named_parameters()))).render("rnn_torchviz", format="png")
-        print(pred.shape, gt.shape)
+        
         loss = criterion(pred, gt)
         
         loss.backward()

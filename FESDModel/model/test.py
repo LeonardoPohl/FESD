@@ -1,7 +1,6 @@
 from utils import AvgMeter, clip_gradient
 import torch
 import numpy as np
-from torchviz import make_dot
 
 # eval
 def test(test_loader, model, criterion, epoch, epochs, writer):
