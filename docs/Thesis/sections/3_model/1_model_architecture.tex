@@ -7,8 +7,17 @@ The different modalities are combined in the final three fully connected layers.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.8\linewidth]{figures/model_architecture.png}
-  \caption{Model architecture}
+  \includegraphics[width=\linewidth]{figures/Model/FESD.png}
+  \caption[FESDModel architecture]{FESDModel architecture with three different inputs; RGB, Depth and Joint data. After three convolutions the three streams are concatenated to be passed into three fully connected layers. The output is a 1D 80 tensor of multi-object multi-class values.}
   \label{fig:model_architecture}
 \end{figure}
 
+We pass the three different modalities as multi dimensional tensors into the network. Prior to this we applied all augmentations and resize the images to fit the tensor size as seen in Figure \ref{fig:model_architecture}. We discuss the augmentations that we apply in Section \ref{sec:data_augmentation}.
+
+Then a 3x3 convolution is applied on the data to extract low level features. After the features are extracted a Relu, or rectified linear unit is applied to combat the vanishing gradient problem. For the visual channels of the data, i.e. the RGB data and the depth data MaxPooling is applied to down sample the data. It is not applied to the joint data since the data available per input is already limited.
+
+This Convolution, Relu and Max Pooling is repeated three times to extract ever higher level features. We found that three layers were the best choice.
+
+After the convolution layers we flatten the output of each of the RGB, Dept and Joint CNN into a single feature vector. This feature vector is passed into the fully connected network. We use three layers to gradually reduce the neuron size to our desired output size of $20\cdot4$ classes.
+
+Inherently this is the network, however, to use the data a softmax is applied to each object to extract the most likely joint error. The $20\cdot4$ classes can then be reduced to $20$ errors and a confidence rating.

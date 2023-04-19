@@ -1,17 +1,6 @@
 \section{Future work}
 \label{sec:future_work}
 
-\begin{itemize}
-  \item More stability in software (it is actually quite stable already but adding tests and ensuring adequate error handling would make it generally usable) (I also have a lot of ideas for this but I will not write them here, maybe ill name some in the report)
-  \item Save everything in a single rosbag file and write a custom rosbag reader
-  \item Multithreaded Streaming and recording (would probably not work since memory would be bottle neck, especially to a single file this would be a problem)
-  \item More data more variation in session parameters
-  \item Different exercises
-  \item Joint Reconstruction
-  \item Attempt to fix detected error
-  \item Import model using ONNX \cite{ONNX}
-  \item Use trained model in SilverFit
-  \item Use trained model in HPE sdk
-  \item Use data collector to formulate a dataset for exercise specific HPE
-  \item Train model with different HPE algorithms and use the model to decide when to use which
-\end{itemize}
+There are a multiple areas in which FESD can be expanded. Firstly, FESDData is already quite stable and user friendly software, however, as any software it can be improved. Firstly, the file storage is efficient enough for data recording but it is prone to error and can easily be interrupted by a corrupt file. In a future, more stable version of FESDData storing each recording in a separate RosBag file would improve the stability of the file system. Additionally, we have not fixed some edge case issues which were not essential to the thesis itself.
+
+The developed model could be improved by increasing the training data and recording in different settings. To further validate the model we could imagine applying it to a different dataset that is used by an action detector and evaluating its performance with introduced errors. Additionally, we could derive with a model which not only determines if there is an error, but also tries to fix the error by suggesting a different location.
