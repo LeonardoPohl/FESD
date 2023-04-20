@@ -28,6 +28,8 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
   origin = person['Skeleton'][4]
 
   for joint in person['Skeleton']:
+    if (len(person['Skeleton']) == 25) and (joint['i'] in [0, 10, 16, 20, 24]):
+      continue
     if (joint['error'] != 1):
       bounding_boxes_2d[0] = np.minimum(bounding_boxes_2d[0], [joint['u'], joint['v'], joint['d']])
       bounding_boxes_2d[1] = np.maximum(bounding_boxes_2d[1], [joint['u'], joint['v'], joint['d']])

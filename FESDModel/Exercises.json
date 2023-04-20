@@ -65,15 +65,15 @@
     },
     {
       "Id": "E-2.03",
-      "Description": "In a standing position, bow forward and then return to the standing position. Repeat this.",
-			"Sitting" : false,
+      "Description": "In a natural sitting position, raise the knees to the chest and lower them.",
+			"Sitting" : true,
       "Ankle Weight" : false,
 			"Holding Weight" : false
     },
     {
       "Id": "E-3.00",
-      "Description": "In a natural sitting position, raise the knees to the chest and lower them.",
-			"Sitting" : true,
+      "Description": "In a standing position, bow forward and then return to the standing position. Repeat this.",
+			"Sitting" : false,
       "Ankle Weight" : false,
 			"Holding Weight" : false
     },
