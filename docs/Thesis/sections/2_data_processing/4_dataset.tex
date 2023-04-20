@@ -19,26 +19,44 @@ Equation \ref{eq:orientation} was used to achieve the specified orientation. In 
 
 An important aspect of the dataset is the structure and distribution of data and their labels. In total we recorded all 13 exercises, mentioned in Section \ref{sec:exercises}, twice. Each recording session consists of exactly 300 frames.
 
-If a joint cannot be detected by Nuitrack it automatically gets zero coordinates, i.e. every value is zero. This makes it easy to automatically label these joints as faulty, in particular with the error label $1$ - Joint Missing. However, for the rest of the errors each frame has to be manually inspected and each joint considered. Since this requires a lot of work we reduced the labeled frames to 10 percent of the original size. Therefore, each exercise contains 60 frames. 
+If a joint cannot be detected by Nuitrack it automatically gets zero coordinates, i.e. every value is zero. This makes it easy to automatically label these joints as faulty, in particular with the error label $1$ - Joint Missing. However, for the rest of the errors each frame has to be manually inspected and each joint considered. Since this requires a lot of work we reduced the labeled frames to 10 percent of the original size. Therefore, each exercise contains 30 frames and in total $30 \cdot 13 \cdot 2 = 720$ frames are labeled. 
 
 \subsubsection{Distribution of Errors}
 
-An important factor of how well a model can be trained on data is the balance of the dataset. In this case the dataset is balanced by the error labels. In Figure \ref{fig:statistics_err} we can see the distribution of errors in the dataset as a whole. We see that ...
+An important factor in how well a model can be trained on data is the balance of the dataset. In this case, the dataset is balanced by the error labels. In Figure \ref{fig:statistics_err_dist} we can see the distribution of errors in the dataset as a whole. We see that most of the joints are not faulty, i.e. are in the position they are supposed be within a margin of error.
 
 \begin{figure}
   \centering
-  \textit{A histogram depicting the distribution of errors over all exercises (not created yet but probably, mostly No error then wrong position and then not found.)}
-  %\includegraphics[width=0.5\textwidth]{}
-  \caption[Error Distribution]{The distribution of errors}
-  \label{fig:statistics_err}
+  \includegraphics[width=0.5\textwidth]{figures/Data/Error_Distribution.png}
+  \caption[Error Distribution]{The distribution of errors TODO}
+  \label{fig:statistics_err_dist}
 \end{figure}
 
-To diversify the dataset we recorded different exercises with varying difficulties. In Figure \ref{fig:statistics_err_diff} we see that the difficulty has an influence on the correctness of the joints. This proves the soundness of our design proposals for challenging exercises from Section \ref{sec:exercises}.
+To diversify the dataset we recorded different exercises with varying difficulties. In Figure \ref{fig:statistics_err_diff} we see that the difficulty has an influence on the amount of errors that occur for any given joint. We see that there is barely any difference between the trivial and the easy exercises. However, in Figure \ref{fig:statistics_err_dist_diff} we see that while trivial exercises have a higher percentage of unrealistic joint positions, i.e. the joint is in a wrong location, the easy exercises have a higher percentage of joints which are not detected. However, this difference is very small. 
+
+Medium exercises have around half of the joints
+
+This proves the soundness of our design proposals for challenging exercises from Section \ref{sec:exercises}.
 
 \begin{figure}
   \centering
-  \textit{A histogram similar to the previous graph. However, With 4 different classes at each error (x). (Not created yet. Based on labelling it seems to be as expected, i.e. Trivial mostly no error and hard mostly wrong.)}
-  %\includegraphics[width=0.5\textwidth]{}
-  \caption[Error Distribution with Difficulty]{The distribution of errors with additional difficulty distinction.}
+  \includegraphics[width=0.5\textwidth]{figures/Data/Error_Rate_by_Difficulty.png}
+  \caption[Error Rate by Difficulty]{The rate that errors occur for any given difficulty. TODO}
   \label{fig:statistics_err_diff}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/Data/Error_Distribution_by_Difficulty.png}
+  \caption[Error Distribution by Difficulty]{The distribution of errors by difficulty. TODO}
+  \label{fig:statistics_err_dist_diff}
+\end{figure}
+
+Some joints are more likely than others to be faulty, based on frequent occlusion, or generally more challenging detection. For example, hands and ankles are quite challenging to detect since they move frequently and are frequently occluded. On the other hand the head and the neck are least likely to be faulty. This distribution can be seen in Figure \ref{fig:statistics_err_dist_joint}, where the distribution of errors are shown for each joint. The joints are sorted by general occourence of errors.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/Data/Error_Distribution_by_Joint.png}
+  \caption[Error Distribution by Joint]{The distribution of errors by Joint. TODO}
+  \label{fig:statistics_err_dist_joint}
 \end{figure}
