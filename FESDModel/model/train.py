@@ -34,8 +34,6 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         loss_record.update(loss.data, 1)
         writer.add_scalar('Loss/train', loss_record.show(), i)
 
-        pred_err, pred_conf = gts2errs(pred)
-        gt_err, _ = gts2errs(gt)
 
         if i == 1 or i == len(train_loader):
           writer.add_graph(model, (rgbs, depths, poses))
