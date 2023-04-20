@@ -91,7 +91,12 @@ namespace GLObject
     // 
     // Updates
     // 
-    void PointCloud::OnUpdate()
+    void PointCloud::OnUpdate() 
+    {
+        this->OnUpdate(true);
+    }
+
+    void PointCloud::OnUpdate(bool subData)
     {
         const int16_t *depth;
 
@@ -103,14 +108,15 @@ namespace GLObject
             if (m_State == m_State.STREAM) {
                 depth = static_cast<const int16_t*>(cam->getDepth());
                 if (depth != nullptr) {
-                    streamDepth(cam_index, depth);
+                    // streamDepth(cam_index, depth);
                 }
             }
 
-            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 
-                                    sizeof(Point) * m_ElementOffset[cam_index], 
-                                    sizeof(Point) * m_NumElements[cam_index], 
-                                    m_Points[cam_index].get()));
+            /*if (false)
+                GLCall(glBufferSubData(GL_ARRAY_BUFFER, 
+                                        sizeof(Point) * m_ElementOffset[cam_index], 
+                                        sizeof(Point) * m_NumElements[cam_index], 
+                                    m_Points[cam_index].get()));*/
         }
     }
 

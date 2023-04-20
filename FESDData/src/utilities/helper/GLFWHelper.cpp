@@ -58,11 +58,11 @@ GLFWwindow *InitialiseGLFWWindow(STATUS &status)
 
 GLuint matToTexture(const cv::Mat& mat, GLenum minFilter, GLenum magFilter, GLenum wrapFilter) {
     // Generate a number for our textureID's unique handle
-    GLuint textureID;
-    glGenTextures(1, &textureID);
+    //GLuint textureID;
+    //glGenTextures(1, 0);
 
     // Bind to our texture handle
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Catch silly-mistake texture interpolation method for magnification
     if (magFilter == GL_LINEAR_MIPMAP_LINEAR ||
@@ -112,5 +112,5 @@ GLuint matToTexture(const cv::Mat& mat, GLenum minFilter, GLenum magFilter, GLen
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 
-    return textureID;
+    return 0;
 }

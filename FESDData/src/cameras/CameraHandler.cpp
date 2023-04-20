@@ -34,7 +34,7 @@ CameraHandler::CameraHandler(Camera *cam, Renderer *renderer, Logger::Logger* lo
 
     findRecordings();
     updateSessionName();
-    m_SkeletonDetectorOpenPose = std::make_unique<SkeletonDetectorOpenPose>(mp_Logger);
+    // m_SkeletonDetectorOpenPose = std::make_unique<SkeletonDetectorOpenPose>(mp_Logger);
 
 }
 
@@ -42,7 +42,7 @@ CameraHandler::~CameraHandler()
 {
     stopRecording();
     clearCameras();
-    
+
     openni::OpenNI::shutdown();
 }
 
@@ -421,7 +421,7 @@ void CameraHandler::findRecordings() {
 void CameraHandler::showRecordings() {
     ImGui::Begin("Recordings");
     static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-    if (ImGui::BeginTable("Recordings", 9, flags)) {
+    if (ImGui::BeginTable("Recordings", 10, flags)) {
         ImGui::TableSetupColumn("Cameras");
         ImGui::TableSetupColumn("Exercise");
         ImGui::TableSetupColumn("Date");
@@ -431,9 +431,10 @@ void CameraHandler::showRecordings() {
         ImGui::TableSetupColumn("Calculate Skeleton");
         ImGui::TableSetupColumn("Fix Skeleton");
         ImGui::TableSetupColumn("Playback");
+        ImGui::TableSetupColumn("Lablled");
         ImGui::TableHeadersRow();
 
-        for (auto recording : m_Recordings) {
+        for (auto& recording : m_Recordings) {
             ImGui::TableNextRow();
             bool isValid = false;
             bool isNuitrack = false;
@@ -491,6 +492,21 @@ void CameraHandler::showRecordings() {
                 startPlayback(recording);
             }
             ImGui::EndDisabled();
+
+            // Labled
+            ImGui::TableSetColumnIndex(9);
+            auto labelled = recording["Labelled"].asBool();
+            if (ImGui::Checkbox(("##" + recording["Name"].asString()).c_str(), &labelled)) {
+                recording["Labelled"] = labelled;
+                auto configPath = m_RecordingDirectory / getFileSafeSessionName(recording["Name"].asString());
+                configPath += ".json";
+
+                std::fstream configJson(configPath, std::ios::out | std::ios::trunc);
+                Json::StreamWriterBuilder builder;
+                configJson << Json::writeString(builder, recording);
+                configJson.close();
+            }
+
         }
         ImGui::EndTable();
     }
@@ -570,14 +586,17 @@ void CameraHandler::playback()
             mp_PointCloud->OnUpdate();
         }
         mp_PointCloud->OnRender();
+        
         for (auto cam : m_DepthCameras)
         {
             if (!m_PlaybackPaused && (m_ShowColorFrames || m_DoSkeletonDetection)) {
                 auto frame = cam->getColorFrame();
+
                 if (!frame.empty()) {
                     if (m_DoSkeletonDetection) {
                         m_SkeletonDetectorOpenPose->drawSkeleton(frame, m_ScoreThreshold, m_ShowUncertainty);
                     }
+
                     ImGui::Begin((cam->getCameraName() + (std::string)" Color Frame").c_str());
                     ImGuiHelper::showImage(frame);
                     ImGui::End();
@@ -669,7 +688,8 @@ void CameraHandler::fixSkeleton() {
 
     int valid_people = 0;
 
-    mp_PointCloud->OnUpdate();
+    cam->getDepth();
+    //mp_PointCloud->OnUpdate();
     m_CurrentColorFrame = cam->getColorFrame();
     if (m_CurrentColorFrame.empty()) {
         mp_Logger->log("No color frame!", Logger::Priority::ERR);
@@ -706,10 +726,10 @@ void CameraHandler::fixSkeleton() {
             auto checkbox_name = (std::string)"  " + SkeletonDetectorNuitrack::getJointName(joint_i);
             auto checkbox_id = (std::string)"##C" + std::to_string(i) + (std::string)"." + joint["i"].asString();
             auto joint_col = SkeletonDetectorNuitrack::getJointColor(joint_i);
-
+            
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(joint_col[2] * 255, joint_col[1] * 255, joint_col[0] * 255, 255));
 
-            if (ImGui::Checkbox((checkbox_name + checkbox_id).c_str(), &joint_valid)) {
+            if (person_valid && ImGui::Checkbox((checkbox_name + checkbox_id).c_str(), &joint_valid)) {
                 if (joint_valid) {
                     joint["error"] = 0;
                 }
@@ -718,8 +738,9 @@ void CameraHandler::fixSkeleton() {
                 }
             }
             ImGui::PopStyleColor();
+            
 
-            if (!joint_valid) {
+            if (person_valid && !joint_valid) {
                 ImGui::SameLine();
                 int err = joint["error"].asInt();
                 JointErrors.Slider(&err, person["Index"].asInt(), joint["i"].asInt());
@@ -808,6 +829,17 @@ void CameraHandler::stopPlayback()
         
     }
     m_FoundRecordedSkeleton = false;
+
+    if (m_FixSkeleton) {
+        m_Recording["Labelled"] = true;
+        auto configPath = m_RecordingDirectory / getFileSafeSessionName(m_Recording["Name"].asString());
+        configPath += ".json";
+
+        std::fstream configJson(configPath, std::ios::out | std::ios::trunc);
+        Json::StreamWriterBuilder builder;
+        configJson << Json::writeString(builder, m_Recording);
+        configJson.close();
+    }
 
     clearCameras();
     m_State = Streaming;

@@ -59,6 +59,7 @@ namespace GLObject
 		
 		// Updates
 		void OnUpdate() override;
+		void OnUpdate(bool subData);
 		void OnRender() override;
 		void OnImGuiRender() override;
 		void manipulateTranslation();

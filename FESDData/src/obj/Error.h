@@ -20,7 +20,7 @@ public:
 	std::string name;
 };
 
-static enum class ErrorType {
+enum class ErrorType {
 	Joint,
 	Skleleton
 };
