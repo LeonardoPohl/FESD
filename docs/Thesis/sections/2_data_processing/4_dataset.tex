@@ -19,7 +19,9 @@ Equation \ref{eq:orientation} was used to achieve the specified orientation. In 
 
 An important aspect of the dataset is the structure and distribution of data and their labels. In total we recorded all 13 exercises, mentioned in Section \ref{sec:exercises}, twice. Each recording session consists of exactly 300 frames.
 
-If a joint cannot be detected by Nuitrack it automatically gets zero coordinates, i.e. every value is zero. This makes it easy to automatically label these joints as faulty, in particular with the error label $1$ - Joint Missing. However, for the rest of the errors each frame has to be manually inspected and each joint considered. Since this requires a lot of work we reduced the labeled frames to 10 percent of the original size. Therefore, each exercise contains 30 frames and in total $30 \cdot 13 \cdot 2 = 720$ frames are labeled. 
+If a joint cannot be detected by Nuitrack it automatically gets zero coordinates, i.e. every value is zero. This makes it easy to automatically label these joints as faulty, in particular with the error label $1$ - Joint Missing. However, for the rest of the errors each frame has to be manually inspected and each joint considered. Since this requires a lot of work we reduced the labeled frames to 10 percent of the original size. Therefore, each exercise contains 30 frames and in total $30 \cdot 13 \cdot 2 = 720$ frames are labeled.
+
+When multiple persons are detected one person might be incorrectly detected in the background. While analysing the data we pick the person that is not labeled as faulty whenever possible. For training and testing this is choosen at random. If a person is labeled as faulty each joint is marked as in a unrealistic position.
 
 \subsubsection{Distribution of Errors}
 
@@ -32,16 +34,12 @@ An important factor in how well a model can be trained on data is the balance of
   \label{fig:statistics_err_dist}
 \end{figure}
 
-To diversify the dataset we recorded different exercises with varying difficulties. In Figure \ref{fig:statistics_err_diff} we see that the difficulty has an influence on the amount of errors that occur for any given joint. We see that there is barely any difference between the trivial and the easy exercises. However, in Figure \ref{fig:statistics_err_dist_diff} we see that while trivial exercises have a higher percentage of unrealistic joint positions, i.e. the joint is in a wrong location, the easy exercises have a higher percentage of joints which are not detected. However, this difference is very small. 
-
-Medium exercises have around half of the joints
-
-This proves the soundness of our design proposals for challenging exercises from Section \ref{sec:exercises}.
+To diversify the dataset we recorded different exercises with varying difficulties. In Figure \ref{fig:statistics_err_diff} we see that the difficulty has an influence on the amount of errors that occur for any given joint. We see that there is barely any difference between the trivial and the easy exercises. However, in Figure \ref{fig:statistics_err_dist_diff} we see that while trivial exercises have a higher percentage of unrealistic joint positions, i.e. the joint is in a wrong location, the easy exercises have a higher percentage of joints which are not detected. However, this difference is very small. Medium and Hard exercises are more error prone as was intended. This reflects our design proposals for challenging exercises from Section \ref{sec:exercises} indeed cause more difficult scenarios.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{figures/Data/Error_Rate_by_Difficulty.png}
-  \caption[Error Rate by Difficulty]{The rate that errors occur for any given difficulty. TODO}
+  \caption[Error Rate by Difficulty]{The rate that errors occur for any given difficulty. }
   \label{fig:statistics_err_diff}
 \end{figure}
 
