@@ -19,8 +19,13 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   
-  i = np.random.randint(0, len(skeletons_json))
-  
+  #i = np.random.randint(0, len(skeletons_json))
+  i = 0
+
+  for j, skel in enumerate(skeletons_json):
+    if skel["error"] == 0:
+      i = j
+
   person = skeletons_json[i]
   joints_2d = np.ndarray(shape=[0, 3])
   joints_3d = np.ndarray(shape=[0, 3])
@@ -48,7 +53,7 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
       joint['z'] - origin['z']
       ]], axis=0)
 
-    errors = np.append(errors, 1 if person['error'] == 1 else joint['error'])
+    errors = np.append(errors, 2 if person['error'] == 1 else joint['error'])
 
   joints_2d *= -1 if flip else 1
   joints_3d *= -1 if flip else 1

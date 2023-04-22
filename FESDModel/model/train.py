@@ -1,11 +1,11 @@
 from utils import AvgMeter, clip_gradient
 import torch
 import numpy as np
-from data import errs2gts, gts2errs
-from torchmetrics.classification import BinaryCohenKappa
+
+from .eval import val
 
 # training
-def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epochs, writer):
+def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epochs, writer, is_cuda, df):
     loss_record = AvgMeter()
 
     mse = np.zeros(100)
@@ -15,69 +15,29 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         optimizer.zero_grad()
         
         rgbs, depths, poses_2d, gt = pack
-        
-        rgbs = rgbs.cuda()
-        depths = depths.cuda()
-        poses = poses_2d.cuda()
+                
+        if is_cuda:
+          gt = gt.cuda()
+          poses_2d = poses_2d.cuda()
+          rgbs = rgbs.cuda()
+          depths = depths.cuda()
 
-        gt = gt.cuda()
+        pred = model(rgbs, depths, poses_2d)
+
+        loss = 0
+        # TODO this is not tested
+        for i in range(0, 20, 4):
+          g = gt[:,i:i+4]
+          p = pred[:,i:i+4]
         
-        pred = model(rgbs, depths, poses)
-        
-        loss = criterion(pred, gt)
-        
+          loss += criterion(g, p)
+          
         loss.backward()
+
         clip_gradient(optimizer, clip)
         optimizer.step()
         scheduler.step()
         
         loss_record.update(loss.data, 1)
-        writer.add_scalar('Loss/train', loss_record.show(), i)
-
-
-        if i == 1 or i == len(train_loader):
-          writer.add_graph(model, (rgbs, depths, poses))
-
-        tp = torch.sum(gt_err == pred_err)
-        tn = torch.sum(gt_err == pred_err)
-        fp = torch.sum(gt_err != pred_err)
-        fn = torch.sum(gt_err != pred_err)
         
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-      
-        f1 = (precision * recall) / (precision + recall)
-
-        accuracy = (tp + tn) / (tp + tn + fp + fn)
-        metric = BinaryCohenKappa()
-
-        writer.add_scalar('accuracy/complete/train', accuracy, i, global_step=epoch)
-        writer.add_scalar('precision/complete/train', precision, i, global_step=epoch)
-        writer.add_scalar('recall/complete/train', recall, i, global_step=epoch)
-        writer.add_scalar('f1/complete/train', f1, i, global_step=epoch)
-
-        pred_err = pred_err.apply_(lambda x: 0 if x == 0 else 1)
-        gt_err = gt_err.apply_(lambda x: 0 if x == 0 else 1)
-        
-        tp = torch.sum(torch.logical_and(gt_err == 0, pred_err == 0))
-        tn = torch.sum(torch.logical_and(gt_err != 0, pred_err != 0))
-        fp = torch.sum(torch.logical_and(gt_err != 0, pred_err == 0))
-        fn = torch.sum(torch.logical_and(gt_err == 0, pred_err != 0))
-        
-        precision = torch.sum(pred_err == gt_err) / len(pred_err)
-        recall = torch.sum(pred_err == gt_err) / len(gt_err)
-        f1 = 2 * (precision * recall) / (precision + recall)
-
-        accuracy = (tp + tn) / (tp + tn + fp + fn)
-
-        writer.add_scalar('accuracy/simplified/train', accuracy, i, global_step=epoch)
-        writer.add_scalar('precision/simplified/train', precision, i, global_step=epoch)
-        writer.add_scalar('recall/simplified/train', recall, i, global_step=epoch)
-        writer.add_scalar('f1/simplified/train', f1, i, global_step=epoch)
-        writer.add_scalar('cohen_kappa/simplified/train', metric(pred_err, gt_err), i, global_step=epoch)
-
-        if i % 100 == 0 or i == len(train_loader):
-          print(f'Epoch [{epoch:03d}/{epochs:03d}], \
-                  Step [{i:04d}/{len(train_loader):04d}], \
-                  Loss: {loss_record.show():.4f}')
-      
+        val(pred, gt, writer, loss_record, epoch, i, len(train_loader), "train", df)
