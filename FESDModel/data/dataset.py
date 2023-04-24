@@ -109,7 +109,7 @@ class FESDDataset(data.Dataset):
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
     gt = err2gt(errors)
     
-    return rgb, depth, pose_2d, gt
+    return rgb, depth, pose_2d, gt, self.frame.session
 
   def get_index(self, index):
     session = index // self.frames_per_session

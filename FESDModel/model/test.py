@@ -1,32 +1,24 @@
 from utils import AvgMeter, clip_gradient
 import torch
 import numpy as np
+from .eval import val
 
 # eval
-def test(test_loader, model, criterion, epoch, epochs, writer):
+def test(test_loader, model, criterion, writer, df):
     loss_record = AvgMeter()
 
-    mse = np.zeros(100)
-    rmse = np.zeros(100)
-
-    for i, pack in enumerate(eval_loader, start=1):        
-        rgbs, depths, poses_2d, errors = pack
+    for i, pack in enumerate(test_loader, start=1):      
+        rgbs, depths, poses_2d, gt, session = pack
         
-        rgbs = rgbs.cuda()
-        depths = depths.cuda()
-        poses = poses_2d.cuda()
-
-        gt = errors.cuda()
+        pred = model(rgbs, depths, poses_2d)
         
-        pred_s = model(rgbs, depths, poses)
+        loss = 0
+        for j in range(0, 20, 4):
+          g = gt[:,j:j+4]
+          p = pred[:,j:j+4]
         
-        # TODO Calculate different loss based on the error label
-        loss = criterion(pred_s, gt)
-        loss_record.update(loss)
-
-        mse[i%100] = sum(sum((pred_s - gt)**2) / len(pred_s)) / rgbs.shape[0]
-        rmse[i%100] = np.sqrt(mse[i%100])
-
-        writer.add_scalar('Loss/test', loss_record.show(), i)
-        writer.add_scalar('MSE/test', sum(sum((pred_s - gt)**2) / len(pred_s)) / rgbs.shape[0], i)
-      
+          loss += criterion(g, p)
+        
+        loss_record.update(loss.data, 1)
+          
+        val(pred, gt, writer, loss_record, loss.data, 0, 0, i, len(test_loader), "test", session['Session Parameters']["Exercise"][0], df)

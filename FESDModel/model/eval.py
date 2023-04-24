@@ -5,14 +5,9 @@ from data import gts2errs
 from torchmetrics.classification import BinaryCohenKappa
 
 # eval
-def val(prediction, gt, writer, loss_record, epoch, i, data_size, identifier, df):
+def val(prediction, gt, writer, loss_record, loss, epoch, epochs, i, data_size, identifier, exercise, df):
     gt_err, _ = gts2errs(gt)
     pred_err, pred_confidence = gts2errs(prediction)
-
-    writer.add_scalar('Loss/train', loss_record.show(), i)
-
-    if i == 1 or i == data_size:
-        writer.add_graph(model, (rgbs, depths, poses))
 
     tp = torch.sum(gt_err == pred_err)
     tn = torch.sum(gt_err == pred_err)
@@ -27,7 +22,7 @@ def val(prediction, gt, writer, loss_record, epoch, i, data_size, identifier, df
     accuracy = (tp + tn) / (tp + tn + fp + fn)
     metric = BinaryCohenKappa()
 
-    df.loc[len(df)] = [epoch, i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), loss_record.show(), accuracy, tp, tn, fp, fn,  precision, recall, f1, np.NaN, identifier, False]
+    df.loc[len(df)] = [epoch, i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), np.NaN, identifier, exercise, False]
 
     pred_err = pred_err.apply_(lambda x: 0 if x == 0 else 1)
     gt_err = gt_err.apply_(lambda x: 0 if x == 0 else 1)
@@ -43,7 +38,7 @@ def val(prediction, gt, writer, loss_record, epoch, i, data_size, identifier, df
 
     accuracy = (tp + tn) / (tp + tn + fp + fn)
 
-    df.loc[len(df)] = [epoch, i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), loss_record.show(), accuracy, tp, tn, fp, fn,  precision, recall, f1, metric(pred_err, gt_err), identifier, True]
+    df.loc[len(df)] = [epoch, i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), float(metric(pred_err, gt_err)), identifier, exercise, True]
 
     if i % 100 == 0 or i == data_size:
         print(f'Epoch [{epoch:03d}/{epochs:03d}], \
