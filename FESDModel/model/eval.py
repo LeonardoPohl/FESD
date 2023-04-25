@@ -7,10 +7,14 @@ from tqdm import tqdm
 
 # eval
 def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, identifier, exercise, df):
+    gt_errs, _ = gts2errs(gt)
+    pred_errs, pred_confidences = gts2errs(prediction)
+    
+
     for joint_i in range(0, 20):
-        gt_err = gt[:,joint_i]
-        pred_err = prediction[:,joint_i]
-        #pred_confidence = pred_confidence[joint_i]
+        gt_err = gt_errs[:,joint_i]
+        pred_err = pred_errs[:,joint_i]
+        pred_confidence = pred_confidences[0]
         
         tp = torch.sum(gt_err == pred_err)
         tn = torch.sum(gt_err == pred_err)
@@ -24,8 +28,13 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
 
         accuracy = (tp + tn) / (tp + tn + fp + fn)
         metric = BinaryCohenKappa()
-
-        df.loc[len(df)] = [epoch, i, joint_i, gt_err.tolist(), pred_err.tolist(), np.NaN, float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), np.NaN, lr, identifier, exercise, False]
+        
+        df.loc[len(df)] = [epoch, i, joint_i, 
+        gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), 
+        float(loss_record.show()), float(loss), float(accuracy), 
+        float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1),
+         np.NaN, lr, identifier, 
+         exercise, False]
 
         pred_err = pred_err.apply_(lambda x: 0 if x == 0 else 1)
         gt_err = gt_err.apply_(lambda x: 0 if x == 0 else 1)
@@ -41,7 +50,7 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
 
         accuracy = (tp + tn) / (tp + tn + fp + fn)
 
-        df.loc[len(df)] = [epoch, i, joint_i, gt_err.tolist(), pred_err.tolist(), np.NaN, float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), float(metric(pred_err, gt_err)), lr, identifier, exercise, True]
+        df.loc[len(df)] = [epoch, i, joint_i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), float(metric(pred_err, gt_err)), lr, identifier, exercise, True]
 
         #if i % 100 == 0 or i == data_size:
         #    tqdm.write(f'Epoch [{epoch:03d}/{epochs:03d}], \

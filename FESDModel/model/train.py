@@ -38,4 +38,4 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
         
         loss_record.update(loss.data, 1)
         
-        val(pred, gt, writer, loss_record, loss.data, optimizer.param_groups[0]["lr"], epoch, epochs, i, len(train_loader), "train", session['Session Parameters']["Exercise"][0], df)
+        val(pred, gt, loss_record, loss.data, optimizer.param_groups[0]["lr"], epoch, epochs, i, len(train_loader), "train", session['Session Parameters']["Exercise"][0], df)

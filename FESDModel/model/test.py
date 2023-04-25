@@ -27,4 +27,4 @@ def test(test_loader, model, criterion, writer, is_cuda, df):
         
         loss_record.update(loss.data, 1)
           
-        val(pred, gt, writer, loss_record, loss.data, np.NaN, 0, 0, i, len(test_loader), "test", session['Session Parameters']["Exercise"][0], df)
+        val(pred, gt, loss_record, loss.data, np.NaN, 0, 0, i, len(test_loader), "test", session['Session Parameters']["Exercise"][0], df)
