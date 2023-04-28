@@ -4,7 +4,7 @@ import numpy as np
 from .eval import val
 
 # eval
-def test(test_loader, model, criterion, writer, is_cuda, mode, df):
+def test(test_loader, model, criterion, is_cuda, mode, df):
     loss_record = AvgMeter()
 
     for i, pack in enumerate(test_loader, start=1):      

@@ -8,7 +8,7 @@ from utils.mode import Mode
 from .eval import val
 
 # training
-def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epochs, writer, is_cuda, mode, df):
+def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epochs, is_cuda, mode, df):
   loss_record = AvgMeter()
 
   for i, pack in enumerate(train_loader, start=1):
