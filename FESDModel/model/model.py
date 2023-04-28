@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class FESD(nn.Module):
-    def __init__(self):
+    def __init__(self, num_classes=80):
         super(FESD, self).__init__()
 
         # RGB Input convolution layers with pooling
@@ -30,7 +30,7 @@ class FESD(nn.Module):
         # Fully connected layers
         self.fc1 = nn.Linear(128 * 18 * 18 + 128 * 18 * 18 + 128 * 20, 1024)
         self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, 80)
+        self.fc3 = nn.Linear(512, num_classes)
 
         # Dropout layer
         self.dropout = nn.Dropout(p=0.5)

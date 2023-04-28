@@ -5,48 +5,18 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import numpy as np
 from pathlib import Path
+from enum import Enum
+
+from utils.mode import Mode
+from utils import gt2err, err2gt
 
 from .frame_loader import load_frame
 from .augmentation_parameters import AugmentationParams 
 from .frame import Frame
+
   
-def err2gt(err):
-  gt = torch.zeros(len(err) * 4, dtype=torch.float32)
-  for (i, e) in enumerate(err):
-    gt[int(i*4 + e)] = 1
-  return gt
-
-def errs2gts(errs):
-  gts = torch.zeros(len(errs), len(errs[0]) * 4, dtype=torch.float32)
-  for (i, err) in enumerate(errs):
-    gts[i] = err2gt(err)
-  return gts
-
-def gt2err(gt):
-  err = torch.zeros(len(gt) // 4, dtype=torch.float32)
-  confidence = torch.zeros(len(gt) // 4, dtype=torch.float32)
-  for i in range(0, len(gt), 4):
-    e = gt[i:i+4]
-    probs = torch.nn.functional.softmax(e, dim=0) 
-    conf, classes = torch.max(probs, 0) 
-    confidence[i // 4] = conf
-    err[i // 4] = classes
-
-  return err, confidence
-
-def gts2errs(gts):
-  errs = torch.zeros(len(gts), len(gts[0]) // 4, dtype=torch.float32)
-  confidences = torch.zeros(len(gts), len(gts[0]) // 4, dtype=torch.float32)
-  for (i, gt) in enumerate(gts):
-    err, confidence = gt2err(gt)
-    errs[i] = err
-    confidences[i] = confidence
-  
-  return errs, confidences
-
-
 class FESDDataset(data.Dataset):
-  def __init__(self, recording_dir, trainsize, test=False):
+  def __init__(self, recording_dir, trainsize, test=False, mode:Mode=Mode.FULL_BODY):
     self.trainsize = trainsize
     self.recording_dir = recording_dir
     self.recording_jsons = []
@@ -72,6 +42,7 @@ class FESDDataset(data.Dataset):
     print(f"Recordings Found: {len(self.recording_jsons)}")
     print(f"Total Frames: {self.size}")
 
+    self.mode = mode
     self.augmentation_params = AugmentationParams(flip=False, crop=False, crop_random=False, crop_pad=0, gaussian=False)
     self.randomize_augmentation_params = False
 
@@ -90,7 +61,7 @@ class FESDDataset(data.Dataset):
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
 
-    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params)
+    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode)
 
     rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
     rgb = transforms.Resize(self.trainsize)(rgb.permute(2, 0, 1))
@@ -107,7 +78,8 @@ class FESDDataset(data.Dataset):
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
 
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
-    gt = err2gt(errors)
+    
+    gt = err2gt(errors, self.mode)
     
     return rgb, depth, pose_2d, gt, self.frame.session
 

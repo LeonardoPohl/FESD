@@ -2,20 +2,17 @@ import numpy as np
 import cv2
 import json
 from pathlib import Path
+
+from utils.mode import Mode
+
 from .augmentation_parameters import AugmentationParams
 from .frame import Frame
 
 def id_2_name(i: int):
   return 'frame_' + str(i) + '.bin'
 
-# Load Frames(/Videos(Later maybe)) and skeletons from a recording
 
-# TODO: Unsure if this is a problem but bounding boxes will change making crop size different
-#     Possible solution: If multiple frames are used to represent a frame, use the same bounding box for all frames
-#              For query frames, use the bounding box of the first frame and return list of list of frames as video
-# Question: Should the videos be overlapping in frames?
-# TODO: Add augmentation maybe?
-def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
+def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   
@@ -29,6 +26,7 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
   person = skeletons_json[i]
   joints_2d = np.ndarray(shape=[0, 3])
   joints_3d = np.ndarray(shape=[0, 3])
+  errs = np.ndarray(shape=[0])
   errors = np.ndarray(shape=[0])
   origin = person['Skeleton'][4]
 
@@ -53,8 +51,33 @@ def load_skeletons(skeletons_json, flip: bool=False) -> (np.ndarray, np.ndarray,
       joint['z'] - origin['z']
       ]], axis=0)
 
-    errors = np.append(errors, 2 if person['error'] == 1 else joint['error'])
+    errs = np.append(errs, 2 if person['error'] == 1 else joint['error'])
 
+  upper_body_i = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13]
+  lower_body_i = [14, 15, 16, 17, 18, 19]
+
+  torso_i = [2, 3, 4]
+  head_i = [0, 1]
+  left_arm_i = [5, 6, 7, 8]
+  right_arm_i = [10, 11, 12, 13]
+  left_leg_i = [14, 15, 16]
+  right_leg_i = [17, 18, 19]
+
+  if mode == Mode.FULL_BODY:
+    errors = np.append(errors, np.count_nonzero(errs) > 5)
+  elif mode == Mode.HALF_BODY:
+    errors = np.append(errors, np.count_nonzero(errs[upper_body_i]) > 3)
+    errors = np.append(errors, np.count_nonzero(errs[lower_body_i]) > 4)
+  elif mode == Mode.LIMBS:
+    errors = np.append(errors, np.count_nonzero(errs[torso_i]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[head_i]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[left_arm_i]) > 2)
+    errors = np.append(errors, np.count_nonzero(errs[right_arm_i]) > 1)
+    errors = np.append(errors, np.count_nonzero(errs[left_leg_i]) > 2)
+    errors = np.append(errors, np.count_nonzero(errs[right_leg_i]) > 1)
+  elif mode == Mode.JOINTS:
+    errors = errs  
+  
   joints_2d *= -1 if flip else 1
   joints_3d *= -1 if flip else 1
   
@@ -74,7 +97,7 @@ def read_frame(path: Path) -> cv2.Mat:
 
   return mat
 
-def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams()) -> Frame:
+def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams(), mode: Mode = Mode.FULL_BODY) -> Frame:
   frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id * 10))
   frame = np.asarray( frame_mat[:,:] )
   rgb, depth = np.split(frame, [3], axis=2)
@@ -92,7 +115,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
 
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id * 10]
-    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip)
+    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip, mode)
 
   if (params.flip):
     rgb = np.flip(rgb, axis=1)
