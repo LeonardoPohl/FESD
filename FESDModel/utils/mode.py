@@ -34,7 +34,6 @@ class Mode(Enum):
     for j in range(0, self.get_num_layers(), self.get_num_error_label()):
       g = gt[:,j:j+self.get_num_error_label()]
       p = pred[:,j:j+self.get_num_error_label()]
-    
       loss += criterion(g, p)
 
     return loss

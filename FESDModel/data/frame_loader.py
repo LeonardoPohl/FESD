@@ -135,7 +135,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
         seed = params.seed
 
       np.random.seed(seed)
-      mi = np.random.randint(0, max(0, mi))
+      mi = np.random.randint(0, max(1, mi))
       ma = np.random.randint(min(rgb.shape[1] - 1, ma), rgb.shape[1])
 
     rgb = rgb[mi:ma, mi:ma]

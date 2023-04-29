@@ -24,21 +24,7 @@ def train(train_loader, model, optimizer, criterion, scheduler, clip, epoch, epo
 
     pred = model(rgbs, depths, poses_2d)
 
-    loss = 0
-
-    if mode == Mode.JOINTS:
-      for j in range(0, 20, 4):
-        g = gt[:,j:j+4]
-        p = pred[:,j:j+4]
-      
-        loss += criterion(g, p)
-    else:
-      for j in range(0, 12, 2):
-        g = gt[:,j:j+2]
-        p = pred[:,j:j+2]
-      
-        loss += criterion(g, p)
-    
+    loss = mode.get_loss(criterion, pred, gt)    
     loss.backward()
     
     clip_gradient(optimizer, clip)

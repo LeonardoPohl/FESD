@@ -24,11 +24,8 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
     for joint_i in range(joint_count):
         gt_err = gt_errs[:,joint_i]
         pred_err = pred_errs[:,joint_i]
-        
-        if mode == Mode.FULL_BODY:
-            pred_confidence = pred_confidences[0]
-        else:
-            pred_confidence = pred_confidences[joint_i]
+        pred_confidence = pred_confidences[:,joint_i]
+
         tp = torch.sum(gt_err == pred_err)
         tn = torch.sum(gt_err == pred_err)
         fp = torch.sum(gt_err != pred_err)

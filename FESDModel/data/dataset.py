@@ -60,7 +60,7 @@ class FESDDataset(data.Dataset):
     
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
-
+      
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode)
 
     rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
