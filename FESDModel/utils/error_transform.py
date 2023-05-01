@@ -6,7 +6,6 @@ def err2gt(err, mode:Mode=Mode.JOINTS):
   if mode == Mode.JOINTS:
     for (i, e) in enumerate(err):
       gt[int(i*4 + e)] = 1
-  
   else:
     for i in range(0, len(gt), 2):
       if err[i//2] == 0:

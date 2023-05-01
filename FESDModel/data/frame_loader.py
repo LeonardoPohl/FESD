@@ -11,7 +11,6 @@ from .frame import Frame
 def id_2_name(i: int):
   return 'frame_' + str(i) + '.bin'
 
-
 def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
@@ -53,28 +52,30 @@ def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np
 
     errs = np.append(errs, 2 if person['error'] == 1 else joint['error'])
 
-  upper_body_i = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13]
-  lower_body_i = [14, 15, 16, 17, 18, 19]
+  upper_body_i = [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  lower_body_i = [3, 14, 15, 16, 17, 18, 19]
 
-  torso_i = [2, 3, 4]
-  head_i = [0, 1]
-  left_arm_i = [5, 6, 7, 8]
+  torso_i     = [2, 3, 4, 9]
+  head_i      = [0, 1]
+  left_arm_i  = [5, 6, 7, 8]
   right_arm_i = [10, 11, 12, 13]
-  left_leg_i = [14, 15, 16]
+  left_leg_i  = [14, 15, 16]
   right_leg_i = [17, 18, 19]
 
   if mode == Mode.FULL_BODY:
-    errors = np.append(errors, np.count_nonzero(errs) > 5)
+    errors = np.append(errors, np.count_nonzero(errs) >= 3)
   elif mode == Mode.HALF_BODY:
-    errors = np.append(errors, np.count_nonzero(errs[upper_body_i]) > 3)
-    errors = np.append(errors, np.count_nonzero(errs[lower_body_i]) > 4)
+    class_dict = mode.get_class_dict()
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) >= 2)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) >= 2)
   elif mode == Mode.LIMBS:
-    errors = np.append(errors, np.count_nonzero(errs[torso_i]) > 0)
-    errors = np.append(errors, np.count_nonzero(errs[head_i]) > 0)
-    errors = np.append(errors, np.count_nonzero(errs[left_arm_i]) > 2)
-    errors = np.append(errors, np.count_nonzero(errs[right_arm_i]) > 1)
-    errors = np.append(errors, np.count_nonzero(errs[left_leg_i]) > 2)
-    errors = np.append(errors, np.count_nonzero(errs[right_leg_i]) > 1)
+    class_dict = mode.get_class_dict()
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Torso"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Head"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Arm"]]) > 1)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Arm"]]) > 1)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Leg"]]) > 2)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Leg"]]) > 1)
   elif mode == Mode.JOINTS:
     errors = errs  
   
