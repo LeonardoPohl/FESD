@@ -26,6 +26,8 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
         pred_err = pred_errs[:,joint_i]
         pred_confidence = pred_confidences[:,joint_i]
 
+        metric = BinaryCohenKappa()
+
         if mode.get_num_error_label() > 2:
             tp = torch.sum(gt_err == pred_err)
             tn = torch.sum(gt_err == pred_err)
@@ -38,14 +40,13 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
             f1 = (precision * recall) / (precision + recall)
 
             accuracy = (tp + tn) / (tp + tn + fp + fn)
-            metric = BinaryCohenKappa()
             
             df.loc[len(df)] = [epoch, i, joint_i, 
                             gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), 
                             float(loss_record.show()), float(loss), float(accuracy), 
                             float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1),
                             np.NaN, lr, identifier, 
-                            exercise, False, mode]
+                            exercise, False, mode.name.lower()]
 
             pred_err = pred_err.apply_(lambda x: 0 if x == 0 else 1)
             gt_err = gt_err.apply_(lambda x: 0 if x == 0 else 1)
@@ -61,5 +62,5 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
 
         accuracy = (tp + tn) / (tp + tn + fp + fn)
 
-        df.loc[len(df)] = [epoch, i, joint_i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), float(metric(pred_err, gt_err)), lr, identifier, exercise, True, mode]
+        df.loc[len(df)] = [epoch, i, joint_i, gt_err.tolist(), pred_err.tolist(), pred_confidence.tolist(), float(loss_record.show()), float(loss), float(accuracy), float(tp), float(tn), float(fp), float(fn),  float(precision), float(recall), float(f1), float(metric(pred_err, gt_err)), lr, identifier, exercise, True, mode.name.lower()]
       
