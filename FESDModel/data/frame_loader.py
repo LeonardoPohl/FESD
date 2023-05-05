@@ -8,10 +8,37 @@ from utils.mode import Mode
 from .augmentation_parameters import AugmentationParams
 from .frame import Frame
 
-def id_2_name(i: int):
-  return 'frame_' + str(i) + '.bin'
+def pad(mi, ma, pad_mi, pad_ma, min_mi, max_mi, min_ma, max_ma, overflow: bool=True):
+  print(mi, pad_mi)
+  print(ma, pad_ma)
 
-def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
+  mi -= pad_mi
+  print(mi)
+  print(min_mi, max_mi)
+  if mi < min_mi:
+    if overflow:
+      ma += min_mi - mi
+    mi = min_mi
+    
+  if mi > max_mi:
+    if overflow:
+      ma -= mi - max_mi
+    mi = max_mi
+    
+  print(ma, pad_ma)
+  ma += pad_ma
+  if ma < min_ma:
+    if overflow:
+      mi += min_ma - ma
+    ma = min_ma
+  
+  if ma > max_ma:
+    if overflow:
+      mi -= ma - max_ma
+    ma = max_ma
+  return mi, ma
+  
+def load_skeletons(skeletons_json, mode=Mode.FULL_BODY, use_v2:bool=False) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   
@@ -38,17 +65,30 @@ def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np
       bounding_boxes_3d[0] = np.minimum(bounding_boxes_3d[0], [joint['x'], joint['y'], joint['z']])
       bounding_boxes_3d[1] = np.maximum(bounding_boxes_3d[1], [joint['x'], joint['y'], joint['z']])
 
-    joints_2d = np.append(joints_2d, [[
-      joint['u'] - origin['u'],
-      joint['v'] - origin['v'],
-      joint['d'] - origin['d']
-      ]], axis=0)
+    if use_v2:
+      joints_2d = np.append(joints_2d, [[
+        joint['u'],
+        joint['v'],
+        joint['d']
+        ]], axis=0)
 
-    joints_3d = np.append(joints_3d, [[
-      joint['x'] - origin['x'],
-      joint['y'] - origin['y'],
-      joint['z'] - origin['z']
-      ]], axis=0)
+      joints_3d = np.append(joints_3d, [[
+        joint['x'],
+        joint['y'],
+        joint['z']
+        ]], axis=0)
+    else:
+      joints_2d = np.append(joints_2d, [[
+        joint['u'] - origin['u'],
+        joint['v'] - origin['v'],
+        joint['d'] - origin['d']
+        ]], axis=0)
+
+      joints_3d = np.append(joints_3d, [[
+        joint['x'] - origin['x'],
+        joint['y'] - origin['y'],
+        joint['z'] - origin['z']
+        ]], axis=0)
 
     errs = np.append(errs, 2 if person['error'] == 1 else joint['error'])
 
@@ -77,10 +117,7 @@ def load_skeletons(skeletons_json, flip: bool=False, mode=Mode.FULL_BODY) -> (np
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Leg"]]) > 2)
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Leg"]]) > 1)
   elif mode == Mode.JOINTS:
-    errors = errs  
-  
-  joints_2d *= -1 if flip else 1
-  joints_3d *= -1 if flip else 1
+    errors = errs
   
   return joints_2d, joints_3d, errors, bounding_boxes_2d, bounding_boxes_3d
 
@@ -98,55 +135,100 @@ def read_frame(path: Path) -> cv2.Mat:
 
   return mat
 
-def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams(), mode: Mode = Mode.FULL_BODY) -> Frame:
-  frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / id_2_name(frame_id * 10))
-  frame = np.asarray( frame_mat[:,:] )
+def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, params: AugmentationParams = AugmentationParams(), mode: Mode = Mode.FULL_BODY, use_v2:bool=False) -> Frame:
+  frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / f'frame_{frame_id * 10}.bin')
+  frame = np.asarray(frame_mat[:,:])
   rgb, depth = np.split(frame, [3], axis=2)
   rgb, depth = rgb.astype(np.float32), depth.astype(np.float32)
-
-  # calculate number of rows/columns to remove
-  c_to_remove = rgb.shape[1] - rgb.shape[0]
-
-  if c_to_remove % 2 == 0:
-      rgb = rgb[:, c_to_remove//2:-c_to_remove//2, :]
-      depth = depth[:, c_to_remove//2:-c_to_remove//2, :]
-  else:
-      rgb = rgb[:, (c_to_remove-1)//2:-(c_to_remove+1)//2, :]
-      depth = depth[:, (c_to_remove-1)//2:-(c_to_remove+1)//2, :]
-
+  
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id * 10]
-    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip, mode)
+    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, mode, use_v2)
 
-  if (params.flip):
-    rgb = np.flip(rgb, axis=1)
-    depth = np.flip(depth, axis=1)
+  pose_im = np.zeros_like(depth)
+  
+  for pose in pose_2d:
+    coords = [(int(min(max(0, pose[0] + x), rgb.shape[0])), int(min(max(0, pose[1] + y), rgb.shape[1]))) for x in [-2, -1, 0, 1, 2] for y in [-2, -1, 0, 1, 2]]
+    
+    for x, y in coords:
+      pose_im[y, x] = 255
 
-  if params.crop or params.crop_random:
-    mi = min(int(np.floor(bounding_boxes_2d[0][1])), int(np.floor(bounding_boxes_2d[0][0])))
-    mi = max(0, mi - params.crop_pad)
+  rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d)
 
-    ma = max(int(np.ceil(bounding_boxes_2d[1][1])), int(np.ceil(bounding_boxes_2d[1][0])))
-    ma = min(min(rgb.shape[0], rgb.shape[1]), ma + params.crop_pad)
+  print(rgb.shape, depth.shape)
+  
+  rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
+
+  return Frame(rgb, depth, pose_im, pose_2d, pose_3d, errors, session)
+
+
+def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):
+  min_mi_x, min_mi_y, min_ma_x, min_ma_y = 0, 0, 0, 0
+  max_mi_x, max_mi_y, max_ma_x, max_ma_y = image_1.shape[0], image_1.shape[1], image_1.shape[0], image_1.shape[1]
+  print("Bounding Boxes", bounding_boxes_2d)
+  print("Im Shape", image_1.shape)
+  mi_x = int(np.floor(bounding_boxes_2d[0][0]))
+  mi_y = int(np.floor(bounding_boxes_2d[0][1]))
+  min_mi_x, min_mi_y = 0, 0
+  max_mi_x, max_mi_y = mi_x, mi_y
+
+  ma_x = int(np.floor(bounding_boxes_2d[1][0]))
+  ma_y = int(np.floor(bounding_boxes_2d[1][1]))
+  min_ma_x, min_ma_y = ma_x, ma_y
+  max_ma_x, max_ma_y = image_1.shape[1], image_1.shape[0]
+
+  if params.crop_pad > 0 or params.crop_random:
+    if params.crop_pad > 0:
+      mi_x, ma_x = pad(mi_x, ma_x, params.crop_pad, params.crop_pad, min_mi_x, max_mi_x, min_ma_x, max_ma_x, True)
+      mi_y, ma_y = pad(mi_y, ma_y, params.crop_pad, params.crop_pad, min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
 
     if (params.crop_random):
       if (params.seed == -1):
         seed = np.random.randint(0, 100000)
       else:
         seed = params.seed
+      np.random.seed(seed=seed)
 
-      np.random.seed(seed)
-      mi = np.random.randint(0, max(1, mi))
-      ma = np.random.randint(min(rgb.shape[1] - 1, ma), rgb.shape[1])
+      pad_x = im_size - (ma_x - mi_x)
+      if pad_x < 0: 
+        pad_mi_x = np.random.randint(pad_x, 1)
+      elif pad_x > 0:
+        pad_mi_x = np.random.randint(0, pad_x + 1)
+      else:
+        pad_mi_x = 0
 
-    rgb = rgb[mi:ma, mi:ma]
-    depth = depth[mi:ma, mi:ma] 
-  
-  if (params.gaussian and False):
-    rgb = cv2.GaussianBlur(rgb, (5, 5), 0)
-    depth = cv2.GaussianBlur(depth, (5, 5), 0)
+      pad_ma_x = pad_mi_x - pad_x
 
-  rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
+      pad_y = im_size - (ma_x - mi_x)
+      if pad_y < 0: 
+        pad_mi_y = np.random.randint(pad_y, 1)
+      elif pad_x > 0:
+        pad_mi_y = np.random.randint(0, pad_y + 1)
+      else:
+        pad_mi_y = 0
 
-  return Frame(rgb, depth, pose_2d, pose_3d, errors, session)
+      pad_ma_y = pad_mi_y - pad_y
 
+      mi_x, ma_x = pad(mi_x, ma_x, pad_mi_x, pad_ma_x, min_mi_x, max_mi_x, min_ma_x, max_ma_x, True)
+      mi_y, ma_y = pad(mi_y, ma_y, pad_mi_y, pad_ma_y, min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
+    
+  if ma_x - mi_x != im_size:
+    pad_mi_x = (im_size - (ma_x - mi_x)) // 2
+    pad_ma_x = pad_mi_x + (1 if pad_mi_x * 2 + (ma_x - mi_x) != im_size else 0)
+    print("Pad x", pad_mi_x, pad_ma_x)
+    print("mimax before", mi_x, ma_x)
+    mi_x, ma_x = pad(mi_x, ma_x, pad_mi_x, pad_ma_x, min_mi_x, max_mi_x, min_ma_x, max_ma_x, True)
+    print("mimax after", mi_x, ma_x)
+  if ma_y - mi_y != im_size:
+    pad_mi_y = (im_size - (ma_y - mi_y)) // 2
+    pad_ma_y = pad_mi_y + (1 if pad_mi_y * 2 + (ma_y - mi_y) != im_size else 0)
+    print("Pad y", pad_mi_y, pad_ma_y)
+    print("mimay before", mi_y, ma_y)
+    
+    mi_y, ma_y = pad(mi_y, ma_y, pad_mi_y, pad_ma_y, min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
+    print("mimay after", mi_y, ma_y)
+
+  print(image_1.shape)
+  print(mi_x, ma_x)
+  print(mi_y, ma_y)
+  return image_1[mi_y:ma_y, mi_x:ma_x], image_2[mi_y:ma_y, mi_x:ma_x], image_3[mi_y:ma_y, mi_x:ma_x]

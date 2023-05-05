@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 import cv2
 import json
+import typing
 
 FIGURES_DIR = Path('../docs/Thesis/figures/')
 
@@ -10,6 +11,7 @@ FIGURES_DIR = Path('../docs/Thesis/figures/')
 class Frame:
     rgb: np.ndarray
     depth: np.ndarray
+    pose_im: np.ndarray | None
     pose_2d: np.ndarray
     poses_3d: np.ndarray
     errors: np.ndarray

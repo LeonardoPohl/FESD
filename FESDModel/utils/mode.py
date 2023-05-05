@@ -6,6 +6,16 @@ class Mode(Enum):
   LIMBS = 2
   JOINTS = 3
 
+  def from_str(mode_str: str):
+    if mode_str == "full_body":
+      return Mode.FULL_BODY
+    elif mode_str == "half_body":
+      return Mode.HALF_BODY
+    elif mode_str == "limbs":
+      return Mode.LIMBS
+    elif mode_str == "joints":
+      return Mode.JOINTS
+
   def __eq__(self, o):
     return self.value == o.value
 
