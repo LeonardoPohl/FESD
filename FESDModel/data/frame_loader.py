@@ -9,12 +9,7 @@ from .augmentation_parameters import AugmentationParams
 from .frame import Frame
 
 def pad(mi, ma, pad_mi, pad_ma, min_mi, max_mi, min_ma, max_ma, overflow: bool=True):
-  print(mi, pad_mi)
-  print(ma, pad_ma)
-
   mi -= pad_mi
-  print(mi)
-  print(min_mi, max_mi)
   if mi < min_mi:
     if overflow:
       ma += min_mi - mi
@@ -25,7 +20,6 @@ def pad(mi, ma, pad_mi, pad_ma, min_mi, max_mi, min_ma, max_ma, overflow: bool=T
       ma -= mi - max_mi
     mi = max_mi
     
-  print(ma, pad_ma)
   ma += pad_ma
   if ma < min_ma:
     if overflow:
@@ -148,15 +142,12 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, p
   pose_im = np.zeros_like(depth)
   
   for pose in pose_2d:
-    coords = [(int(min(max(0, pose[0] + x), rgb.shape[0])), int(min(max(0, pose[1] + y), rgb.shape[1]))) for x in [-2, -1, 0, 1, 2] for y in [-2, -1, 0, 1, 2]]
+    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in [-2, -1, 0, 1, 2] for y in [-2, -1, 0, 1, 2]]
     
     for x, y in coords:
-      pose_im[y, x] = 255
+      pose_im[x, y] = 255
 
-  rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d)
-
-  print(rgb.shape, depth.shape)
-  
+  rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d) 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
 
   return Frame(rgb, depth, pose_im, pose_2d, pose_3d, errors, session)
@@ -165,8 +156,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, p
 def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):
   min_mi_x, min_mi_y, min_ma_x, min_ma_y = 0, 0, 0, 0
   max_mi_x, max_mi_y, max_ma_x, max_ma_y = image_1.shape[0], image_1.shape[1], image_1.shape[0], image_1.shape[1]
-  print("Bounding Boxes", bounding_boxes_2d)
-  print("Im Shape", image_1.shape)
+  
   mi_x = int(np.floor(bounding_boxes_2d[0][0]))
   mi_y = int(np.floor(bounding_boxes_2d[0][1]))
   min_mi_x, min_mi_y = 0, 0
@@ -215,20 +205,12 @@ def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):
   if ma_x - mi_x != im_size:
     pad_mi_x = (im_size - (ma_x - mi_x)) // 2
     pad_ma_x = pad_mi_x + (1 if pad_mi_x * 2 + (ma_x - mi_x) != im_size else 0)
-    print("Pad x", pad_mi_x, pad_ma_x)
-    print("mimax before", mi_x, ma_x)
+    
     mi_x, ma_x = pad(mi_x, ma_x, pad_mi_x, pad_ma_x, min_mi_x, max_mi_x, min_ma_x, max_ma_x, True)
-    print("mimax after", mi_x, ma_x)
   if ma_y - mi_y != im_size:
     pad_mi_y = (im_size - (ma_y - mi_y)) // 2
     pad_ma_y = pad_mi_y + (1 if pad_mi_y * 2 + (ma_y - mi_y) != im_size else 0)
-    print("Pad y", pad_mi_y, pad_ma_y)
-    print("mimay before", mi_y, ma_y)
     
     mi_y, ma_y = pad(mi_y, ma_y, pad_mi_y, pad_ma_y, min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
-    print("mimay after", mi_y, ma_y)
-
-  print(image_1.shape)
-  print(mi_x, ma_x)
-  print(mi_y, ma_y)
+    
   return image_1[mi_y:ma_y, mi_x:ma_x], image_2[mi_y:ma_y, mi_x:ma_x], image_3[mi_y:ma_y, mi_x:ma_x]

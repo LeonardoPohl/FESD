@@ -43,7 +43,6 @@ class FESDDataset(data.Dataset):
     print(f"Recordings Found: {len(self.recording_jsons)}")
     print(f"Total Frames: {self.size}")
 
-    self.save_frames = False
     self.use_v2 = use_v2
     self.mode = mode
     self.augmentation_params = AugmentationParams(crop_random=False, crop_pad=0, gaussian=False)
@@ -84,8 +83,7 @@ class FESDDataset(data.Dataset):
     
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
 
-    errors = torch.tensor(self.frame.errors, dtype=torch.float32)
-    
+    errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
     gt = err2gt(errors, self.mode)
     
     return rgb, depth, pose_2d, gt, self.frame.session
@@ -93,7 +91,6 @@ class FESDDataset(data.Dataset):
   
   def get_frame_v2(self, index):
     rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
-    print(rgb.shape)
     rgb_im = Image.fromarray((rgb.numpy() * 255).astype(np.uint8))
     r,g,b = rgb_im.split()
     rgb_im = Image.merge("RGB", (b, g, r))
@@ -111,19 +108,11 @@ class FESDDataset(data.Dataset):
       rgb = blurrer(rgb)
       depth = blurrer(depth)
     
-    pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
-
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
     gt = err2gt(errors, self.mode)
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
     
-    if self.save_frames:  
-      rgb_im.show()
-      depth_im.show()
-      pose_im.show()
-      merged_image.show()
-
     return merged_image, gt, self.frame.session
 
   def get_index(self, index):
