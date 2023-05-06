@@ -32,11 +32,10 @@ def pad(mi, ma, pad_mi, pad_ma, min_mi, max_mi, min_ma, max_ma, overflow: bool=T
     ma = max_ma
   return mi, ma
   
-def load_skeletons(skeletons_json, mode=Mode.FULL_BODY, use_v2:bool=False) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
+def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, use_v2:bool=False) -> (np.ndarray, np.ndarray, np.ndarray, list[tuple[float, float, float]], list[tuple[float, float, float]]):
   bounding_boxes_2d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   bounding_boxes_3d = [(np.inf, np.inf, np.inf), (0, 0, 0)]
   
-  #i = np.random.randint(0, len(skeletons_json))
   i = 0
 
   for j, skel in enumerate(skeletons_json):
@@ -86,6 +85,7 @@ def load_skeletons(skeletons_json, mode=Mode.FULL_BODY, use_v2:bool=False) -> (n
 
     errs = np.append(errs, 2 if person['error'] == 1 else joint['error'])
 
+
   upper_body_i = [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
   lower_body_i = [3, 14, 15, 16, 17, 18, 19]
 
@@ -96,20 +96,25 @@ def load_skeletons(skeletons_json, mode=Mode.FULL_BODY, use_v2:bool=False) -> (n
   left_leg_i  = [14, 15, 16]
   right_leg_i = [17, 18, 19]
 
+  if flip:
+    # Change left and right limbs
+    errs[left_arm_i], errs[right_arm_i] = errs[right_arm_i], errs[left_arm_i]
+    errs[left_leg_i], errs[right_leg_i] = errs[right_leg_i], errs[left_leg_i]
+
   if mode == Mode.FULL_BODY:
     errors = np.append(errors, np.count_nonzero(errs) >= 3)
   elif mode == Mode.HALF_BODY:
     class_dict = mode.get_class_dict()
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) >= 2)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) >= 2)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) >= 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) >= 0)
   elif mode == Mode.LIMBS:
     class_dict = mode.get_class_dict()
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Torso"]]) > 0)
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Head"]]) > 0)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Arm"]]) > 1)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Arm"]]) > 1)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Leg"]]) > 2)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Leg"]]) > 1)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Arm"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Arm"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Left Leg"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Right Leg"]]) > 0)
   elif mode == Mode.JOINTS:
     errors = errs
   
@@ -137,15 +142,20 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, p
   
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id * 10]
-    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, mode, use_v2)
+    pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip, mode, use_v2)
 
   pose_im = np.zeros_like(depth)
   
   for pose in pose_2d:
-    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in [-2, -1, 0, 1, 2] for y in [-2, -1, 0, 1, 2]]
+    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in [-3, -2, -1, 0, 1, 2, 3] for y in [-3, -2, -1, 0, 1, 2, 3]]
     
     for x, y in coords:
       pose_im[x, y] = 255
+
+  if params.flip:
+    rgb = np.flip(rgb, axis=1)
+    depth = np.flip(depth, axis=1)
+    pose_im = np.flip(pose_im, axis=1)
 
   rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d) 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)

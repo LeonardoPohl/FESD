@@ -7,7 +7,7 @@ import numpy as np
 from pathlib import Path
 from enum import Enum
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 
 from utils.mode import Mode
 from utils import gt2err, err2gt
@@ -50,12 +50,12 @@ class FESDDataset(data.Dataset):
 
   def reset_augmentation_params(self):
     self.randomize_augmentation_params = False
-    with self.augmentation_params as params:
-      params.flip = False
-      params.crop = False
-      params.crop_random = False
-      params.crop_pad = 0
-      params.gaussian = False
+    
+    self.augmentation_params.flip = False
+    self.augmentation_params.crop = False
+    self.augmentation_params.crop_random = False
+    self.augmentation_params.crop_pad = 0
+    self.augmentation_params.gaussian = False
 
   def __getitem__(self, index):    
     session, index = self.get_index(index)
@@ -77,9 +77,8 @@ class FESDDataset(data.Dataset):
     depth.unsqueeze(0)
     
     if self.augmentation_params.gaussian:
-      blurrer = transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))
-      rgb = blurrer(rgb)
-      depth = blurrer(depth)
+      rgb = rgb.filter(ImageFilter.GaussianBlur(5))
+      depth = depth.filter(ImageFilter.GaussianBlur(5))
     
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
 
@@ -97,16 +96,18 @@ class FESDDataset(data.Dataset):
     
     depth = torch.tensor(self.frame.depth.copy(), dtype=torch.float32)
     depth.unsqueeze(0)
-    depth_im = Image.fromarray(((depth.numpy() / 3.5) * 255).astype(np.uint8).repeat(3, axis=2))
+    norm_depth = (depth.numpy() - 1.8) / 1.5
+    norm_depth[norm_depth > 1] = 1
+    norm_depth[norm_depth < 0] = 0
+    depth_im = Image.fromarray((norm_depth * 255).astype(np.uint8).repeat(3, axis=2))
 
     pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
     pose.unsqueeze(0)
     pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
 
     if self.augmentation_params.gaussian:
-      blurrer = transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))
-      rgb = blurrer(rgb)
-      depth = blurrer(depth)
+      rgb_im = rgb_im.filter(ImageFilter.GaussianBlur(3))
+      depth_im = depth_im.filter(ImageFilter.GaussianBlur(3))
     
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
     gt = err2gt(errors, self.mode)
