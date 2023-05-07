@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.models import EfficientNet_V2_M_Weights
+from torchvision.models import EfficientNet_V2_M_Weights, efficientnet_v2_m, EfficientNet
 
 class FESD(nn.Module):
     def __init__(self, num_classes=80):
@@ -90,27 +90,30 @@ class FESD(nn.Module):
 
 class FESDv2(nn.Module):
     def __init__(self, num_classes=80):
-        super(FESD, self).__init__()
-
+        super(FESDv2, self).__init__()
+        
+        weights = EfficientNet_V2_M_Weights(EfficientNet_V2_M_Weights.DEFAULT)
+        
         # Inception module for merged input as feature extractor
-        self.efficient_net = EfficientNet_V2_M_Weights()
+        self.efficient_net = efficientnet_v2_m(weights=weights)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
+
         # Fully connected layers
-        self.fc1 = nn.Linear(128 * 18 * 18 + 128 * 18 * 18 + 128 * 20, 1024)
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, num_classes)
+        self.fc1 = nn.Linear(1280, 512)
+        self.fc2 = nn.Linear(512, num_classes)
 
         # Dropout layer
         self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, merged_image):
         # Not sure if this works already or not
-        w = self.efficient_net(merged_image)
+        
+        x = self.efficient_net.features(merged_image)
+        x = self.avgpool(x)
+        w = torch.flatten(x, 1)
 
         # Fully connected layers
         w = self.dropout(nn.functional.relu(self.fc1(w)))
-        w = self.dropout(nn.functional.relu(self.fc2(w)))
-        w = self.fc3(w)
-
-        # w = nn.functional.log_softmax(w, dim=1)
+        w = nn.functional.relu(self.fc2(w))
 
         return w

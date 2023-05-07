@@ -105,8 +105,8 @@ def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, us
     errors = np.append(errors, np.count_nonzero(errs) >= 3)
   elif mode == Mode.HALF_BODY:
     class_dict = mode.get_class_dict()
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) >= 0)
-    errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) >= 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) > 0)
+    errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) > 0)
   elif mode == Mode.LIMBS:
     class_dict = mode.get_class_dict()
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Torso"]]) > 0)

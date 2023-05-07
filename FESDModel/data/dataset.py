@@ -47,6 +47,7 @@ class FESDDataset(data.Dataset):
     self.mode = mode
     self.augmentation_params = AugmentationParams(crop_random=False, crop_pad=0, gaussian=False)
     self.randomize_augmentation_params = randomize_augmentation_params
+    self.to_tensor = transforms.Compose([transforms.PILToTensor()])
 
   def reset_augmentation_params(self):
     self.randomize_augmentation_params = False
@@ -66,34 +67,22 @@ class FESDDataset(data.Dataset):
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, im_size=self.im_size, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
     if self.use_v2:
-      return self.get_frame_v2(index)
+      return self.get_frame_v2()
     else:
       return self.get_frame_v1()
       
-  def get_frame_v1(self):
-    rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
-
-    depth = torch.tensor(self.frame.depth.copy(), dtype=torch.float32)
-    depth.unsqueeze(0)
-    
-    if self.augmentation_params.gaussian:
-      rgb = rgb.filter(ImageFilter.GaussianBlur(5))
-      depth = depth.filter(ImageFilter.GaussianBlur(5))
-    
-    pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
-
-    errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
-    gt = err2gt(errors, self.mode)
-    
-    return rgb, depth, pose_2d, gt, self.frame.session
-
-  
-  def get_frame_v2(self, index):
+  def get_rgb_im(self):
     rgb = torch.tensor(self.frame.rgb.copy(), dtype=torch.float32)
     rgb_im = Image.fromarray((rgb.numpy() * 255).astype(np.uint8))
     r,g,b = rgb_im.split()
     rgb_im = Image.merge("RGB", (b, g, r))
     
+    if self.augmentation_params.gaussian:
+      rgb_im = rgb_im.filter(ImageFilter.GaussianBlur(3))
+    
+    return rgb_im
+
+  def get_depth_im(self):
     depth = torch.tensor(self.frame.depth.copy(), dtype=torch.float32)
     depth.unsqueeze(0)
     norm_depth = (depth.numpy() - 1.8) / 1.5
@@ -101,20 +90,37 @@ class FESDDataset(data.Dataset):
     norm_depth[norm_depth < 0] = 0
     depth_im = Image.fromarray((norm_depth * 255).astype(np.uint8).repeat(3, axis=2))
 
+    if self.augmentation_params.gaussian:
+      depth_im = depth_im.filter(ImageFilter.GaussianBlur(3))
+
+    return depth_im
+    
+  def get_frame_v1(self):
+    rgb_im = self.get_rgb_im()
+    depth_im = self.get_depth_im()
+    
+    pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
+
+    errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
+    gt = err2gt(errors, self.mode)
+
+    return self.to_tensor(rgb_im), self.to_tensor(depth_im), pose_2d, gt, self.frame.session
+
+  
+  def get_frame_v2(self):
+    rgb_im = self.get_rgb_im()
+    depth_im = self.get_depth_im()
+
     pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
     pose.unsqueeze(0)
     pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
-
-    if self.augmentation_params.gaussian:
-      rgb_im = rgb_im.filter(ImageFilter.GaussianBlur(3))
-      depth_im = depth_im.filter(ImageFilter.GaussianBlur(3))
     
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
     gt = err2gt(errors, self.mode)
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
-    
-    return merged_image, gt, self.frame.session
+
+    return self.to_tensor(merged_image), gt, self.frame.session
 
   def get_index(self, index):
     session = index // self.frames_per_session
