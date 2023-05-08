@@ -3,12 +3,35 @@
 
 In the process of this thesis, two versions of the FESD model were implemented. The first approach can be seen in Figure \ref{fig:model_architecture_v1}. In the first approach, the RGB, Depth, and Joint data are passed into three different convolutional neural networks with intermittent max-pooling. The output of the three networks is then concatenated and passed into three fully connected layers. The output of the fully connected layers is a 1D 2, 4, 20, and 80 tensors of multi-object multi-class values depending on the problem set. The different problem sets are discussed in section \ref{sec:problem_set}. However, for this approach, the amount of data that was captured was not sufficient so no satisfying results could be achieved. Therefore, a second approach was implemented.
 
-The second approach is relying on transfer learning, in which a pretrained model is use
-
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/Model/FESD.png}
   \caption[FESDModel architecture version 1]{Original FESDModel architecture with three different inputs; RGB, Depth and Joint data. After three convolutions the three streams are concatenated to be passed into three fully connected layers. The output is a 1D 80 tensor of multi-object multi-class values.}
+  \label{fig:model_architecture_v1}
+\end{figure}
+
+The second approach is relying on transfer learning, in which a pre-trained model is used as part of a new network. To choose a network, multiple different networks have been compared, which can be seen in Figure \ref{fig:network_comparison}. Since the application is in gaming a lightweight model which does not impact the performance much is preferred. Therefore, we compare the models by their number of floating-point operations (FLOPS) to their Accuracy on ImageNet-1K. Honorable mentions as well as the five most performing models are marked in the plot with their Top-5 and Top-1 Accuracy. Table \ref{tab:network_comparison} shows the top 5 models according to their accuracy and performance. 
+
+\begin{tabular}{lrrrr}
+  \label{tab:network_comparison}
+  \caption[Top 5 models for Accuracy and Performance]{The top 5 models according to their accuracy and performance. The models are sorted by their GFLOPS and their Top-5 Accuracy\footnote{Source: \url{https://pytorch.org/vision/main/models.html} on 08/05/2023}. The models are EfficientNet V2 S, ConvNeXt Base, EfficientNet B6, Swin V2 B, and EfficientNet V2 M.}
+\toprule
+           Weight &  Acc@1 &  Acc@5 &   Params &  GFLOPS \\
+\midrule
+EfficientNet V2 S & 84.228 & 96.878 & $2.15 \times 10^7$ &   8.370 \\
+    ConvNeXt Base & 84.062 & 96.870 & $8.86 \times 10^7$ &  15.360 \\
+  EfficientNet B6 & 84.008 & 96.916 & $4.30 \times 10^7$ &  19.070 \\
+        Swin V2 B & 84.112 & 96.864 & $8.79 \times 10^7$ &  20.320 \\
+EfficientNet V2 M & 85.112 & 97.156 & $5.41 \times 10^7$ &  24.580 \\
+\bottomrule
+\end{tabular}
+
+EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. The model architecture can be seen in Figure \ref{fig:model_architecture_v2}. The model is split into two parts. The first part is the feature extractor, which is the EfficientNet v2 S. The second part is the classifier, which is two fully connected Layers. The output of the classifier is a 1D 2, 4, 20, or 80 tensors of multi-object multi-class values depending on the problem set. Additionally, the input is merged into a single Image
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/Model/FESDv2.png}
+  \caption[FESDModel architecture version 2]{FESDModel architecture with transfer learning.}
   \label{fig:model_architecture_v1}
 \end{figure}
 
