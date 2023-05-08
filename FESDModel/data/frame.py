@@ -16,6 +16,7 @@ class Frame:
     poses_3d: np.ndarray
     errors: np.ndarray
     session: json
+    im_size: int | None
     
     def show(self):
       depth_norm = self.depth / 5

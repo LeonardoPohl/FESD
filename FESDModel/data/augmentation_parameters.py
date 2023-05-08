@@ -8,10 +8,11 @@ class AugmentationParams:
     gaussian: bool = False
     flip: bool = False
     seed: int = -1
+    min_pad: int = 20
 
     def Randomize(self):
         self.crop_random = np.random.choice([True, False])
-        self.crop_pad = np.random.randint(0, 100)
+        self.crop_pad = np.random.randint(20, 100)
         self.gaussian = np.random.choice([True, False])
         self.flip = np.random.choice([True, False])
         self.seed = np.random.randint(0, 100000)
