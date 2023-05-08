@@ -1,6 +1,6 @@
 from enum import Enum
 from torchmetrics.classification import BinaryCohenKappa, MulticlassCohenKappa
-from utils import gts2errs
+# from .utils import gts2errs
 
 class Mode(Enum):
   FULL_BODY = 0
@@ -50,18 +50,18 @@ class Mode(Enum):
       count += 1
       loss += criterion(g, p.softmax(dim=1))
 
-    if self == Mode.JOINTS:
-      metric = MulticlassCohenKappa(num_classes=self.get_num_error_label())
-    else:
-      metric = BinaryCohenKappa()
-
-    gt_errs, _ = gts2errs(gt, self)
-    pred_errs, _ = gts2errs(pred, self)
-
-    for joint_i in range(self.get_num_joints()):
-      g = gt_errs[:,joint_i]
-      p = pred_errs[:,joint_i]
-      loss -= metric(g, p)
+    # if self == Mode.JOINTS:
+    #   metric = MulticlassCohenKappa(num_classes=self.get_num_error_label())
+    # else:
+    #   metric = BinaryCohenKappa()
+# 
+    # gt_errs, _ = gts2errs(gt, self)
+    # pred_errs, _ = gts2errs(pred, self)
+# 
+    # for joint_i in range(self.get_num_joints()):
+    #   g = gt_errs[:,joint_i]
+    #   p = pred_errs[:,joint_i]
+    #   loss -= metric(g, p)
 
     return loss / count
 
