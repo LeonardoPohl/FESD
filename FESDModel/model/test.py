@@ -15,7 +15,7 @@ def test(test_loader, model, criterion, is_cuda, mode, df, use_v2):
       if is_cuda:
         gt = gt.cuda()
         merged_image = merged_image.cuda()
-
+        
       pred = model(merged_image)
     else:
       rgbs, depths, poses_2d, gt, session = pack
