@@ -40,13 +40,15 @@ class Mode(Enum):
 
   def get_loss(self, criterion, pred, gt):
     loss = 0
+    count = 0
 
     for j in range(0, self.get_num_layers(), self.get_num_error_label()):
       g = gt[:,j:j+self.get_num_error_label()]
       p = pred[:,j:j+self.get_num_error_label()]
-      loss += criterion(g, p)
+      count += 1
+      loss += criterion(g, p.softmax(dim=1))
 
-    return loss
+    return loss / count
 
   def get_class_dict(self):
     if self == Mode.JOINTS or self == Mode.FULL_BODY:
