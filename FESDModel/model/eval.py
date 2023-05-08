@@ -11,15 +11,6 @@ from utils.mode import Mode
 def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, identifier, exercise, mode, df, use_v2):
     gt_errs, _ = gts2errs(gt, mode)
     pred_errs, pred_confidences = gts2errs(prediction, mode)
-    
-    if mode == Mode.FULL_BODY:
-        joint_count = 1
-    elif mode == Mode.HALF_BODY:
-        joint_count = 2
-    elif mode == Mode.LIMBS:
-        joint_count = 6
-    if mode == Mode.JOINTS:
-        joint_count = 20
 
     for joint_i in range(mode.get_num_joints()):
         gt_err = gt_errs[:,joint_i]
