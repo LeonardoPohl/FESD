@@ -42,10 +42,13 @@ class Mode(Enum):
     loss = 0
     count = 0
 
+    ck = BinaryCohenKappa()
+
     for j in range(0, self.get_num_layers(), self.get_num_error_label()):
       g = gt[:,j:j+self.get_num_error_label()]
       p = pred[:,j:j+self.get_num_error_label()]
-      count += 1
+      count += 2
+      loss += (ck(g, p) + 1) / -2.0
       loss += criterion(g, p.softmax(dim=1))
 
     return loss / count
