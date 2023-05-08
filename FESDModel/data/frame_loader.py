@@ -134,7 +134,7 @@ def read_frame(path: Path) -> cv2.Mat:
 
   return mat
 
-def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, params: AugmentationParams = AugmentationParams(), mode: Mode = Mode.FULL_BODY, use_v2:bool=False) -> Frame:
+def load_frame(recording_dir: Path, session: json, frame_id: int, params: AugmentationParams = AugmentationParams(), mode: Mode = Mode.FULL_BODY, use_v2:bool=False) -> Frame:
   frame_mat = read_frame(recording_dir /  session['Cameras'][0]['FileName'] / f'frame_{frame_id * 10}.bin')
   frame = np.asarray(frame_mat[:,:])
   rgb, depth = np.split(frame, [3], axis=2)
@@ -143,7 +143,8 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, p
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id * 10]
     pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip, mode, use_v2)
-
+  im_size = int(np.floor(max(abs(bounding_boxes_2d[1][0] - bounding_boxes_2d[0][0]), abs(bounding_boxes_2d[1][1] - bounding_boxes_2d[0][1])))) + params.crop_pad
+  im_size = min(im_size, min(rgb.shape[0], rgb.shape[1]))
   pose_im = np.zeros_like(depth)
   
   for pose in pose_2d:
@@ -160,7 +161,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, im_size:int, p
   rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d) 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
 
-  return Frame(rgb, depth, pose_im, pose_2d, pose_3d, errors, session)
+  return Frame(rgb, depth, pose_im, pose_2d, pose_3d, errors, session, im_size)
 
 
 def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):

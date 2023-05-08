@@ -92,10 +92,10 @@ class FESDv2(nn.Module):
     def __init__(self, num_classes=80):
         super(FESDv2, self).__init__()
         
-        weights = EfficientNet_V2_M_Weights(EfficientNet_V2_M_Weights.DEFAULT)
+        weights = EfficientNet_V2_S_Weights(EfficientNet_V2_S_Weights.DEFAULT)
         
         # Inception module for merged input as feature extractor
-        self.efficient_net = efficientnet_v2_m(weights=weights)
+        self.efficient_net = efficientnet_v2_s(weights=weights)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
 
         # Fully connected layers
@@ -114,6 +114,6 @@ class FESDv2(nn.Module):
 
         # Fully connected layers
         w = self.dropout(nn.functional.relu(self.fc1(w)))
-        w = nn.functional.relu(self.fc2(w))
+        w = self.fc2(w)
 
         return w

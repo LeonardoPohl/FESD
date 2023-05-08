@@ -64,7 +64,7 @@ class FESDDataset(data.Dataset):
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
       
-    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, im_size=self.im_size, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
+    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
     if self.use_v2:
       return self.get_frame_v2()
@@ -119,7 +119,7 @@ class FESDDataset(data.Dataset):
     gt = err2gt(errors, self.mode)
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
-
+    merged_image = ImageOps.scale(merged_image, self.im_size/float(self.frame.im_size))
     return self.to_tensor(merged_image), gt, self.frame.session
 
   def get_index(self, index):
