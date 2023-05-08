@@ -1,4 +1,5 @@
 from enum import Enum
+from torchmetrics.classification import BinaryCohenKappa
 
 class Mode(Enum):
   FULL_BODY = 0
