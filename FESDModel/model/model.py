@@ -114,6 +114,6 @@ class FESDv2(nn.Module):
 
         # Fully connected layers
         w = self.dropout(nn.functional.relu(self.fc1(w)))
-        w = nn.functional.relu(self.fc2(w))
+        w = self.fc2(w)
 
         return w

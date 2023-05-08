@@ -34,10 +34,20 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
             fp = torch.sum(gt_err != pred_err)
             fn = torch.sum(gt_err != pred_err)
             
-            precision = tp / (tp + fp)
-            recall = tp / (tp + fn)
-            
-            f1 = (precision * recall) / (precision + recall)
+            if tp + fp == 0:
+                precision = 0.0
+            else:
+                precision = tp / (tp + fp)
+
+            if tp + fn == 0:
+                recall = 0.0
+            else:
+                recall = tp / (tp + fn)
+
+            if precision + recall == 0:
+                f1 = 0.0
+            else:
+                f1 = (precision * recall) / (precision + recall)
 
             accuracy = (tp + tn) / (tp + tn + fp + fn)
             
@@ -56,9 +66,20 @@ def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, iden
         fp = torch.sum(torch.logical_and(gt_err != 0, pred_err == 0))
         fn = torch.sum(torch.logical_and(gt_err == 0, pred_err != 0))
         
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        f1 = 2 * (precision * recall) / (precision + recall)
+        if tp + fp == 0:
+            precision = 0.0
+        else:
+            precision = tp / (tp + fp)
+
+        if tp + fn == 0:
+            recall = 0.0
+        else:
+            recall = tp / (tp + fn)
+
+        if precision + recall == 0:
+            f1 = 0
+        else:
+            f1 = 2 * (precision * recall) / (precision + recall)
 
         accuracy = (tp + tn) / (tp + tn + fp + fn)
 

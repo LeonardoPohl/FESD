@@ -10,7 +10,7 @@ from utils.mode import Mode
 from .eval import val
 
 # training
-def train(train_loader: DataLoader, model: FESD | FESDv2, optimizer, criterion, scheduler, clip, epoch, epochs, is_cuda, mode, df, use_v2):
+def train(train_loader: DataLoader, model, optimizer, criterion, scheduler, clip, epoch, epochs, is_cuda, mode, df, use_v2):
   loss_record = AvgMeter()
 
   for i, pack in enumerate(train_loader, start=1):
@@ -41,7 +41,7 @@ def train(train_loader: DataLoader, model: FESD | FESDv2, optimizer, criterion, 
     
     clip_gradient(optimizer, clip)
     optimizer.step()
-    # scheduler.step()
+    scheduler.step()
     
     loss_record.update(loss.data, 1)
     
