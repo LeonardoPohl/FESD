@@ -26,6 +26,7 @@ class FESDDataset(data.Dataset):
     self.size = 0
     self.frames_per_session = 0
     self.total_frames_per_session = 0
+    
     for file in os.listdir(recording_dir):
       if file.endswith('.json'):
         with open(file=os.path.join(recording_dir, file), mode='r') as file:
@@ -40,8 +41,8 @@ class FESDDataset(data.Dataset):
           self.frames_per_session = data['Frames']
           self.recording_jsons.append(data)
 
-    print(f"Recordings Found: {len(self.recording_jsons)}")
-    print(f"Total Frames: {self.size}")
+#    print(f"Recordings Found: {len(self.recording_jsons)}")
+#    print(f"Total Frames: {self.size}")
 
     self.use_v2 = use_v2
     self.mode = mode
