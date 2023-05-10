@@ -59,12 +59,13 @@ class FESDDataset(data.Dataset):
     self.augmentation_params.crop_pad = 0
     self.augmentation_params.gaussian = False
 
-  def __getitem__(self, index):    
-    session, index = self.get_index(index)
+  def __getitem__(self, i):    
+    session, index = self.get_index(i)
     
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
       
+    print(i, session, index, len(self.recording_jsons))
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
     if self.use_v2:
@@ -117,7 +118,7 @@ class FESDDataset(data.Dataset):
     pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
     
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
-    gt = err2gt(errors, self.mode)
+    gt = errors
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
     merged_image = ImageOps.scale(merged_image, self.im_size/float(self.frame.im_size))

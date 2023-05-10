@@ -4,7 +4,6 @@ import torch.nn as nn
 from torch.utils.data import WeightedRandomSampler
 import json
 
-from data import Frame, AugmentationParams
 from data import FESDDataset
 
 from model import FESD, FESDv2
@@ -82,7 +81,7 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
 def get_model_iter_all(use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float):
   model_iter = []
   
-  for mode in [Mode.FULL_BODY, Mode.HALF_BODY, Mode.LIMBS, Mode.JOINTS]:
+  for mode in [Mode.LIMBS, Mode.HALF_BODY, Mode.FULL_BODY, Mode.JOINTS]:
     model_iter += get_model_iter(mode, use_cuda, use_v2, test_exercises, epochs, batchsize, im_size, clip)
 
   return model_iter
