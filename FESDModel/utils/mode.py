@@ -18,6 +18,16 @@ class Mode(Enum):
     elif mode_str == "joints":
       return Mode.JOINTS
 
+  def to_str(self):
+    if self == Mode.FULL_BODY:
+      return "full_body"
+    elif self == Mode.HALF_BODY:
+      return "half_body"
+    elif self == Mode.LIMBS:
+      return "limbs"
+    elif self == Mode.JOINTS:
+      return "joints"
+
   def __eq__(self, o):
     return self.value == o.value
 
