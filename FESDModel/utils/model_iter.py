@@ -4,8 +4,6 @@ import torch.nn as nn
 from torch.utils.data import WeightedRandomSampler
 import json
 
-from data import FESDDataset
-
 from model import FESD, FESDv2
 
 from .mode import Mode
@@ -54,6 +52,9 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
   if use_cuda:
     model.cuda()
   
+  from data import FESDDataset
+  from data import AugmentationParams
+  
   dataset_train = FESDDataset(RECORDING_DIR, im_size, test_exercises=test_exercises, mode=mode, randomize_augmentation_params=True, use_v2=use_v2)
   dataset_test = FESDDataset(RECORDING_DIR, im_size, test_exercises=test_exercises, mode=mode, test=True, use_v2=use_v2)
 
@@ -61,7 +62,7 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
     weights = json.load(fp)
 
   problem_set = "Full Body" if mode == Mode.FULL_BODY else "Half Body" if mode == Mode.HALF_BODY else "Limbs" if mode == Mode.LIMBS else "Joints"
-  w = weights[problem_set]["Train"]
+  w = weights[problem_set]
   sampler = WeightedRandomSampler(weights=w, num_samples=len(dataset_train))
 
   train_loader  = torch.utils.data.DataLoader(dataset_train, sampler=sampler, batch_size=batchsize)

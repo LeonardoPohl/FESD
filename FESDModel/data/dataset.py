@@ -60,12 +60,12 @@ class FESDDataset(data.Dataset):
     self.augmentation_params.gaussian = False
 
   def __getitem__(self, i):    
+    i %= self.size
     session, index = self.get_index(i)
     
     if self.randomize_augmentation_params:
       self.augmentation_params.Randomize()
       
-    print(i, session, index, len(self.recording_jsons))
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
     if self.use_v2:
