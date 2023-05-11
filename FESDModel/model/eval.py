@@ -8,7 +8,7 @@ from tqdm import tqdm
 from utils.mode import Mode
 
 # eval
-def val(prediction, gt, loss_record, loss, lr, epoch, epochs, i, data_size, identifier, exercise, mode, df, use_v2):
+def val(prediction, gt, loss_record, loss, lr, epoch, i, data_size, identifier, exercise, mode, df, use_v2):
     gt_errs, _ = gts2errs(gt, mode)
     pred_errs, pred_confidences = gts2errs(prediction, mode)
 

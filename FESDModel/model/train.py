@@ -10,7 +10,7 @@ from utils.mode import Mode
 from .eval import val
 
 # training
-def train(train_loader: DataLoader, model, optimizer, criterion, scheduler, clip, epoch, epochs, is_cuda, mode, df, use_v2):
+def train(train_loader: DataLoader, model, optimizer, criterion, scheduler, clip, epoch, is_cuda, mode, df, use_v2):
   loss_record = AvgMeter()
 
   for i, pack in enumerate(train_loader, start=1):
@@ -45,6 +45,6 @@ def train(train_loader: DataLoader, model, optimizer, criterion, scheduler, clip
     
     loss_record.update(loss.data, 1)
     
-    val(pred, gt, loss_record, loss.data, optimizer.param_groups[0]["lr"], epoch, epochs, i, len(train_loader), "train", session['Session Parameters']["Exercise"][0], mode, df, use_v2)
+    val(pred, gt, loss_record, loss.data, optimizer.param_groups[0]["lr"], epoch, i, len(train_loader), "train", session['Session Parameters']["Exercise"][0], mode, df, use_v2)
     
   return loss_record.show()

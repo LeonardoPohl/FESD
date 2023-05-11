@@ -4,7 +4,7 @@ import numpy as np
 from .eval import val
 
 # eval
-def test(test_loader, model, criterion, is_cuda, mode, df, use_v2):
+def test(test_loader, model, criterion, epoch, is_cuda, mode, df, use_v2):
   loss_record = AvgMeter()
 
   for i, pack in enumerate(test_loader, start=1):      
@@ -32,4 +32,4 @@ def test(test_loader, model, criterion, is_cuda, mode, df, use_v2):
     
     loss_record.update(loss.data, 1)
       
-    val(pred, gt, loss_record, loss.data, np.NaN, 0, 0, i, len(test_loader), "test", session['Session Parameters']["Exercise"][0], mode, df, use_v2)
+    val(pred, gt, loss_record, loss.data, np.NaN, epoch, i, len(test_loader), "test", session['Session Parameters']["Exercise"][0], mode, df, use_v2)

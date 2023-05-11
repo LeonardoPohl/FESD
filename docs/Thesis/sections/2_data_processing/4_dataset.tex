@@ -17,11 +17,11 @@ Equation \ref{eq:orientation} was used to achieve the specified orientation. In 
 
 \subsection{Analysis}
 
-An important aspect of the dataset is the structure and distribution of data and their labels. In total we recorded all 13 exercises, mentioned in Section \ref{sec:exercises}, twice. Each recording session consists of exactly 300 frames.
+An important aspect of the dataset is the structure and distribution of data and their labels. In total, we recorded all 13 exercises, mentioned in Section \ref{sec:exercises}, twice. Each recording session consists of exactly 300 frames.
 
 If a joint cannot be detected by Nuitrack it automatically gets zero coordinates, i.e. every value is zero. This makes it easy to automatically label these joints as faulty, in particular with the error label $1$ - Joint Missing. However, for the rest of the errors each frame has to be manually inspected and each joint considered. Since this requires a lot of work we reduced the labeled frames to 10 percent of the original size. Therefore, each exercise contains 30 frames and in total $30 \cdot 13 \cdot 2 = 720$ frames are labeled.
 
-When multiple persons are detected one person might be incorrectly detected in the background. While analysing the data we pick the person that is not labeled as faulty whenever possible. For training and testing this is choosen at random. If a person is labeled as faulty each joint is marked as in a unrealistic position.
+When multiple persons are detected one person might be incorrectly detected in the background. While analysing the data we pick the person that is not labeled as faulty whenever possible. For training and testing this is chosen at random. If a person is labeled as faulty each joint is marked as in an unrealistic position.
 
 \subsubsection{Distribution of Errors}
 
@@ -50,7 +50,7 @@ To diversify the dataset we recorded different exercises with varying difficulti
   \label{fig:statistics_err_dist_diff}
 \end{figure}
 
-Some joints are more likely than others to be faulty, based on frequent occlusion, or generally more challenging detection. For example, hands and ankles are quite challenging to detect since they move frequently and are frequently occluded. On the other hand the head and the neck are least likely to be faulty. This distribution can be seen in Figure \ref{fig:statistics_err_dist_joint}, where the distribution of errors are shown for each joint. The joints are sorted by general occourence of errors.
+Some joints are more likely than others to be faulty, based on frequent occlusion, or generally more challenging detection. For example, hands and ankles are quite challenging to detect since they move frequently and are frequently occluded. On the other hand the head and the neck are least likely to be faulty. This distribution can be seen in Figure \ref{fig:statistics_err_dist_joint}, where the distribution of errors are shown for each joint. The joints are sorted by general occurrence of errors.
 
 \begin{figure}
   \centering
@@ -61,3 +61,5 @@ Some joints are more likely than others to be faulty, based on frequent occlusio
 
 \subsection{Problem Sets}
 \label{sec:problem_set}
+
+Different problem sets are used to create different versions of the model. The problem sets are defined by the number of objects that are considered and are defined as erroneous. There are four different problem sets. The first problem set is the \textit{Joint} problem set. In this problem set, each joint is considered as a single object. The first simplification is to consider each joint, i.e. the individual arms, legs, the torso and the head. The second simplification is to consider the upper and the lower body. Finally, only the whole body is considered.
