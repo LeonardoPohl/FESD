@@ -118,7 +118,7 @@ class FESDDataset(data.Dataset):
     pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
     
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
-    gt = errors
+    gt = err2gt(errors, self.mode)
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
     merged_image = ImageOps.scale(merged_image, self.im_size/float(self.frame.im_size))
