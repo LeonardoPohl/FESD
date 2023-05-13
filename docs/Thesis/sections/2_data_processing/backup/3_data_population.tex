@@ -1,7 +1,7 @@
 \section{Data population}
 \label{sec:data_population}
 
-\textit{\textbf{JUST AS REFERENC} To achieve the highest framerate, we calculate the skeleton based on the recorded data and add it to the dataset in a separate step. The RGB stream is used to create the dataset for the skeleton detection and the depth stream is used to create the point clouds for the calculation of global skeleton points. We store both the local 2D coordinates in accordance with the image used for the skeleton detection, as well as the global 3D coordinates based on the aligned point clouds. Additionally, OpenPose provides us with a confidence score for each joint.}
+\textit{\textbf{JUST AS REFERENC} To achieve the highest framerate, REPLACE_WE calculate the skeleton based on the recorded data and add it to the dataset in a separate step. The RGB stream is used to create the dataset for the skeleton detection and the depth stream is used to create the point clouds for the calculation of global skeleton points. REPLACE_WE store both the local 2D coordinates in accordance with the image used for the skeleton detection, as well as the global 3D coordinates based on the aligned point clouds. Additionally, OpenPose provides REPLACE_US with a confidence score for each joint.}
 
 \textit{\textbf{DECISION} I decided to switch to NuiTrack, it is closer to silverfit and I think a better choice. Openpose poses more problems than it solves}
 
@@ -19,6 +19,6 @@ To utilise skeleton data, as well as the human silhouette in their games, Silver
 
 \subsection{Human Pose Estimation}
 
-Human pose estimation is not trivial in terms of resource usage. Calculating the human pose while recording would mean a significant reduction of the recorded frames. Therefore, we calculate the skeleton seperatly for each frame of the recording.
+Human pose estimation is not trivial in terms of resource usage. Calculating the human pose while recording would mean a significant reduction of the recorded frames. Therefore, REPLACE_WE calculate the skeleton seperatly for each frame of the recording.
 
 The skeletons is stored ... \textit{\textbf{TODO} Explain how the skeleton is stored}.

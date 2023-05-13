@@ -1,13 +1,13 @@
 \section{Data Evaluation}
 \label{sec:data_evaluation}
 
-Next, we evaluate the recorded data and especially the detected skeleton. We focus specifically on the joints with a low confidence value. 
+Next, REPLACE_WE evaluate the recorded data and especially the detected skeleton. REPLACE_WE focus specifically on the joints with a low confidence value. 
 
-We discard frames with lacking pose data from the training dataset, they are not usable to train a model. We might still use it for the testing phase. If we notice that the dataset is getting too small, we might re-record some sessions.
+We discard frames with lacking pose data from the training dataset, they are not usable to train a model. REPLACE_WE might still use it for the testing phase. If REPLACE_WE notice that the dataset is getting too small, REPLACE_WE might re-record some sessions.
 
 \textit{\textbf{QUESTION} Should I discard frames with limited joints?}
 
-Additionally, while recording multiple people might be wrongly detected. However, in our experiments we only consider single person recordings. Therefore, we can discard other people from the data.
+Additionally, while recording multiple people might be wrongly detected. However, in REPLACE_OUR experiments REPLACE_WE only consider single person recordings. Therefore, REPLACE_WE can discard other people from the data.
 
 The pseudo code for the data evaluation process can be seen in Listing \ref{lst:data_eval}. Most of the checks mentioned, such as \texttt{selectInvalidPeople} in Line 9 or \texttt{checkJointValidity} in Line 14 happen manually. However, the data processing is done automatically by the code to redue human error.
 

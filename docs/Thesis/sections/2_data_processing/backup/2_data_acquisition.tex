@@ -1,19 +1,19 @@
 \section{Data acquisition}
 \label{sec:data_acquisition}
 
-The second phase of the pipeline is data acquisition. After we have set up the camera according to the session parameters we can start recording. We set a timer for $30s$ and record the RGB and Depth streams from the camera. We also record the camera intrinsics, which we will use to recreate the point cloud at a later stage. We record the data in a folder structure that is defined by the session parameters.
+The second phase of the pipeline is data acquisition. After REPLACE_WE have set up the camera according to the session parameters REPLACE_WE can start recording. REPLACE_WE set a timer for $30s$ and record the RGB and Depth streams from the camera. REPLACE_WE also record the camera intrinsics, which REPLACE_WE will use to recreate the point cloud at a later stage. REPLACE_WE record the data in a folder structure that is defined by the session parameters.
 
 \subsection{Data format}
 
-An important part of data acquisition is the description of the way the data is stored in the file system. This is essential for any future use of the data and therefore we need to make sure that the data is stored in a way that is easy to understand and easy to use. We store in general two to five files per session depending on the camera configuration. 
+An important part of data acquisition is the description of the way the data is stored in the file system. This is essential for any future use of the data and therefore REPLACE_WE need to make sure that the data is stored in a way that is easy to understand and easy to use. REPLACE_WE store in general two to five files per session depending on the camera configuration. 
 
 \subsubsection{Session Metadata}
 
-Every session contains a "\texttt{SESSION\_NAME.json}" file that contains the session parameters and camera metadata. The session name is automatically generated based on the starting time of the session, this way we can make sure that the session name is unique every time and we can also have an idea of which recording is the most recent without looking at the contents of the file.
+Every session contains a "\texttt{SESSION\_NAME.json}" file that contains the session parameters and camera metadata. The session name is automatically generated based on the starting time of the session, this way REPLACE_WE can make sure that the session name is unique every time and REPLACE_WE can also have an idea of which recording is the most recent without looking at the contents of the file.
 
 \paragraph{Camera metadata}
 
-The camera metadata contains the camera intrinsics, which we will use to recreate the point cloud at a later stage. The camera intrinsics are the field of view of the depth camera in the horizontal and vertical direction, and the principal point in the horizontal and vertical direction. The field of view is the angle between the optical axis and the image plane. The principal point is the point in the image where the optical axis of the camera intersects the image plane. The principal point and the field of view are explained in Figure \ref{fig:pinhole_camera_model}.
+The camera metadata contains the camera intrinsics, which REPLACE_WE will use to recreate the point cloud at a later stage. The camera intrinsics are the field of view of the depth camera in the horizontal and vertical direction, and the principal point in the horizontal and vertical direction. The field of view is the angle between the optical axis and the image plane. The principal point is the point in the image where the optical axis of the camera intersects the image plane. The principal point and the field of view are explained in Figure \ref{fig:pinhole_camera_model}.
 
 \begin{figure}[ht]
   \centering
@@ -24,7 +24,7 @@ The camera metadata contains the camera intrinsics, which we will use to recreat
 
 \paragraph{Camera orientation}
 
-Additionally, to the camera intrinsics we store the relative rotation and translation between the cameras if multiple cameras are used. The rotation and translation are stored as Euler angles\footnote{Technically we are storing the rotation with the Tait–Bryan notation, i.e. x-y-z or yaw-pitch-roll, rather than the classic Euler notation. However, the name Euler angle is more commonly used and understood.} and a vector respectively \cite{euler1776formulae}. The rotation is the rotation of the camera relative to the second camera in the system. The translation is the translation of the camera concerning the second camera in the system.
+Additionally, to the camera intrinsics REPLACE_WE store the relative rotation and translation between the cameras if multiple cameras are used. The rotation and translation are stored as Euler angles\footnote{Technically REPLACE_WE are storing the rotation with the Tait–Bryan notation, i.e. x-y-z or yaw-pitch-roll, rather than the classic Euler notation. However, the name Euler angle is more commonly used and understood.} and a vector respectively \cite{euler1776formulae}. The rotation is the rotation of the camera relative to the second camera in the system. The translation is the translation of the camera concerning the second camera in the system.
 
 \paragraph{Session parameters}
 
@@ -78,17 +78,17 @@ An example of the Session metadata can be seen in Listing \ref{lst:session_metad
 
 \subsubsection{Realsense Cameras}
 
-We record Realsense Cameras using the librealsense SDK provided by Intel. Using the SDK we have access to the Hight-Level Pipeline API which allows us to stream the camera feed and access the camera intrinsics. This High-Level Pipeline API allows us to record the RGB and Depth streams from the Realsense camera. The SDK automatically synchronises the Depth and RGB stream as well as the motion sensors, which we do not use since our camera is static. The librealsense SDK is available on GitHub\footnote{\url{https://github.com/IntelRealSense/librealsense}}.
+We record Realsense Cameras using the librealsense SDK provided by Intel. Using the SDK REPLACE_WE have access to the Hight-Level Pipeline API which allows REPLACE_US to stream the camera feed and access the camera intrinsics. This High-Level Pipeline API allows REPLACE_US to record the RGB and Depth streams from the Realsense camera. The SDK automatically synchronises the Depth and RGB stream as well as the motion sensors, which REPLACE_WE do not use since REPLACE_OUR camera is static. The librealsense SDK is available on GitHub\footnote{\url{https://github.com/IntelRealSense/librealsense}}.
 
-The Recordings are stored in a ROS bag file. A ROS bag file is a file format for storing ROS messages. The ROS bag file format is a container format that stores multiple messages in a single file. The ROS bag file format is described in detail in the ROS wiki\footnote{\url{http://wiki.ros.org/Bags}}. The ROS bag file format is a container format that stores multiple messages in a single file. In our case, the important messages are the camera intrinsics, which allow us to create a virtual Realsense Camera from the recording, the RGB stream, and the Depth stream. However, other messages are also stored and can be accessed using the ROS Bag API\footnote{\url{http://wiki.ros.org/rosbag/Code\%20API}}.
+The Recordings are stored in a ROS bag file. A ROS bag file is a file format for storing ROS messages. The ROS bag file format is a container format that stores multiple messages in a single file. The ROS bag file format is described in detail in the ROS wiki\footnote{\url{http://wiki.ros.org/Bags}}. The ROS bag file format is a container format that stores multiple messages in a single file. In REPLACE_OUR case, the important messages are the camera intrinsics, which allow REPLACE_US to create a virtual Realsense Camera from the recording, the RGB stream, and the Depth stream. However, other messages are also stored and can be accessed using the ROS Bag API\footnote{\url{http://wiki.ros.org/rosbag/Code\%20API}}.
 
 \subsubsection{Orbbecc Astra Cameras}
 
-To read the depth stream of the Orbbecc Astra camera we use the OpenNI2 API\footnote{\url{https://structure.io/openni}}. The OpenNI2 API is a cross-platform API that allows us to access the depth stream of the Orbbecc Astra camera. The OpenNI API is no longer being developed by PrimeSense and has been renamed to OpenNI2 to avoid confusion with the OpenNI API. The OpenNI2 API is available on GitHub\footnote{\url{https://github.com/structureio/OpenNI2}}.
+To read the depth stream of the Orbbecc Astra camera REPLACE_WE use the OpenNI2 API\footnote{\url{https://structure.io/openni}}. The OpenNI2 API is a cross-platform API that allows REPLACE_US to access the depth stream of the Orbbecc Astra camera. The OpenNI API is no longer being developed by PrimeSense and has been renamed to OpenNI2 to avoid confusion with the OpenNI API. The OpenNI2 API is available on GitHub\footnote{\url{https://github.com/structureio/OpenNI2}}.
 
-Using the OpenNI2 API we can also record the depth stream to a file. The depth stream is stored as a \texttt{.ONI} file. The \texttt{.ONI} file format is a proprietary format that is not documented. However, the OpenNI2 API provides a \texttt{.ONI} file reader that allows us to access the depth stream.
+Using the OpenNI2 API REPLACE_WE can also record the depth stream to a file. The depth stream is stored as a \texttt{.ONI} file. The \texttt{.ONI} file format is a proprietary format that is not documented. However, the OpenNI2 API provides a \texttt{.ONI} file reader that allows REPLACE_US to access the depth stream.
 
-Sadly, the OpenNI2 API does not provide a way to access the RGB stream. Therefore, we use the OpenNI2 API to access the depth stream and OpenCV to access the RGB stream. The RGB stream is stored as a \texttt{.AVI} file. The \texttt{.AVI} file format is a container format that stores multiple video streams in a single file. The \texttt{.AVI} file format is described in detail in the Microsoft documentation\footnote{\url{https://docs.microsoft.com/en-us/previous-versions/ms779636(v=vs.85)}}. 
+Sadly, the OpenNI2 API does not provide a way to access the RGB stream. Therefore, REPLACE_WE use the OpenNI2 API to access the depth stream and OpenCV to access the RGB stream. The RGB stream is stored as a \texttt{.AVI} file. The \texttt{.AVI} file format is a container format that stores multiple video streams in a single file. The \texttt{.AVI} file format is described in detail in the Microsoft documentation\footnote{\url{https://docs.microsoft.com/en-us/previous-versions/ms779636(v=vs.85)}}. 
 
 \textit{
   \textbf{ISSUE}: currently the playback of the \texttt{.AVI} file is only possible at a specific framerate, which is set at the beginning of the recording session. This poses a substantial issue regarding synchronisation. Should I write about this? Should I only use depth data? 

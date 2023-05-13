@@ -1,11 +1,11 @@
 \section{Stream pre-processing}
 \label{sec:stream_pre_processing}
 
-To get the best possible results we need to make sure that the cameras are set up in exactly the intended way. 
+To get the best possible results REPLACE_WE need to make sure that the cameras are set up in exactly the intended way. 
 
 \subsection{Multiple Cameras}
 
-We use multiple cameras to increase the accuracy of the results. We use two cameras to record the same scene from two different angles. This way we can compare the results from the two cameras and make sure that the results are consistent. We also use multiple cameras to record the same scene from different heights and angles.
+We use multiple cameras to increase the accuracy of the results. REPLACE_WE use two cameras to record the same scene from two different angles. This way REPLACE_WE can compare the results from the two cameras and make sure that the results are consistent. REPLACE_WE also use multiple cameras to record the same scene from different heights and angles.
 
 \textit{\textbf{UNSURE} Should I write about it if Im not going to do it? Its quite interesting how the synchronisation might work and how the pointclouds can be synchronised. I already did a lot of research on it but if Im not going to implement it then this might not be the best point to do it.}
 
@@ -15,27 +15,27 @@ We consider different environmental setups to increase the significance of the r
 
 \subsubsection{Lighting}
 
-RGBD cameras function with infrared light therefore is the lighting of a scene essential. We found that direct sunlight interferes with some RGBD cameras more than others based on the infrared range that is used. Since the exact sunlighting is not controllable we choose to make it as optimal as possible to improve reproducibility. Therefore, we choose a room with no sunlight but we do include artificial light to reduce any damage that might occur to visibility issues.
+RGBD cameras function with infrared light therefore is the lighting of a scene essential. REPLACE_WE found that direct sunlight interferes with some RGBD cameras more than others based on the infrared range that is used. Since the exact sunlighting is not controllable REPLACE_WE choose to make it as optimal as possible to improve reproducibility. Therefore, REPLACE_WE choose a room with no sunlight but REPLACE_WE do include artificial light to reduce any damage that might occur to visibility issues.
 
 \subsubsection{Relative Camera Position}
 
-At SilverFit, cameras are attached above a screen at a height of $180 cm$ facing downward at around $20\deg$. To form a more general model, we will experiment with different setups and angles. We experiment with six different setups in total. Three setups from different angles ($20\deg, 0\deg, 340\deg$) at two different heights ($180cm$, $120cm$). The different setups can be seen in figure TODO.
+At SilverFit, cameras are attached above a screen at a height of $180 cm$ facing downward at around $20\deg$. To form a more general model, REPLACE_WE will experiment with different setups and angles. REPLACE_WE experiment with six different setups in total. Three setups from different angles ($20\deg, 0\deg, 340\deg$) at two different heights ($180cm$, $120cm$). The different setups can be seen in figure TODO.
 
 \textit{\textbf{TODO} Add figure with different setups.}
 
 \textit{
-  \textbf{UNSURE} We Develop a functionality that lets us determine the exact height and orientation of the camera. We do this by detecting the floor and thereby calculating the height of the camera and the angle at which it is pointing downward. We can also detect if the camera is not completely straight and therefore might influence the results.
+  \textbf{UNSURE} REPLACE_WE Develop a functionality that lets REPLACE_US determine the exact height and orientation of the camera. REPLACE_WE do this by detecting the floor and thereby calculating the height of the camera and the angle at which it is pointing downward. REPLACE_WE can also detect if the camera is not completely straight and therefore might influence the results.
 }
 
 \subsubsection{Sitting or standing}
 
-From experience, we know that detecting the joints correctly is influenced by the position of the participant. This is especially true for the difference between a sitting and a standing patient. Human pose detection is in general more reliable if the patient is standing, due to reduced occlusion. We record each scenario sitting and standing.
+From experience, REPLACE_WE know that detecting the joints correctly is influenced by the position of the participant. This is especially true for the difference between a sitting and a standing patient. Human pose detection is in general more reliable if the patient is standing, due to reduced occlusion. REPLACE_WE record each scenario sitting and standing.
 
 \subsubsection{Clothing and ankle and wrist attachments}
 
 Clothing can have a similar effect on the efficacy of HPE as lighting. If the participant is wearing black pants infrared light will be absorbed rather than reflected leading to 'blind spots' in the legs. Since the legs are already more unreliable than the rest of the body, these blind spots can negatively affect HPE. 
 
-Since SilverFit develops games for rehabilitation, the supervising physiotherapist might choose to attach weights to the ankles and/or wrists to increase the effectiveness of the exercise. We therefore also include attached and held weights to simulate difficult situations.
+Since SilverFit develops games for rehabilitation, the supervising physiotherapist might choose to attach weights to the ankles and/or wrists to increase the effectiveness of the exercise. REPLACE_WE therefore also include attached and held weights to simulate difficult situations.
 
 \subsubsection{Background}
 
@@ -43,7 +43,7 @@ The background of the scene can have a significant effect on the results. We, th
 
 \subsubsection{Crampedness of the Environment}
 
-The Crampedness of the scene increases the number of false positives of HPE. We, therefore, record the same scenario with and without clutter. We consider clutter to be any object that is not a part of the participant's body. However, clutter is quite objective and therefore we will not be able to define it in a universally applicable way. 
+The Crampedness of the scene increases the number of false positives of HPE. We, therefore, record the same scenario with and without clutter. REPLACE_WE consider clutter to be any object that is not a part of the participant's body. However, clutter is quite objective and therefore REPLACE_WE will not be able to define it in a universally applicable way. 
 
 \subsubsection{Distance to the camera}
 

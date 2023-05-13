@@ -2,9 +2,9 @@
 
 To interact with computers humans have come up with a plethora of methods. Ranging from early punch cards to modern touch screens, the methods have evolved to be more natural and intuitive. In recent years, the use of cameras to interact with computers has become more popular, since they require no physical contact and can make the use of computer systems seamless when developed properly.
 
-In this section, we discuss some of the methods that have been used to extract the pose of a human from videos of different formats. We also discuss possible applications of human pose estimation. Finally, we 
+In this section, REPLACE_WE discuss some of the methods that have been used to extract the pose of a human from videos of different formats. REPLACE_WE also discuss possible applications of human pose estimation. Finally, REPLACE_WE 
 
-In chapter \ref{sec:errors} Human Pose Estimation Difficulties, we go into more detail about the method we used to extract the pose and what factors influence the result of the pose estimation.
+In chapter \ref{sec:errors} Human Pose Estimation Difficulties, REPLACE_WE go into more detail about the method REPLACE_WE used to extract the pose and what factors influence the result of the pose estimation.
 
 We will go into more detail about some of the state-of-the-art human pose estimators for both RGB and RGBD data and even from point clouds in Section \ref{sec:related_work} Related Work.
 
@@ -15,7 +15,7 @@ There are mainly three different ways the human pose can be visualised. The firs
 \begin{figure}
     \centering
     \includegraphics[width=0.8\linewidth]{figures/HPE/PoseExample.png}
-    \caption[Example for human Pose estimation]{Example of a human pose captured with different methods. (a) A captured skeleton using MoCap which we do not focus on in this report. (b) A traditional human skeleton representation. (c) A pose representation that includes the orientation of the joints as well as the bones as presented by Martin Fish and Ronald Clark\cite{KeypointOrientation}}
+    \caption[Example for human Pose estimation]{Example of a human pose captured with different methods. (a) A captured skeleton using MoCap which REPLACE_WE do not focus on in this report. (b) A traditional human skeleton representation. (c) A pose representation that includes the orientation of the joints as well as the bones as presented by Martin Fish and Ronald Clark\cite{KeypointOrientation}}
     \label{fig:pose_example}
 \end{figure}
 
@@ -38,9 +38,9 @@ Additionally, some datasets are captured with depth cameras. Depth cameras are c
 
 Finally, there are also methods of human pose estimation that use point clouds. Point clouds are a collection of points in space, which can be used to represent the shape of an object. Point clouds are often used in combination with RGB data. Some of the most common datasets that are captured with depth cameras are the SMMC-10 dataset\cite{SMMC10}, and the EVAL dataset\cite{EVAL}. However, any RGBD dataset can be used to train and test point cloud-based pose estimation algorithms if the camera intrinsics and extrinsic, such as the horizontal and vertical field of view, the focal point, and the depth units are known. With the knowledge of these parameters, the depth information can be converted to a point cloud and if the RGB data is in line with the depth data, the individual points can be colored accordingly.
 
-Additionally, to the data that is provided, we also differentiate between monocular and multi-modal data. Monocular data is data that is captured with a single camera. Multi-modal data is data that is captured with multiple cameras. The most common multi-modal data is stereo data, which is data that is captured with two cameras. The cameras are usually placed next to each other and are angled toward the same scene. This allows the cameras to capture the same scene from different angles and therefore improving the accuracy of the pose estimation. There are not many datasets for this type of data, but the most common one was captured by Waymo\cite{Waymo}.
+Additionally, to the data that is provided, REPLACE_WE also differentiate between monocular and multi-modal data. Monocular data is data that is captured with a single camera. Multi-modal data is data that is captured with multiple cameras. The most common multi-modal data is stereo data, which is data that is captured with two cameras. The cameras are usually placed next to each other and are angled toward the same scene. This allows the cameras to capture the same scene from different angles and therefore improving the accuracy of the pose estimation. There are not many datasets for this type of data, but the most common one was captured by Waymo\cite{Waymo}.
 
-However, RGB cameras are far more widely spread and generally cheaper than depth cameras. Hence, most methods use RGB cameras to estimate the pose of a human. However, since depth cameras can provide more detailed information about the scene, they can be used to improve the accuracy of the pose estimation and in this report, we will mainly focus on monocular RGBD data.
+However, RGB cameras are far more widely spread and generally cheaper than depth cameras. Hence, most methods use RGB cameras to estimate the pose of a human. However, since depth cameras can provide more detailed information about the scene, they can be used to improve the accuracy of the pose estimation and in this report, REPLACE_WE will mainly focus on monocular RGBD data.
 
 \subsection{Depth cameras}
 
@@ -52,7 +52,7 @@ Finally, there are also structured light cameras. These cameras use a pattern of
 
 \subsection{Applications}
 
-Human pose estimation finds application in many different fields. Here we mention a few of the most common applications.
+Human pose estimation finds application in many different fields. Here REPLACE_WE mention a few of the most common applications.
 
 \subsubsection{Gaming and entertainment}
 

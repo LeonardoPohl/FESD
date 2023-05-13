@@ -1,8 +1,8 @@
 \section{Environment}
 
-The first error source that we will discuss is the environment. We consider everything that is not the user or the camera as the environment. This includes the lighting of the room and the room itself. The environment can be an issue that is sometimes hard, if not impossible to fix. 
+The first error source that REPLACE_WE will discuss is the environment. REPLACE_WE consider everything that is not the user or the camera as the environment. This includes the lighting of the room and the room itself. The environment can be an issue that is sometimes hard, if not impossible to fix. 
 
-In this section, we discuss the most common issues that occur in the environment and how they can be addressed.
+In this section, REPLACE_WE discuss the most common issues that occur in the environment and how they can be addressed.
 
 \subsection{Background}
 
@@ -14,7 +14,7 @@ While RGB cameras are not affected by too much light, RGBD cameras are heavily i
 
 Most RGBD cameras use infrared light to determine the depth of the scene, some use a pattern of infrared light that is projected onto the scene and distorted by physical objects and some use the time-of-flight method to determine the depth of the scene. The issue that arises with infrared is that it is also emitted by the sun. This means that light emitted by the sun can interfere with the infrared light emitted by the camera. This can cause the depth of the scene to be incorrect or missing in parts with a high intensity of sunlight.
 
-To reduce the effect of the sunlight, the camera can be placed in a room with curtains or blinds. This will reduce the amount of sunlight that enters the room and therefore reduce the effect of the sunlight on the camera. Since lighting is hard to perfectly reproduce without a controlled environment, we refrain from experimenting with different lighting in the room. Therefore, we do all of the recordings in a room without any natural light or at night.
+To reduce the effect of the sunlight, the camera can be placed in a room with curtains or blinds. This will reduce the amount of sunlight that enters the room and therefore reduce the effect of the sunlight on the camera. Since lighting is hard to perfectly reproduce without a controlled environment, REPLACE_WE refrain from experimenting with different lighting in the room. Therefore, REPLACE_WE do all of the recordings in a room without any natural light or at night.
 
 However, if a method heavily relies on RGB data for the pose estimation, eliminating any form of light is not a valid option since then the data that can be gathered by RGB cameras is very limited and may result in a wrong pose.
 
