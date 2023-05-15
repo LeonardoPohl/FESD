@@ -23,7 +23,7 @@ torchrun --nproc_per_node=8 train.py \
 # optimizer
 optim = 'adam'
 # learning rate
-learning_rate = 0.005
+learning_rate = 0.00005
 # learning rate scheduler. can be step, poly or cosine
 lr_scheduler = 'cosine'
 # warmup epoch
