@@ -8,7 +8,7 @@ The finished data preparation pipeline can be seen in Figure \ref{fig:data_prepa
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{figures/ProcessingPipeline/DataProcessing.png}
-  \caption[Data preparation pipeline]{The data preparation pipeline. The data is randomly flipped, Blurred and Cropped and then merged into a single RGB image.}
+  \caption[Data preparation pipeline]{The data preparation pipeline. The data is randomly flipped, Blurred, and Cropped and then merged into a single RGB image.}
   \label{fig:data_preparation_pipeline}
 \end{figure}
 
@@ -27,9 +27,9 @@ The augmentations can be seen in Figure \ref{fig:data_preparation_pipeline} wher
 
 \subsection{Data merging}
 
-While there are different ways of applying transfer learning to the problem at hand, REPLACE_WE chose to merge the different modalities into a single tensor. This allows REPLACE_US to use the EfficientNet v2 as a feature extractor for all modalities, without the added computations of extracting the features of each modality individually. The data is merged by assigning each modality to a channel in an RGB image.
+While there are different ways of applying transfer learning to the problem at hand, $REPLACE_WE$ chose to merge the different modalities into a single tensor. This allows $REPLACE_US$ to use the EfficientNet v2 as a feature extractor for all modalities, without the added computations of extracting the features of each modality individually. The data is merged by assigning each modality to a channel in an RGB image.
 
-In Figure \ref{fig:data_preparation_pipeline} REPLACE_WE can see the different modalities as they are merged into a single tensor. The RGB image is transformed into greyscale and assigned to the red channel, the depth image is scaled to a value between 0 and 255 and assigned to the green channel, and the joint coordinates are assigned to the blue channel. The data is then passed into the EfficientNet v2 as a single RGB image.
+In Figure \ref{fig:data_preparation_pipeline} $REPLACE_WE$ can see the different modalities as they are merged into a single tensor. The RGB image is transformed into greyscale and assigned to the red channel, the depth image is scaled to a value between 0 and 255 and assigned to the green channel, and the joint coordinates are assigned to the blue channel. The data is then passed into the EfficientNet v2 as a single RGB image.
 
 \subsection{Data balancing}
 

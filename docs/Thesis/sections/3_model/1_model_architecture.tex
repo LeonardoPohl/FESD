@@ -10,42 +10,42 @@ In the process of this thesis, two versions of the FESD model were implemented. 
   \label{fig:model_architecture_v1}
 \end{figure}
 
-The second approach is relying on transfer learning, in which a pre-trained model is used as part of a new network. To choose a network, multiple different networks have been compared, which can be seen in Figure \ref{fig:network_comparison}. Since the application is in gaming a lightweight model which does not impact the performance much is preferred. Therefore, REPLACE_WE compare the models by their number of floating-point operations (FLOPS) to their Accuracy on ImageNet-1K. Honorable mentions as well as the five most performing models are marked in the plot with their Top-5 and Top-1 Accuracy. Table \ref{tab:network_comparison} shows the top 5 models according to their accuracy and performance. 
+The second approach is relying on transfer learning, in which a pre-trained model is used as part of a new network. To choose a network, multiple different networks have been compared, which can be seen in Figure \ref{fig:network_comparison}. Since the application is in gaming a lightweight model which does not impact the performance much is preferred. Therefore, $REPLACE_WE$ compare the models by their number of floating-point operations (FLOPS) to their Accuracy on ImageNet-1K. Honorable mentions as well as the five most performing models are marked in the plot with their Top-5 and Top-1 Accuracy. Table \ref{tab:network_comparison} shows the top 5 models according to their accuracy and performance. 
 
-\begin{tabular}{lrrrr}
-  \label{tab:network_comparison}
-  \caption[Top 5 models for Accuracy and Performance]{The top 5 models according to their accuracy and performance. The models are sorted by their GFLOPS and their Top-5 Accuracy\footnote{Source: \url{https://pytorch.org/vision/main/models.html} on 08/05/2023}. The models are EfficientNet V2 S, ConvNeXt Base, EfficientNet B6, Swin V2 B, and EfficientNet V2 M.}
-\toprule
-           Weight &  Acc@1 &  Acc@5 &   Params &  GFLOPS \\
-\midrule
-EfficientNet V2 S & 84.228 & 96.878 & $2.15 \times 10^7$ &   8.370 \\
-    ConvNeXt Base & 84.062 & 96.870 & $8.86 \times 10^7$ &  15.360 \\
-  EfficientNet B6 & 84.008 & 96.916 & $4.30 \times 10^7$ &  19.070 \\
-        Swin V2 B & 84.112 & 96.864 & $8.79 \times 10^7$ &  20.320 \\
-EfficientNet V2 M & 85.112 & 97.156 & $5.41 \times 10^7$ &  24.580 \\
-\bottomrule
-\end{tabular}
+% \begin{tabular}{lrrrr}
+%   \label{tab:network_comparison}
+%   \caption[Top 5 models for Accuracy and Performance]{The top 5 models according to their accuracy and performance. The models are sorted by their GFLOPS and their Top-5 Accuracy\footnote{Source: \url{https://pytorch.org/vision/main/models.html} on 08/05/2023}. The models are EfficientNet V2 S, ConvNeXt Base, EfficientNet B6, Swin V2 B, and EfficientNet V2 M.}
+% \toprule
+%            Weight &  Acc@1 &  Acc@5 &   Params &  GFLOPS \\
+% \midrule
+% EfficientNet V2 S & 84.228 & 96.878 & $2.15 \times 10^7$ &   8.370 \\
+%     ConvNeXt Base & 84.062 & 96.870 & $8.86 \times 10^7$ &  15.360 \\
+%   EfficientNet B6 & 84.008 & 96.916 & $4.30 \times 10^7$ &  19.070 \\
+%         Swin V2 B & 84.112 & 96.864 & $8.79 \times 10^7$ &  20.320 \\
+% EfficientNet V2 M & 85.112 & 97.156 & $5.41 \times 10^7$ &  24.580 \\
+% \bottomrule
+% \end{tabular}
 
 EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. The model architecture can be seen in Figure \ref{fig:model_architecture_v2}. The model is split into two parts. The first part is the feature extractor, which is the EfficientNet v2 S. The second part is the classifier, which is two fully connected Layers. The output of the classifier is a 1D 2, 4, 20, or 80 tensors of multi-object multi-class values depending on the problem set. Additionally, the input is merged into a single image so that the EfficientNet v2 can be used to extract the features of all modalities.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\linewidth]{figures/Model/FESDv2.png}
+  \includegraphics[width=\linewidth]{figures/Model/FESD.png}
   \caption[FESDModel architecture version 2]{FESDModel architecture with transfer learning.}
   \label{fig:model_architecture_v1}
 \end{figure}
 
-% With the data prepared and the data layout known, REPLACE_WE can start to build a model to predict the errors in the data. As is common practice in computer vision tasks, REPLACE_WE use a convolutional neural network to predict the error type of the individual joints. The input of the network are the individual datastreams, i.e. a stream of RGB data, a stream of depth data, and a stream of joint data. The output of the network is a list of error labels for each joint. The network is trained to predict the error labels for each joint. The error labels are the same as the error labels used in the data labeling. The error labels are explained in section \ref{sec:data_labeling}. 
+% With the data prepared and the data layout known, $REPLACE_WE$ can start to build a model to predict the errors in the data. As is common practice in computer vision tasks, $REPLACE_WE$ use a convolutional neural network to predict the error type of the individual joints. The input of the network are the individual datastreams, i.e. a stream of RGB data, a stream of depth data, and a stream of joint data. The output of the network is a list of error labels for each joint. The network is trained to predict the error labels for each joint. The error labels are the same as the error labels used in the data labeling. The error labels are explained in section \ref{sec:data_labeling}. 
 
 % The different modalities are combined in the final three fully connected layers. The model architecture is shown in figure \ref{fig:model_architecture}.
 
 
-% REPLACE_WE pass the three different modalities as multi dimensional tensors into the network. Prior to this REPLACE_WE applied all augmentations and resize the images to fit the tensor size as seen in Figure \ref{fig:model_architecture}. REPLACE_WE discuss the augmentations that REPLACE_WE apply in Section \ref{sec:data_augmentation}.
+% $REPLACE_WE$ pass the three different modalities as multi dimensional tensors into the network. Prior to this $REPLACE_WE$ applied all augmentations and resize the images to fit the tensor size as seen in Figure \ref{fig:model_architecture}. $REPLACE_WE$ discuss the augmentations that $REPLACE_WE$ apply in Section \ref{sec:data_augmentation}.
 
 % Then a 3x3 convolution is applied on the data to extract low level features. After the features are extracted a Relu, or rectified linear unit is applied to combat the vanishing gradient problem. For the visual channels of the data, i.e. the RGB data and the depth data MaxPooling is applied to down sample the data. It is not applied to the joint data since the data available per input is already limited.
 
-% This Convolution, Relu and Max Pooling is repeated three times to extract ever higher level features. REPLACE_WE found that three layers were the best choice.
+% This Convolution, Relu and Max Pooling is repeated three times to extract ever higher level features. $REPLACE_WE$ found that three layers were the best choice.
 
-% After the convolution layers REPLACE_WE flatten the output of each of the RGB, Dept and Joint CNN into a single feature vector. This feature vector is passed into the fully connected network. REPLACE_WE use three layers to gradually reduce the neuron size to REPLACE_OUR desired output size of $20\cdot4$ classes.
+% After the convolution layers $REPLACE_WE$ flatten the output of each of the RGB, Dept and Joint CNN into a single feature vector. This feature vector is passed into the fully connected network. $REPLACE_WE$ use three layers to gradually reduce the neuron size to $REPLACE_OUR$ desired output size of $20\cdot4$ classes.
 
 % Inherently this is the network, however, to use the data a softmax is applied to each object to extract the most likely joint error. The $20\cdot4$ classes can then be reduced to $20$ errors and a confidence rating.

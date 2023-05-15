@@ -2,11 +2,14 @@
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-Human pose estimation aims at detecting the pose or skeleton of a person based on visual information only. It finds many applications, from games to medical applications. This thesis is written in collaboration with SilverFit\footnote{\url{https://www.silverfit.com/en/}}. SilverFit develops games for rehabilitation with a special focus on geriatric patients. In their games, SilverFit uses human pose estimation to detect the pose of the player and use it to control the game to make exercise more enjoyable while promoting activity. They are interested in a fault estimation system for human pose estimation in their games. This thesis aims to develop such a fault estimation system for human pose estimation in their games.
+Human pose estimation aims at detecting the pose or skeleton of a person based on visual information only. It finds many applications, from games to medical applications\cite{kumarapu2020animepose, ClinicalApplicationChen, MedicalAnimation}. However, since human pose estimation is a difficult task, it is prone to errors\cite{HPEIsHard}. These errors can be caused by different factors, such as the environment, the camera, and the person. These errors can cause the joints to be in the incorrect position or missing. This can cause the pose estimation to be incorrect, and therefore, the human-computer interaction will be hampered.
 
-In this chapter, REPLACE_WE give an overview of different applications of human pose estimation and the challenges that are associated with it. REPLACE_WE focus on applications of human pose estimation at SilverFit and their desire for a fault estimation system for human pose estimation in their games. Then REPLACE_WE discuss the problem that REPLACE_WE are trying to solve and the research question that REPLACE_WE are trying to answer. Finally, REPLACE_WE explore other approaches to the problem and how they differ from REPLACE_OUR approach and how they influence the development of this project.
+One of the hampering factors for human pose estimation is the user itself. If the posture is not as the model expects then errors might occur. This is especially true for applications that are designed for rehabilitation and exercise purposes. In these applications, the user is often elderly and has limited mobility, as is the case for games developed by SilverFit\footnote{\url{https://www.silverfit.com/en/}}. SilverFit is a serious gaming company that develops games for rehabilitation with a special focus on geriatric patients. In their games, SilverFit uses human pose estimation to detect the pose of the player and use it to control the game to make exercise more enjoyable while promoting activity.
 
-\input{sections/0_introduction/1_hpe.tex}
+For some exercises designed by SilverFit, human pose estimation is not sufficiently reliable to create an enjoyable experience for patients in every environment. Especially sedentary exercises often cause the human pose estimation to fail or to produce unreliable results.
+
+In this chapter, the research question that is answered in this thesis is discussed. Furthermore, the procedure with which the research question is answered is laid out. Finally, the fundamentals of human pose estimation and the metrics that are used to analyse the results are discussed, and related work is presented.
+
 \input{sections/0_introduction/2_research_question.tex}
 \input{sections/0_introduction/3_process_pipeline.tex}
 \input{sections/0_introduction/4_fundamentals.tex}
