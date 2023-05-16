@@ -26,6 +26,7 @@ class FESDDataset(data.Dataset):
     self.size = 0
     self.frames_per_session = 0
     self.total_frames_per_session = 0
+    exercises = []
     
     for file in os.listdir(recording_dir):
       if file.endswith('.json'):
@@ -35,8 +36,11 @@ class FESDDataset(data.Dataset):
           self.total_frames_per_session = data['Frames']
           if ((test and data['Session Parameters']['Exercise'] not in test_exercises) or
           (not test and data['Session Parameters']['Exercise'] in test_exercises)):
-            continue
-
+            if test and data['Session Parameters']['Exercise'] not in exercises:
+              exercises.append(data['Session Parameters']['Exercise'])
+            else:
+              continue
+            
           self.size += data['Frames']
           self.frames_per_session = data['Frames']
           self.recording_jsons.append(data)
@@ -68,7 +72,9 @@ class FESDDataset(data.Dataset):
       
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
-    if self.use_v2:
+    if self.use_v3:
+      return self.get_frame_v3()
+    elif self.use_v2:
       return self.get_frame_v2()
     else:
       return self.get_frame_v1()
