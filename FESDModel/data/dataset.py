@@ -27,26 +27,37 @@ class FESDDataset(data.Dataset):
     self.frames_per_session = 0
     self.total_frames_per_session = 0
     exercises = []
-    
+    count = 0
     for file in os.listdir(recording_dir):
-      if file.endswith('.json'):
-        with open(file=os.path.join(recording_dir, file), mode='r') as file:
-          data = json.load(file)
-          
-          self.total_frames_per_session = data['Frames']
-          if ((test and data['Session Parameters']['Exercise'] not in test_exercises) or
-          (not test and data['Session Parameters']['Exercise'] in test_exercises)):
-            if test and data['Session Parameters']['Exercise'] not in exercises:
+      if not file.endswith('.json'):
+        continue
+      count += 1
+      with open(file=os.path.join(recording_dir, file), mode='r') as file:
+        data = json.load(file)
+        
+        self.total_frames_per_session = data['Frames']
+
+        if test:
+          if data['Session Parameters']['Exercise'] in test_exercises:
+            if data['Session Parameters']['Exercise'] not in exercises:
+              exercises.append(data['Session Parameters']['Exercise'])
+              continue
+            else:
+              pass
+          else:
+            continue
+        else:
+          if data['Session Parameters']['Exercise'] in test_exercises:
+            if data['Session Parameters']['Exercise'] not in exercises:
               exercises.append(data['Session Parameters']['Exercise'])
             else:
               continue
-            
-          self.size += data['Frames']
-          self.frames_per_session = data['Frames']
-          self.recording_jsons.append(data)
+          else:
+            pass
 
-#    print(f"Recordings Found: {len(self.recording_jsons)}")
-#    print(f"Total Frames: {self.size}")
+        self.size += data['Frames']
+        self.frames_per_session = data['Frames']
+        self.recording_jsons.append(data)
 
     self.use_v2 = use_v2
     self.mode = mode
@@ -72,9 +83,7 @@ class FESDDataset(data.Dataset):
       
     self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=self.use_v2)
 
-    if self.use_v3:
-      return self.get_frame_v3()
-    elif self.use_v2:
+    if self.use_v2:
       return self.get_frame_v2()
     else:
       return self.get_frame_v1()
