@@ -1,11 +1,11 @@
 \section{Research question}
+% the research questions that we are going to address is... as a list
+% dataset
+% model and so on
+A major problem with human pose estimation is that it is not possible to tell if the joints of the pose are faulty or not. Using faulty joints can decrease the efficacy of the training effect of the developed games and can make them very frustrating to use and develop. A joint is considered faulty if it is not in the incorrect position, i.e. the distance from the actual position is greater than a chosen threshold, or if it missing from the skeleton.
 
-As mentioned earlier, a major problem with human pose estimation is that it is not possible to tell if the joints are faulty or not. This is a problem for SilverFit, as they want to be able to tell if the joints are faulty or not. Using faulty joints can decrease the efficacy of the training effect of the developed games and can make them very frustrating to use and develop. A joint is considered faulty if it is not in the incorrect position, i.e. the distance from the theoretical position is greater than a chosen threshold, or if it missing from the skeleton.
+In this thesis, first, the problems that occur during human pose estimation are analysed. The aim is to find which problems are the most common and which joints are most affected by the errors. Additionally, exercises are designed to emulate different scenarios with ever-increasing difficulty. This will help give an overview of the issues related to human pose estimation and help develop ways to detect these issues. 
 
-In this thesis, $REPLACE_WE$ first ask what problems occur during human pose estimation and what common error sources are. $REPLACE_WE$ aim to find which problems are the most common and which joints are most affected by the errors. This will help give an overview of the issues related to human pose estimation and help develop ways to detect these issues. 
+Once the issues and error sources that occur during human pose estimation are analysed, a method is developed to capture the camera stream in a way that allows the labelling of the data according to the exercise and environment it was captured in. This allows for the creation of a dataset that can be used to train a model to detect faulty joints.
 
-Once $REPLACE_WE$ know the issues that occur during human pose estimation, $REPLACE_WE$ aim to develop a method that can capture the camera stream in a way that allows $REPLACE_US$ to label the data according to the exercise and environment it was captured in. This will allow $REPLACE_US$ to create a dataset that can be used for future purposes.
-
-Furthermore, $REPLACE_WE$ try to find if it is possible, given a joint, the RGB data, and the depth data, to determine if the joint is faulty or not using machine learning. 
-
-Finally, based on the result of the model $REPLACE_WE$ attempt to fix the faulty joints in the pose estimation to create a more robust human pose estimation model.
+Using the dataset that is developed we train a model. Using the model we answer the research question posed; "Is it possible to train a model using multi-modal data to determine if a joint is faulty."

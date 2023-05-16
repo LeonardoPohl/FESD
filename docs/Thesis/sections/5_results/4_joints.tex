@@ -1,0 +1,50 @@
+\section{Joint Error Estimation}
+\label{sec:joint_error_estimation}
+
+The results for the joint error estimation are the same as for the full-body error estimation. The model is overfitting and therefore only predicts the error label $0$ - No Error for most joints. The results of the training process of the Joint model can be seen in Figure \ref{fig:Joint_training_results}.
+
+\input{sections/5_results/4_joints_input}
+
+\subsection{Confusion Matrix}
+
+The confusion matrix of the joint model is shown in Figure \ref{fig:joint_confusion_matrix}(TODO: split that graph, its huge). It can be seen that the model only predicts the error label $0$ - No Error for most joints. This is because the model is overfitting.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/results/confusion/joints.png}
+  \caption[Joint model confusion matrix]{The confusion matrix of the joint model.}
+  \label{fig:joint_confusion_matrix}
+\end{figure}
+
+\subsection{Emulated Full Body}
+
+As with the half-body Error estimator, the full body is emulated with the result of the limb error estimation. The results can be seen in Figure \ref{fig:joints_emulated_full_body}. 
+
+\begin{figure}
+    \centering
+    %\includegraphics[width=0.8\textwidth]{figures/results/Half_Body/Emulated_Full_Body.png}
+    \caption[Joint model with emulated Full Body results]{The results of the Joint model when emulating the full body results.}
+    \label{fig:joints_emulated_full_body}
+\end{figure}
+  
+\subsection{Emulated Half Body}
+
+Additionally, the half body is emulated with the result of the limb error estimation. The Head, Torso, and Left and Right arms are considered the upper body, and the Left and Right legs are considered the lower body. The results of the model are shown in Figure \ref{fig:joints_emulated_half_body}.
+
+\begin{figure}
+    \centering
+    %\includegraphics[width=0.8\textwidth]{figures/results/Half_Body/Emulated_Full_Body.png}
+    \caption[Joint model with emulated Half Body results]{The results of the Joint model when emulating the half body results.}
+    \label{fig:joints_emulated_full_body}
+\end{figure}
+
+\subsection{Emulated Limbs}
+
+Finally, the results of the joint model are used to emulate the limb model. The results can be seen in Figure \ref{fig:joints_emulated_half_body}.
+
+\begin{figure}
+    \centering
+    %\includegraphics[width=0.8\textwidth]{figures/results/Half_Body/Emulated_Full_Body.png}
+    \caption[joint model with emulated Limb results]{The results of the Limb model when emulating the limb results.}
+    \label{fig:joints_emulated_half_body}
+\end{figure}

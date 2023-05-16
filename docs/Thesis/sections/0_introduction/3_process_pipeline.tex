@@ -1,3 +1,12 @@
 \section{Process Pipeline}
 \label{sec:process_pipeline}
 
+In the scope of the thesis, three steps were defined that are necessary to achieve the goal of the thesis. These steps are the analysis of the problem, the data collection and processing, and the model development.
+
+During the analysis of the problem, different factors are discussed which might influence the human pose estimation. Based on these factors exercises are designed to emulate different scenarios with different difficulties. This is discussed in Section \ref{sec:errors}.
+
+The data collection and processing are discussed in Section \ref{sec:data_acquisition}. The data is captured using a custom tool, FESDData, that was developed for this thesis. The tool allows capturing predefined exercises and labelling them with error labels. The data is then processed and stored in a custom format.
+
+Using the collected dataset a data loader and model are derived. The data loader performs the necessary preprocessing steps and the model is trained to detect faulty joints. This is discussed in Section \ref{sec:model_development}.
+
+Finally, the model is evaluated on a test set and the results are discussed in Section \ref{sec:results}.

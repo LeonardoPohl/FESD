@@ -21,9 +21,7 @@ These exercises might not be the most realistic, but they represent common issue
 
 The exercises are numbered according to the difficulty. The first letter is an identifier that it is an exercise. The first digit indicates the difficulty of the exercise, while the second digit indicates the number of the exercise. The difficulty is rated from 0 to 4, where 0 is the easiest and 4 is the most difficult. The exercises are divided into four categories: trivial, easy, medium and hard.
 
-\textbf{Need to create this}
-A sample of each exercise can be seen in Figure \ref{fig:exercises}.
-
+% example images for the exercises with skeleton, small strip like 6 images in a row
 
 \subsubsection{Trivial Exercises}
 
@@ -35,7 +33,7 @@ In the most trivial case, the person is standing still with their arms stretched
 
 \paragraph{E-0.01 - Arms extended to the side}
 
-Another trivial case is to extend the arms to both sides of the body.  
+Another trivial case is to extend the arms to both sides of the body. 
 
 \subsubsection{Easy Exercises}
 
@@ -73,9 +71,9 @@ As with the previous exercise, the user will be sitting down and holding weights
 
  In the next exercise, the user crosses their arms in front of the body. This exercise is slightly more challenging than the previous exercise, as the arms are now occluding themselves, as well as the upper body.
 
-\paragraph{E-2.03 - Crossing the arms}
+ \paragraph{E-2.03 - Raising the knee}
 
-Finally, the user will be standing and bowing forward. 
+ The first exercise is when the user raises the knee. This exercise had to be reworked at SilverFit to function well since the pose estimation was too unreliable. From a neutral sitting position with knees at around 90 degrees, the user lifts the knee to a 45-degree angle. Meanwhile, the arms are down to the side.
 
 \subsubsection{Difficult Exercises}
 
@@ -83,13 +81,13 @@ Difficult exercises are exercises that are performed in a standing position and 
 
 Tölgyessy et al. found that facing away from the camera decreases the accuracy of HPE due to self-occlusion. \cite{HPEIsHard}
 
-\paragraph{E-3.00 - Raising the knee}
+\paragraph{E-3.00 - Bowing toward the camera}
 
-The first exercise is when the user raises the knee. This exercise had to be reworked at SilverFit to function well since the pose estimation was too unreliable. From a neutral sitting position with knees at around 90 degrees, the user lifts the knee to a 45-degree angle. Meanwhile, the arms are down to the side.
+Finally, the user is standing still and bowing forward. Most pose estimators use the head as an anchor point from which the rest of the body is calculated. By bowing forward the head is not perfectly visible and therefore issues are caused.
 
 \paragraph{E-3.01 - Raising the knee leaning forward}
 
-Additionally to raising the knee, the user will now lean forward, to emulate bad posture.
+Additionally to raising the knee, the user will now lean forward, to emulate bad posture. This has the same effect as the previous exercise, as the head is not perfectly visible. However, this exercise is more challenging, as the user is now in a sitting position and the joints are more occluded by the body.
 
 \paragraph{E-3.02 - Raising the knee leaning forward facing away from the camera}
 

@@ -1,0 +1,24 @@
+\section{Full Body Error Estimation}
+\ref{sec:full_body}
+
+The first and most general model that was developed was the full body model. The full body model was trained to give a single error label as an output given an image as an input. The results of the training process of the Full Body model can be seen in Figure \ref{fig:full_body_training_results}.
+
+The result of the training is rather disappointing. The testing showed that the model only performs well on the training data. The model does not generalise well to new data. The reason for this is that the model is overfitting. The model is overfitting because the model is too complex for the amount of data that is available. The model has 21.5 million trainable parameters. This is too many parameters for the amount of data that is available. The model is not able to learn the underlying patterns of the data, but rather memorises the training data. This is also shown in the training and testing loss. The training loss is decreasing, but the testing loss is increasing. This is a clear sign of overfitting.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/Results/fb/FullBodyErrorEstimation.png}
+  \caption[Full Body model training results]{The training results of the full body model.}
+  \label{fig:full_body_training_results}
+\end{figure}
+
+\subsection{Confusion Matrix}
+
+The confusion matrix of the full body model is shown in Figure \ref{fig:full_body_confusion_matrix}. It can be seen that the model only predicts the error label $0$ - No Error. This is because the model is overfitting.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/results/confusion/full.png}
+  \caption[Full Body model confusion matrix]{The confusion matrix of the full body error estimation model.}
+  \label{fig:full_body_confusion_matrix}
+\end{figure}

@@ -1,70 +1,83 @@
 \section{Related Work}
 \label{sec:related_work}
-
-\textbf{This still needs a lot of work}
-
-
-A plethora of methods have been developed to estimate the pose of a human. In this section, $REPLACE_WE$ will discuss some of the methods that have been developed to estimate the pose of a human. Additionally, $REPLACE_WE$ discuss datasets that have been developed to test the performance of the methods. Finally, $REPLACE_WE$ discuss some of the methods that have been developed to estimate the fault.
-
+% related work before fundamentals
+% no subsections but paragraphs
+% make it already finished
 \subsection{Human Pose Estimation}
 
 
-Human Pose Estimation using Iterative Error feedback. \cite{IterativeErrorFeedback}
-
-While OpenPose developed Hand Pose\cite{OpenPoseHand} and also Multi-Person Human Pose Estimation \cite{OpenPoseMulti}, $REPLACE_OUR$ main focus lies on their most recent pose estimator \cite{OpenPosePose} and their CNN network \cite{OpenPoseCNN}. Openpose uses affinity fields. The affinity fields are a set of 2D Gaussian distributions that are used to estimate the pose of a human. The affinity fields are used to estimate the pose of a human by estimating the probability of a joint being in a certain location. The probability of a joint being in a certain location is calculated by summing the probability of the joint being in that location for each of the Gaussian distributions.
-
-\subsubsection{Reviews}
-
-
-A review of point cloud-based human pose estimation \cite{ReviewPointcloudHPE}
-
-A review of 2D human pose estimation methods \cite{ReviewHPE}
-
 \subsubsection{RGB Pose Estimation}
 
-But $REPLACE_WE$ wont go into much detail as $REPLACE_WE$ focus on RGBD data.
-
-\textbf{This is a bit wrong, the dataset is multi modal but the definition of multimodal is different in this method, it means RGB plus D and not different angles sometimes maybe not, read it through again:}
-The limited number of multi-modal datasets causes the existence of human pose estimators for cameras from different angles to be small. One example of multi-modal human pose estimation was introduced by Jingxiao Zheng et al.\cite{MultiModalHPERGBD}. In their paper 
+% OpenPose
+While OpenPose developed Hand Pose\cite{OpenPoseHand} and also Multi-Person Human Pose Estimation \cite{OpenPoseMulti}, $REPLACE_OUR$ main focus lies on their most recent pose estimator \cite{OpenPosePose} and their CNN network \cite{OpenPoseCNN}. Openpose uses affinity fields. The affinity fields are a set of 2D Gaussian distributions that are used to estimate the pose of a human. The affinity fields are used to estimate the pose of a human by estimating the probability of a joint being in a certain location. The probability of a joint being in a certain location is calculated by summing the probability of the joint being in that location for each of the Gaussian distributions.
 
 \subsubsection{RGBD Pose Estimation}
 
-\textbf{This is a bit out of context:}
-As mentioned by Jingxiao Zheng et al. in \cite{MultiModalHPERGBD}, the key points or joints of the skeleton do not lay on the surface of the person and therefore the determination of the exact position of the joints are not a direct projection on the depth image or the point cloud.
+\subsection{Action Detection}
 
-\cite{PASCUALHERNANDEZ2022102225}
+\subsection{Fault Detection}
 
-\cite{RGBDHPEforRoboticTaskLearning}
+Human Pose Estimation using Iterative Error feedback. \cite{IterativeErrorFeedback}
+
+% \textbf{This still needs a lot of work}
+
+
+% A plethora of methods have been developed to estimate the pose of a human. In this section, $REPLACE_WE$ will discuss some of the methods that have been developed to estimate the pose of a human. Additionally, $REPLACE_WE$ discuss datasets that have been developed to test the performance of the methods. Finally, $REPLACE_WE$ discuss some of the methods that have been developed to estimate the fault.
+
+% \subsection{Human Pose Estimation}
+
+
+% Human Pose Estimation using Iterative Error feedback. \cite{IterativeErrorFeedback}
+
+% While OpenPose developed Hand Pose\cite{OpenPoseHand} and also Multi-Person Human Pose Estimation \cite{OpenPoseMulti}, $REPLACE_OUR$ main focus lies on their most recent pose estimator \cite{OpenPosePose} and their CNN network \cite{OpenPoseCNN}. Openpose uses affinity fields. The affinity fields are a set of 2D Gaussian distributions that are used to estimate the pose of a human. The affinity fields are used to estimate the pose of a human by estimating the probability of a joint being in a certain location. The probability of a joint being in a certain location is calculated by summing the probability of the joint being in that location for each of the Gaussian distributions.
+
+% \subsubsection{Reviews}
+
+
+% A review of point cloud-based human pose estimation \cite{ReviewPointcloudHPE}
+
+% A review of 2D human pose estimation methods \cite{ReviewHPE}
+
+% \subsubsection{RGB Pose Estimation}
+
+% But $REPLACE_WE$ wont go into much detail as $REPLACE_WE$ focus on RGBD data.
+
+% The limited number of multi-modal datasets causes the existence of human pose estimators for cameras from different angles to be small. One example of multi-modal human pose estimation was introduced by Jingxiao Zheng et al.\cite{MultiModalHPERGBD}. In their paper 
+
+% \subsubsection{RGBD Pose Estimation}
+
+% \textbf{This is a bit out of context:}
+% As mentioned by Jingxiao Zheng et al. in \cite{MultiModalHPERGBD}, the key points or joints of the skeleton do not lay on the surface of the person and therefore the determination of the exact position of the joints are not a direct projection on the depth image or the point cloud.
+
+% \cite{PASCUALHERNANDEZ2022102225}
+
+% \cite{RGBDHPEforRoboticTaskLearning}
 
 
 
 
-\subsection{RGBD CNNs}
+% \subsection{RGBD CNNs}
 
-Early HPE algorithm uses trees \cite{EarlyRGBDHPE}
+% Early HPE algorithm uses trees \cite{EarlyRGBDHPE}
 
-CNNs more useful for images and stuff. Cnns are not a new invention yada yada yada \cite{OldCNN}. But like many things in the neural network Biz, they were limited by the hardware available at the time. They have since formed the basis of many new methods in computer vision, such as Human Pose estimation. Especially AlexNet \cite{AlexNet} and VGG \cite{VGG} proved the potential of CNNs in Computer Vision tasks. 
+% CNNs more useful for images and stuff. Cnns are not a new invention yada yada yada \cite{OldCNN}. But like many things in the neural network Biz, they were limited by the hardware available at the time. They have since formed the basis of many new methods in computer vision, such as Human Pose estimation. Especially AlexNet \cite{AlexNet} and VGG \cite{VGG} proved the potential of CNNs in Computer Vision tasks. 
 
-\subsection{Object Detection}
+% \subsection{Object Detection}
 
-\cite{Chen2021} Proposes different methods of fusion for RGBD data.
+% \cite{Chen2021} Proposes different methods of fusion for RGBD data.
 
-\subsubsection{Depth Completion}
+% \subsubsection{Depth Completion}
 
-Realsense with Tensorflow \cite{TensorflowRealsense} uses U-Net for depth completion \cite{UNET}.
+% Realsense with Tensorflow \cite{TensorflowRealsense} uses U-Net for depth completion \cite{UNET}.
 
-\subsubsection{Action Recognition}
+% \subsubsection{Action Recognition}
 
-Cool CNN --> \cite{ElboushakiAbdessamad2020MAmf}
+% Cool CNN --> \cite{ElboushakiAbdessamad2020MAmf}
 
-Another Review on human pose estimation but this time it is for action recognition \cite{ReviewHPEforActionRecognition}
+% Another Review on human pose estimation but this time it is for action recognition \cite{ReviewHPEforActionRecognition}
 
-In \cite{Seddik2017} Seddik et al. introduce different fusion methods for action recognition. They use RGB, Depth, and Skeleton data. After detecting the features for each modality, they fuse the features using different methods as can be seen in Figure \ref{fig:fusionmethods}. Seddik et al. use different bags of visual words (BoVW).
+% In \cite{Seddik2017} Seddik et al. introduce different fusion methods for action recognition. They use RGB, Depth, and Skeleton data. After detecting the features for each modality, they fuse the features using different methods as can be seen in Figure \ref{fig:fusionmethods}. Seddik et al. use different bags of visual words (BoVW).
 
-Human3.6M: Large Scale Datasets and Predictive Methods for 3D Human Sensing in Natural Environments \cite{h36m_pami}
+% Human3.6M: Large Scale Datasets and Predictive Methods for 3D Human Sensing in Natural Environments \cite{h36m_pami}
 
-Latent Structured Models for Human Pose Estimation \cite{IonescuSminchisescu11} 
-
-\subsection{Anomaly Estimation}
-
-This is quite close to my topic I will find some papers that do this and write about them.
+% Latent Structured Models for Human Pose Estimation \cite{IonescuSminchisescu11} 
