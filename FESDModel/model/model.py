@@ -29,7 +29,7 @@ class FESD(nn.Module):
         self.joint_conv3 = nn.Conv1d(64, 128, kernel_size=3, stride=1, padding=1)
 
         # Fully connected layers
-        self.fc1 = nn.Linear(128 * 18 * 18 + 128 * 18 * 18 + 128 * 20, 1024)
+        self.fc1 = nn.Linear(128 * 4 * 4 + 128 * 4 * 4 + 128 * 20, 1024)
         self.fc2 = nn.Linear(1024, 512)
         self.fc3 = nn.Linear(512, num_classes)
 
@@ -72,8 +72,8 @@ class FESD(nn.Module):
         y = nn.functional.max_pool2d(y, kernel_size=2)
 
         # Flatten and concatenate all three inputs
-        x = x.view(-1, 128 * 18 * 18)
-        y = y.view(-1, 128 * 18 * 18)
+        x = x.view(-1, 128 * 4 * 4)
+        y = y.view(-1, 128 * 4 * 4)
         z = z.view(-1, 128 * 20)
 
         w = torch.cat([x, y, z], dim=1)
@@ -82,8 +82,6 @@ class FESD(nn.Module):
         w = self.dropout(nn.functional.relu(self.fc1(w)))
         w = self.dropout(nn.functional.relu(self.fc2(w)))
         w = self.fc3(w)
-
-        # w = nn.functional.log_softmax(w, dim=1)
 
         return w
 

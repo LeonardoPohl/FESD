@@ -114,14 +114,20 @@ class FESDDataset(data.Dataset):
     
   def get_frame_v1(self):
     rgb_im = self.get_rgb_im()
+    rgb_im = ImageOps.scale(rgb_im, self.im_size/float(self.frame.im_size))
+    rgb_im = self.to_tensor(rgb_im).float() / 255.
+
     depth_im = self.get_depth_im()
-    
+    depth_im = ImageOps.scale(depth_im, self.im_size/float(self.frame.im_size))
+    depth_im = depth_im.split()[0]
+    depth_im = self.to_tensor(depth_im).float() / 255.
+        
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
 
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
     gt = err2gt(errors, self.mode)
-
-    return self.to_tensor(rgb_im), self.to_tensor(depth_im), pose_2d, gt, self.frame.session
+    
+    return rgb_im, depth_im, pose_2d, gt, self.frame.session
 
   
   def get_frame_v2(self):
