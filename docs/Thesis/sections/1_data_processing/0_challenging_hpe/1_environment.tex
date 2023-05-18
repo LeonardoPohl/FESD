@@ -1,0 +1,29 @@
+\subsection{Environment}
+
+The environment in which the data is recocorded can be an issue that is sometimes hard, if not impossible, to fix. The environment can cause issues in the human pose estimation process if it is not controlled. The environment can be split into multiple categories, which are discussed in the following sections. The mentioned difficulties depend on how the method itself works. For example, if a method uses RGB data, the background might be an issue, whereas if a method uses depth data, the lighting is more of an issue.
+
+\subsubsection{Background}
+
+The background of the scene can cause difficulties in the human pose estimation process. Methods using RGB cameras might have difficulties detecting the difference between the foreground and the background. In RGBD-based methods, the background can cause depth ambiguities which might even prevent the human from being detectable, especially if the background is reflective, or too close to the user.
+
+\subsubsection{Lighting}
+
+While RGB cameras are not affected by too much light, RGBD cameras are heavily influenced by light as most detection methods involve some form of light, be it visible to the human eye or not.
+
+Most RGBD cameras use infrared light to determine the depth of the scene, some use a pattern of infrared light that is projected onto the scene and distorted by physical objects and some use the time-of-flight method to determine the depth of the scene. The issue that arises with infrared light is that it is also emitted by the sun. This means that light emitted by the sun can interfere with the infrared light emitted by the camera. This can cause the depth of the scene to be incorrect or missing in parts with a high intensity of sunlight.
+
+To reduce the effect of the sunlight, the camera can be placed in a room with curtains or blinds. This will reduce the amount of sunlight that enters the room and therefore reduce the effect of the sunlight on the camera. Since lighting is hard to perfectly reproduce without a controlled environment, the lighting is not varied throughout the experiments. Therefore, $REPLACE_WE$ do all of the recordings in a room without any natural light or at night.
+
+However, if a method heavily relies on RGB data for the pose estimation, eliminating any form of light is not a valid option since then the data that can be gathered by RGB cameras is very limited and may result in a wrong pose.
+
+\subsubsection{Objects}
+
+The objects in the scene may cause issues in the human pose estimation process if they either occlude the user or are too close to the user. Occlusion can cause inaccurate or missing joints. Whereas objects that are too close to the user can cause joints to move to these objects instead.
+
+Therefore, it is essential to keep the area of detection as clear as possible to avoid any occlusion or interference with the pose estimation.
+
+\subsubsection{Chair}
+
+If the exercise is performed in a sitting position the chair might influence the accuracy of HPE. For example, wheelchairs pose a problem in some estimators but a significant part of SilverFit's users are using wheelchairs due to health conditions. Furthermore, bulky chairs that go higher than the head may prevent accurate head detection and silhouette estimation, which is also sometimes used instead of the pose.
+
+In some cases it is not possible to change the chair, either there are no other chairs available, or the person has to sit in a wheelchair. If human pose estimation does not work reliably in these cases alternatives have to be found or the skeleton has to be somehow fixed.

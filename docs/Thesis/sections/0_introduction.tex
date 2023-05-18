@@ -10,7 +10,37 @@ For some exercises designed by SilverFit and other companies, human pose estimat
 
 In this chapter, the research question that is answered in this thesis is discussed. Furthermore, the procedure with which the research question is answered is laid out. Finally, the fundamentals of human pose estimation and the metrics that are used to analyse the results are discussed, and related work is presented.
 
+
+\subsubsection{Applications of human pose estimation}
+% Should be in the introduction and not headers necessary
+Human pose estimation finds application in many different fields. In this chapter some of the most common applications of human pose estimation are mentioned.
+
+\paragraph{Gaming and entertainment}
+
+Gaming and entertainment is one of the most common applications of human pose estimation. Games can use human pose estimation in a way that makes the interaction between humans and computers very natural. One of the systems that kickstarted the use of depth cameras in games was the Xbox Kinect by Microsoft. The Kinekt used a depth camera to track the movement of the player and used this information to control the games. \cite[Citation needed]{}
+
+However, since human pose estimation requires space and a good camera, it is not as wide spread as conventional input peripherals.
+
+\paragraph{Autonomous Driving}
+
+Autonomous driving has been in development ever since humans replaced horses with cars\cite{OldAutoDrive}. However, the development of autonomous driving has been very slow. The main reason for this is that autonomous driving requires a lot of information about the environment. This information is usually provided by sensors that are installed in the car. However, sensors alone do not always suffice. In some cases, cars need to be able to estimate the pose of a human to make a decision. The posture of a human can be used to determine the action and therefore the future trajectory of the person. 
+
+\paragraph{Animation}
+
+To exactly emulate human movements in animation, animators can either manually move the joints of a digital skeleton or they can use real human\footnote{Or animal} actors to provide the movement for them. The manual creation of realistic movement is oftentimes very time-consuming and also error-prone. Therefore, animators often use real human actors to provide the movement for them. This provides animators with a skeleton and movement which is accurate and does not include human error. In large production studios, this is often done with motion capture or MoCap. 
+
+MoCap is a technique that uses cameras to capture the movement of a human actor. The cameras are placed around the actor and record the movement of the actor. The actor usually wears a suit that is covered with markers. These markers are used to determine the position of the actor. To reduce the amount of occlusion of the markers a large number of cameras are used. This allows the cameras to capture the movement of the actor from different angles. However, this also increases the price of development. In cases where MoCap is not a viable option, animators can use human pose estimation to estimate the pose of a human actor using cheaper RGB cameras or RGBD cameras.
+
+\paragraph{Security}
+
+Another application of human pose estimation is the detection of annomalous behaviour. The detection of such behaviour can be used to prevent security incidents in public spaces.
+
+\paragraph{Healthcare}
+
+To aid in the rehabilitation of patients as well as to improve the quality of life of elderly people, human pose estimation can be used to detect the pose of a person and provide feedback on the pose of the person during exercises.\cite{ClinicalApplicationChen}
+
+
 \input{sections/0_introduction/2_research_question.tex}
 \input{sections/0_introduction/3_process_pipeline.tex}
-\input{sections/0_introduction/4_fundamentals.tex}
-\input{sections/0_introduction/5_related_work.tex}
+\input{sections/0_introduction/4_related_work.tex}
+\input{sections/0_introduction/5_fundamentals.tex}

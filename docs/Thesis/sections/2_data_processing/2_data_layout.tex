@@ -1,9 +1,0 @@
-\section{Data layout}
-
-As mentioned earlier, the data is made up of multiple different streams or modalities. There are two separate visual streams, the RGB stream, and the depth stream, as well as the estimated human pose, the time stamps, and the recording metadata.
-
-The visual streams are normalised and combined into a single file. OpenCV is used to store the RGB and the depth data into a single matrix and after the stream into a single file per frame. The RGB data is normalised to have values between 0 and 1, whereas the depth data is stored in meters.
-
-The pose that is estimated by Nuitrack, as well as the error labels, are stored in a separate JSON file. The separate frames are stored in a list of frames. Each frame contains a list of all people that were detected. Each person contains a list of joints as well as an error label. Each joint is stored with real-world 3D coordinates which are stored in meters. These real-world coordinates are labelled $x$, $y$, and $z$. Additionally, the 2D projection and depth of the joint are stored in image coordinates and meters for the depth. The 2D projection is labelled $u$ and $v$ and the depth is labelled $d$. 
-
-The error label is an integer which is the error id specific for joint and skeleton errors. The errors corresponding to the error ids are explained in section \ref{sec:data_labeling}. Finally, the timestamp of each frame is stored.

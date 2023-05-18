@@ -17,15 +17,21 @@ Making the dataset and evaluating the model for fault estimation in human pose e
 \clearpage
 
 \begin{abstract}
-    
-  % First paragraph is not about skeleton
-  From early punch cards to the more recent voice activation, with each new technology, the interaction between humans and computers has become more natural and unobtrusive. One of these newer advances is the interaction with computers based on visual input. Thanks to faster and more available hardware, we can analyse video streams in real time and use the information to enable the interaction between humans and computers. However, this interaction is not always as accurate as desired.
+    \textbf{Supervisor notes:}      
+      \textit{   First paragraph is not about skeleton}
+      
+      \textit{    In collaboration with SilverFit not in abstract put it in more general}
+      
+      \textit{      name general applications}
+      
+      \textit{      Dataset should have a name}
+      
+      \textit{       some prelimenary results}
+  
+  Human pose estimation has been a topic of research for many years. With the advancement of hardware, it has become viable to apply human pose estimation in real time applications such as games and rehabilitation. However, human pose estimation is a difficult task that is prone to errors, especially in complicated situations, such as a hospital environment. These errors can be caused by different factors, such as the environment, the camera, and the person. These errors can cause the joints of the pose to be in the incorrect position or missing. This can cause the pose estimation to be incorrect, and therefore, the human-computer interaction will be hampered. The goal of this thesis is to develop a method that allows for the detection of these errors such that the pose information can either be improved on them or that the error can be handled accordingly.
 
-  In the scope of this thesis, a method is developed that is capable of capturing and labelling multi-modal data, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). Using the dataset that is recorded and labelled using FESDData, I developed a model which aims to detect if an error occurs, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Model} (FESDModelv2). FESDModelv2 is an improvement over an older model that was also developed in the scope of this thesis. The new version uses transfer learning to extract the features from the data. This thesis is written in collaboration with SilverFit, a serious gaming company that develops video games for rehabilitation purposes. SilverFit deals with unnatural poses due to injury or old age in a lot of cases. 
-% In collaboration with SilverFit not in abstract put it in more general
-% name general applications
-% Dataset should have a name
-% some prelimenary results
+  In the scope of this thesis, a method is developed that is capable of capturing and labelling multi-modal data, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). Using the dataset that is recorded and labelled using FESDData, I developed a model which aims to detect if an error occurs, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Model} (FESDModelv2). FESDModelv2 is an improvement over an older model that was also developed in the scope of this thesis. The new version uses transfer learning to extract the features from the data. This might prove useful for the development of applications which rely on human pose estimation.
+
   The result of my research shows that the collected and labelled data is not enough to create a generalised model for error detection. There are too many parameters  However, the developed method for data collection might still prove useful in future applications. This opens ways to improve the quality of the interaction between humans and computers by improving the robustness of human pose estimation.
    
 \end{abstract}

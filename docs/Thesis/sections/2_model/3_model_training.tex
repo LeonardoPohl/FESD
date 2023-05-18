@@ -1,0 +1,10 @@
+\section{Experimental Setup}
+\label{sec:model_training}
+
+
+
+To train a neural network with supervised learning, you first pass the input data into the network and forward it through the defined layers. Then a loss is calculated an is is back propagated through the network to adapt the weights accordingly. 
+
+As mentioned earlier, error or anomaly detection for human pose estimation can be seen as a multi-class multi-object classification problem. The loss function needs to be chosen such that it best reflects the data and the efficacy of the model. In most classification problems \textit{Cross Entropy Loss} is calculated and propagated through the network to adapt the weights and convolutions accordingly. Cross entropy loss calculates the soft max of the result and compares it to the ground truth. The soft max calculates the probability of each index in a list based on the value at that index. Cross Entropy Loss penalises the results based on the probability of the target class.
+
+However, since multiple objects, or areas, are considered the loss function has to be split the loss function and apply it area wise. This is done by calculating the loss for each area and then summing the losses and calculating the average. This is done to ensure that the model is not biased toward any particular area. 
