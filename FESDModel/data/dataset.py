@@ -58,12 +58,13 @@ class FESDDataset(data.Dataset):
         self.size += data['Frames']
         self.frames_per_session = data['Frames']
         self.recording_jsons.append(data)
-
+    
     self.use_v2 = use_v2
     self.mode = mode
     self.augmentation_params = AugmentationParams(crop_random=False, crop_pad=0, gaussian=False)
     self.randomize_augmentation_params = randomize_augmentation_params
-    self.to_tensor = transforms.Compose([transforms.PILToTensor()])
+    self.to_tensor = True
+    self.pil_to_tensor = transforms.Compose([transforms.PILToTensor()])
 
   def reset_augmentation_params(self):
     self.randomize_augmentation_params = False
@@ -115,14 +116,25 @@ class FESDDataset(data.Dataset):
   def get_frame_v1(self):
     rgb_im = self.get_rgb_im()
     rgb_im = ImageOps.scale(rgb_im, self.im_size/float(self.frame.im_size))
-    rgb_im = self.to_tensor(rgb_im).float() / 255.
+    if self.to_tensor:
+      rgb_im = self.pil_to_tensor(rgb_im).float() / 255.
 
     depth_im = self.get_depth_im()
     depth_im = ImageOps.scale(depth_im, self.im_size/float(self.frame.im_size))
     depth_im = depth_im.split()[0]
-    depth_im = self.to_tensor(depth_im).float() / 255.
+
+    assert depth_im.size[0:2] == rgb_im.size[0:2]
+    assert depth_im.size[0:2] == (self.im_size, self.im_size)
+
+    if self.to_tensor:
+      depth_im = self.pil_to_tensor(depth_im).float() / 255.
         
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
+    
+    pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
+    pose.unsqueeze(0)
+    pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
+    pose_im = ImageOps.scale(pose_im, self.im_size/float(self.frame.im_size))
 
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
     gt = err2gt(errors, self.mode)
@@ -143,7 +155,11 @@ class FESDDataset(data.Dataset):
     
     merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
     merged_image = ImageOps.scale(merged_image, self.im_size/float(self.frame.im_size))
-    return self.to_tensor(merged_image), gt, self.frame.session
+
+    if self.to_tensor:
+      merged_image = self.pil_to_tensor(merged_image)
+
+    return merged_image, gt, self.frame.session
 
   def get_index(self, index):
     session = index // self.frames_per_session

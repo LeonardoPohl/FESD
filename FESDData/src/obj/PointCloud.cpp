@@ -108,15 +108,14 @@ namespace GLObject
             if (m_State == m_State.STREAM) {
                 depth = static_cast<const int16_t*>(cam->getDepth());
                 if (depth != nullptr) {
-                    // streamDepth(cam_index, depth);
+                    streamDepth(cam_index, depth);
                 }
             }
 
-            /*if (false)
-                GLCall(glBufferSubData(GL_ARRAY_BUFFER, 
-                                        sizeof(Point) * m_ElementOffset[cam_index], 
-                                        sizeof(Point) * m_NumElements[cam_index], 
-                                    m_Points[cam_index].get()));*/
+            GLCall(glBufferSubData(GL_ARRAY_BUFFER, 
+                                    sizeof(Point) * m_ElementOffset[cam_index], 
+                                    sizeof(Point) * m_NumElements[cam_index], 
+                                m_Points[cam_index].get()));
         }
     }
 
