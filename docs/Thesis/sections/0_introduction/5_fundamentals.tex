@@ -40,7 +40,13 @@ Additionally, some datasets are captured with depth cameras. Depth cameras are c
 
 Finally, there are also methods of human pose estimation that use point clouds. Point clouds are a collection of points in space, which can be used to represent the shape of an object. Each point in the point cloud represents a point in the environment. The point cloud is created using the depth information of a scene and the intrinsics of a camera, i.e. the field of view and the focal point of the camera. A point cloud is a reconstruction of the real world scene. Point clouds are often used in combination with RGB data. Some of the most common datasets that are captured with depth cameras are the SMMC-10 dataset\cite{SMMC10}, and the EVAL dataset\cite{EVAL}. However, any RGBD dataset can be used to train and test point cloud-based pose estimation algorithms if the camera intrinsics and extrinsic, such as the horizontal and vertical field of view, the focal point, and the depth units are known. With the knowledge of these parameters, the depth information can be converted to a point cloud and if the RGB data is in line with the depth data, the individual points can be coloured accordingly.
 
-\subsection{Neural Networks}
+\subsection{Convolutional Neural Networks}
+
+Convolutional neural networks are a type of neural network that is commonly used for image classification and object detection. Convolutional neural networks are a type of feed-forward neural network that uses convolutional layers. Convolutional layers are layers that use a convolutional operation to extract features from the input. The convolutional operation is a mathematical operation that is used to extract features from an image. 
+
+In most cases the features that are produced by multiple convolutional layers are forwarded into fully connected layers. These layers learn the features based on the input data. The fully connected layers are usually followed by a softmax layer. The softmax layer is used to calculate the probability of each class. The class with the highest probability is then used as the prediction of the network.
+
+Since convulutional neural networks require a lot of data to be trained properly, transfer learning is applied in some cases. Transfer learning is a technique that uses a pretrained model to extract features from the input data. The pretrained model is usually trained on a large dataset, such as ImageNet\cite{ImageNet}. The pretrained model is then used to extract features from the input data. These features are then used to train a new model. This allows the new model to be trained with less data and therefore less time. Additionally, the pretrained model is usually trained on a large dataset and therefore the features that are extracted are more general and can be used for different tasks. 
 
 \subsection{Evaluation metrics}
 
@@ -53,6 +59,7 @@ A confusion matrix is a graph which represents the false positives and the true 
 \begin{table}[]
     \caption{The confusion matrix for binary classification.}
     \label{tab:confusion_matrix}
+    \centering
     \begin{tabular}{l|ll}
     PRED \textbackslash GT & TRUE & FALSE \\ \hline
     TRUE                   & TP   & FP    \\
@@ -108,8 +115,4 @@ The Cohen's kappa coefficient is an inter-rater reliability measure\cite{kappa}.
     \kappa = \frac{2(tp \cdot tn - fn \cdot fp)}{(tp + fp)(fp+tn) + (tp + fn)(fn + tn)}
 \end{equation}
 
-If Cohens Kappa is less than 0, there is no agreement between the two raters. If the kappa score is less than 0.5 there is a slight agreement. A score of more than 0.8 is considered as almost perfect. However, this variies from field to field.
-
-\subsubsection{Cross-Entropy Loss}
-
-
+If Cohens Kappa is less than 0, there is no agreement between the two raters. If the kappa score is less than 0.5 there is a slight agreement. A score of more than 0.8 is considered as almost perfect. However, the "exact" values vary from application to application.

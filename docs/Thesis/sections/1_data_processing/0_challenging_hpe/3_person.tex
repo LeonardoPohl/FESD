@@ -25,7 +25,7 @@ The exercises are numbered according to the difficulty. The first letter is an i
 
 Trivial exercises are exercises that are easy to detect and are therefore good for testing the pose estimators. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. The two trivial exercises can be seen in table \ref{tab:trivial_exercises}. Example images of the exercises can be seen in figure \ref{fig:trivial_exercises}.
 
-\begin{table}[]
+\begin{table}[ht]
   \caption[Trivial Exercises]{The two Trivial Exercises, E-0.00 and E-0.01.}
   \label{tab:trivial_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
@@ -36,7 +36,9 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
   \end{tabular}
 \end{table} 
 
-\begin{figure}
+
+
+\begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
@@ -57,12 +59,12 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
 
 Easy exercises are essential for creating a good baseline of how the pose estimators should work. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to detect. The easy exercises can be seen in table \ref{tab:easy_exercises}. Example images of the exercises can be seen in figure \ref{fig:easy_exercises}.
 
-\begin{table}[]
+\begin{table}[ht]
   \caption[Easy Exercises]{The Easy exercises, E-1.00 through E-1.03. The easy exercises include both standing and sitting exercises.}
   \label{tab:easy_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
-  Exercise & Short Description             & Challenge                                                                                                                                                                                           \\ \hline
+  Exercise & Short Description             & Challenge \\ \hline
   E-1.00   & Raising the arms to the side  & Now the arms are no longer stationary. Still, there is no Occlusion. \\
   E-1.01   & Raising the arms to the front & The arms might occlude themselves and part of the body.  \\
   E-1.02   & Raise the knees to the chest  & The legs now occlude parts of the hip.  \\
@@ -71,7 +73,8 @@ Easy exercises are essential for creating a good baseline of how the pose estima
   \end{table}
 
 
-  \begin{figure}
+
+  \begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
@@ -116,7 +119,7 @@ Easy exercises are essential for creating a good baseline of how the pose estima
 
 Exercises which are performed in a seated position are harder to detect since parts of the body are occluded. Medium exercises focus on exercises, which are performed in a seated position. The medium exercises can be seen in table \ref{tab:medium_exercises}. Example images of the exercises can be seen in figure \ref{fig:medium_exercises}.
 
-\begin{table}[]
+\begin{table}[ht]
   \caption[Medium Exercises]{The Medium exercises, E-2.00 through E-2.03. The medium exercises are all in a sitting position.}
   \label{tab:medium_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
@@ -130,7 +133,8 @@ Exercises which are performed in a seated position are harder to detect since pa
   \end{table}
 
 
-  \begin{figure}
+
+  \begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
@@ -171,14 +175,13 @@ Exercises which are performed in a seated position are harder to detect since pa
     \label{fig:medium_exercises}
   \end{figure}  
 
-
 \paragraph{Difficult Exercises}
 
 Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for the pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world exercises.
 
 Tölgyessy et al. found that facing away from the camera decreases the accuracy of HPE due to self-occlusion. \cite{HPEIsHard} Therefore, some of the exercises will be performed facing away from the camera. The difficult exercises can be seen in table \ref{tab:difficult_exercises}. Example images of the exercises can be seen in figure \ref{fig:difficult_exercises}.
 
-\begin{table}[]
+\begin{table}[ht]
   \caption[Difficult Exercises]{The Difficult exercises, E-3.00 through E-3.02. The difficult exercises are all in a standing position.}
   \label{tab:difficult_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
@@ -190,7 +193,9 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
   \end{tabular}
 \end{table}
 
-\begin{figure}
+
+
+\begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.16\linewidth}
       \centering

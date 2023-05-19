@@ -1,7 +1,25 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-In Conclusion, $REPLACE_WE$ can see that ... \textbf{Not sure what $REPLACE_WE$ can see yet}
+In the scope of this thesis, I analysed common problems of human pose estimation and derived exercises which cause issues in a controlled manner. Using these exercises I captured and labelled FESDDataset using a custom tool for multi-modal stream capture and error labelling for human pose estimation. To investigate different problem areas I defined four different problem sets which incompass different abstractions of the problem. 
 
-\input{sections/4_conclusion/1_contribution.tex}
-\input{sections/4_conclusion/2_future_work.tex}
+Using the dataset I trained eight models, FESDModel, two for each problem set, version one of the model, FESDModelv1, uses a custom feature extractor, which extracts the features of each modality individually and then combines all features into a single feature vector where it is passed into a fully connected layer. Version two of the model, FESDModelv2, uses a pre-trained EfficientNetv2 to extract the features from a single RGB image. The features are then passed into a fully connected layer.
+
+Two of the eight trained models achieve arguably good results. With an accuracy of $0.89$ and an F1-score of $0.64$ the best performing model is FESDModelv2 trained on the joint problem set. The second best performing model is FESDModelv2 trained on the half-body problem set with an accuracy of 0.65 and and F1-score of 0.49. FESDModelv2 is overfitting on each of the other problem sets and only predicting that there is no error. %FESDModelv1 is overfitting on all problem sets.
+
+The code of this thesis is available on GitHub\footnote{\url{https://github.com/LeonardoPohl/FESD}}. The repository is divided into two major parts, FESDData, which contains the C++ implementation of FESDData recorded, FESDModel, which contains the implementation of the model, FESDModelv1 and FESDModelv2, as well as the Jupyter notebooks that were used to evaluate the dataset, to train and evaluate the model.
+
+\section{Future work}
+\label{sec:future_work}
+
+To further improve the dataset and the model, FESDData and FESDDataset could be expanded to include the accurate position of the joints in the image. This would allow for the use of the dataset for error correction.
+
+To improve the quality of FESDModel, more data needs to be collected and labelled in different settings. The current dataset is limited to a single room with a single camera. To improve the model, the dataset needs to be expanded to include different scenes, different pices of clothing and different camera angles. These additions might prevent the model from overfitting. Additionally, the model could be improved by using a different backbone, which is not as performant but more accurate, such as EfficientNet, or by using a different loss function, such as focal loss, which.
+
+\subsection{Possible applications}
+
+FESD might find several different areas of application in the future. Firstly, the trained model can be used to assist in developing games and other applications that utilise Human Pose estimation. In its simplest application it may be used to warn users of possible errors when the skeleton is not detected correctly. In more advanced cases the information provided by the model could be used to attempt to fix joints through joint position interpolation and prediction rather than using the faulty joint. Moreover, multiple human pose estimators could be considered resulting in an overall more robust human pose estimation.
+
+Furthermore, if the model proves to have a high accuracy for a specific use-case, it could be used to train a better pose detector in the same way as it is proposed by Jo\~ao Carreira et al. in \cite{IterativeErrorFeedback}.
+
+The dataset and the dataset recorder may also be used to further the development for FESDModel and it can also find application in other areas such as recording datasets for action recognition. The dataset in and of itself can be used for action detection. The exercises are predefined and can be recorded and automatically labeled by FESDData, thereby making it easy to record large amounts of data without requiring manual labelling.
