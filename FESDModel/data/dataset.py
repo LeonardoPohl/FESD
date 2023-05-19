@@ -122,12 +122,13 @@ class FESDDataset(data.Dataset):
     depth_im = self.get_depth_im()
     depth_im = ImageOps.scale(depth_im, self.im_size/float(self.frame.im_size))
     depth_im = depth_im.split()[0]
-
-    assert depth_im.size[0:2] == rgb_im.size[0:2]
-    assert depth_im.size[0:2] == (self.im_size, self.im_size)
-
     if self.to_tensor:
       depth_im = self.pil_to_tensor(depth_im).float() / 255.
+
+    if self.to_tensor:
+      assert depth_im.size()[1:] == rgb_im.size()[1:]  
+      if depth_im.size()[1:] != (self.im_size, self.im_size):
+        print(f"{depth_im.size()[1:]} != {(self.im_size, self.im_size)}")
         
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
     

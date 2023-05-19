@@ -58,7 +58,7 @@ def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, us
       bounding_boxes_3d[0] = np.minimum(bounding_boxes_3d[0], [joint['x'], joint['y'], joint['z']])
       bounding_boxes_3d[1] = np.maximum(bounding_boxes_3d[1], [joint['x'], joint['y'], joint['z']])
 
-    if use_v2:
+    if use_v2 or True:
       joints_2d = np.append(joints_2d, [[
         joint['u'],
         joint['v'],
@@ -143,38 +143,43 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
   with open(file=recording_dir /  session['Skeleton'], mode='r') as file:
     skeleton_json = json.load(file)[frame_id * 10]
     pose_2d, pose_3d, errors, bounding_boxes_2d, bounding_boxes_3d = load_skeletons(skeleton_json, params.flip, mode, use_v2)
-  im_size = int(np.floor(max(abs(bounding_boxes_2d[1][0] - bounding_boxes_2d[0][0]), abs(bounding_boxes_2d[1][1] - bounding_boxes_2d[0][1])))) + params.crop_pad
+  im_size = int(np.floor(max(abs(bounding_boxes_2d[1][0] - bounding_boxes_2d[0][0]), 
+                             abs(bounding_boxes_2d[1][1] - bounding_boxes_2d[0][1])))) + params.crop_pad
   im_size = min(im_size, min(rgb.shape[0], rgb.shape[1]))
   pose_im = np.zeros_like(depth)
-  
+
   for pose in pose_2d:
-    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in [-3, -2, -1, 0, 1, 2, 3] for y in [-3, -2, -1, 0, 1, 2, 3]]
+    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in range(-2, 3) for y in range(-2, 3)]
     
     for x, y in coords:
       pose_im[x, y] = 255
+
+  rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d) 
 
   if params.flip:
     rgb = np.flip(rgb, axis=1)
     depth = np.flip(depth, axis=1)
     pose_im = np.flip(pose_im, axis=1)
 
-  rgb, depth, pose_im = crop(rgb, depth, pose_im, im_size, params, bounding_boxes_2d) 
   rgb, depth = rgb.astype(dtype=np.float16), depth.astype(dtype=np.float16)
+
+  if rgb.shape[0] != rgb.shape[1]:
+    print("WARNING: Image not square!")
 
   return Frame(rgb, depth, pose_im, pose_2d, pose_3d, errors, session, im_size)
 
 
 def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):
   min_mi_x, min_mi_y, min_ma_x, min_ma_y = 0, 0, 0, 0
-  max_mi_x, max_mi_y, max_ma_x, max_ma_y = image_1.shape[0], image_1.shape[1], image_1.shape[0], image_1.shape[1]
-  
-  mi_x = int(np.floor(bounding_boxes_2d[0][0]))
-  mi_y = int(np.floor(bounding_boxes_2d[0][1]))
+  max_mi_x, max_mi_y, max_ma_x, max_ma_y = image_1.shape[1], image_1.shape[0], image_1.shape[1], image_1.shape[0]
+
+  mi_x = max(int(np.floor(bounding_boxes_2d[0][0])), 0)
+  mi_y = max(int(np.floor(bounding_boxes_2d[0][1])), 0)
   min_mi_x, min_mi_y = 0, 0
   max_mi_x, max_mi_y = mi_x, mi_y
 
-  ma_x = int(np.floor(bounding_boxes_2d[1][0]))
-  ma_y = int(np.floor(bounding_boxes_2d[1][1]))
+  ma_x = min(int(np.floor(bounding_boxes_2d[1][0])), max_ma_x)
+  ma_y = min(int(np.floor(bounding_boxes_2d[1][1])), max_ma_y)
   min_ma_x, min_ma_y = ma_x, ma_y
   max_ma_x, max_ma_y = image_1.shape[1], image_1.shape[0]
 
@@ -223,5 +228,20 @@ def crop(image_1, image_2, image_3, im_size, params, bounding_boxes_2d):
     pad_ma_y = pad_mi_y + (1 if pad_mi_y * 2 + (ma_y - mi_y) != im_size else 0)
     
     mi_y, ma_y = pad(mi_y, ma_y, pad_mi_y, pad_ma_y, min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
-    
+
+  if ma_y - mi_y != ma_x - mi_x: 
+    diff_x = (ma_x - mi_x)
+    diff_y = (ma_y - mi_y)
+    print(f"WARNING: Image is not square (x:{diff_x}, y:{diff_y}) attempting to fix...")
+
+    if diff_y > diff_x:
+      diff = diff_y - diff_x
+      pad(mi_x, ma_x, diff // 2, diff // 2 + (1 if diff % 2 == 1 else 0), min_mi_x, max_mi_x, min_ma_x, max_ma_x, True)
+    else:
+      diff = diff_x - diff_y
+      pad(mi_y, ma_y, diff // 2, diff // 2 + (1 if diff % 2 == 1 else 0), min_mi_y, max_mi_y, min_ma_y, max_ma_y, True)
+
+    if ma_y - mi_y != ma_x - mi_x:
+      raise Exception(f"Failed to fix image (x:{ma_x - mi_x}, y:{ma_y - mi_y})")
+
   return image_1[mi_y:ma_y, mi_x:ma_x], image_2[mi_y:ma_y, mi_x:ma_x], image_3[mi_y:ma_y, mi_x:ma_x]

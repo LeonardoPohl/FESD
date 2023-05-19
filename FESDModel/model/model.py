@@ -72,8 +72,8 @@ class FESD(nn.Module):
         y = nn.functional.max_pool2d(y, kernel_size=2)
 
         # Flatten and concatenate all three inputs
-        x = x.view(-1, 128 * 4 * 4)
-        y = y.view(-1, 128 * 4 * 4)
+        x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3])
+        y = y.view(-1, y.shape[1] * y.shape[2] * y.shape[3])
         z = z.view(-1, 128 * 20)
 
         w = torch.cat([x, y, z], dim=1)
