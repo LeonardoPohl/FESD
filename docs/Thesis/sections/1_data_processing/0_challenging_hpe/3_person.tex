@@ -4,7 +4,7 @@ Finally, one of the main error sources of human pose estimation is the person. T
 
 \subsubsection{Clothes}
 
-As mentioned earlier, most RGBD cameras use infrared light to determine the depth of the scene. This means that the clothes of the user can cause more or less absorption of light and therefore influence the detected depth. This can cause the joints to be detected in the wrong position or not at all. This is especially the case for dark clothes, as they absorb more light than light clothes.
+As mentioned earlier, most RGB-D cameras use infrared light to determine the depth of the scene. This means that the clothes of the user can cause more or less absorption of light and therefore influence the detected depth. This can cause the joints to be detected in the wrong position or not at all. This is especially the case for dark clothes, as they absorb more light than light clothes.
 
 Furthermore, bulky clothes or skirts and dresses may influence the pose, since the exact position of the legs is not visible.
 
@@ -19,11 +19,25 @@ Finally, the most important factor is the exercise that is carried out. In this 
 
 These exercises might not be the most realistic, but they represent common issues with pose estimation in a reproducible manner. Furthermore, these exercises are not too difficult to perform, which makes them suitable for testing the pose estimators. The difficulty rating of the exercise might not reflect the difficulty of the exercise for the user, but it does reflect the difficulty of the exercise for the pose estimator.
 
-The exercises are numbered according to the difficulty. The first letter is an identifier that is an exercise. The first digit indicates the difficulty of the exercise, while the second digit indicates the number of the exercise. The difficulty is rated from 0 to 4, where 0 is the easiest and 4 is the most difficult. The exercises are divided into four categories: trivial, easy, medium and hard.
+The exercises are numbered according to the difficulty. An example of the naming of the exercises can be seen here:
+
+\[
+    \underbrace{E}_\text{Exercise}-\overbrace{2}^\text{Difficulty}.\underbrace{02}_\text{Exercise Id}
+\]
+
+The different difficulties are numbered as follows:
+
+\begin{enumerate}
+    \addtocounter{enumi}{-1}
+    \item Trivial
+    \item Easy
+    \item Medium
+    \item Hard
+\end{enumerate}
 
 \paragraph{Trivial Exercises}
 
-Trivial exercises are exercises that are easy to detect and are therefore good for testing the pose estimators. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. The two trivial exercises can be seen in table \ref{tab:trivial_exercises}. Example images of the exercises can be seen in figure \ref{fig:trivial_exercises}.
+Trivial exercises are exercises that are easy to detect and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. The two trivial exercises can be seen in table \ref{tab:trivial_exercises}. Example images of the exercises can be seen in figure \ref{fig:trivial_exercises}.
 
 \begin{table}[ht]
   \caption[Trivial Exercises]{The two Trivial Exercises, E-0.00 and E-0.01.}
@@ -36,28 +50,28 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
   \end{tabular}
 \end{table} 
 
-
-
 \begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/trivial/E-0.00_10.png}
       \caption[]{E-0.00}
+      \label{fig:trivial_0}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/trivial/E-0.01_38.png}
       \caption[]{E-0.01}
+      \label{fig:trivial_1}
   \end{subfigure}
-  \caption[Trivial Exercises]{The two trivial exercises. (a) Arms hanging to the side. (b) Arms extended to the side.}
+  \caption[Trivial Exercises]{The two trivial exercises. (\ref{fig:trivial_0}) Arms hanging to the side. (\ref{fig:trivial_1}) Arms extended to the side.}
   \label{fig:trivial_exercises}
 \end{figure}  
 
 \paragraph{Easy Exercises}
 
-Easy exercises are essential for creating a good baseline of how the pose estimators should work. These exercises are not too difficult to detect and are therefore good for testing the pose estimators. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to detect. The easy exercises can be seen in table \ref{tab:easy_exercises}. Example images of the exercises can be seen in figure \ref{fig:easy_exercises}.
+Easy exercises are essential for creating a good baseline of how the pose estimators should work. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to detect. The easy exercises can be seen in table \ref{tab:easy_exercises}. Example images of the exercises can be seen in figure \ref{fig:easy_exercises}.
 
 \begin{table}[ht]
   \caption[Easy Exercises]{The Easy exercises, E-1.00 through E-1.03. The easy exercises include both standing and sitting exercises.}
@@ -72,46 +86,50 @@ Easy exercises are essential for creating a good baseline of how the pose estima
   \end{tabular}
   \end{table}
 
-
-
   \begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.00_126.png}
         \caption[]{E-1.00}
+        \label{fig:easy_0_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.00_137.png}
         \caption[]{E-1.00}
+        \label{fig:easy_0_1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.01_188.png}
         \caption[]{E-1.01}
+        \label{fig:easy_1_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.01_197.png}
         \caption[]{E-1.01}
+        \label{fig:easy_1_1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.02_230.png}
         \caption[]{E-1.02}
+        \label{fig:easy_2_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/easy/E-1.03_301.png}
         \caption[]{E-1.03}
+        \label{fig:easy_3_0}
     \end{subfigure}
-    \caption[Easy Exercises]{The four easy exercises. (a) Raising the arms to the side. (b) Raising the arms to the front. (c) Raising the knee up to the chest. (d) Sitting in a chair motionless.}
+    \caption[Easy Exercises]{The four easy exercises. (\ref{fig:easy_0_0}, \ref{fig:easy_0_1}) Raising the arms to the side. (\ref{fig:easy_1_0}, \ref{fig:easy_1_1}) Raising the arms to the front. (\ref{fig:easy_2_0}) Raising the knee to the chest. (\ref{fig:easy_3_0}) Sitting in a chair motionless.}
     \label{fig:easy_exercises}
   \end{figure}  
 
@@ -132,52 +150,56 @@ Exercises which are performed in a seated position are harder to detect since pa
   \end{tabular}
   \end{table}
 
-
-
   \begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.00_365.png}
         \caption[]{E-2.00}
+        \label{fig:medium_0_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.00_385.png}
         \caption[]{E-2.00}
+        \label{fig:medium_0_1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.01_440.png}
         \caption[]{E-2.01}
+        \label{fig:medium_1_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.02_487.png}
         \caption[]{E-2.02}
+        \label{fig:medium_2_0}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.02_500.png}
         \caption[]{E-2.02}
+        \label{fig:medium_2_1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.16\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/samples/medium/E-2.03_590.png}
         \caption[]{E-2.03}
+        \label{fig:medium_3_0}
     \end{subfigure}
-    \caption[Easy Exercises]{The four medium exercises. (a) Raising the arms to the side while sitting. (b) Raising the arms to the front while sitting. (c) Crossing the arms in front of the chest while sitting. (d) Raising the knee up to the chest while sitting.}
+    \caption[Easy Exercises]{The four medium exercises. (\ref{fig:medium_0_0}, \ref{fig:medium_0_1}) Raising the arms to the side while sitting. (\ref{fig:medium_1_0}) Raising the arms to the front while sitting. (\ref{fig:medium_2_0}, \ref{fig:medium_2_1}) Crossing the arms in front of the chest while sitting. (\ref{fig:medium_3_0}) Raising the knee up to the chest while sitting.}
     \label{fig:medium_exercises}
   \end{figure}  
 
 \paragraph{Difficult Exercises}
 
-Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for the pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world exercises.
+Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world exercises.
 
 Tölgyessy et al. found that facing away from the camera decreases the accuracy of HPE due to self-occlusion. \cite{HPEIsHard} Therefore, some of the exercises will be performed facing away from the camera. The difficult exercises can be seen in table \ref{tab:difficult_exercises}. Example images of the exercises can be seen in figure \ref{fig:difficult_exercises}.
 
@@ -193,45 +215,49 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
   \end{tabular}
 \end{table}
 
-
-
 \begin{figure}[ht]
   \centering
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.00_530.png}
       \caption[]{E-3.00}
+      \label{fig:hard_0_0}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.00_535.png}
       \caption[]{E-3.00}
+      \label{fig:hard_0_1}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.01_635.png}
       \caption[]{E-3.01}
+      \label{fig:hard_1_0}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.01_685.png}
       \caption[]{E-3.01}
+      \label{fig:hard_1_1}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.02_695.png}
       \caption[]{E-3.02}
+      \label{fig:hard_2_0}
   \end{subfigure}
   \hfill
   \begin{subfigure}[b]{0.16\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/samples/hard/E-3.02_725.png}
       \caption[]{E-3.02}
+      \label{fig:hard_2_1}
   \end{subfigure}
-  \caption[Difficult Exercises]{The three difficult exercises. (a) Bowing toward the camera. (b) Raising the knee leaning forward. (c) Raising the knee leaning forward while sitting and facing away from the camera. Some of the exercises contain errors in the sample.}
+  \caption[Difficult Exercises]{The three difficult exercises. (\ref{fig:hard_0_0} \ref{fig:hard_0_1}) Bowing toward the camera. (\ref{fig:hard_1_0}, \ref{fig:hard_1_1}) Raising the knee leaning forward. (\ref{fig:hard_2_0}, \ref{fig:hard_2_1}) Raising the knee leaning forward while sitting and facing away from the camera. Some of the exercises contain errors in the sample.}
   \label{fig:difficult_exercises}
 \end{figure}
