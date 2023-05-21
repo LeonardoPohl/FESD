@@ -33,7 +33,7 @@ warmup_multiplier = 100
 # for step scheduler. where to decay lr, can be a list
 lr_decay_epochs = [120, 160, 200]
 # for step scheduler. step size to decay lr
-lr_decay_steps = 20 
+lr_decay_steps = 20
 # for step scheduler. decay rate for learning rate
 lr_decay_rate = 0.01
 # weight decay
@@ -61,7 +61,7 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
   with open("weights.json", 'r') as fp:
     weights = json.load(fp)
 
-  problem_set = "Full Body" if mode == Mode.FULL_BODY else "Half Body" if mode == Mode.HALF_BODY else "Limbs" if mode == Mode.LIMBS else "Joints"
+  problem_set = "Full Body" if mode == Mode.FULL_BODY else "Half Body" if mode == Mode.HALF_BODY else "Body parts" if mode == Mode.BODY_PARTS else "Joints"
   w = weights[problem_set]
   sampler = WeightedRandomSampler(weights=w, num_samples=len(dataset_train))
 
@@ -82,7 +82,7 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
 def get_model_iter_all(use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float):
   model_iter = []
   
-  for mode in [Mode.LIMBS, Mode.HALF_BODY, Mode.FULL_BODY, Mode.JOINTS]:
+  for mode in [Mode.BODY_PARTS, Mode.HALF_BODY, Mode.FULL_BODY, Mode.JOINTS]:
     model_iter += get_model_iter(mode, use_cuda, use_v2, test_exercises, epochs, batchsize, im_size, clip)
 
   return model_iter

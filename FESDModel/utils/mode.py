@@ -5,7 +5,7 @@ from torchmetrics.classification import BinaryCohenKappa, MulticlassCohenKappa
 class Mode(Enum):
   FULL_BODY = 0
   HALF_BODY = 1
-  LIMBS = 2
+  BODY_PARTS = 2
   JOINTS = 3
 
   def from_str(mode_str: str):
@@ -13,8 +13,8 @@ class Mode(Enum):
       return Mode.FULL_BODY
     elif mode_str == "half_body":
       return Mode.HALF_BODY
-    elif mode_str == "limbs":
-      return Mode.LIMBS
+    elif mode_str == "body_parts" or mode_str == "limbs":
+      return Mode.BODY_PARTS
     elif mode_str == "joints":
       return Mode.JOINTS
 
@@ -23,8 +23,8 @@ class Mode(Enum):
       return "full_body"
     elif self == Mode.HALF_BODY:
       return "half_body"
-    elif self == Mode.LIMBS:
-      return "limbs"
+    elif self == Mode.BODY_PARTS:
+      return "body_parts"
     elif self == Mode.JOINTS:
       return "joints"
 
@@ -40,7 +40,7 @@ class Mode(Enum):
   def get_num_joints(self):
     if self == Mode.JOINTS:
       return 20
-    elif self == Mode.LIMBS:
+    elif self == Mode.BODY_PARTS:
       return 6
     elif self == Mode.HALF_BODY:
       return 2
@@ -65,7 +65,7 @@ class Mode(Enum):
   def get_class_dict(self):
     if self == Mode.JOINTS or self == Mode.FULL_BODY:
       raise Exception(f"Class not supported for this mode ({self.name})")
-    elif self == Mode.LIMBS:
+    elif self == Mode.BODY_PARTS:
       head_i      = [0, 1]
       torso_i     = [2, 3, 4, 9]
       left_arm_i  = [5, 6, 7, 8]
@@ -88,7 +88,7 @@ class Mode(Enum):
   def get_class(self, index):
     if self == Mode.JOINTS or self == Mode.FULL_BODY:
       raise Exception(f"Class not supported for this mode ({self.name})")
-    elif self == Mode.LIMBS:
+    elif self == Mode.BODY_PARTS:
       torso_i     = self.get_class_dict()["Torso"]
       head_i      = self.get_class_dict()["Head"]
       left_arm_i  = self.get_class_dict()["Left Arm"]
@@ -119,7 +119,7 @@ class Mode(Enum):
       #  0, 1,
       #  1, 0,
       #  1, 0]
-    elif mode == Mode.LIMBS:
+    elif mode == Mode.BODY_PARTS:
       # [0, 1, 0, 0, 1, 1, 0]
       #  to
       # [1, 0, 

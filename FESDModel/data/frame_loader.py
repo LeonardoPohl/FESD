@@ -58,7 +58,7 @@ def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, us
       bounding_boxes_3d[0] = np.minimum(bounding_boxes_3d[0], [joint['x'], joint['y'], joint['z']])
       bounding_boxes_3d[1] = np.maximum(bounding_boxes_3d[1], [joint['x'], joint['y'], joint['z']])
 
-    if use_v2 or True:
+    if use_v2:
       joints_2d = np.append(joints_2d, [[
         joint['u'],
         joint['v'],
@@ -97,7 +97,7 @@ def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, us
   right_leg_i = [17, 18, 19]
 
   if flip:
-    # Change left and right limbs
+    # Change left and right body_parts
     errs[left_arm_i], errs[right_arm_i] = errs[right_arm_i], errs[left_arm_i]
     errs[left_leg_i], errs[right_leg_i] = errs[right_leg_i], errs[left_leg_i]
 
@@ -107,7 +107,7 @@ def load_skeletons(skeletons_json, flip:bool=False, mode:Mode=Mode.FULL_BODY, us
     class_dict = mode.get_class_dict()
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Upper Body"]]) > 0)
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Lower Body"]]) > 1)
-  elif mode == Mode.LIMBS:
+  elif mode == Mode.BODY_PARTS:
     class_dict = mode.get_class_dict()
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Torso"]]) > 0)
     errors = np.append(errors, np.count_nonzero(errs[class_dict["Head"]]) > 0)
