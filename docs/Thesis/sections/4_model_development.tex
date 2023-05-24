@@ -1,0 +1,10 @@
+\chapter[FESDModel]{FESDModel - Model development}
+\label{sec:model_development}
+
+While there could be multiple approaches to fault estimation, a deep-learning approach using deep convolutional neural networks(CNN) has been chosen. The reason for this is that CNNs have shown to be very successful in many different fields, especially in computer vision tasks, such as image classification, object detection, and image segmentation. The reason for this is that CNNs learn the features of the data to do a prediction.
+
+Other possible solutions could be to use rule-based systems, which use inverse kinematics, or use frame-to-frame joint comparison to detect discrepancies, however, these are quite limited and might result in either too many false positives or false negatives. Furthermore, these rules, such as the frame-to-frame joint comparison, are not always applicable to all types of movements, and therefore might not be able to detect all types of faults in all cases.
+
+\input{sections/2_model/1_model_architecture.tex}
+\input{sections/2_model/2_data_preparation.tex}
+\input{sections/2_model/3_model_training.tex}

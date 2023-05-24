@@ -94,7 +94,6 @@ class FESDv2(nn.Module):
         
         # Inception module for merged input as feature extractor
         self.efficient_net = efficientnet_v2_s(weights=weights)
-        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
         # Fully connected layers
         self.fc1 = nn.Linear(1280, 512)
@@ -103,11 +102,8 @@ class FESDv2(nn.Module):
         # Dropout layer
         self.dropout = nn.Dropout(p=0.5)
 
-    def forward(self, merged_image):
-        # Not sure if this works already or not
-        
+    def forward(self, merged_image):        
         x = self.efficient_net.features(merged_image)
-        x = self.avgpool(x)
         w = torch.flatten(x, 1)
 
         # Fully connected layers

@@ -5,7 +5,7 @@ The two main difficulties that can occur with the camera setup are the camera po
 
 \subsubsection{Distance}
 
-The distance of the camera to the user affects the quality of the pose estimation in multiple ways. Firstly, if the user is too close to the camera, the camera might not get the complete body into the frame. The legs and arms might be off the frame preventing them to be estimated properly. Additionally, depth cameras can only detect the depth for a specific range, so if a user is too close they might not be visible to the depth camera.
+The distance of the camera to the user affects the quality of the pose estimation in multiple ways. Firstly, if the user is too close to the camera, the camera might not have the complete body in the frame. The legs and arms might be off the frame preventing them to be estimated properly. Additionally, depth cameras can only detect the depth for a specific range, so if a user is too close they might not be visible to the depth camera.
 
 However, if the user is too far away from the camera, the person might be too small to be detected reliably. Additionally, depth cameras operate at different depth ranges. If a user is too far away from the camera it will not be visible to the depth camera. This range varies from camera to camera and depends on the method of detection.
 
@@ -13,7 +13,7 @@ However, if the user is too far away from the camera, the person might be too sm
 
 When considering angles the main focus lies on pitch and roll. For the experiments, the yaw is assumed as fixed and directed facing the user, such that the user is in the centre. The camera is set up such that there is no or minimal roll as all applications ensure that the camera is not tilted to the side.
 
-The pitch may introduce or reduce the occlusion of joints by other joints. It also influences which area is best for human pose estimation. The pitch of a camera depends on what the main application is. For example, if the legs are not considered then the pitch could be used to focus more on the upper body.
+The pitch may introduce or reduce the occlusion of joints by other joints. It also influences which area is best for HPE. The pitch of a camera depends on what the main application is. For example, if the legs are not considered then the pitch could be used to focus more on the upper body.
 
 \subsubsection{Resolution}
 

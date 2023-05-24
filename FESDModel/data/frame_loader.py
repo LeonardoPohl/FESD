@@ -149,7 +149,7 @@ def load_frame(recording_dir: Path, session: json, frame_id: int, params: Augmen
   pose_im = np.zeros_like(depth)
 
   for pose in pose_2d:
-    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in range(-2, 3) for y in range(-2, 3)]
+    coords = [(int(min(max(0, pose[1] + x), rgb.shape[0] - 1)), int(min(max(0, pose[0] + y), rgb.shape[1] - 1))) for x in range(-3, 4) for y in range(-3, 4)]
     
     for x, y in coords:
       pose_im[x, y] = 255

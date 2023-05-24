@@ -7,8 +7,8 @@
 
 ## Introduction
 
-- Human Pose estimation and its applications
-- Annomaly detection for human pose estimation
+- HPE and its applications
+- Annomaly detection for HPE
 - Why important
 - Silverfit short mention
 

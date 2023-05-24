@@ -1,7 +1,7 @@
 \section{Model architecture}
 \label{sec:model_architecture}
 
-To solve the problem of error estimation, two different model architectures are devised. The first model architecture, FESDModelv1, is a deep convolutional neural network that takes the RGB, Depth, and Joint data as input. This model can be seen in figure \ref{fig:model_architecture_v1}. 
+To solve the problem of error estimation, two different model architectures are devised. The first model architecture, FESDModelv1, is a deep convolutional neural network that uses the RGB, Depth, and Pose data as separate inputs. This model can be seen in figure \ref{fig:model_architecture_v1}.
 
 \begin{figure}[ht]
   \centering
@@ -51,4 +51,4 @@ To choose a network that is used by FESDModelv2 as a feature extractor, multiple
   \end{tabular}
 \end{table}
 
-EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. The model architecture can be seen in figure \ref{fig:model_architecture_v2}.
+EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. EfficientNetv2 is a convolutional neural network, which optimises training speed and parameter efficiency, by 

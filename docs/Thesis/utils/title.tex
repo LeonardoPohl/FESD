@@ -2,34 +2,28 @@
 \title{Improving the Robustness of Human Pose Estimation using Fault Estimation on Multi-Modal Data}
 \author{Leonardo Benedikt Pohl}
 % TITLE
-Making the dataset and evaluating the model for fault estimation in human pose estimation
-
 \date{\today}
+ 
+\newlength{\originalVOffset}
+\newlength{\originalHOffset}
+\setlength{\originalVOffset}{\voffset}   
+\setlength{\originalHOffset}{\hoffset}
 
-% \setlength{\voffset}{0cm}
-% \setlength{\hoffset}{0cm}
-
-% \includepdf[pages=-]{title.pdf}
-
-% \setlength{\voffset}{-2.54cm}
-% \setlength{\hoffset}{-2.54cm}
+\setlength{\voffset}{0cm}
+\setlength{\hoffset}{0cm}
+\includepdf[pages=1]{title_page.pdf}
+\setlength{\voffset}{\originalVOffset}
+\setlength{\hoffset}{\originalHOffset}
 
 \clearpage
 
 \begin{abstract}  
-  \paragraph{Background}
-  Human pose estimation, or skeleton detection, has been a topic of research for many years. With the advancement of hardware, it has become viable to apply human pose estimation in real-time applications such as games. However, human pose estimation is a difficult task that is prone to errors or faults, especially in complicated situations, such as cramped environments. These errors might cause human-computer interaction to be hampered.
+  Human pose estimation(HPE), or skeleton detection, has been a topic of research for many years. With the advancement of hardware, it has become viable to apply HPE in real-time applications such as games. However, HPE is a difficult task that is prone to errors or faults, especially in complicated situations, such as cramped environments. These errors might cause human-computer interaction to be hampered.
 
-  \paragraph{Objective}
-  The goal of this thesis is to understand what causes the problems and design exercises which deliberately cause common errors and to capture them within a dataset and label the entries accordingly. Finally, a preliminary method is developed to detect the errors or faults caused by human pose estimation using the dataset.
+  The goal of this thesis is to understand what causes the problems, and design exercises which deliberately cause common errors and to capture them within a dataset and label the entries accordingly. Finally, a preliminary method is developed to detect the errors or faults caused by HPE using the dataset.
 
-  \paragraph{Methods}
-  In the scope of this thesis, a method is developed that is capable of capturing and labelling multi-modal data, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). I define four different problem sets with increasingly detailed areas, ranging from body-wise fault estimation to joint-wise fault estimation. Using the dataset that is recorded and labelled using FESDData, FESDDataset, I developed one model for each problem set, which aims to detect if an error occurs at different levels, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Model} (FESDModelv1 and FESDModelv2). While version one of the models uses custom feature extraction the second version uses transfer learning.
+  In the scope of this thesis, a method is developed that is capable of capturing and labelling multi-modal data, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). I define four different problem sets with increasingly detailed areas, ranging from body-wise fault estimation to joint-wise fault estimation. Using the dataset, FESDDataset, that is recorded and labelled using FESDData, I developed one model for each problem set, which aims to detect if an error occurs at different levels, \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Model} (FESDModelv1 and FESDModelv2). While version one of the models uses custom feature extraction the second version uses transfer learning.
 
-  \paragraph{Results}
-  The result of my research shows that the collected and labelled data is not enough to create a generalised model for error detection. The best results are achieved when detecting errors for the individual body halves and for the individual joints using FESDModelv2. The rest of the problem sets achieve bad results which indicates overfitting. 
-  
-  \paragraph{Conclusion}
-  While the results seem to be underwhelming, the research shows that the approach is viable and that two of the 8 preliminary models seem to be successfully trained. Additionally, FESDData and consequently FESDDataset, would not only prove useful for the advancement of further FESDModels but could also be applied to general human pose estimation problems, such as action recognition. With the future improvement of FESDData and Model, the way that human pose estimation is evaluated could be changed by adding an extra level of verification.
+  In this thesis, I found common error sources that occur during HPE. Based on these I developed exercises which are captured in the FESDDataset using the dataset collection tool FESDData. The joints of the poses are then labelled based on the errors that occur. I abstracted the data to form four different problem sets, for each of which the two models, FESDModelv1 and FESDModelv2, are trained. The results of the model were at first promising, however, on further inspection proved to be overfitting since the data was insufficient and the model too complex. However, with further research and data FESDModelv1 and FESDModelv2 could be improved and, therefore, the way that HPE is evaluated could be changed by adding an extra level of verification.
 
 \end{abstract}

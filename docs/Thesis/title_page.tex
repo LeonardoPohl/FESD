@@ -1,0 +1,106 @@
+% First page for bachelor thesis at LIACS: bachelorpage.tex
+% Invullen titel, naam+ nummer, datum en begeleiders.
+% Version 1.053 Juni 2014 (studentnummer weggehaald)
+% Version 1.000 November 2013 (aanpassing oude versie WAK met begeleiders)
+
+% Usage: 
+%   latex bachelorpage.tex
+%   dvips -Ppdf bachelorpage.dvi
+%   ps2pdf bachelorpage.ps
+% Needed: file ullogo.eps for the university logo
+%
+%  concatenate bachelorpage.pdf with yourthesis.pdf to yourfinalthesis.pdf by means of
+%  gs -q -sPAPERSIZE=a4 -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=yourfinalthesis.pdf bachelorpage.pdf yourthesis.pdf
+
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+
+\setlength{\textheight}{24.7cm}
+\setlength{\textwidth}{16cm}
+\setlength{\unitlength}{1mm}
+\setlength{\topskip}{1truecm}
+\topmargin 280mm \advance \topmargin -\textheight
+\divide \topmargin by 2 \advance \topmargin -1in
+\headheight 0pt \headsep 0pt
+\leftmargin 210mm \advance \leftmargin -\textwidth
+\divide \leftmargin by 2 \advance \leftmargin -1in
+\oddsidemargin \leftmargin \evensidemargin \leftmargin
+\parindent=0pt
+\frenchspacing
+
+\newcommand{\bree}[1]{\makebox[4.1cm][l]{#1:}}
+
+\begin{document}
+
+%No page number
+\thispagestyle{empty}
+\pagestyle{empty}
+\sf 
+\nocite{*}
+
+\begin{tabular}[t]{p{3.5cm}@{\hspace{4mm}\vrule width 1.5pt\hspace{4mm}}l}
+%Logo Leiden University
+\makebox(20,0)[t]{\includegraphics{UL_PMS-kleur.eps}}
+&
+\begin{minipage}[t]{12cm}
+\begin{Huge}
+\vspace*{0.4cm}
+\textbf{}
+\\[2ex]
+\textbf{Master Computer Science}
+\end{Huge}
+
+\vspace*{4cm}
+
+\begin{Large}
+  FESD: A Fault Estimation Pipeline for Human Pose Estimation
+  % Fault Estimation for Human Pose Estimation using a Self-Built Multi-Modal Dataset
+\hfill 
+
+\vspace*{3mm}
+
+\hfill
+
+\vspace*{5.5cm}
+
+
+%% --> Add your data here!
+\bree{Name}%
+Leonardo Benedikt Pohl
+\\
+\bree{Student ID}%
+s3059030
+\\[1ex]
+\bree{Date}%
+30/05/2023
+\\[1ex]
+\bree{Specialisation}%
+Advanced Computing and Systems
+\\[1ex]
+\bree{1st supervisor}%
+Dr. Erwin Bakker
+\\ 
+\bree{2nd supervisor}%
+Prof. Dr. Michael Lew
+\end{Large}
+
+
+\begin{large}
+\vspace*{2.5cm}
+Master's Thesis in Computer Science
+
+\vspace*{5mm}
+Leiden Institute of Advanced Computer Science (LIACS)\\
+Leiden University\\
+Niels Bohrweg 1\\
+2333 CA Leiden\\
+The Netherlands
+\end{large}
+
+
+\end{minipage}
+\end{tabular}
+\bibliography{utils/refs.bib}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{plain}
+\end{document}

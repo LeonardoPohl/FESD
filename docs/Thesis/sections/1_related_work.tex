@@ -1,0 +1,25 @@
+\chapter{Related Work}
+\label{sec:related_work}
+% related work before fundamentals
+% no subsections but paragraphs
+% make it already finished
+
+\paragraph{HPE}
+
+To detect errors in HPE the methods of capturing the human pose from different modalities are essential. Multiple different human pose estimators have been developed using different modalities and focussing on different parts of the body. For example, OpenPose has developed a general human pose estimator\cite{OpenPosePose}, as well as a hand pose estimator\cite{OpenPoseHand} and an estimator that is capable of detecting multiple people\cite{OpenPoseMulti}. Z. Cao et al. achieve this by using solely RGB data.
+
+A method that uses RGB data, as well as errors to detect the correct pose, is proposed by Joao Carreira et al.\cite{IterativeErrorFeedback}. In their paper, the authors extract the features of both input and output spaces. This enables Joao Carreira et al. to develop a self-correcting model using Iterative Error Feedback.
+
+Other methods use point clouds which are extracted from depth data. Point clouds are a common representation of depth data as they are used heavily in Autonomous driving with large amounts of data for example the Kitti Dataset developed by Geiger et al. \cite{Geiger2012CVPR}. However, conventional feature extraction using CNNs is hard if not impossible to apply since most point clouds are not ordered and not dense so locality cannot be ensured. PointCNN, proposed by Yangyan Li et al.\cite{li2018pointcnn}, combats this problem by learning an $\mathcal{X}$-Transformation to then extract the features using a generalised CNN.
+
+Additionally, RGB-D data is used to estimate human pose data. An example of RGB-D-based HPE was proposed by D. Pascual-Hernández et al.\cite{PASCUALHERNANDEZ2022102225}.
+
+\paragraph{Datasets}
+
+There are different datasets encompassing different environments and modalities. The KITTI dataset is captured using LIDaR cameras and contains both depth and RGB data\cite{Geiger2012CVPR}. One of the largest datasets specifically for HPE and its applications is Human3.6M\cite{h36m_pami}. Human3.6M is a large-scale dataset containing RGB, Depth and Pose information.
+
+\paragraph{Action Recognition}
+
+One of the uses of HPE is action recognition. Action recognition is the extraction of pre-defined actions from different modalities. 
+
+To use different modalities in combination Seddik et al. compare different fusion methods for action recognition\cite{Seddik2017}. After detecting the features for each of the modalities, RGB data, Depth data and Pose data, they fuse the features using different methods. 

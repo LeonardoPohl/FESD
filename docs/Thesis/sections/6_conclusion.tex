@@ -1,0 +1,36 @@
+\chapter{Conclusion}
+\label{sec:conclusion}
+% too many I's write passive
+In order to improve on existing human pose estimators we have to understand the errors and how they occur. In the scope of this thesis, I answered the research questions asked; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
+
+\begin{enumerate}[label=\Alph*]
+  \item I analysed common problems of HPE and derived exercises which cause issues in a controlled manner. I found that lighting has a high influence on the pose estimation, as well as the posture of the user, and the visibility of the head.
+  \item Using these exercises I captured and labelled FESDDataset using a custom tool for multi-modal stream capture and error labelling for HPE. To investigate different problem areas I defined four different problem sets that encompass different abstractions of the problem. 
+  \item Finally, I conceptualised two different models which use different methods to process the different modalities. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines all three modalities into a single RGB image, which is passed into a pre-trained model for feature extraction.
+\end{enumerate}
+
+None of the eight devised models produces good, usable results. The results indicate that the models are overfitting. The models do not seem to generalise well to new data. The reason for this is the complexity of the model and the amount and variety of the data. The models have too many trainable parameters to be learned by such limited data. A solution would be to both decrease the complexity of the model and increase the amount of captured data both quantitatively and in a wider variety of environments. However, this is out of the scope of this thesis and is left for future research.
+
+\section{Contribution}
+
+The code of this thesis is available on GitHub\footnote{\url{https://github.com/LeonardoPohl/FESD}}. The repository is divided into two major parts, FESDData, which contains the C++ implementation of FESDData recorded, FESDModel, which contains the implementation of the model, FESDModelv1 and FESDModelv2, as well as the Jupyter notebooks that were used to evaluate the dataset, to train and evaluate the model. FESDDataset, as well as the trained models, are available on request.
+
+\section{Future work}
+\label{sec:future_work}
+
+To further improve the dataset and the model, FESDData and FESDDataset could be expanded to include the accurate position of the joints in the image. This would allow for the use of the dataset for error correction.
+
+To improve the quality of the FESDModel, more data needs to be collected and labelled in different settings. The current dataset is limited to a single room with a single camera. To improve the model, the dataset needs to be expanded to include different scenes, different pieces of clothing and different camera angles. These additions might prevent the model from overfitting. Additionally, the model could be improved by using a different backbone, which is not as performant but more accurate, such as EfficientNet, or by using a different loss function, such as focal loss, which.
+
+\subsection{Possible applications}
+
+FESD might find several different areas of application in the future. Firstly, the trained model can be used to assist in developing games and other applications that utilise HPE. In its simplest application, it may be used to warn users of possible errors when the skeleton is not detected correctly. In more advanced cases the information provided by the model could be used to attempt to fix joints through joint position interpolation and prediction rather than using the faulty joint. Moreover, multiple human pose estimators could be considered resulting in an overall more robust HPE.
+
+Furthermore, if the model proves to have high accuracy for a specific use case, it could be used to train a better pose detector in the same way as it is proposed by Jo\~ao Carreira et al.\cite{IterativeErrorFeedback}.
+
+The dataset and the dataset recorder may also be used to further the development of FESDModel and it can also find application in other areas such as recording datasets for action recognition. The dataset in and of itself can be used for action detection. The exercises are predefined and can be recorded and automatically labelled by FESDData, thereby making it easy to record large amounts of data without requiring manual labelling.
+
+\noindent\rule[0.5pt]{\linewidth}{1pt}
+
+
+In conclusion, while the models I developed proved to be overfitting, the foundational work of the error assessment and FESDData can prove useful for future research in the area of error detection of HPE, which is an area with very limited research.
