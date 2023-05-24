@@ -96,8 +96,9 @@ class FESDv2(nn.Module):
         self.efficient_net = efficientnet_v2_s(weights=weights)
 
         # Fully connected layers
-        self.fc1 = nn.Linear(1280, 512)
-        self.fc2 = nn.Linear(512, num_classes)
+        self.fc1 = nn.Linear(5120, 1280)
+        self.fc2 = nn.Linear(1280, 512)
+        self.fc3 = nn.Linear(512, num_classes)
 
         # Dropout layer
         self.dropout = nn.Dropout(p=0.5)
@@ -108,6 +109,7 @@ class FESDv2(nn.Module):
 
         # Fully connected layers
         w = self.dropout(nn.functional.relu(self.fc1(w)))
-        w = self.fc2(w)
+        w = self.dropout(nn.functional.relu(self.fc2(w)))
+        w = self.fc3(w)
 
         return w

@@ -22,8 +22,6 @@ torchrun --nproc_per_node=8 train.py \
 
 # optimizer
 optim = 'adam'
-# learning rate
-learning_rate = 0.00005
 # learning rate scheduler. can be step, poly or cosine
 lr_scheduler = 'cosine'
 # warmup epoch
@@ -43,7 +41,7 @@ momentum = 0.9
 
 RECORDING_DIR = Path('D:/Recordings/')
 
-def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float):
+def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float, learning_rate):
   if use_v2:
     model = nn.DataParallel(FESDv2(mode.get_num_layers()))
   else:
@@ -79,10 +77,10 @@ def get_model_iter(mode: Mode, use_cuda: bool, use_v2: bool, test_exercises: lis
   
   return [[mode, model, optimiser, scheduler, train_loader, test_loader]]
 
-def get_model_iter_all(use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float):
+def get_model_iter_all(use_cuda: bool, use_v2: bool, test_exercises: list, epochs: int, batchsize: int, im_size: int, clip: float, learning_rate):
   model_iter = []
   
-  for mode in [Mode.BODY_PARTS, Mode.HALF_BODY, Mode.FULL_BODY, Mode.JOINTS]:
-    model_iter += get_model_iter(mode, use_cuda, use_v2, test_exercises, epochs, batchsize, im_size, clip)
+  for mode in [Mode.FULL_BODY, Mode.HALF_BODY, Mode.BODY_PARTS, Mode.JOINTS]:
+    model_iter += get_model_iter(mode, use_cuda, use_v2, test_exercises, epochs, batchsize, im_size, clip, learning_rate)
 
   return model_iter
