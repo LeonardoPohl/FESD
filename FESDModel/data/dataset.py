@@ -113,6 +113,13 @@ class FESDDataset(data.Dataset):
 
     return depth_im
     
+  def get_pose_im(self):
+    pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
+    pose.unsqueeze(0)
+    pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
+
+    return pose_im
+
   def get_frame_v1(self):
     rgb_im = self.get_rgb_im()
     rgb_im = ImageOps.scale(rgb_im, self.im_size/float(self.frame.im_size))
@@ -132,9 +139,7 @@ class FESDDataset(data.Dataset):
         
     pose_2d = torch.tensor(self.frame.pose_2d.copy(), dtype=torch.float32).permute(1, 0)
     
-    pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
-    pose.unsqueeze(0)
-    pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
+    pose_im = self.get_pose_im()
     pose_im = ImageOps.scale(pose_im, self.im_size/float(self.frame.im_size))
 
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)    
@@ -146,10 +151,7 @@ class FESDDataset(data.Dataset):
   def get_frame_v2(self):
     rgb_im = self.get_rgb_im()
     depth_im = self.get_depth_im()
-
-    pose = torch.tensor(self.frame.pose_im.copy(), dtype=torch.float32)
-    pose.unsqueeze(0)
-    pose_im = Image.fromarray((pose.numpy()).astype(np.uint8).repeat(3, axis=2))
+    pose_im = self.get_pose_im()
     
     errors = torch.tensor(self.frame.errors, dtype=torch.float32)
     gt = err2gt(errors, self.mode)
@@ -161,6 +163,29 @@ class FESDDataset(data.Dataset):
       merged_image = self.pil_to_tensor(merged_image)
 
     return merged_image, gt, self.frame.session
+
+  def get_visual_frames(self, i):
+    i %= self.size
+    session, index = self.get_index(i)
+    
+    if self.randomize_augmentation_params:
+      self.augmentation_params.Randomize()
+      
+    self.frame = load_frame(recording_dir=self.recording_dir, session=self.recording_jsons[session], frame_id=index, params=self.augmentation_params, mode=self.mode, use_v2=True)
+
+    rgb_im = self.get_rgb_im()
+    rgb_im = ImageOps.scale(rgb_im, self.im_size/float(self.frame.im_size))
+
+    depth_im = self.get_depth_im()
+    depth_im = ImageOps.scale(depth_im, self.im_size/float(self.frame.im_size))
+    
+    pose_im = self.get_pose_im()
+    pose_im = ImageOps.scale(pose_im, self.im_size/float(self.frame.im_size))
+
+    merged_image = Image.merge("RGB", (ImageOps.grayscale(image=rgb_im).split()[0], depth_im.split()[0], pose_im.split()[0]))
+    merged_image = ImageOps.scale(merged_image, self.im_size/float(self.frame.im_size))
+    
+    return rgb_im, depth_im, pose_im, merged_image, self.frame.session
 
   def get_index(self, index):
     session = index // self.frames_per_session

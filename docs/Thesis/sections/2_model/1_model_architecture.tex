@@ -6,7 +6,7 @@ To solve the problem of error estimation, two different model architectures are 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.8\linewidth]{figures/Model/FESD.png}
-  \caption[FESDModel architecture version 1]{Original FESDModel architecture with three different inputs; RGB, Depth and Joint data. After three convolutions the three streams are concatenated to be passed into three fully connected layers with ReLU activation functions. In this example network, the model calculates the joint problem set, therefore the output is a 1D 80 tensor of multi-object, one for each joint, i.e. 20, multi-class, one for each error class, i.e. 4, values.}
+  \caption[FESDModel architecture version 1]{Original FESDModel architecture with three different inputs; RGB, Depth and Joint data. With 'S' as the image size. After three convolutions the three streams are concatenated to be passed into three fully connected layers with ReLU activation functions. In this example network, the model calculates the joint problem set, therefore the output is a 1D 80 tensor of multi-object, one for each joint, i.e. 20, multi-class, one for each error class, i.e. 4, values.}
   \label{fig:model_architecture_v1}
 \end{figure}
 
@@ -15,7 +15,7 @@ The second model architecture, FESDModelv2, utilises transfer learning to extrac
 \begin{figure}[ht]
   \centering
   \includegraphics[width=.6\linewidth]{figures/Model/FESDv2.png}
-  \caption[FESDModel architecture version 2]{FESDModelv2 architecture with transfer learning. The input is merged into a single RGB image and passed into a feature extractor. The feature extractor is a pre-trained EfficientNet v2 S. The output of the feature extractor is passed into two fully connected layers with ReLU activation functions. In this example network, the model calculates the joint problem set, therefore the output is a 1D 80 tensor of multi-object, one for each joint, i.e. 20, multi-class, one for each error class, i.e. 4, values.}
+  \caption[FESDModel architecture version 2]{FESDModelv2 architecture with transfer learning. The input is merged into a single RGB image and passed into a feature extractor. With 'S' as the image size. The feature extractor is a pre-trained EfficientNet v2 S. The output of the feature extractor is passed into two fully connected layers with ReLU activation functions. In this example network, the model calculates the joint problem set, therefore the output is a 1D 80 tensor of multi-object, one for each joint, i.e. 20, multi-class, one for each error class, i.e. 4, values.}
   \label{fig:model_architecture_v2}
 \end{figure}
 
@@ -51,4 +51,4 @@ To choose a network that is used by FESDModelv2 as a feature extractor, multiple
   \end{tabular}
 \end{table}
 
-EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. EfficientNetv2 is a convolutional neural network, which optimises training speed and parameter efficiency, by 
+EfficientNet v2 was chosen since it proved to be the most performant while being the most accurate of the networks that were analysed. In particular, the small variant with $2.15 \times 10^7$ Parameters and a Top-1 Accuracy of $84.228\%$. EfficientNetv2 is a convolutional neural network, which optimises training speed and parameter efficiency, and improves upon EfficientNet\cite{tan2020efficientnet,tan2021efficientnetv2}. The main focus of EfficientNet is the scaling of the model in width, depth and resolution of the input image. 
