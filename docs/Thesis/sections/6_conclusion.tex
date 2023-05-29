@@ -1,12 +1,12 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
-% too many I's write passive
-In order to improve on existing human pose estimators we have to understand the errors and how they occur. In the scope of this thesis, I answered the research questions asked; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
+
+In order to improve on existing human pose estimators we have to understand the errors and how they occur. In the scope of this thesis, the following research questions were asked; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
 
 \begin{enumerate}[label=\Alph*]
-  \item I analysed common problems of HPE and derived exercises which cause issues in a controlled manner. I found that lighting has a high influence on the pose estimation, as well as the posture of the user, and the visibility of the head.
-  \item Using these exercises I captured and labelled FESDDataset using a custom tool for multi-modal stream capture and error labelling for HPE. To investigate different problem areas I defined four different problem sets that encompass different abstractions of the problem. 
-  \item Finally, I conceptualised two different models which use different methods to process the different modalities. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines all three modalities into a single RGB image, which is passed into a pre-trained model for feature extraction.
+  \item Common problems of HPE were analysed and exercises were designed that cause issues in a controlled manner. It was found that lighting has a high influence on the pose estimation, as well as the posture of the user, and the visibility of the head.
+  \item Using these exercises a dataset, FESDDataset, was captured and labelled using a custom tool for multi-modal stream capture and error labelling for HPE, FESDData. To investigate different problem areas were defined four different problem sets that encompass different abstractions of the problem. 
+  \item Finally, two different models were conceptualised which use different methods to process the different modalities. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines all three modalities into a single RGB image, which is passed into a pre-trained model for feature extraction.
 \end{enumerate}
 
 None of the eight devised models produces good, usable results. The results indicate that the models are overfitting. The models do not seem to generalise well to new data. The reason for this is the complexity of the model and the amount and variety of the data. The models have too many trainable parameters to be learned by such limited data. A solution would be to both decrease the complexity of the model and increase the amount of captured data both quantitatively and in a wider variety of environments. However, this is out of the scope of this thesis and is left for future research.
@@ -33,4 +33,4 @@ The dataset and the dataset recorder may also be used to further the development
 \noindent\rule[0.5pt]{\linewidth}{1pt}
 
 
-In conclusion, while the models I developed proved to be overfitting, the foundational work of the error assessment and FESDData can prove useful for future research in the area of error detection of HPE, which is an area with very limited research.
+In conclusion, while the models that were developed in the scope of the thesis proved to be overfitting, the foundational work of the error assessment and FESDData can prove useful for future research in the area of error detection of HPE, which is an area with very limited research.
