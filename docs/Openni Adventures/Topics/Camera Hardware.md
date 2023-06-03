@@ -1,1 +1,0 @@
-[[Papers/Collections/Camera Hardware]]
