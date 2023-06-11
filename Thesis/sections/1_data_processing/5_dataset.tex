@@ -1,11 +1,11 @@
 \section{Dataset Analysis}
 \label{sec:dataset}
 
-Multiple iterations of the recording process were run to find the best possible setup, which reduces the light interference as much as possible and which offers the best results with the resources at hand. The camera setup that is used by SilverFit was reproduced. At SilverFit the camera is mounted at $175cm$ above the floor. The camera that is used has an accelerometer which was used to adjust the camera angle relative to the ground. The camera is angled downward at a $70^\circ$ angle. To record the dataset an Intel Realsense L515 camera was used. Additionally, for the preliminary analysis of errors an Orbbec Astra+ and a Microsoft Kinect v2 were used.
+To get a better understanding of the data and how it can be used it has to be analysed. Especially the distribution of errors within the dataset is important to understand the balance of the dataset and to understand possible outcomes of the model development phase.
 
 \subsection{Distribution of Errors}
 
-An important aspect of the dataset is the structure and distribution of data and their labels. In total, all 13 exercises mentioned in section \ref{sec:exercises} were recorded twice. Each recording session consists of exactly 300 frames.
+An important aspect of the dataset is the structure and distribution of data and their labels. In total, all 13 exercises mentioned in section \ref{sec:exercises} were recorded twice. Each recording session consists of exactly 300 frames, resulting in a total of 7800 frames. Of these, every 10th frame was labelled for a total of 780 labelled frames, which were used for the preliminary model development.
 
 When multiple persons are detected one person might be incorrectly detected in the background. While analysing the data the person that is not labelled as faulty is selected whenever possible. If a person is labelled as faulty each joint is marked as in an unrealistic position.
 
@@ -17,7 +17,7 @@ In Figure \ref{fig:fb_pie} the error distribution of the Full body problem set c
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.4\textwidth]{figures/Data/dist_full_body/Error_Distribution_by_Body_Half.png}
+  \includegraphics[width=0.8\textwidth]{figures/Data/dist_full_body/Error_Distribution.png}
   \caption[Error Distribution of the Full Body]{The distribution of Errors of the full body problem set.}
   \label{fig:fb_pie}
 \end{figure}
@@ -28,18 +28,18 @@ Figure \ref{fig:hb_pie} shows a discrepancy between the error distribution of th
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.6\textwidth]{figures/Data/dist_half_body/Error_Distribution_by_Joint.png}
+  \includegraphics[width=0.8\textwidth]{figures/Data/dist_half_body/Error_Distribution_by_Body_Half.png}
   \caption[Error Distribution by Body Half]{The distribution of Errors of the half body problem set.}
   \label{fig:hb_pie}
 \end{figure}
 
 \subsubsection{Body part Error Distribution}
 
-The error distribution of each body part is shown in figure \ref{fig:lb_pie}. It can be observed that the errors of the body parts are individually very unbalanced. The left arm is the most error-prone body part with $24.1\%$ of the joints being faulty. The torso is the least error-prone body part with $10.3\%$ of the joints being faulty. This again underlines the assumption that the upper body is more stable than the lower body.
+The error distribution of each body part is shown in figure \ref{fig:lb_pie}. It can be observed that the errors of the body parts are individually very unbalanced. The left arm is the most error-prone body part with $24.1\%$ of the joints being faulty. The torso is the least error-prone body part with $10.3\%$ of the joints being faulty.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\textwidth]{figures/Data/dist_limbs/Error_Distribution_by_Joint.png}
+  \includegraphics[width=0.8\textwidth]{figures/Data/dist_limbs/Error_Distribution_by_Limb.png}
   \caption[Error Distribution by Body part]{The distribution of errors of the body part problem set.}
   \label{fig:lb_pie}
 \end{figure}
@@ -50,7 +50,7 @@ Figure \ref{fig:jt_pie} shows that the major part of the errors that occur are e
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.4\textwidth]{figures/Data/dist_joints/Error_Distribution.png}
+  \includegraphics[width=0.8\textwidth]{figures/Data/dist_joints/Error_Distribution.png}
   \caption[Error Distribution for each error class]{The distribution of each error class.}
   \label{fig:jt_pie}
 \end{figure}

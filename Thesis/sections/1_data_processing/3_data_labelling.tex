@@ -1,10 +1,38 @@
-\subsection{Data labeling}
+\section{Data labeling}
 \label{sec:data_labeling}
 
 A large part of the data preparation is the labelling of the data. The data is labelled with error labels. There are two different layers which can be labelled as erroneous. First, there are skeleton errors that occur when the pose estimator detects a human in places where there are no humans. Second, there are joint errors that occur when the pose estimator detects a joint in the wrong place. 
 
 For example, the estimator might label the left foot as the right foot. This is a common error, especially when the body parts are close to each other. An estimator might also not detect a joint at all. This might be caused by occlusion, be it by another joint, an object, or by the image border. Most applications avoid the last cause for occlusion by defining a minimum distance from the camera and specific camera placement to ensure that the user is always fully in view.
 
-In the data, no error is denoted with $0$. If a joint is not detected at all, it is labelled with $1$. If a joint is detected in the wrong place that is outside of the body, or somewhere where there should not be a joint, it is labelled with $2$. If a joint is detected in the approximate position of where another joint should be then it is labelled with $3$. If the whole skeleton is in the wrong position it can be labelled as faulty and subsequently, every joint will be labelled with $2$.
+The possible error labels for the skeleton itself can be seen in table \ref{tab:skel_errs}. Table \ref{tab:jt_errs}, shows the different error labels for the individual joints of the skeleton.
 
-Implicitly, this creates two simpler general labels. Either a joint is faulty, i.e. the error label is $1$, $2$, or $3$, or it is not faulty, i.e. the error label is $0$.
+\begin{table}[htb]
+  \centering
+  \caption{The two possible errors for the skeleton}
+  \label{tab:skel_errs}
+  \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
+  \hline
+  \textbf{Label} & \textbf{Error Name} & \textbf{Example} \\ \hline
+  0                    & No Error            & The skeleton is exactly aligned to the body               \\
+  1                    & Error               & The skeleton is in a different location and not on a body \\ \hline
+  \end{tabular} 
+\end{table}
+
+\begin{table}[htb]
+  \centering
+  \caption{The four possible errors for the individual Joints.}
+  \label{tab:jt_errs}
+  \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
+  \hline
+  \textbf{Label} & \textbf{Error Name}      & \textbf{Example} \\ \hline
+  0                    & No Error                 & The joint is exactly aligned to the position where it is supposed to be \\
+  1                    & Missing Joint            & The joint is not detected at all \\
+  2                    & Wrong Joint Position     & The joint is somewhere outside the body \\
+  3                    & Different Joint Position & The joint for the left foot is in the position of the right foot \\
+  \hline   
+  \end{tabular}
+\end{table}
+
+Implicitly, the errors shown in table \ref{tab:jt_errs} create two simpler general labels. Either a joint is faulty, i.e. the error label is $1$, $2$, or $3$, or it is not faulty, i.e. the error label is $0$.
+

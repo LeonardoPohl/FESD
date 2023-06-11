@@ -1,6 +1,6 @@
 \subsection{Person}
 
-Finally, one of the main error sources of HPE is the person. The person can cause difficulties in the HPE process by moving, wearing specific clothes, or having a different body posture. Body posture is of special importance for SilverFit since SilverFit specialises in games for rehabilitation and elderly people. Elderly people have different body postures than the average person, which can cause difficulties in the HPE process.
+Finally, one of the main error sources of HPE is the person. The person can cause difficulties in the HPE process by moving, wearing specific clothes, or having a different body posture. Body posture is of special importance for SilverFit since the company specialises in games for rehabilitation and elderly people. Elderly people have different body postures than the average person, which can cause difficulties in the HPE process.
 
 \subsubsection{Clothes}
 
@@ -25,15 +25,7 @@ The exercises are numbered according to the difficulty. An example of the naming
     \underbrace{E}_\text{Exercise}-\overbrace{2}^\text{Difficulty}.\underbrace{02}_\text{Exercise Id}
 \]
 
-The different difficulties are numbered as follows:
-
-\begin{enumerate}
-    \addtocounter{enumi}{-1}
-    \item Trivial
-    \item Easy
-    \item Medium
-    \item Hard
-\end{enumerate}
+The different difficulties are (0) Trivial, (1) Easy, (2) Medium, and (3) Hard. The Exercise Id is the numbering of the exercises, not necessarily in order of difficulty.
 
 \paragraph{Trivial Exercises}
 
@@ -44,7 +36,7 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
   \label{tab:trivial_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
-  Exercise & Short Description         & challenge   \\ \hline
+  \textbf{Exercise} & \textbf{Short Description}         & \textbf{Challenge}   \\ \hline
   E-0.00   & Arms hanging to the side  & This exercise is very easy since no part of the body is occluded by any other part. Additionally, the joints are not moving. \\
   E-0.01   & Arms extended to the side & The arms are no longer in a natural position but still not occluded and no joint is moving \\ \hline
   \end{tabular}
@@ -52,14 +44,14 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
 
 \begin{figure}[htb]
   \centering
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/trivial/E-0.00_10.png}
       \caption[]{E-0.00}
       \label{fig:trivial_0}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/trivial/E-0.01_38.png}
       \caption[]{E-0.01}
@@ -78,7 +70,7 @@ Easy exercises are essential for creating a good baseline of how the pose estima
   \label{tab:easy_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
-  Exercise & Short Description             & Challenge \\ \hline
+  \textbf{Exercise}& \textbf{Short Description}             & \textbf{Challenge} \\ \hline
   E-1.00   & Raising the arms to the side  & Now the arms are no longer stationary. Still, there is no occlusion. \\
   E-1.01   & Raising the arms to the front & The arms occlude themselves and part of the body.  \\
   E-1.02   & Raise the knees to the chest  & The legs now occlude parts of the hip.  \\
@@ -88,42 +80,42 @@ Easy exercises are essential for creating a good baseline of how the pose estima
 
   \begin{figure}[htb]
     \centering
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.00_126.png}
         \caption[]{E-1.00}
         \label{fig:easy_0_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.00_137.png}
         \caption[]{E-1.00}
         \label{fig:easy_0_1}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.01_188.png}
         \caption[]{E-1.01}
         \label{fig:easy_1_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.01_197.png}
         \caption[]{E-1.01}
         \label{fig:easy_1_1}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.02_230.png}
         \caption[]{E-1.02}
         \label{fig:easy_2_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/easy/E-1.03_301.png}
         \caption[]{E-1.03}
@@ -142,7 +134,7 @@ Exercises which are performed in a seated position are harder to detect since pa
   \label{tab:medium_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
-  Exercise & Short Description                                     & Challenge \\ \hline
+  \textbf{Exercise}& \textbf{Short Description}                                     & \textbf{Challenge} \\ \hline
   E-2.00   & Raising the arms to the side while sitting            & Now the arms are no longer stationary. With added difficulty since the user is now sitting.         \\
   E-2.01   & Raising the arms to the front while sitting           & The arms might occlude themselves and part of the body. Additionally, the person is now sitting down\\
   E-2.02   & Crossing the arms in front of the chest while sitting & The arms now occlude large parts of the upper body.                                                                                            \\
@@ -152,42 +144,42 @@ Exercises which are performed in a seated position are harder to detect since pa
 
   \begin{figure}[htb]
     \centering
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.00_365.png}
         \caption[]{E-2.00}
         \label{fig:medium_0_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.00_385.png}
         \caption[]{E-2.00}
         \label{fig:medium_0_1}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.01_440.png}
         \caption[]{E-2.01}
         \label{fig:medium_1_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.02_487.png}
         \caption[]{E-2.02}
         \label{fig:medium_2_0}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.02_500.png}
         \caption[]{E-2.02}
         \label{fig:medium_2_1}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.32\linewidth}
+    \begin{subfigure}[b]{0.29\linewidth}
         \centering
         \includegraphics[width=\textwidth]{figures/Data/samples/medium/E-2.03_590.png}
         \caption[]{E-2.03}
@@ -208,7 +200,7 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
   \label{tab:difficult_exercises}
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
-  Exercise & Short Description                                                              & Challenge \\ \hline
+  \textbf{Exercise}& \textbf{Short Description}                                                              & \textbf{Challenge} \\ \hline
   E-3.00   & Bowing toward the camera                                                       & The head is often used as an anchor point for the skeleton as it is quite stable. When bowing forward the head is no longer easily detectable. \\
   E-3.01   & Raising the knee leaning forward                                               & Leaning forward increases the difficulty since the position is not natural \\
   E-2.02   & Raising the knee leaning forward while sitting and facing away from the camera & Facing away from the camera makes it more difficult to detect the pose and induces more occlusion.  \\ \hline
@@ -217,42 +209,42 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
 
 \begin{figure}[htb]
   \centering
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.00_530.png}
       \caption[]{E-3.00}
       \label{fig:hard_0_0}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.00_535.png}
       \caption[]{E-3.00}
       \label{fig:hard_0_1}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.01_635.png}
       \caption[]{E-3.01}
       \label{fig:hard_1_0}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.01_685.png}
       \caption[]{E-3.01}
       \label{fig:hard_1_1}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.02_695.png}
       \caption[]{E-3.02}
       \label{fig:hard_2_0}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.32\linewidth}
+  \begin{subfigure}[b]{0.29\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Data/samples/hard/E-3.02_725.png}
       \caption[]{E-3.02}
@@ -261,3 +253,5 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
   \caption[Difficult Exercises]{The three difficult exercises. (\ref{fig:hard_0_0} \ref{fig:hard_0_1}) Bowing toward the camera. (\ref{fig:hard_1_0}, \ref{fig:hard_1_1}) Raising the knee leaning forward. (\ref{fig:hard_2_0}, \ref{fig:hard_2_1}) Raising the knee leaning forward while sitting and facing away from the camera. Some of the exercises contain errors in the sample.}
   \label{fig:difficult_exercises}
 \end{figure}
+
+\FloatBarrier

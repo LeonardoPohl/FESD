@@ -1,15 +1,20 @@
 \begin{table}
       \caption[]{}
       \label{}
-      \begin{tabular}{lrrrr}
+          \begin{table}[!htbp]
+        \caption[Test Results of FESDModelv2]{The test results of FESDModelv2 after 50 epochs of training.}
+        \label{tab:res_v2}
+        \begin{tabular}{lrrrrr}
 \hline
-{} &  Percentage of positive guesses &  Accuracy &  F1-Score &  Cohen's Kappa Coefficient \\
-Problem Set   &                                 &           &           &                            \\
+{} &  Percentage of positive guesses &  Accuracy &  F1-Score &  F2-Score &  Cohen's Kappa Coefficient \\
+Problem Set   &                                 &           &           &           &                            \\
 \hline
-Body Parts &                         100.000 &     0.874 &     0.874 &                      0.000 \\
-Full Body  &                         100.000 &     0.725 &     0.725 &                      0.000 \\
-Half Body  &                          81.250 &     0.662 &     0.521 &                      0.293 \\
-Joints     &                          70.000 &     0.892 &     0.638 &                      0.773 \\
+Body Parts &                         100.000 &     0.874 &     0.874 &     0.972 &                      0.000 \\
+Full Body  &                         100.000 &     0.725 &     0.725 &     0.929 &                      0.000 \\
+Half Body  &                          81.250 &     0.662 &     0.521 &     0.846 &                      0.293 \\
+Joints     &                          70.000 &     0.892 &     0.638 &     0.918 &                      0.773 \\
 \hline
 \end{tabular}
-\end{table}
+
+    \end{table}
+  \end{table}

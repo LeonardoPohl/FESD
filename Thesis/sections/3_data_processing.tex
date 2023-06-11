@@ -1,13 +1,13 @@
 \chapter[FESDData]{FESDData - Data Acquisition and Labelling of FESDDataset}
 \label{sec:data_processing}
 
-One of the most important aspects of machine learning is data acquisition since a machine learning algorithm can only be as good as the data provided. In this thesis, a custom tool is developed which is capable of capturing and labelling multi-modal data. The tool is called \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). It is capable of capturing RGB-D data from multiple different RGB-D cameras as well as pose data calculated by Nuitrack, which was developed by 3DiVi Inc\footnote{\url{https://nuitrack.com/}}. Nuitrack was chosen as the pose estimation backbone since it provided the support of multiple different camera models as well as the ability to extract the RGB-D data and pose data simultaneously.
+One of the most important aspects of machine learning is data acquisition since a machine learning algorithm can only be as good as the data provided. In this thesis, a custom tool is developed which is capable of capturing and labelling multi-modal data. The tool is called \textbf{F}ault \textbf{E}stimator for \textbf{S}keleton \textbf{D}etection \textbf{Data} processor (FESDData). It is capable of capturing RGB-D data (RGB and the corresponding depth) from multiple different RGB-D cameras as well as pose data calculated by Nuitrack, which was developed by 3DiVi Inc\footnote{\url{https://nuitrack.com/}}. Nuitrack was chosen as the pose estimation backbone since it provided the support of multiple different camera models as well as the ability to extract the RGB-D data and pose data simultaneously.
 
 In addition to Nuitrack, FESDData is capable of calculating the pose information using OpenPose after the recording is done. This offers future support for other pose estimation backbones. However, OpenPose is not used in the scope of this thesis.
 
-FESDData is designed to be easy to use by anyone and to require minimal setup or tweaking. It allows for the rapid capture of RGB-D datasets with the pre-labelling of multiple different exercises. The parameters can be adapted to capture datasets for many different applications, e.g. action detection, where HPE is used to identify an action. 
+FESDData is designed to be easily used by anyone and to require minimal setup or tweaking. It allows for the rapid capture of RGB-D datasets with the pre-labelling of multiple different exercises. The parameters can be adapted to capture datasets for many different applications, e.g. action detection, where HPE is used to identify an action. 
 
-For this thesis, exercises have been derived which are designed to emulate different scenarios with different difficulties. These exercises are discussed in section \ref{sec:errors}. The labelling of errors in the data requires domain-specific knowledge and is therefore done manually. The resulting dataset, FESDDataset, is discussed in section \ref{sec:dataset}. It consists of the RGB-D data as well as the pose data and the labels for the errors for each of the joints in the pose.
+For this research, exercises have been derived which are designed to emulate different scenarios with different difficulties. These exercises are discussed in section \ref{sec:errors}. The labelling of errors in the data requires domain-specific knowledge and is therefore done manually. The resulting dataset, FESDDataset, is discussed in section \ref{sec:dataset}. It consists of the RGB-D data as well as the pose data and the labels for the errors for each of the joints in the pose.
 
 In this chapter, the approach to the design of the exercises is discussed by showing the difficulties of HPE. Furthermore, the data acquisition and labelling process is discussed. Finally, the features of the dataset are presented.
 
@@ -16,4 +16,5 @@ In this chapter, the approach to the design of the exercises is discussed by sho
 \input{sections/1_data_processing/2_data_layout}
 \input{sections/1_data_processing/3_data_labelling}
 \input{sections/1_data_processing/4_problem_sets}
+\input{sections/1_data_processing/4.1_recording_setup}
 \input{sections/1_data_processing/5_dataset}

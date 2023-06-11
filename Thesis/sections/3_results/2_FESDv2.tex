@@ -1,50 +1,35 @@
 \section{FESDModelv2 Results}
 
-The results of the testing after 100 epochs of training for FESDModelv2 can be seen in table \ref{tab:res_v2}. The numeric values of the accuracy and F1-Score show good results. However, the percentage of positive guesses metric seems to hint at overfitting.
+The results of the testing after 50 epochs of training for FESDModelv2 can be seen in table \ref{tab:res_v2}. The numeric values of the accuracy and F1-Score show good results. However, the percentage of positive guesses metric seems to hint at overfitting.
 
-\begin{table}
-  \caption[Test Results of FESDModelv2]{The test results of FESDModelv2 after 100 epochs of training.}
-  \label{tab:res_v2}
-  \centering
-  \begin{tabular}{p{0.15\linewidth}p{0.15\linewidth}p{0.15\linewidth}p{0.15\linewidth}p{0.15\linewidth}}
-    \hline
-    {} &  Percentage of positive guesses &  Accuracy &  F1-Score &  Cohen's Kappa Coefficient \\
-    Problem Set   &                                 &           &           &                            \\
-    \hline
-    Full Body  &                         100.000 &     0.725 &     0.725 &                      0.000 \\
-    Half Body  &                          78.542 &     0.698 &     0.525 &                      0.370 \\
-    Body Parts &                         100.000 &     0.874 &     0.874 &                      0.000 \\
-    Joints     &                          70.010 &     0.892 &     0.638 &                      0.772 \\
-    \hline
-  \end{tabular}
-\end{table}
+\input{figures/Results/v2/res_table.tex}
 
 The results shown in table \ref{tab:res_v2} are reflected in the confusion matrices seen in figure \ref{fig:conf_v2}. The half-body and body parts problem set only guess positive results, hence the Percentage of positive guesses. The Cohen's Kappa Coefficient is 0 if $tp \cdot tn = fn \cdot fp$. This is the case if only one class is guessed, which is the case if all guesses are positive.
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/confusion/full_together.png}
       \caption[]{Full Body Problem Set}
       \label{fig:fb_conf}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/confusion/half_together.png}
       \caption{Half Body Problem Set}
       \label{fig:hb_conf}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/confusion/body_parts_together.png}
       \caption{Body Part Problem Set}
       \label{fig:bp_conf}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/confusion/joints_together.png}
       \caption{Joint Problem Set}
@@ -54,32 +39,32 @@ The results shown in table \ref{tab:res_v2} are reflected in the confusion matri
   \label{fig:conf_v2}
 \end{figure}
 
-While the half-body and joint models seem to achieve good results, the ROC-curve shown in figure \ref{fig:roc_v2}, shows that also these models perform badly.
+The ROC-curves shown in figure \ref{fig:roc_v2}, show the different true positive and false positive rates for each of the areas in each problem set.
 
-\begin{figure}
+\begin{figure}[htbp]
   \centering
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/roc/fb.png}
       \caption[]{Full Body Problem Set}
       \label{fig:fb_roc_v2}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/roc/hb.png}
       \caption[]{Half Body Problem Set}
       \label{fig:hb_roc_v2}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/roc/bp.png}
       \caption[]{Body Part Problem Set}
       \label{fig:bp_roc_v2}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.47\linewidth}
+  \begin{subfigure}[b]{0.4\linewidth}
       \centering
       \includegraphics[width=\textwidth]{figures/Results/v2/roc/jt.png}
       \caption[]{Joint Problem Set}
@@ -89,4 +74,22 @@ While the half-body and joint models seem to achieve good results, the ROC-curve
   \label{fig:roc_v2}
 \end{figure}
 
-The ROC curve shows that also the model for the half-body and joint problem set is no better than a random classifier due to over-confidence regardless of the result.
+The Joint model seems like it is getting good results when considering all joints together. However, when considering the confusion matrix for each of the joints, as can be seen in figure \ref{fig:conf_v2_jts}, the show that while in total not a single error label is guessed all the time for all joints together, each joint does not have varying error labels and is therefore not a good model. 
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/Results/v2/confusion/joints_joint.png}
+  \caption[Confusion matrix of FESDModelv2 for each Joint]{The confusion matrix of each joint for FESDModelv2 for the joint problem set.}
+  \label{fig:conf_v2_jts}
+\end{figure}
+
+Similar to FESDModelv1, the Half Body problem set is getting very good results which do not indicate overfitting. In figure \ref{fig:conf_v2_hb_ul} the confusion matrices can be seen for the upper and lower body. It can be seen that the detection of the lower body is more successful than the detection of the upper body. It is important to consider, that the upper body has far more stable joints and more joints in general. This discrepancy might be the reason for the diverging accuracy of the upper and lower body.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/Results/v2/confusion/body_halves_half.png}
+  \caption[Confusion matrix of FESDModelv2 for each Body Half]{The confusion matrix of the upper and lower body for FESDModelv2 for the body half problem set.}
+  \label{fig:conf_v2_hb_ul}
+\end{figure}
+
+\FloatBarrier
