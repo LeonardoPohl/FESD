@@ -68,6 +68,19 @@ The percentage of positive guesses is an indicator of the performance of a model
     \text{Percentage of positive guesses} = \frac{\text{Number of positive guesses}}{\text{Number of guesses}} = \frac{tp + fp}{tp + fp + tn + fn}
 \end{equation}
 
+\subsection{Receiver Operating Characteristic Curve}
+
+The receiver operating characteristic curve (ROC curve) is a metric that shows the performance of a model performing binary classification tasks. It plots the true positive rate \(\frac{TP}{TP+FN}\) against the false positive rate \(\frac{FP}{FP+TN}\). This allows for the evaluation of a classifier without the influence of class distribution. An interpretation of the ROC Curve can be seen in figure \ref{fig:roc-curve}
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/Roc_curve.png}
+    \caption[An interpretation of the ROC Curve]{An interpretation of the ROC curve. The plotted lines are examples of exceedingly good classifiers, with orange being the worst and blue being the best.\cite{ROC-Drawing}}
+    \label{fig:roc-curve}
+\end{figure}
+  
+
 \subsection{Accuracy, Precision, Recall and F1-Score}
 
 The accuracy of a prediction is the ratio of the number of correct predictions to the total number of predictions. The accuracy is calculated using equation \ref{eq:accuracy}. The accuracy is a good indicator of the performance of a model if the dataset is balanced. However, if the dataset is unbalanced, the accuracy might be sufficiently good when only guessing for the majority class. 

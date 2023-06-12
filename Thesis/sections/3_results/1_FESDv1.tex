@@ -40,7 +40,10 @@ To get a further understanding of these results the cofusion matrix and ROC curv
   \label{fig:conf_v1}
 \end{figure}
 
-\begin{figure}
+
+The odd looking figure \ref{fig:jt_roc_v1} can be explained using the results of the prediction. The model predicting the joint problem set is overconfident and therefore, there is only a limited number of thresholds that can be shown in the ROC curve. Therefore, the majority of the datapoints is in the upper right corner.
+
+\begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.4\linewidth}
       \centering
@@ -73,7 +76,7 @@ To get a further understanding of these results the cofusion matrix and ROC curv
   \label{fig:roc_v1}
 \end{figure}
 
-The model is most accurate when predicting the body part problem set according to the calculated F1 score. However, there is a discrepancy between the F1 score, which is around 0.74, and Cohen's Kappa metric, which is only around 0.18. The reason for this discrepancy can be seen when considering the confusion matrix for each of the body parts. This can be seen in figure \ref{fig:conf_v1_bps}. While the model predicts that there is no error quite well, it does not predict errors well.
+The model is most accurate when predicting the body part problem set according to the calculated F1 score. However, there is a discrepancy between the F1 score, which is around 0.87, and Cohen's Kappa metric, which is only around 0.22. The reason for this discrepancy can be seen when considering the confusion matrix for each of the body parts. This can be seen in figure \ref{fig:conf_v1_bps}. While the model predicts that there is no error quite well, it does not predict errors well.
 
 \begin{figure}[!htbp]
   \centering

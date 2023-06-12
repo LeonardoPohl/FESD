@@ -1,20 +1,17 @@
-\begin{table}
-      \caption[]{}
-      \label{}
-          \begin{table}[!htbp]
-        \caption[Test Results of FESDModelv2]{The test results of FESDModelv2 after 50 epochs of training.}
+    \begin{table}[!htbp]
+        \caption[Test Results of FESDModelv2]{The test results of FESDModelv2 after 50 epochs of training. Showing the Percentage of Positive Guesses (PPG), the Accuracy (Acc), the F-$\beta$ score calculated with $\beta = [1, 0.5, 2]$ (F1, F0.5, F2 respectively) and the Cohen's Kappa Coefficient ($\kappa$).}
         \label{tab:res_v2}
-        \begin{tabular}{lrrrrr}
+        \begin{tabular}{p{0.13\linewidth}p{0.13\linewidth}p{0.13\linewidth}p{0.13\linewidth}p{0.13\linewidth}p{0.13\linewidth}p{0.13\linewidth}}
 \hline
-{} &  Percentage of positive guesses &  Accuracy &  F1-Score &  F2-Score &  Cohen's Kappa Coefficient \\
-Problem Set   &                                 &           &           &           &                            \\
+{} &    PPG &  Acc &   F1 &  F0.5 &   F2 &  $\kappa$ \\
+Problem Set   &        &      &      &       &      &           \\
 \hline
-Body Parts &                         100.000 &     0.874 &     0.874 &     0.972 &                      0.000 \\
-Full Body  &                         100.000 &     0.725 &     0.725 &     0.929 &                      0.000 \\
-Half Body  &                          81.250 &     0.662 &     0.521 &     0.846 &                      0.293 \\
-Joints     &                          70.000 &     0.892 &     0.638 &     0.918 &                      0.773 \\
+Full Body  & 100.00 & 0.72 & 0.84 &  0.77 & 0.93 &      0.00 \\
+Half Body  &  81.25 & 0.66 & 0.76 &  0.68 & 0.85 &      0.26 \\
+Body Parts & 100.00 & 0.87 & 0.93 &  0.90 & 0.97 &      0.00 \\
+Joints     &  70.00 & 0.89 & 0.91 &  0.91 & 0.92 &      0.77 \\
 \hline
 \end{tabular}
 
     \end{table}
-  \end{table}
+  
