@@ -26,7 +26,7 @@ The augmentations can be seen in figure \ref{fig:data_preparation_pipeline} wher
 
 \subsection{Data balancing}
 
-In the ordinary case, HPE is not meant to produce faulty results. In the selected exercises it is aimed to produce faulty results. However, this does still not produce a balanced dataset. In section \ref{sec:dataset}, the statistics of the dataset are shown. Most notably for the problem set \textit{Half} and \textit{Full}, in figures \ref{fig:hb_pie} and \ref{fig:fb_pie}, where the error label \textit{No Error} is overrepresented it can be seen that the dataset is imbalanced.
+In the ordinary case, HPE is not meant to produce faulty results. In the selected exercises it is aimed to produce faulty results. However, this still does not produce a balanced dataset. In section \ref{sec:dataset}, the statistics of the dataset are shown. Most notably for the problem set \textit{Half} and \textit{Full}, in figures \ref{fig:hb_pie} and \ref{fig:fb_pie}, where the error label \textit{No Error} is overrepresented it can be seen that the dataset is imbalanced.
 
 To balance the dataset, frames are sampled using a Weighted Random Sampler for each batch of the training. The weights for the samples are calculated based on the occurrence of the error labels in the dataset. While only considering the whole body as a single object, the calculation of the weights is simple. For each frame, the error label is counted and the inverse of the count is used as the weight for the frame. This ensures that the model is not biased toward any particular error label by oversampling the frames which contain an error.
 

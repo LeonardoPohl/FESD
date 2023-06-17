@@ -1,11 +1,19 @@
 \section{FESDModelv1 Results}
 \label{sec:FESDModelv1_results}
 
-After training all four models using FESDModelv1, the results are evaluated. Table \ref{tab:res_v1} shows the results of the testing after 50 epochs of training. The results seem promising with an accuracy in the range of 80 to 90 percent. Additionally, the Cohen's Kappa coefficient shows results in a good range.
+After training all four models using FESDModelv1, the results are evaluated. Table \ref{tab:res_v1} shows the results of the testing after 50 epochs of training. The results show that the models predict the error labels positively with an accuracy in the range of $70-90\%$ and an F1-Score of around 0.8.
 
 \input{figures/Results/v1/res_table.tex}
 
 To get a further understanding of these results the cofusion matrix and ROC curve were calculated. The confusion matrices can be seen in figure \ref{fig:conf_v1} and ROC curves can be seen in figure \ref{fig:roc_v1}.
+
+Figure \ref{fig:jt_roc_v1} can be explained using the results of the prediction. The model predicting the joint problem set is overconfident and therefore, there is only a limited number of thresholds that can be shown in the ROC curve. Therefore, the majority of the data points have a high true positive rate and a high false positive rate. The joint problem set proves to be very hard to train due to the size of the resulting search space with 20 joints and 4 error labels.
+
+The model is most accurate when predicting the body part problem set according to the calculated F1 score. However, there is a discrepancy between the F1 score, which is around 0.87, and Cohen's Kappa metric, which is only around 0.22. The reason for this discrepancy can be seen when considering the confusion matrix for each of the body parts. This can be seen in figure \ref{fig:conf_v1_bps}. While the model predicts that there is no error quite well, it does not predict errors well.
+
+When only considering the accuracy of FESDModelv1 when predicting the joint problem set, the model is predicting the error labels accurately. However, since the results are taken as the average, the individual results have to be investigated to get a clear picture of the results. Figure \ref{fig:conf_v1_jts} shows the confusion matrix of each joint on the test dataset. It can be seen that each joint is only predicting either no error or error depending on the joint. This is probably due to the unbalanced nature of the dataset.
+
+The best results are achieved using the half-body problem set. In Figure \ref{fig:conf_v1_hbs} the confusion matrix for the upper and lower body can be seen. The matrices indicate that FESDModelv1 is more accurate when detecting errors for the lower body than for the upper body. This is also reflected by the ROC-Curve seen in figure \ref{fig:hb_roc_v1}, which shows that the lower body is achieving better results than the upper body.
 
 \begin{figure}[!htbp]
   \centering
@@ -40,9 +48,6 @@ To get a further understanding of these results the cofusion matrix and ROC curv
   \label{fig:conf_v1}
 \end{figure}
 
-
-The odd looking figure \ref{fig:jt_roc_v1} can be explained using the results of the prediction. The model predicting the joint problem set is overconfident and therefore, there is only a limited number of thresholds that can be shown in the ROC curve. Therefore, the majority of the datapoints is in the upper right corner.
-
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.4\linewidth}
@@ -76,8 +81,6 @@ The odd looking figure \ref{fig:jt_roc_v1} can be explained using the results of
   \label{fig:roc_v1}
 \end{figure}
 
-The model is most accurate when predicting the body part problem set according to the calculated F1 score. However, there is a discrepancy between the F1 score, which is around 0.87, and Cohen's Kappa metric, which is only around 0.22. The reason for this discrepancy can be seen when considering the confusion matrix for each of the body parts. This can be seen in figure \ref{fig:conf_v1_bps}. While the model predicts that there is no error quite well, it does not predict errors well.
-
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=.8\linewidth]{figures/Results/v1/confusion/body_parts_part.png}
@@ -85,7 +88,6 @@ The model is most accurate when predicting the body part problem set according t
   \label{fig:conf_v1_bps}
 \end{figure}
 
-When only considering the accuracy of FESDModelv1 when predicting the joint problem set, it seems that FESDModelv1 is predicting the error labels well. However, since the results are taken as the average the individual results have to be investigated to get a clear picture of the results. Figure \ref{fig:conf_v1_jts} shows the confusion matrix of each joint on the test dataset. It can be seen that each joint is only predicting either no error or error depending on the joint. This is probably due to the unbalanced nature of the dataset.
 
 \begin{figure}[!htbp]
   \centering
@@ -93,8 +95,6 @@ When only considering the accuracy of FESDModelv1 when predicting the joint prob
   \caption[Confusion matrix of FESDModelv1 for each Joint]{The confusion matrix of each joint for FESDModelv1 for the joint problem set.}
   \label{fig:conf_v1_jts}
 \end{figure}
-
-The best results are achieved using the half-body problem set. In Figure \ref{fig:conf_v1_hbs} the confusion matrix for the upper and lower body can be seen. The matrices indicate that FESDModelv1 is more accurate when detecting errors for the lower body than for the upper body. This is also reflected by the ROC-Curve seen in figure \ref{fig:hb_roc_v1}, which shows that the lower body is achieving better results than the upper body.
 
 \begin{figure}[!htbp]
   \centering

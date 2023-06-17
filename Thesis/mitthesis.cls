@@ -171,7 +171,7 @@
    \@afterindentfalse		% Suppresses indent in first paragraph.  Change
    \secdef\@chapter\@schapter}	% to \@afterindenttrue to have indent.
 \else
-\def\chapter{\cleardoublepage	% Starts new page.
+\def\chapter{\clearpage	% Starts new page.
    \thispagestyle{plain}	% Page style of chapter page is 'plain'
    \global\@topnum\z@		% Prevents figures from going at top of page.
    \@afterindentfalse		% Suppresses indent in first paragraph.  Change
@@ -310,7 +310,7 @@ at the
 % this environment should probably be called abstract,
 % but we want people to also be able to get at the more
 % basic abstract environment
-\def\abstractpage{\cleardoublepage
+\def\abstractpage{\clearpage
 \begin{center}{\large{\bf \@title} \\
 by \\
 \@author \\[\baselineskip]}
@@ -339,7 +339,7 @@ requirements for the \@degreeword\ of \\
 % paragraph skip is infinitely stretchable, so if you leave a blank line
 % between lines that you want space between, the space will stretch so
 % that the title page fills up the entire page.
-\def\titlepage{\cleardoublepage\centering
+\def\titlepage{\clearpage\centering
   \thispagestyle{empty}
   \parindent 0pt \parskip 10pt plus 1fil minus 1fil
   \def\baselinestretch{1}\@normalsize\vbox to \vsize\bgroup\vbox to 9in\bgroup}

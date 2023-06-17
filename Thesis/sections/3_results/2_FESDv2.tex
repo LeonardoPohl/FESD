@@ -1,10 +1,16 @@
 \section{FESDModelv2 Results}
 
-The results of the testing after 50 epochs of training for FESDModelv2 can be seen in table \ref{tab:res_v2}. The numeric values of the accuracy and F1-Score show good results. However, the percentage of positive guesses metric seems to hint at overfitting.
+The results of the testing after 50 epochs of training for FESDModelv2 can be seen in table \ref{tab:res_v2}. The numeric values of the accuracy and F1-Score are within a good range. However, the percentage of positive guesses metric indicates that the model is overfitting and only predicts positive values.
 
 \input{figures/Results/v2/res_table.tex}
 
 The results shown in table \ref{tab:res_v2} are reflected in the confusion matrices seen in figure \ref{fig:conf_v2}. The half-body and body parts problem set only guess positive results, hence the Percentage of positive guesses. The Cohen's Kappa Coefficient is 0 if $tp \cdot tn = fn \cdot fp$. This is the case if only one class is guessed, which is the case if all guesses are positive.
+
+The ROC curves shown in figure \ref{fig:roc_v2}, show the different true positive and false positive rates for each of the areas in each problem set.
+
+The results of the model developed to detect errors in the Joint Problem set are in a good range when considering all joints together. However, when considering the confusion matrix for each of the joints, as can be seen in figure \ref{fig:conf_v2_jts}, the show that while in total not a single error label is guessed all the time for all joints together, each joint does not have varying error labels and is therefore not a good model for this dataset. 
+
+Similar to FESDModelv1, the Half Body problem set is producing very good predictions which do not indicate overfitting. In figure \ref{fig:conf_v2_hb_ul} the confusion matrices can be seen for the upper and lower body. It can be seen that the detection of the lower body is more successful than the detection of the upper body. It is important to note, that the upper body has far more stable joints and more joints in general. The difference in accuracy when predicting errors in the lower and upper body is possibly caused by this distribution of stable joints.
 
 \begin{figure}[htbp]
   \centering
@@ -39,8 +45,6 @@ The results shown in table \ref{tab:res_v2} are reflected in the confusion matri
   \label{fig:conf_v2}
 \end{figure}
 
-The ROC-curves shown in figure \ref{fig:roc_v2}, show the different true positive and false positive rates for each of the areas in each problem set.
-
 \begin{figure}[htbp]
   \centering
   \begin{subfigure}[b]{0.4\linewidth}
@@ -74,16 +78,12 @@ The ROC-curves shown in figure \ref{fig:roc_v2}, show the different true positiv
   \label{fig:roc_v2}
 \end{figure}
 
-The Joint model seems like it is getting good results when considering all joints together. However, when considering the confusion matrix for each of the joints, as can be seen in figure \ref{fig:conf_v2_jts}, the show that while in total not a single error label is guessed all the time for all joints together, each joint does not have varying error labels and is therefore not a good model. 
-
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=.8\linewidth]{figures/Results/v2/confusion/joints_joint.png}
   \caption[Confusion matrix of FESDModelv2 for each Joint]{The confusion matrix of each joint for FESDModelv2 for the joint problem set.}
   \label{fig:conf_v2_jts}
 \end{figure}
-
-Similar to FESDModelv1, the Half Body problem set is getting very good results which do not indicate overfitting. In figure \ref{fig:conf_v2_hb_ul} the confusion matrices can be seen for the upper and lower body. It can be seen that the detection of the lower body is more successful than the detection of the upper body. It is important to consider, that the upper body has far more stable joints and more joints in general. This discrepancy might be the reason for the diverging accuracy of the upper and lower body.
 
 \begin{figure}[htbp]
   \centering
