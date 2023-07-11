@@ -1,21 +1,23 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-In order to improve on existing human pose estimators we have to understand the errors and how they occur. In the scope of this thesis, the following research questions were asked; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
+In this thesis, a benchmark dataset for the evaluation of HPE error detectors has been constructed. HPE error detection is important for the improvement of the user experience several applications such as serious gaming as used by SilverFit.
+
+The following important research questions were addressed; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
 
 \begin{enumerate}[label=\Alph*]
-  \item Common problems of HPE were analysed and exercises were designed that cause issues in a controlled manner. It was found that lighting has a high influence on the pose estimation, as well as the posture of the user, and the visibility of the head.
-  \item Using these exercises a dataset, FESDDataset, was captured and labelled using a custom tool for multi-modal stream capture and error labelling for HPE, FESDData. To investigate different problem areas were defined four different problem sets that encompass different abstractions of the problem. 
-  \item Finally, two different models were conceptualised as preliminary experiments which use different methods to process the different modalities. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines all three modalities into a single RGB image, which is passed into a pre-trained model for feature extraction.
+  \item Common problems of HPE were analysed and exercises were designed that cause challenges for HPE in a controlled manner. It was found that lighting has a high impact on the performance pose estimation, as well as the posture of the user, and the visibility of the head.
+  \item Using these exercises a dataset, FESDDataset, was captured and labelled using a custom tool for multi-modal stream capture and labelling for HPE error detection. Four different problem sets were captured and labelled that encompass different levels of challenges for HPE.
+  \item Finally, two different models, FESDModelv1, and FESDModelv2 were proposed with which preliminary HPE error detection experiments were conducted on the four datasets. As input the DNN models used RGB, Depth and pose Data. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines the RGB, depth, and pose data into a single RGB image, which is passed into a pre-trained model for feature extraction.
 \end{enumerate}
 
-The result of preliminary experiments showed that both FESDModelv1 and FESDModelv2 achieve the best results with the half body problem set, in which the upper and lower halves can individually be detected as faulty. In general, FESDModelv1 seems to outperform FESDModelv2 for every problem set. This might be due to the feature extraction method. While EfficientNet performs very well on standard RGB images it was not trained on the merged modalities as they were used by FESDModelv2. 
+To interpret the results of the preliminary experiments a baseline has been created for each of the models. The baseline model predicts "Error", or positive, for all results. We see that all models outperform this baseline based on the F1 score.
 
-In conclusion, the results of the preliminary experiments show that the development of a model for error detection using RGB, Depth and Pose Data is a possibility. However, more data is necessary to avoid overfitting the models and to form a more generalised method.
+In conclusion, the results of the preliminary experiments show that the development of a model for error detection using RGB, Depth and Pose Data is a possibility.
 
-\section{Contribution}
+\section{Contributions}
 
-In this thesis, Exercises were proposed, which challenge HPE at varying difficulties. Furthermore, a database collection tool, FESDData was developed, which allows the capture of RGB, Depth and Pose data simultaneously and allows for the labelling of errors. Using that tool FESDDataset was captured which contains 300 frames for 13 Exercises which were recorded twice, resulting in a total of 7800 frames of multimodal data. Finally, preliminary experiments were conducted to show the viability of model development on the recorded data.
+In this thesis, Exercises were proposed, which challenge HPE at varying difficulty levels. Furthermore, a HPE dataset construction tool, FESDData was developed, which allows the capture of RGB, Depth and Pose data simultaneously and allows for the labelling of errors. Using that tool FESDDataset was captured and constructed which contains 300 frames for 13 Exercises which were recorded twice, resulting in a total of 7800 frames of multimodal HPE and RGB-D data. Finally, preliminary experiments were conducted to show the viability of model development for HPE error detection using the novel datasets.
 
 The code of this thesis is available on GitHub\footnote{\url{https://github.com/LeonardoPohl/FESD}}. The repository is divided into two major parts, FESDData, which contains the C++ implementation of FESDData, FESDModel, which contains the implementation of the model, FESDModelv1 and FESDModelv2, as well as the Jupyter notebooks that were used to evaluate the dataset, to train and evaluate the model. FESDDataset, as well as the trained models, are available on request.  
 

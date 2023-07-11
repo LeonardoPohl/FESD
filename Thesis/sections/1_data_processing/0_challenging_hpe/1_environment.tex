@@ -1,6 +1,6 @@
 \subsection{Environment}
 
-The environment in which the data is recorded is crucial to the quality of the pose estimation. The mentioned difficulties depend on how the method itself works. For example, if a method uses RGB data, the background might be an issue, whereas if a method uses depth data, the lighting is more of an issue.
+The environment in which the data is recorded is crucial to the quality of the pose estimation. The mentioned difficulties depend on how the method itself works. For example, if a method uses RGB data, the background might be an issue, whereas if a method uses depth data, the reflections and IR component of the lighting is often more of an issue.
 
 \subsubsection{Background}
 
@@ -12,12 +12,12 @@ While RBG cameras are to some extent insensitive to the amount of incoming light
 
 To reduce the effect of the sunlight, the camera can be placed in a room with curtains or blinds. This will reduce the amount of sunlight that enters the room and therefore reduce the effect of the sunlight on the camera. Since lighting is hard to perfectly reproduce without a controlled environment, the lighting is not varied throughout the experiments. Therefore, all of the experiments were conducted in a room without any natural light or during the night.
 
-However, if a method heavily relies on RGB data for the pose estimation, eliminating any form of light is not a valid option since then the data that can be gathered by RGB cameras in low light environments is limited and may result in a wrong pose.
+However, if a method heavily relies on RGB data for the pose estimation, eliminating any form of light is not a valid option since then the data that can be gathered by RGB cameras in low light environments is limited and may result in a wrong pose estimation.
 
 \subsubsection{Objects}
 
-The objects in the scene may cause issues in the HPE process if they either occlude or are too close to the user. Occlusion can cause inaccurate or missing joints. Whereas objects that are too close to the user can cause joints to move to these objects instead.
+The objects in the scene may cause issues in the HPE process if they occlude or are too close to the user. Occlusion can cause inaccurate or missing joints. Whereas objects that are too close to the user can cause joints to move to these objects instead.
 
 \subsubsection{Chair}
 
-If the exercise is performed in a sitting position the chair might influence the accuracy of HPE. For example, wheelchairs pose a problem in some estimators, but a significant part of users who use pose estimation for rehabilitation games are using wheelchairs due to health conditions. Furthermore, bulky chairs that go higher than the head may prevent accurate head detection and therefore, negatively impact the pose estimation, since in some pose estimators the head is used as an ankor point as it is usually reliable.
+If the exercise is performed in a sitting position the chair might influence the accuracy of HPE. For example, wheelchairs pose a problem for some estimators, but a significant part of users who use pose estimation for rehabilitation games are using wheelchairs due to health conditions. Furthermore, bulky chairs that go higher than the head may prevent accurate head detection and therefore, negatively impact the pose estimation, since in some pose estimators the head is used as an ankor point as it is usually reliable.

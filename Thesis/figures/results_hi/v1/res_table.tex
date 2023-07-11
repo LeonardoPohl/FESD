@@ -1,0 +1,18 @@
+    \begin{table}[!htbp]
+        \caption[Test Results of FESDModelv1]{The test results of FESDModelv1 after 22 epochs of training on the Body Parts and Joints dataset. Showing the Percentage of Positive Guesses (PPG), the Accuracy (Acc), the F-$\beta$ score calculated with $\beta = [1, 0.5, 2]$ (F1, F0.5, F2 respectively) and the Cohen's Kappa Coefficient ($\kappa$).}
+        \label{tab:hi_res_v1}
+        \begin{tabular}{p{0.14\linewidth}p{0.12\linewidth}p{0.12\linewidth}p{0.12\linewidth}p{0.12\linewidth}p{0.12\linewidth}p{0.12\linewidth}}
+\hline
+{} &   PPG &  Acc &   F1 &  F0.5 &   F2 &  $\kappa$ \\
+Problem Set   &       &      &      &       &      &           \\
+\hline
+\hline
+Baseline    & $1.00$ &	$0.13$ &	$0.22$ &	$0.15$ &	$0.42$ &	$0.00$ \\
+Body Parts  & $0.07$ &	$0.87\uparrow$ &	$0.32\uparrow$ &	$0.40\uparrow$ &	$0.27\downarrow$ &	$0.26\uparrow$ \\
+\hline
+Baseline    & $1.00$ &	$0.13$ &	$0.23$ &	$0.16$ & 	$0.43$ &	$0.00$ \\
+Joints      & $0.22$ &	$0.81\uparrow$ &	$0.45\uparrow$ &	$0.39\uparrow$ &	$0.53\uparrow$ &	$0.34\uparrow$ \\
+\hline
+\end{tabular}
+\end{table}
+  

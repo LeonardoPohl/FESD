@@ -1,10 +1,12 @@
 \section{Experimental Setup}
 \label{sec:model_training}
 
-To train the models the data has to be passed into the network so that it can predict a value. Based on that value a loss is calculated which is used to adapt the weights of the networks. In the case of FESDModel \textit{cross entropy loss} is used. In cases where the problem set contains more than one problem area, i.e. all problem sets except the full body problem set, the cross entropy loss is calculated for each object or area separately and a summed cross entropy loss is calculated.
+To train the models the data has to be passed into the network so that it can predict a value. Based on that value a loss is calculated which is used to adapt the weights of the networks. In the case of both FESDModelv1 and FESDModelv2 \textit{cross entropy loss} is used. In cases where the problem set contains more than one problem area, i.e. all problem sets except the Full Body problem set, the cross-entropy loss is calculated for each object or area separately and an average cross-entropy loss is calculated. 
 
-Carl F. Sabottke and Bradley M. Spieler showed in their study that a lower resolution of the input images achieves better performances\cite{LowResGood}. They found that images that were passed into a CNN which were of a resolution of 300x300 pixels achieved worse results than images with 64x64 pixels. Therefore, the images are scaled to 64x64 pixels.
+Initially, low-resolution images of 64x64 pixels were used for training to minimise the prediction time and the training time. However, this proved to negatively impact the performance of FESDModelv2. Therefore, more iterations of the training were run where the images are rescaled to a resolution of 200x200 pixels. This resolution was chosen to limit training time and optimise performance while keeping a high resolution to improve the accuracy of the model. No extended investigation into the resolution of the input image has been conducted and remains subject to future research.
+
+The models that were trained on low-resolution images were trained for 50 epochs. Due to limited time, the models were only trained for 20 epochs on the images with a higher resolution.
 
 Both networks are trained using the Adam optimiser, as described by Diederik P. Kingma and Jimmy Ba\cite{kingma2017adam}, with an initial learning rate of 0.00005 with learning rate decay.
 
-To improve the performance of the training process Cuda is used. To further speed up the training a batch size of 32 is used.
+To improve the performance of the training process Cuda is used.

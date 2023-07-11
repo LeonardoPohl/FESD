@@ -4,11 +4,11 @@ This appendix contains graphs which were not included in the main body of the th
 
 \section{Distribution of the number of joints with an error}
 
-Each problem set, except the joint problem set, is an abstraction from the base data which combines different areas of the pose into separate objects. A threshold is used to determine whether an area is considered as faulty based on the number of joints that are faulty in the pose. To determine this threshold the distribution of joints with errors is calculated for each of the problem areas over all the data and the 50th percentile is picked as the threshold.
+Each problem set, except the Joint problem set, is an abstraction from the base data which combines different areas of the pose into separate objects. A threshold is used to determine whether an area is considered as faulty based on the number of joints that are faulty in the pose. To determine this threshold the distribution of joints with errors is calculated for each of the problem areas over all the data and the 50th percentile is picked as the threshold.
 
 \paragraph{Full Body problem set}
 
-The results of the full body problem set can be seen in Figure \ref{fig:dist_jt_epp}. The threshold is at two errors, i.e. if more than two joints in the whole body are faulty, the whole body is considered as faulty.
+The results of the Full Body problem set can be seen in Figure \ref{fig:dist_jt_epp}. The threshold is at two errors, i.e. if more than two joints in the whole body are faulty, the whole body is considered as faulty.
 
 \begin{figure}[ht]
   \centering
@@ -19,7 +19,7 @@ The results of the full body problem set can be seen in Figure \ref{fig:dist_jt_
 
 \paragraph{Half Body problem set}
 
-The distribution of joints with errors for both the lower and upper body can be seen in figure \ref{fig:dist_bh_epp}. If one joint in the upper body or more than two joints in the lower body are considered as faulty, the upper or lower body is considered as faulty respectively.
+The distribution of joints with errors for both the lower and upper body can be seen in Figure \ref{fig:dist_bh_epp}. If one joint in the upper body or more than two joints in the lower body are considered as faulty, the upper or lower body is considered as faulty respectively.
 
 \begin{figure}[ht]
   \centering
@@ -50,24 +50,24 @@ Figure \ref{fig:fb_diff_dist} gives an overview of the error distribution by the
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/Data/dist_full_body/Error_Rate_by_Difficulty.png}
-  \caption[Error Distribution of the Full Body by difficulty]{The distribution of Errors of the full body problem set by difficulty.}
+  \caption[Error Distribution of the Full Body by difficulty]{The distribution of Errors of the Full Body problem set by difficulty.}
   \label{fig:fb_diff_dist}
 \end{figure}
 
 \paragraph{Half Body}
 
-The distribution of errors by difficulty for the half body problem set can be seen in figure \ref{fig:hb_diff_dist}. Easy exercises seem to be less error-prone when grouping the joints into body halves. This might be caused by the error threshold that was set before.
+The distribution of errors by difficulty for the Half Body problem set can be seen in Figure \ref{fig:hb_diff_dist}. Easy exercises seem to be less error-prone when grouping the joints into body halves. This might be caused by the error threshold that was set before.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/Data/dist_half_body/Error_Rate_by_Difficulty.png}
-  \caption[Error Distribution of the Half Body by difficulty]{The distribution of Errors of the half body problem set by difficulty.}
+  \caption[Error Distribution of the Half Body by difficulty]{The distribution of Errors of the Half Body problem set by difficulty.}
   \label{fig:hb_diff_dist}
 \end{figure}
 
 \paragraph{Body parts}
 
-The distribution of errors by difficulty can be seen in figure \ref{fig:lb_diff_dist}. A less distinct distribution of errors can be seen when grouping the joints into body parts. Only a very small amount of errors occur during trivial exercises. This might be caused by the error threshold that was set before. The majority of errors occurring during trivial exercises are caused by a single faulty joint in the ankle. In Figure \ref{fig:dist_lb_epp} it is shown that the legs have an error threshold of two faulty joints. This means that the legs are considered faulty if there are more than two faulty joints. The ankle is the only joint that is faulty in trivial exercises. This means that the legs are not considered faulty.
+The distribution of errors by difficulty can be seen in Figure \ref{fig:lb_diff_dist}. A less distinct distribution of errors can be seen when grouping the joints into body parts. Only a very small amount of errors occur during trivial exercises. This might be caused by the error threshold that was set before. The majority of errors occurring during trivial exercises are caused by a single faulty joint in the ankle. In Figure \ref{fig:dist_lb_epp} it is shown that the legs have an error threshold of two faulty joints. This means that the legs are considered faulty if there are more than two faulty joints. The ankle is the only joint that is faulty in trivial exercises. This means that the legs are not considered faulty.
 
 \begin{figure}[ht]
   \centering
@@ -78,9 +78,9 @@ The distribution of errors by difficulty can be seen in figure \ref{fig:lb_diff_
 
 \paragraph{Joints}
 
-In medium exercises, the majority of errors that occur for the joints problem set, occur due to missing joints, rather than joints which are in the wrong position. This is shown in figure \ref{fig:jt_pie_diff}.
+In medium exercises, the majority of errors that occur for the joints problem set, occur due to missing joints, rather than joints which are in the wrong position. This is shown in Figure \ref{fig:jt_pie_diff}.
 
-A clear distinction between error-prone and stable joints can be seen in figure \ref{fig:jt_pie_joint}. While in the majority of cases ($72.3\%$) the right ankle is faulty only $4.9\%$ of the left shoulder is faulty. Furthermore, the left and right ankles have a significant number of missing joints, contrary to the other joints, which have a more balanced distribution of error classes. This might be caused by occlusion or a cutoff from the image or a confidence which is too low and therefore discarded by Nuitrack.
+A clear distinction between error-prone and stable joints can be seen in Figure \ref{fig:jt_pie_joint}. While in the majority of cases ($72.3\%$) the right ankle is faulty only $4.9\%$ of the left shoulder is faulty. Furthermore, the left and right ankles have a significant number of missing joints, contrary to the other joints, which have a more balanced distribution of error classes. This might be caused by occlusion or a cutoff from the image or a confidence which is too low and therefore discarded by Nuitrack.
 
 \begin{figure}[ht]
   \centering
@@ -99,6 +99,6 @@ A clear distinction between error-prone and stable joints can be seen in figure 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/Data/dist_joints/Error_Rate_by_Difficulty.png}
-  \caption[Error Distribution of the joints by difficulty]{The distribution of Errors of the joint problem set by difficulty.}
+  \caption[Error Distribution of the joints by difficulty]{The distribution of Errors of the Joint problem set by difficulty.}
   \label{fig:jt_diff_dist}
 \end{figure}

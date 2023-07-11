@@ -1,5 +1,5 @@
 class truths:
-  def __init__(self, tp, fn, fp, tn):
+  def __init__(self, tn, fp, fn, tp):
    self.tp=tp
    self.fp=fp
    self.fn=fn
@@ -12,7 +12,8 @@ class truths:
     return self.f_beta(0.5)
 
   def f1(self):
-    return self.f_beta(1)
+    # return self.f_beta(1)
+    return 2 * (self.precision() * self.recall()) / (self.precision() + self.recall())
   
   def f2(self):
     return self.f_beta(2)
@@ -32,36 +33,47 @@ class truths:
   
   def print(self):
     print("---")
-    print(f"  Precision: {self.precision()}")
-    print(f"  Recall: {self.recall()}")
-    print(f"  Accuracy: {self.acc()}")
-    print(f"  F0.5: {self.f05()}")
-    print(f"  F1: {self.f1()}")
-    print(f"  F2: {self.f2()}")
-    print(f"  Kappa: {self.kappa()}")
+    print(f"  Precision: {self.precision():.2}")
+    print(f"  Recall: {self.recall():.2}")
+    print(f"  Accuracy: {self.acc():.2}")
+    print(f"  F0.5: {self.f05():.2}")
+    print(f"  F1: {self.f1():.2}")
+    print(f"  F2: {self.f2():.2}")
+    print(f"  Kappa: {self.kappa():.2}")
     print("---")
   
   def acc(self):
-    return (self.tp + self.tn)/(self.tp+self.tn+self.fp+self.fn)
+    # return (self.tp + self.tn)/(self.tp+self.tn+self.fp+self.fn)
+    tp = self.tp
+    tn = self.tn
+    fp = self.fp
+    fn = self.fn
+
+    return (tp + tn) / (tp + tn + fp + fn)
 
 print("V1:")
-fb_v1 = truths(110, 64, 11, 55)
+fb_v1 = truths(110, 64, 
+                11, 55)
 fb_v1.print()
-hb_v1 = truths(214, 58, 54, 154)
+
+
+hb_v1 = truths(214, 58, 
+               54, 154)
 hb_v1.print()
-bp_v1 = truths(1039, 219, 99, 83)
+bp_v1 = truths(1039, 219, 
+                  99, 83)
 bp_v1.print()
-jt_v1 = truths(7992, 338, 648, 55)
-jt_v1.print()
+# jt_v1 = truths(7992, 338, 648, 55)
+# jt_v1.print()
 
-print("\n\nV2:")
+# print("\n\nV2:")
 
-fb_v2 = truths(169, 5, 66, 0)
-fb_v2.print()
-hb_v2 = truths(214, 58, 54, 154)
-hb_v2.print()
-bp_v2 = truths(1039, 219, 99, 83)
-bp_v2.print()
-jt_v2 = truths(7992, 338, 648, 55)
-jt_v2.print()
+# fb_v2 = truths(169, 5, 66, 0)
+# fb_v2.print()
+# hb_v2 = truths(214, 58, 54, 154)
+# hb_v2.print()
+# bp_v2 = truths(1039, 219, 99, 83)
+# bp_v2.print()
+# jt_v2 = truths(7992, 338, 648, 55)
+# jt_v2.print()
 

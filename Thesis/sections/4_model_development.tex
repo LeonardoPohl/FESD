@@ -3,9 +3,11 @@
 
 While there could be multiple approaches to fault estimation, a deep-learning approach using deep convolutional neural networks(CNN) has been chosen. The reason for this is that CNNs have shown to be very successful in many different fields, especially in computer vision tasks, such as image classification, object detection, and image segmentation.
 
-Other possible solutions could be to use rule-based systems, which use inverse kinematics, or use frame-to-frame joint comparison to detect discrepancies, however, these are quite limited and might result in either too many false positives or false negatives. Furthermore, these rules, such as the frame-to-frame joint comparison, are not always applicable to all types of movements, and therefore might not be able to detect all types of faults in all cases.
+We speculate that other possible solutions could be to use rule-based systems, which use inverse kinematics, or use frame-to-frame joint comparison to detect discrepancies, however, we expect that these are quite limited and might result in either too many false positives or false negatives, but these are speculations and need to be further investigated to form a clear understanding of alternative approaches for error detection. As no research has been found to actual error detection this is left as future work as such an investigation is a task in its own right. 
 
-Here two different models are proposed as they could be designed for this kind of task on a dataset consisting of three different modalities, RGB, Depth, and Pose Data.
+The closest approach to error detection was proposed by Joao Carreira et. al for their Iterative Error Detection algorithm. However, in their work, the authors do not detect errors but rather determine the best change that can be applied to an estimated pose to achieve a better pose. Therefore, this approach cannot efficiently be used to determine an error in a scene, as a correction does not necessarily mean that there is an error.
+
+Here two different models are proposed as they could in general be designed for this kind of task on a dataset consisting of three different modalities, RGB, Depth, and Pose Data.
 
 \input{sections/2_model/1_model_architecture.tex}
 \input{sections/2_model/2_data_preparation.tex}

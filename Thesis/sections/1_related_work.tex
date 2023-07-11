@@ -1,22 +1,25 @@
 \chapter{Related Work}
 \label{sec:related_work}
 
-\paragraph{Human Pose Estimation}
+\paragraph{Human Pose Estimation (HPE)}
 
-To detect errors in HPE the methods of capturing the human pose from different modalities are essential. Multiple different human pose estimators have been developed using different modalities and focussing on different parts of the body. For example, OpenPose has developed a general human pose estimator\cite{OpenPosePose},  a hand pose estimator\cite{OpenPoseHand} and an estimator that is capable of detecting multiple people\cite{OpenPoseMulti}. Z. Cao et al. achieve this by using solely RGB data.
+Multiple different human pose estimators have been developed using different modalities and focussing on different parts of the body. 
 
-A method that uses RGB data in combination with errors for estimating the correct pose, is proposed by Joao Carreira et al.\cite{IterativeErrorFeedback}. In their paper, the authors extract the features of both input and output spaces. This enables Joao Carreira et al. to develop a self-correcting model using Iterative Error Feedback. 
+OpenPose has developed a general human pose estimator\cite{OpenPosePose}, a hand pose estimator\cite{OpenPoseHand} and an estimator that is capable of detecting multiple people\cite{OpenPoseMulti}. This is achieved by using RGB data only.
 
-Other methods use point clouds which are extracted from depth data. Point clouds are a representation of depth data which represents the environment using points. is commonly used in autonomous driving to represent the real world more accurately and to describe complex objects in the environment. However, conventional feature extraction using CNNs proves difficult to apply since most point clouds are not ordered and not dense so locality cannot be ensured. PointCNN, proposed by Yangyan Li et al.\cite{li2018pointcnn}, combats this problem by learning an $\mathcal{X}$-Transformation to then extract the features using a generalised CNN.
+A method that uses RGB data in combination with errors for estimating the correct pose, is proposed by Joao Carreira et al.\cite{IterativeErrorFeedback}. In their paper, the authors extract the features of both input and output spaces. This enables them to develop a self-correcting model using Iterative Error Feedback. To predict the correct pose for an image, an initial guess is made. Based on this guess, the most optimal predefined error correction is applied and the pose is updated iteratively until a threshold is reached. This method relies on the accuracy of an evaluator or a predefined number of iterations to determine a pose. The method might benefit from a dedicated error detector as is proposed in this research. 
 
-% Additionally, RGB in addition with depth data is used to estimate human pose data, for example with , which was proposed by proposed by D. Pascual-Hernández et al.\cite{PASCUALHERNANDEZ2022102225}.
+Other methods use point clouds which are extracted from depth data. Point clouds are a representation of depth in the environment. These are commonly used in autonomous driving to represent the real world more accurately and to describe complex objects in the environment. However, conventional feature extraction using CNNs proves difficult to be applied on point clouds since most point clouds are not ordered and not dense so locality cannot be ensured. PointCNN, proposed by Yangyan Li et al.\cite{li2018pointcnn}, combats this problem by learning an $\mathcal{X}$-Transformation to then extract the features using a generalised CNN.
+
+
+One of the uses of HPE is action recognition. Action recognition is the detection of pre-defined actions from different modalities. Seddik et al. compare different fusion methods for action recognition\cite{Seddik2017}. After detecting the features for each of the modalities, RGB data, Depth data and Pose data, they fuse the features using different methods. 
+
+In this thesis, we use RGB data, and depth data in addition to pose data to detect the errors created by human pose estimation. We are unaware of any previous work specifically focused on HPE error detection using DNNs.
 
 \paragraph{Datasets}
 
-There are different datasets encompassing different environments and modalities. The KITTI dataset is captured using LIDaR cameras and contains both depth and RGB data\cite{Geiger2012CVPR}. One of the largest datasets specifically for HPE and its applications is Human3.6M\cite{h36m_pami}. Human3.6M is a large-scale dataset containing RGB, Depth and Pose information.
+There are different datasets for human pose estimation encompassing different environments and modalities. The KITTI dataset is captured using LIDaR cameras and contains both depth and RGB data\cite{Geiger2012CVPR}. One of the largest datasets specifically for HPE and its applications is Human3.6M\cite{h36m_pami}. Human3.6M is a large-scale dataset containing RGB, Depth and Pose information.
+
+To our knowledge, there does not exist a dataset that specifically focuses on error detection in human pose estimation.
 
 \paragraph{Action Recognition}
-
-One of the uses of HPE is action recognition. Action recognition is the extraction of pre-defined actions from different modalities. 
-
-To use different modalities in combination Seddik et al. compare different fusion methods for action recognition\cite{Seddik2017}. After detecting the features for each of the modalities, RGB data, Depth data and Pose data, they fuse the features using different methods. 

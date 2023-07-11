@@ -1,13 +1,13 @@
 \subsection{Camera}
 \label{sec:camera}
 
-The two main difficulties that can occur with the camera setup are the camera position and the camera angle. Additionally, the camera itself can make the pose estimation process more difficult. 
+The two main difficulties that can occur with the camera setup are the camera position and the camera angle. Additionally, the camera itself can make the pose estimation process more difficult, as it is the means of capturing the data. If the camera does not record the data at a high enough resolution, the detection of the human pose becomes more challenging.
 
 \subsubsection{Distance to the camera}
 
-The distance of the camera to the user affects the quality of the pose estimation in multiple ways. Firstly, if the user is too close to the camera, the camera might not have the complete body in the frame. The legs and arms might be off the frame preventing them to be estimated properly. Additionally, depth cameras can only detect the depth for a specific range, so if a user is too close they might not be visible to the depth camera.
+The distance of the camera to the user affects the quality of the pose estimation in multiple ways. Firstly, if the user is too close to the camera, the camera might not have the complete body in the frame. The legs and arms might be out of the frame preventing them to be estimated properly. Additionally, depth cameras can only detect the depth for a specific range, so if a user is too close they might not be visible to the depth camera.
 
-However, if the user is too far away from the camera, the person might be too small to be detected reliably. Additionally, depth cameras operate at different depth ranges. If a user is too far away from the camera it will not be visible to the depth camera. This range varies from camera to camera and depends on the method of detection.
+However, if the user is too far away from the camera, the person might be too small to be detected reliably, or the user will not be visible to the depth camera. This range varies from camera to camera and depends on the method of detection.
 
 \subsubsection{Camera Angle}
 
@@ -17,4 +17,4 @@ The pitch may introduce or reduce the occlusion of joints by other joints. It al
 
 \subsubsection{Camera Resolution}
 
-The resolution of the camera, or rather the resolution of the image captured by the camera influences the information that can be gathered about the human and therefore influence the performance of the pose estimation. Also here the application and specific range are important for choosing the right resolution. If a user is far away a higher resolution is needed to detect the pose reliably.
+The resolution of the camera, or rather the resolution of the RGB-D image captured by the camera influences the information that can be gathered about the human and therefore influence the performance of the pose estimation. Also here the application and specific range are important for choosing the right resolution. If a user is far away a higher resolution is needed to detect the pose reliably.

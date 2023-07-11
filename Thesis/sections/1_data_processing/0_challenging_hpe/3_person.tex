@@ -15,11 +15,11 @@ To make exercises more challenging some physiotherapists use additional training
 \subsubsection{Exercises}
 \label{sec:exercises}
 
-Finally, the most important factor is the exercise that is carried out. In this section, both exercises that are easy to detect as well as some exercises that are difficult to detect are proposed.
+Finally, the most important factor is the exercise that is carried out. In this section, a range of exercises are proposed, going from easy to hard for human pose estimators to estimate.
 
-These exercises might not be the most realistic, but they represent common issues with pose estimation in a reproducible manner. Furthermore, these exercises are not too difficult to perform, which makes them suitable for testing the pose estimators. The difficulty rating of the exercise might not reflect the difficulty of the exercise for the user, but it does reflect the difficulty of the exercise for the pose estimator.
+These exercises try to cover common issues with pose estimation in a reproducible manner. The difficulty rating of the exercise does not reflect the difficulty of the exercise for the user, but it does reflect the difficulty of the exercise for the pose estimator.
 
-The exercises are numbered according to the difficulty. An example of the naming of the exercises can be seen here:
+The exercises are numbered according to this difficulty. An example of the naming of the exercises can be seen here:
 
 \[
     \underbrace{E}_\text{Exercise}-\overbrace{2}^\text{Difficulty}.\underbrace{02}_\text{Exercise Id}
@@ -29,7 +29,7 @@ The different difficulties are (0) Trivial, (1) Easy, (2) Medium, and (3) Hard. 
 
 \paragraph{Trivial Exercises}
 
-Trivial exercises are exercises that are easy to detect and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. The two trivial exercises can be seen in table \ref{tab:trivial_exercises}. Example images of the exercises can be seen in figure \ref{fig:trivial_exercises}.
+Trivial exercises are exercises that are easy to detect for a human pose estimator and are therefore good for testing the pose estimators. The exercises do not involve any movement, which makes detecting the joints easier. The two trivial exercises can be seen in Table \ref{tab:trivial_exercises}. Example images of the exercises can be seen in Figure \ref{fig:trivial_exercises}.
 
 \begin{table}[htb]
   \caption[Trivial Exercises]{The two Trivial Exercises, E-0.00 and E-0.01.}
@@ -37,7 +37,7 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
   \begin{tabular}{p{0.1\linewidth}p{0.3\linewidth}p{0.55\linewidth}}
   \hline
   \textbf{Exercise} & \textbf{Short Description}         & \textbf{Challenge}   \\ \hline
-  E-0.00   & Arms hanging to the side  & This exercise is very easy since no part of the body is occluded by any other part. Additionally, the joints are not moving. \\
+  E-0.00   & Arms hanging to the side  & This exercise is very easy for HPE since no part of the body is occluded by any other part. Additionally, the joints are not moving. \\
   E-0.01   & Arms extended to the side & The arms are no longer in a natural position but still not occluded and no joint is moving \\ \hline
   \end{tabular}
 \end{table} 
@@ -63,7 +63,7 @@ Trivial exercises are exercises that are easy to detect and are therefore good f
 
 \paragraph{Easy Exercises}
 
-Easy exercises are essential for creating a good baseline of how the pose estimators should work. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to detect. The easy exercises can be seen in table \ref{tab:easy_exercises}. Example images of the exercises can be seen in figure \ref{fig:easy_exercises}.
+Easy exercises are essential for creating a good baseline of how the pose estimators should work. The exercises include no self-occlusion and are recorded in a standing position, which is generally the easiest position to estimate. The easy exercises can be seen in Table \ref{tab:easy_exercises}. Example images of the exercises can be seen in Figure \ref{fig:easy_exercises}.
 
 \begin{table}[htb]
   \caption[Easy Exercises]{The Easy exercises, E-1.00 through E-1.03. The easy exercises include both standing and sitting exercises.}
@@ -127,7 +127,7 @@ Easy exercises are essential for creating a good baseline of how the pose estima
 
 \paragraph{Medium Exercises}
 
-Exercises which are performed in a seated position are harder to detect since parts of the body are occluded. Medium exercises focus on exercises, which are performed in a seated position. The medium exercises can be seen in table \ref{tab:medium_exercises}. Example images of the exercises can be seen in figure \ref{fig:medium_exercises}.
+Exercises which are performed in a seated position are harder for HPE since parts of the body are occluded. Medium exercises focus on exercises, which are performed in a seated position. The medium exercises can be seen in Table \ref{tab:medium_exercises}. Example images of the exercises can be seen in Figure \ref{fig:medium_exercises}.
 
 \begin{table}[htb]
   \caption[Medium Exercises]{The Medium exercises, E-2.00 through E-2.03. The medium exercises are all in a sitting position.}
@@ -191,9 +191,9 @@ Exercises which are performed in a seated position are harder to detect since pa
 
 \paragraph{Difficult Exercises}
 
-Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world exercises.
+Difficult exercises are exercises that are performed in a standing position and involve leg movement. Leg joints are harder to detect than arm joints and therefore pose a greater challenge for pose estimators. These exercises will be in a seating position and with a difficult posture, such as leaning forward. The difference in posture aims at creating a realistic representation of real-world elderly and therapeutic exercises.
 
-Tölgyessy et al. found that facing away from the camera decreases the accuracy of HPE due to self-occlusion. \cite{HPEIsHard} Therefore, some of the exercises will be performed facing away from the camera. The difficult exercises can be seen in table \ref{tab:difficult_exercises}. Example images of the exercises can be seen in figure \ref{fig:difficult_exercises}.
+Tölgyessy et al.\cite{HPEIsHard} found that facing away from the camera decreases the accuracy of HPE due to self-occlusion. Therefore, some of the exercises will be performed facing away from the camera. The difficult exercises can be seen in Table \ref{tab:difficult_exercises}. Example images of the exercises can be seen in Figure \ref{fig:difficult_exercises}.
 
 \begin{table}[htb]
   \caption[Difficult Exercises]{The Difficult exercises, E-3.00 through E-3.02. The difficult exercises are all in a standing position.}
@@ -250,7 +250,7 @@ Tölgyessy et al. found that facing away from the camera decreases the accuracy 
       \caption[]{E-3.02}
       \label{fig:hard_2_1}
   \end{subfigure}
-  \caption[Difficult Exercises]{The three difficult exercises. (\ref{fig:hard_0_0} \ref{fig:hard_0_1}) Bowing toward the camera. (\ref{fig:hard_1_0}, \ref{fig:hard_1_1}) Raising the knee leaning forward. (\ref{fig:hard_2_0}, \ref{fig:hard_2_1}) Raising the knee leaning forward while sitting and facing away from the camera. Some of the exercises contain errors in the sample.}
+  \caption[Difficult Exercises]{The three difficult exercises. (\ref{fig:hard_0_0} \ref{fig:hard_0_1}) Bowing toward the camera. (\ref{fig:hard_1_0}, \ref{fig:hard_1_1}) Raising the knee leaning forward. (\ref{fig:hard_2_0}, \ref{fig:hard_2_1}) Raising the knee leaning forward while sitting and facing away from the camera. Some of the exercises depict errors that occur during HPE.}
   \label{fig:difficult_exercises}
 \end{figure}
 
