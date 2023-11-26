@@ -11,7 +11,6 @@ A method that uses RGB data in combination with errors for estimating the correc
 
 Other methods use point clouds which are extracted from depth data. Point clouds are a representation of depth in the environment. These are commonly used in autonomous driving to represent the real world more accurately and to describe complex objects in the environment. However, conventional feature extraction using CNNs proves difficult to be applied on point clouds since most point clouds are not ordered and not dense so locality cannot be ensured. PointCNN, proposed by Yangyan Li et al.\cite{li2018pointcnn}, combats this problem by learning an $\mathcal{X}$-Transformation to then extract the features using a generalised CNN.
 
-
 One of the uses of HPE is action recognition. Action recognition is the detection of pre-defined actions from different modalities. Seddik et al. compare different fusion methods for action recognition\cite{Seddik2017}. After detecting the features for each of the modalities, RGB data, Depth data and Pose data, they fuse the features using different methods. 
 
 In this thesis, we use RGB data, and depth data in addition to pose data to detect the errors created by human pose estimation. We are unaware of any previous work specifically focused on HPE error detection using DNNs.
@@ -21,5 +20,3 @@ In this thesis, we use RGB data, and depth data in addition to pose data to dete
 There are different datasets for human pose estimation encompassing different environments and modalities. The KITTI dataset is captured using LIDaR cameras and contains both depth and RGB data\cite{Geiger2012CVPR}. One of the largest datasets specifically for HPE and its applications is Human3.6M\cite{h36m_pami}. Human3.6M is a large-scale dataset containing RGB, Depth and Pose information.
 
 To our knowledge, there does not exist a dataset that specifically focuses on error detection in human pose estimation.
-
-\paragraph{Action Recognition}

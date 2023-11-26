@@ -1,19 +1,15 @@
 \section{FESDModelv1 Results}
 \label{sec:FESDModelv1_results}
 
-Initially, the FESDModelv1 was trained on low-resolution 64x64 pixels images, to improve training and predicting speeds. Further experiments were conducted on higher resolution images. In the next subsections, we present the results of both training variations. Note that the models trained on the low-resolution images were trained for 50 epochs, while when training on images with a higher resolution, the models were trained for 20 epochs due to time limitations.
-
-The results are compared to a baseline model, which solely predicts positive values.
+Initially, FESDModelv1 was trained on low-resolution 64x64 pixels images, to improve training and predicting speeds. Further experiments were conducted on higher resolution images. In the next subsections, we present the results of both training variations. Note that the models trained on the low-resolution images were trained for 50 epochs, while when training on images with a higher resolution, the models were trained for 20 epochs due to time limitations.
 
 \subsection{Results for low-resolution images}
 
 After training the FESDModelv1 on all four problem sets respectively, we obtained the results, as listed in Table \ref{tab:res_v1}. These are the performance results on the test data, after 50 epochs of training on low-resolution images.
 
-Note that the results of the Joint problem set have been omitted since it suffered from neural collapse. The low resolution of the input images prohibited a reasonable forming of the model.
+Note that the results of the Joint problem set have been omitted since it suffered from neural collapse. Here, the low resolution of the input images prohibited obtaining a reasonably performing FESDModelv1 model.
 
 \input{figures/Results_lo/v1/res_table.tex}
-
-FESDModelv1 achieves overall the best F1-Score of $0.77$ on the Half Body problem set. The quality of the model predicting the Half Body problem set is also reflected in the ROC curve as seen in Figure \ref{fig:hb_roc_v1}, with an area under the ROC curve (AUC) value of $0.76$ for the lower body and an AUC of $0.46$.
 
 \begin{figure}[!htbp]
   \centering
@@ -65,6 +61,7 @@ FESDModelv1 achieves overall the best F1-Score of $0.77$ on the Half Body proble
 Table \ref{tab:res_v1} shows the results of the testing after 20 epochs of training the models on the Body Parts and Joints problem set on higher-resolution images. The models of each of the two problem sets perform slightly better than the low-resolution images. However, a direct comparison is difficult to make, since the problem sets that are predicted by FESDModelv1 on low resolution images suffer from neural collapse on the higher resolution images and vice versa. When comparing the Body Parts problem set FESDModelv1 performs better, when trained on higher resolution images.
 
 \input{figures/results_hi/v1/res_table.tex}
+
 
 FESDModelv1 could be trained on the Joint problem set when it is trained with higher resolution input images, resulting in a model that obtains an F1-Score of 0.45. The model might perform better when trained for longer, however, due to time limitations this was not possible and is left for future work.
 

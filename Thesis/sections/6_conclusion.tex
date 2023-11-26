@@ -1,7 +1,7 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-In this thesis, a benchmark dataset for the evaluation of HPE error detectors has been constructed. HPE error detection is important for the improvement of the user experience several applications such as serious gaming as used by SilverFit.
+In this thesis, a benchmark dataset for the evaluation of HPE error detectors has been constructed. HPE error detection is important for the improvement of the user experience in several applications such as serious gaming as used by SilverFit.
 
 The following important research questions were addressed; (A) What errors occur during HPE and how can these errors be reproduced in a controlled manner? (B) How can a dataset of multiple modalities be captured, to analyse if the previous observations about problems during pose estimation are correct? (C) How can the previously captured and labelled dataset be used to train a model using multi-modal data to determine if a joint is faulty or not? 
 
@@ -11,31 +11,29 @@ The following important research questions were addressed; (A) What errors occur
   \item Finally, two different models, FESDModelv1, and FESDModelv2 were proposed with which preliminary HPE error detection experiments were conducted on the four datasets. As input the DNN models used RGB, Depth and pose Data. FESDModelv1 extracts the features of each modality individually, whereas FESDModelv2, combines the RGB, depth, and pose data into a single RGB image, which is passed into a pre-trained model for feature extraction.
 \end{enumerate}
 
-To interpret the results of the preliminary experiments a baseline has been created for each of the models. The baseline model predicts "Error", or positive, for all results. We see that all models outperform this baseline based on the F1 score.
+Preliminary experiments show that both models are able to attain positive results on several of the proposed problem sets. In our experiments FESDModelv2 did not perform better than FESDModelv1 on comparable problem sets, except for the Joint problem set with high resolution images, however, further experiments are necessary in order to be able to draw any final conclusions.
 
-In conclusion, the results of the preliminary experiments show that the development of a model for error detection using RGB, Depth and Pose Data is a possibility.
+In conclusion, the results of the preliminary experiments are promising and show that the development of a model for error detection using RGB, Depth and Pose Data is a viable possibility.
 
 \section{Contributions}
 
-In this thesis, Exercises were proposed, which challenge HPE at varying difficulty levels. Furthermore, a HPE dataset construction tool, FESDData was developed, which allows the capture of RGB, Depth and Pose data simultaneously and allows for the labelling of errors. Using that tool FESDDataset was captured and constructed which contains 300 frames for 13 Exercises which were recorded twice, resulting in a total of 7800 frames of multimodal HPE and RGB-D data. Finally, preliminary experiments were conducted to show the viability of model development for HPE error detection using the novel datasets.
+In this thesis, Exercises were proposed, which challenge HPE at varying difficulty levels. Furthermore, a HPE dataset construction tool, FESDData was designed and implemented, which allows the capture of RGB, Depth and Pose data simultaneously and allows for the labelling of errors. Using that tool FESDDataset was captured and constructed which contains 300 frames for 13 Exercises which were recorded twice, resulting in a total of 7800 frames of multimodal HPE and RGB-D data. Finally, preliminary experiments were conducted to show the viability of model development for HPE error detection using the novel datasets.
 
-The code of this thesis is available on GitHub\footnote{\url{https://github.com/LeonardoPohl/FESD}}. The repository is divided into two major parts, FESDData, which contains the C++ implementation of FESDData, FESDModel, which contains the implementation of the model, FESDModelv1 and FESDModelv2, as well as the Jupyter notebooks that were used to evaluate the dataset, to train and evaluate the model. FESDDataset, as well as the trained models, are available on request.  
+The code of this thesis is available on GitHub (\url{https://github.com/LeonardoPohl/FESD}). The repository is divided into two major parts, FESDData, which contains the C++ implementation of FESDData, FESDModel, which contains the implementation of the model, FESDModelv1 and FESDModelv2, as well as the Jupyter notebooks that were used to evaluate the dataset, to train and evaluate the model. FESDDataset, as well as the trained models, are available on request.  
 
 \section{Future work}
 \label{sec:future_work}
 
-To further improve the dataset and the model, FESDData and FESDDataset could be expanded to include the accurate position of the joints in the image. This would allow for the use of the dataset for error correction.
+To further improve the dataset and subsequently, the model, FESDData and FESDDataset could be expanded to include the accurate position of the joints in the image. This would allow for the use of the dataset for error correction.
 
 To improve the quality of the FESDModel, more data needs to be collected and labelled in different settings. The current dataset is limited to a single room with a single camera. To improve the model, the dataset needs to be expanded to include different scenes, different pieces of clothing and different camera angles. These additions might prevent the model from overfitting. Additionally, the model could be improved by using a different backbone, which is not as performant but more accurate, such as EfficientNet v2 M.
 
+Different architectures for a model could also be imagined. For example, the development of multiple smaller models, which are designed with a specific problem area in mind might offer an improvement over the existing models.
+
 \subsection{Possible applications}
 
-FESD might find several different areas of application in the future. Firstly, the trained model can be used to assist in developing games and other applications that utilise HPE. In its simplest application, it may be used to warn users of possible errors when the skeleton is not detected correctly. In more advanced cases the information provided by the model could be used to attempt to fix joints through joint position interpolation and prediction rather than using the faulty joint. Moreover, multiple human pose estimators could be considered resulting in an overall more robust HPE.
+FESD might find several different areas of application in the future. Firstly, the trained model can be used to assist in developing games and other applications that utilise HPE. In its simplest application, it may be used to warn users of possible errors when an error is detected by FESDModel. In more advanced cases the information provided by the model could be used to attempt to fix joints using for example joint position interpolation or prediction rather than using the faulty joint. Moreover, multiple human pose estimators could be considered resulting in an overall more robust HPE.
 
 Furthermore, if the model proves to have high accuracy for a specific use case, it could be used to train a better pose detector in the same way as it is proposed by Jo\~ao Carreira et al.\cite{IterativeErrorFeedback}.
 
 The dataset and the dataset recorder may also be used to further the development of FESDModel and it can also find application in other areas such as recording datasets for action recognition. The dataset in and of itself can be used for action detection. The exercises are predefined and can be recorded and automatically labelled by FESDData, thereby making it easy to record large amounts of data without requiring manual labelling.
-
-\noindent\rule[0.5pt]{\linewidth}{1pt}
-
-In conclusion, while the models that were developed in the scope of the thesis proved to be overfitting, the foundational work of the error assessment and FESDData can prove useful for future research in the area of error detection of HPE, an area with very limited research.

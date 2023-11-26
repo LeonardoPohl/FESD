@@ -93,14 +93,23 @@ def prepare_result_dir(result_dir):
   (result_dir / "confusion").mkdir(parents=True, exist_ok=True)
 
 all_results = os.listdir("./results")
-all_results
 
-result_is = [2, 0, 1, 5, 3, 4]
+result_is = [0, 4, 1, 5]
 
 for result_i in tqdm(result_is):
   result_version = all_results[result_i][:2]
+
   result_dir = Path(f"./figures/results_all/{all_results[result_i]}")
-  result_dir_general = Path(f"./figures/results/{all_results[result_i][:2]}")
+  if result_i in [0, 4]:
+    result_dir_general = Path(f"./figures/results_hi/{all_results[result_i][:2]}")
+    final_epoch = 22
+  elif result_i in [1, 5]:
+    result_dir_general = Path(f"./figures/results_lo/{all_results[result_i][:2]}")
+    final_epoch = 50
+  else:
+    result_dir_general = Path(f"./figures/results/{all_results[result_i][:2]}")
+    final_epoch = 50
+
 
   prepare_result_dir(result_dir)
   prepare_result_dir(result_dir_general)
@@ -113,10 +122,10 @@ for result_i in tqdm(result_is):
   df_model["mode_str"] = df_model["mode"].apply(lambda x: x.to_str())
   df_model.head()
 
-  tp = df_model["tp"]
-  tn = df_model["tn"]
-  fp = df_model["fp"]
-  fn = df_model["fn"]
+  tn = df_model["tp"]
+  tp = df_model["tn"]
+  fn = df_model["fp"]
+  fp = df_model["fn"]
 
   df_model["p"] = df_model["tp"] + df_model["fp"]
   df_model["n"] = df_model["tn"] + df_model["fn"]
@@ -126,7 +135,7 @@ for result_i in tqdm(result_is):
   coi_tf_pn = ["tp", "tn", "fp", "fn", "p", "n"]
 
 
-  # ### Training Evaluation
+  ### Training Evaluation
 
   # df_model_train = df_model#[df_model["train_test"] == "train"]
 
@@ -286,30 +295,68 @@ for result_i in tqdm(result_is):
 
   
 
-  # ### Test Evaluation
+  ### Test Evaluation
 
-  df_model_test = df_model[df_model["train_test"] == "test"][df_model["epoch"] == 50]
+  df_model_test = df_model[df_model["train_test"] == "test"][df_model["epoch"] == final_epoch]
+  print(result_version)
+  # confusion = df_model_test[["mode_str", "tp","tn","fp","fn"]].groupby("mode_str").sum()
+  # tn = confusion["tp"]
+  # tp = confusion["tn"]
+  # fn = confusion["fp"]
+  # fp = confusion["fn"]
+  d = {"tp":{}, "tn":{}, "fp":{}, "fn":{}}
+  for ps in ["full_body", "half_body", "body_parts", "joints"]:
+    df = df_model_test[df_model_test["mode_str"] == ps]
 
-  confusion = df_model_test[["mode_str", "tp","tn","fp","fn"]].groupby("mode_str").sum()
-  tp = confusion["tp"]
-  tn = confusion["tn"]
-  fp = confusion["fp"]
-  fn = confusion["fn"]
+    gts = ["No Error" if x[0] == 0 else "Error" for x in df["gts"].values.tolist()]
+    preds = ["No Error" if x[0] == 0 else "Error" for x in df["preds"].values.tolist()]
+    cm = confusion_matrix(gts, preds, labels=["No Error", "Error"])
+    
+    d["tn"][ps] = cm[0][0]
+    d["fp"][ps] = cm[0][1]
+    d["fn"][ps] = cm[1][0]
+    d["tp"][ps] = cm[1][1]
+    print("---")
+    print(ps)
+    print(cm)
+    print("---")
+
+    fig, axs = plt.subplots(1, 1, figsize=(7, 2.5), sharey=True)
+    
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["No Error", "Error"])
+    disp.plot(ax=axs, colorbar=False)
+    axs.grid(False)
+    fig.suptitle(f"{ps}\nConfusion Matrix")
+    plt.tight_layout()
+    fig.savefig(result_dir_general / f"{final_epoch	}_{ps}", dpi=300, bbox_inches='tight')
+    fig.savefig(result_dir / f"{final_epoch	}_{ps}", dpi=300, bbox_inches='tight')
+    plt.close()
+
+  df_confusion = pd.DataFrame(d)
+  tp = df_confusion["tp"]
+  fp = df_confusion["fp"]
+  tn = df_confusion["tn"]
+  fn = df_confusion["fn"]
+  print(f"{tn} {fp}\
+    {fn} {tp}")
 
   def fbeta(beta, precision, recall):
     return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
-
+     
   groups = df_model_test[coi].groupby("mode_str").mean()
   groups = groups.drop(["difficulty", "precision", "recall"], axis=1)
   groups["p/(p+n)"] *= 100
   precision = tp / (tp + fp)
   recall = tp / (tp + fn)
+  print(tp)
+  print(precision)
   groups["f0.5"] = fbeta(0.5, precision, recall)
   groups["f1"] = fbeta(1, precision, recall)
   groups["f2"] = fbeta(2, precision, recall)
   groups["binary_kappa"] = (2 * ((tp * tn) - (fn * fp))) / ((tp + fp) * (fp + tn) + (tp + fn) * (fn + tn))
+  groups = groups.fillna(0)
   groups = groups.sort_index(key=lambda x: [["full_body", "half_body", "body_parts", "joints"].index(i) for i in x])
-
+  
   table = groups.rename(columns={
           "p/(p+n)": "PPG",
           "accuracy": "Acc",
@@ -327,7 +374,7 @@ for result_i in tqdm(result_is):
   table = table.replace("mode_str","Problem Set")
   table = table.replace("lrrrrrr", "p{0.13\linewidth}"*7)
 
-  caption = '{' + f"The test results of FESDModel{result_version} after 50 epochs of training. Showing the Percentage of Positive Guesses (PPG), the Accuracy (Acc), the F-$\\beta$ score calculated with $\\beta = [1, 0.5, 2]$ (F1, F0.5, F2 respectively) and the Cohen\'s Kappa Coefficient ($\\kappa$)." + '}'
+  caption = '{' + f"The test results of FESDModel{result_version} after {final_epoch} epochs of training. Showing the Percentage of Positive Guesses (PPG), the Accuracy (Acc), the F-$\\beta$ score calculated with $\\beta = [1, 0.5, 2]$ (F1, F0.5, F2 respectively) and the Cohen\'s Kappa Coefficient ($\\kappa$)." + '}'
 
   table = f"""\
     \\begin{'{table}'}[!htbp]
@@ -343,13 +390,13 @@ for result_i in tqdm(result_is):
     f.write(table)
 
 
-  # #### Full Body Evaluation
-  # 
+  #### Full Body Evaluation
+  
   # The evaluation of the whole body as an error boolean.
 
-  # df_model_full_body_test = df_model_test[df_model_test["mode"] == Mode.FULL_BODY]
-  # df_model_full_body_test[coi].groupby(["difficulty"]).mean(numeric_only=True).sort_values(by="difficulty", ascending=False)
-  # df_model_full_body_test[coi_tf_pn + ["difficulty"]].groupby(["difficulty"]).sum()
+  df_model_full_body_test = df_model_test[df_model_test["mode"] == Mode.FULL_BODY]
+  df_model_full_body_test[coi].groupby(["difficulty"]).mean(numeric_only=True).sort_values(by="difficulty", ascending=False)
+  df_model_full_body_test[coi_tf_pn + ["difficulty"]].groupby(["difficulty"]).sum()
 
   # fig, axs = plt.subplots(1, 4, figsize=(7, 2.5), sharey=True)
   # fig.suptitle(f"Full Body")
@@ -368,38 +415,38 @@ for result_i in tqdm(result_is):
   # fig.savefig(result_dir_general / "confusion/full_difficulty.png", dpi=300, bbox_inches='tight')
   # fig.savefig(result_dir / "confusion/full_difficulty.png", dpi=300, bbox_inches='tight')
   # plt.close()
-  # def single_confusion(df, result_dir, ps_name, file_name):
-  #   fig, axs = plt.subplots(1, 1, figsize=(7, 2.5), sharey=True)
+  def single_confusion(df, result_dir, ps_name, file_name):
+    fig, axs = plt.subplots(1, 1, figsize=(7, 2.5), sharey=True)
 
-  #   gts = ["No Error" if x[0] == 0 else "Error" for x in df["gts"].values.tolist()]
-  #   preds = ["No Error" if x[0] == 0 else "Error" for x in df["preds"].values.tolist()]
-  #   cm = confusion_matrix(gts, preds, labels=["No Error", "Error"])
-  #   disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["No Error", "Error"])
-  #   disp.plot(ax=axs, colorbar=False)
+    gts = ["No Error" if x[0] == 0 else "Error" for x in df["gts"].values.tolist()]
+    preds = ["No Error" if x[0] == 0 else "Error" for x in df["preds"].values.tolist()]
+    cm = confusion_matrix(gts, preds, labels=["Error", "No Error"])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Error", "No Error"])
+    disp.plot(ax=axs, colorbar=False)
 
-  #   axs.grid(False)
+    axs.grid(False)
 
-  #   fig.suptitle(f"{ps_name}\nConfusion Matrix")
-  #   plt.tight_layout()
+    fig.suptitle(f"{ps_name}\nConfusion Matrix")
+    plt.tight_layout()
 
-  #   fig.savefig(result_dir_general / f"confusion/{file_name}", dpi=300, bbox_inches='tight')
-  #   fig.savefig(result_dir / f"confusion/{file_name}", dpi=300, bbox_inches='tight')
-  #   plt.close()
+    fig.savefig(result_dir_general / f"confusion/{file_name}", dpi=300, bbox_inches='tight')
+    fig.savefig(result_dir / f"confusion/{file_name}", dpi=300, bbox_inches='tight')
+    plt.close()
 
-  # single_confusion(df_model_full_body_test, result_dir,"Full Body", "full_together.png")
+  single_confusion(df_model_full_body_test, result_dir,"Full Body", "full_together.png")
   
 
-  # # #### Half Body Evaluation
-  # # 
-  # # The evaluation of the body split into two parts (upper and lower body), each as an error boolean.
+  # #### Half Body Evaluation
+  # 
+  # The evaluation of the body split into two parts (upper and lower body), each as an error boolean.
 
-  # # Split the data
+  # Split the data
 
-  # df_model_half_body_test = df_model_test[df_model_test["mode"] == Mode.HALF_BODY]
-  # df_model_half_body_test["joint_names"] = df_model_half_body_test["joint_id"].apply(lambda x: body_halves[x])
-  # df_model_half_body_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
-  # df_model_half_body_test[coi_tf_pn + ["joint_names", "difficulty"]].groupby(["joint_names", "difficulty"]).sum()
-  # single_confusion(df_model_half_body_test, result_dir, "Half Body", "half_together.png")
+  df_model_half_body_test = df_model_test[df_model_test["mode"] == Mode.HALF_BODY]
+  df_model_half_body_test["joint_names"] = df_model_half_body_test["joint_id"].apply(lambda x: body_halves[x])
+  df_model_half_body_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
+  df_model_half_body_test[coi_tf_pn + ["joint_names", "difficulty"]].groupby(["joint_names", "difficulty"]).sum()
+  single_confusion(df_model_half_body_test, result_dir, "Half Body", "half_together.png")
 
   # df = df_model_half_body_test
   # areas = body_halves
@@ -460,20 +507,20 @@ for result_i in tqdm(result_is):
   # #plt.tight_layout()
   # figure.savefig(result_dir_general / "confusion/body_halves_difficulty.png", dpi=300, bbox_inches='tight')
   # figure.savefig(result_dir / "confusion/body_halves_difficulty.png", dpi=300, bbox_inches='tight')
-  # plt.close()
+  plt.close()
 
-  # # #### Body part Evaluation
-  # # 
-  # # The evaluation of the body split into body_parts (Head, Torso, Left and Right Arm, and Left and Right Leg), each as an error boolean.
+  # #### Body part Evaluation
+  # 
+  # The evaluation of the body split into body_parts (Head, Torso, Left and Right Arm, and Left and Right Leg), each as an error boolean.
 
-  #   # Split the data
+    # Split the data
 
-  # df_model_body_parts_test = df_model_test[df_model_test["mode"] == Mode.BODY_PARTS]
-  # df_model_body_parts_test["joint_names"] = df_model_body_parts_test["joint_id"].apply(lambda x: body_parts[x])
-  # df_model_body_parts_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
-  # df_model_body_parts_test[coi_tf_pn + ["joint_names", "difficulty"]].groupby(["joint_names", "difficulty"]).sum()
+  df_model_body_parts_test = df_model_test[df_model_test["mode"] == Mode.BODY_PARTS]
+  df_model_body_parts_test["joint_names"] = df_model_body_parts_test["joint_id"].apply(lambda x: body_parts[x])
+  df_model_body_parts_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
+  df_model_body_parts_test[coi_tf_pn + ["joint_names", "difficulty"]].groupby(["joint_names", "difficulty"]).sum()
 
-  # single_confusion(df_model_body_parts_test, result_dir, "Body Parts", "body_parts_together.png")
+  single_confusion(df_model_body_parts_test, result_dir, "Body Parts", "body_parts_together.png")
 
   # rows = 2
   # cols = 3
@@ -533,20 +580,20 @@ for result_i in tqdm(result_is):
   # #plt.tight_layout()
   # figure.savefig(result_dir_general / "confusion/body_parts_difficulty.png", dpi=300, bbox_inches='tight')
   # figure.savefig(result_dir / "confusion/body_parts_difficulty.png", dpi=300, bbox_inches='tight')
-  # plt.close()
+  plt.close()
 
-  # # #### Joint Evaluation
-  # # 
-  # # The evaluation of the body as an error class.
+  # #### Joint Evaluation
+  # 
+  # The evaluation of the body as an error class.
 
-  #   # Split the data
+    # Split the data
 
-  # df_model_joints_test = df_model_test[df_model_test["mode"] == Mode.JOINTS]
-  # df_model_joints_test["joint_names"] = df_model_joints_test["joint_id"].apply(lambda x: joint_names[x])
-  # df_model_joints_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
-  # df_model_joints_test[coi_tf_pn + ["difficulty", "joint_names"]].groupby(["joint_names", "difficulty"]).sum()
-  # df_model_joints_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
-  # single_confusion(df_model_joints_test, result_dir, "Joints", "joints_together.png")
+  df_model_joints_test = df_model_test[df_model_test["mode"] == Mode.JOINTS]
+  df_model_joints_test["joint_names"] = df_model_joints_test["joint_id"].apply(lambda x: joint_names[x])
+  df_model_joints_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
+  df_model_joints_test[coi_tf_pn + ["difficulty", "joint_names"]].groupby(["joint_names", "difficulty"]).sum()
+  df_model_joints_test[coi + ["joint_names"]].groupby(["joint_names", "difficulty"]).mean(numeric_only=True)
+  single_confusion(df_model_joints_test, result_dir, "Joints", "joints_together.png")
 
   # rows = 5
   # cols = 4
@@ -607,31 +654,38 @@ for result_i in tqdm(result_is):
   # #plt.tight_layout()
   # figure.savefig(result_dir_general / "confusion/joints_difficulty.png", dpi=300, bbox_inches='tight')
   # figure.savefig(result_dir / "confusion/joints_difficulty.png", dpi=300, bbox_inches='tight')
-  # plt.close()
-  # plt.close()
-  # plt.close()
-  # plt.close()
-  # plt.close()
-  # plt.close()
+  plt.close()
+  plt.close()
+  plt.close()
+  plt.close()
+  plt.close()
+  plt.close()
 
   # # ## ROC
 
   # from sklearn.metrics import roc_curve, roc_auc_score
 
-  # def plot_roc_auc(y_true, y_score, obj, ax, i):
+  # def plot_roc_auc(y_true, y_score, obj, ax, i, name):
+
   #   if i == 0:
   #     ns_probs = [0 for _ in range(len(y_true))]
   #     ns_auc = roc_auc_score(y_true, ns_probs)
   #     ns_fpr, ns_tpr, _ = roc_curve(y_true, ns_probs, drop_intermediate=False)
   #     ax.plot(ns_fpr, ns_tpr, linestyle='--', label='No Skill', color="C0")
-  #   lr_auc = roc_auc_score(y_true, y_score)
-  #   # summarize scores
-  #   #print('ROC AUC=%.3f' % (lr_auc))
-  #   # calculate roc curves
-  #   lr_fpr, lr_tpr, thresh = roc_curve(y_true, y_score, drop_intermediate=False)
+
     
-  #   # plot the roc curve for the model
-  #   ax.plot(lr_fpr, lr_tpr, label=obj, color=f"C{i+1}")
+  #   if len(np.unique(y_true)) != 2:
+  #     print(f"Can't calculate ROC - {len(np.unique(y_true))} classes found needs exactly 2")
+  #   else:
+  #     lr_auc = roc_auc_score(y_true, y_score)
+  #     # summarize scores
+  #     print(f'{name} - ROC AUC={lr_auc:.3}')
+  #     # calculate roc curves
+  #     lr_fpr, lr_tpr, thresh = roc_curve(y_true, y_score, drop_intermediate=False)
+    
+  #     # plot the roc curve for the model
+  #     ax.plot(lr_fpr, lr_tpr, label=obj, color=f"C{i+1}")
+
   #   # axis labels
   #   ax.set_xlabel('False Positive Rate')
   #   ax.set_ylabel('True Positive Rate')
@@ -642,11 +696,11 @@ for result_i in tqdm(result_is):
   # fig, ax = plt.subplots()
   # df_fb = df_model[df_model["mode"] == Mode.FULL_BODY]
   # df_fb = df_fb[df_fb["train_test"] == "test"]
-  # df_fb = df_fb[df_fb["epoch"] == 50]
+  # df_fb = df_fb[df_fb["epoch"] == final_epoch]
   # y_true = (df_fb["gts"].apply(lambda x: int(x[0]))).to_list()
   # y_score = (df_fb["confidences"].apply(lambda x: x[0])).to_list()
 
-  # plot_roc_auc(y_true, y_score, "Full Body", ax, 0)
+  # plot_roc_auc(y_true, y_score, "Full Body", ax, 0, "Full Body")
   # fig = plt.gcf()
   # fig.savefig(result_dir_general / "roc/fb.png", dpi=300, bbox_inches='tight')
   # fig.savefig(result_dir / "roc/fb.png", dpi=300, bbox_inches='tight')
@@ -659,11 +713,11 @@ for result_i in tqdm(result_is):
   #   df_hb = df_model[df_model["mode"] == Mode.HALF_BODY]
   #   df_hb = df_hb[df_hb["joint_id"] == i]
   #   df_hb = df_hb[df_hb["train_test"] == "test"]
-  #   df_hb = df_hb[df_hb["epoch"] == 50]
-  #   y_true = (df_hb["gts"].apply(lambda x: int(x[0]))).to_numpy()
+  #   df_hb = df_hb[df_hb["epoch"] == 22]
+  #   y_true = (df_hb["gts"].apply(lambda x: int(x[0] != 0))).to_numpy()
   #   y_score = (df_hb["confidences"].apply(lambda x: x[0])).to_numpy()
 
-  #   plot_roc_auc(y_true, y_score, obj, ax, i)
+  #   plot_roc_auc(y_true, y_score, obj, ax, i, "Half Body - " + obj)
 
   # fig = plt.gcf()
   # fig.savefig(result_dir_general / "roc/hb.png", dpi=300, bbox_inches='tight')
@@ -677,11 +731,11 @@ for result_i in tqdm(result_is):
   #   df = df_model[df_model["mode"] == Mode.BODY_PARTS]
   #   df = df[df["joint_id"] == i]
   #   df = df[df["train_test"] == "test"]
-  #   df = df[df["epoch"] == 50]
-  #   y_true = (df["gts"].apply(lambda x: int(x[0]))).to_numpy()
+  #   df = df[df["epoch"] == final_epoch]
+  #   y_true = (df["gts"].apply(lambda x: int(x[0] != 0))).to_numpy()
   #   y_score = (df["confidences"].apply(lambda x: x[0])).to_numpy()
-
-  #   plot_roc_auc(y_true, y_score, obj, ax, i)
+    
+  #   plot_roc_auc(y_true, y_score, obj, ax, i, "Body Part - " + obj)
     
   # fig.savefig(result_dir_general / "roc/bp.png", dpi=300, bbox_inches='tight')
   # fig.savefig(result_dir / "roc/bp.png", dpi=300, bbox_inches='tight')
@@ -694,11 +748,11 @@ for result_i in tqdm(result_is):
   #   df = df_model[df_model["mode"] == Mode.JOINTS]
   #   df = df[df["joint_id"] == i]
   #   df = df[df["train_test"] == "test"]
-  #   df = df[df["epoch"] == 50]
+  #   df = df[df["epoch"] == final_epoch]
   #   y_true = (df["gts"].apply(lambda x: int(x[0] != 0))).to_numpy()
   #   y_score = (df["confidences"].apply(lambda x: x[0])).to_numpy()
 
-  #   plot_roc_auc(y_true, y_score, obj, ax, i)
+  #   plot_roc_auc(y_true, y_score, obj, ax, i, "Joint - " + obj)
     
   # plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=3)
   # fig = plt.gcf()

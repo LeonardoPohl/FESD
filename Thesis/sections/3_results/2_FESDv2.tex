@@ -8,9 +8,11 @@ The results of the testing after 50 epochs of training for FESDModelv2 on low-re
 
 The results of the Body Part and Joint problem set have been omitted since the low resolution of the input images prohibited reasonable training for the datasets.
 
+\begin{center}    
 \input{figures/Results_lo/v2/res_table.tex}
+\end{center}
 
-The best results are achieved on the Half Body problem set with an F1 Score of $0.50$. Similar to FESDModelv1, FESDModelv2 achieves the best results when predicting the error label for the lower half of the body. This is also reflected in the area under the ROC curve. The AUC of the lower body prediction is $0.49$ while the AUC of the upper body is $0.42$.
+Note that, FESDModelv2, when trained on low resolution images obtains F1 Scores of $0.22$ and $0.50$, respectively, which are not good results as a trivial model that always predicts positive values would achieve already better F1 Scores of $0.43$ and $0.60$, respectively.
 
 \begin{figure}[htbp]
   \centering
@@ -53,9 +55,11 @@ The best results are achieved on the Half Body problem set with an F1 Score of $
 
 The results of the testing after 20 epochs of training for FESDModelv2 on 200x200 pixels resolution images of the Full Body, Half Body, Body Parts and Joints problem sets, respectively, as listed in Table \ref{tab:hi_res_v2}.
 
+\begin{center}    
 \input{figures/results_hi/v2/res_table.tex}
+\end{center}    
 
-FESDModelv2 achieves the best F1-Score of all models when trained on images with a higher resolution. The best results are achieved on the Half Body problem set with an F1-Score of 0.71.
+FESDModelv2 achieves better F1-Score FESDModelv1 for the Joint problem set of all models when trained on images with a higher resolution. Furthermore, very promising results are achieved on the Half Body problem set with an F1-Score of 0.71. Finally, for the Full and Half Body problem sets higher F1 scores are obtained when using high resolution images.
 
 \begin{figure}[htbp]
   \centering
